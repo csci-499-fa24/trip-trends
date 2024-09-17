@@ -57,7 +57,7 @@ app.post("/create-trip", async (req, res) => {
     try {
         // create a model instance 
         const newTrip = await aTrip.create({name, start_date, end_date, budget});
-        res.json(newTrip);
+        res.json({data: newTrip});
     } catch (err) {
         console.error(err);
     }
@@ -67,7 +67,7 @@ app.post("/create-trip", async (req, res) => {
 app.get("/get-trips", async (req, res) => {
     try {
         const allTrips = await aTrip.findAll();
-        res.json(allTrips);
+        res.json({data: allTrips});
     } catch (err) {
         console.error(err);
     }
