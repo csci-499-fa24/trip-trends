@@ -73,8 +73,6 @@ app.get("/get-trips", async (req, res) => {
     }
 });
 
-aTrip.sync({force: true});
-
 const port = process.env.PORT || 8080;
 app.listen(port, () => {
     console.log(`Server started on port ${port}`);
