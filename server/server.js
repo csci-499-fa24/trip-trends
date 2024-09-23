@@ -31,7 +31,7 @@ sequelize.authenticate().then(() => {
     });
 
 // db schema to add a trip
-const aTrip = sequelize.define("trips", {
+const aTrip = sequelize.define("all_trips", {
     trip_id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -58,7 +58,7 @@ const aTrip = sequelize.define("trips", {
         allowNull: true,
     }
 }, {
-    tableName: 'trips',
+    tableName: 'all_trips',
     timestamps: false
 });
 
@@ -102,7 +102,7 @@ const Expenses = sequelize.define('expense', {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'trips',
+            model: 'all_trips',
             key: 'trip_id',
         },
     },
@@ -141,7 +141,7 @@ const Expenses = sequelize.define('expense', {
 
 
 //db schema to add a shared trip
-const addTrip = sequelize.define('addstrips', {
+const sharedTrip = sequelize.define('sharedtrips', {
     user_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -154,22 +154,22 @@ const addTrip = sequelize.define('addstrips', {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'trips',
+            model: 'all_trips',
             key: 'trip_id',
         },
     },
 }, {
-    tableName: 'addstrips',
+    tableName: 'sharedtrips',
     timestamps: false,
 });
 User.belongsToMany(aTrip, {
-    through: addTrip,
+    through: sharedTrip,
     foreignKey: 'user_id',
     otherKey: 'trip_id',
 });
 
 aTrip.belongsToMany(User, {
-    through: addTrip,
+    through: sharedTrip,
     foreignKey: 'trip_id',
     otherKey: 'user_id',
 });
@@ -181,7 +181,7 @@ const TLocation = sequelize.define('tlocation', {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'trips',
+            model: 'all_trips',
             key: 'trip_id',
         },
     },
@@ -201,7 +201,7 @@ TLocation.belongsTo(aTrip, { foreignKey: 'trip_id' });
 
 
 // post new trip data into the db
-app.post("/create-trip", async (req, res) => {
+app.post("/api/create-trip", async (req, res) => {
     const { name, start_date, end_date, budget, image } = req.body;
     try {
         // create a model instance 
@@ -213,7 +213,7 @@ app.post("/create-trip", async (req, res) => {
 });
 
 // get all trip data in the db
-app.get("/get-trips", async (req, res) => {
+app.get("/api/get-trips", async (req, res) => {
     try {
         const allTrips = await aTrip.findAll();
         res.json({ data: allTrips });
@@ -223,7 +223,7 @@ app.get("/get-trips", async (req, res) => {
 });
 
 // post new user data into the db
-app.post("/create-user", async (req, res) => {
+app.post("/api/create-user", async (req, res) => {
     const { user_id, fname, lname, email, password } = req.body;
     try {
         // create a model instance 
@@ -235,7 +235,7 @@ app.post("/create-user", async (req, res) => {
 });
 
 // get all users data in the db
-app.get("/get-users", async (req, res) => {
+app.get("/api/get-users", async (req, res) => {
     try {
         const allUsers = await User.findAll();
         res.json({ data: allUsers });
@@ -245,7 +245,7 @@ app.get("/get-users", async (req, res) => {
 });
 
 //  post new expense to the db
-app.post("/create-expense", async (req, res) => {
+app.post("/api/create-expense", async (req, res) => {
     const { expense_id, trip_id, name, amount, category, currency, posted, notes, image } = req.body;
     try {
         // create a model instance 
@@ -257,7 +257,7 @@ app.post("/create-expense", async (req, res) => {
 });
 
 // get all expenses from db
-app.get("/get-expenses", async (req, res) => {
+app.get("/api/get-expenses", async (req, res) => {
     try {
         const expenses = await Expenses.findAll();
         res.json({ data: expenses });
@@ -267,11 +267,11 @@ app.get("/get-expenses", async (req, res) => {
 });
 
 // post new shared trip to db
-app.post("/create-sharedTrips", async (req, res) => {
+app.post("/api/create-shared-trips", async (req, res) => {
     const { user_id, trip_id } = req.body;
     try {
         // create a model instance 
-        const newSharedTrip = await addTrip.create({ user_id, trip_id });
+        const newSharedTrip = await sharedTrip.create({ user_id, trip_id });
         res.json({ data: newSharedTrip });
     } catch (err) {
         console.error(err);
@@ -279,9 +279,9 @@ app.post("/create-sharedTrips", async (req, res) => {
 });
 
 // get all shared trips from db
-app.get("/get-sharedTrips", async (req, res) => {
+app.get("/api/get-shared-trips", async (req, res) => {
     try {
-        const sharedTrips = await addTrip.findAll();
+        const sharedTrips = await sharedTrip.findAll();
         res.json({ data: sharedTrips });
     } catch (err) {
         console.error(err);
@@ -289,7 +289,7 @@ app.get("/get-sharedTrips", async (req, res) => {
 });
 
 // post a trip location in db
-app.post("/create-tlocation", async (req, res) => {
+app.post("/api/create-tlocation", async (req, res) => {
     const { trip_id, location } = req.body;
     try {
         // create a model instance 
@@ -301,7 +301,7 @@ app.post("/create-tlocation", async (req, res) => {
 });
 
 // get all trip locations from db
-app.get("/get-tlocations", async (req, res) => {
+app.get("/api/get-tlocations", async (req, res) => {
     try {
         const tlocation = await TLocation.findAll();
         res.json({ data: tlocation });
