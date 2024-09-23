@@ -34,9 +34,9 @@ export default function GetTrips() {
   const [message, setMessage] = useState("Loading")
   const [trips, setTripData] = useState([])
 
-  console.log(process.env.NEXT_PUBLIC_SERVER_URL + "/get-trips")
+  console.log(process.env.NEXT_PUBLIC_SERVER_URL + "/api/get-trips")
   useEffect(() => {
-    fetch(process.env.NEXT_PUBLIC_SERVER_URL + "/get-trips").then(
+    fetch(process.env.NEXT_PUBLIC_SERVER_URL + "/api/get-trips").then(
       response => response.json()
     ).then(
       data => {
