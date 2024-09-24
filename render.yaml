@@ -1,0 +1,42 @@
+services:
+  # Database service
+  - type: database
+    name: postgres
+    plan: free
+    databaseName: trip_trends_data # Name of the db available on Render
+    user: root         
+    envVars:
+      - key: POSTGRES_PASSWORD
+        fromSecret: POSTGRES_PASSWORD # Reference the environment var defined in Render
+  
+  # Server service
+  - type: web
+    name: backend
+    env: docker
+    runtime: docker
+    plan: free
+    branch: main
+    build:
+      dockerfilePath: ./server/Dockerfile
+      context: ./server
+    ports:
+      - 8080
+    envVars:
+      - key: DB_URL
+        fromSecret: DB_URL
+
+  # Client service
+  - type: web
+    name: frontend
+    env: docker
+    runtime: docker
+    plan: free
+    branch: main
+    build:
+      dockerfilePath: ./client/Dockerfile # Path to Dockerfile
+      context: ./client
+    ports:
+      - 3000
+    envVars:
+      - key: NEXT_PUBLIC_SERVER_URL
+        fromSecret: NEXT_PUBLIC_SERVER_URL # Points to the server
