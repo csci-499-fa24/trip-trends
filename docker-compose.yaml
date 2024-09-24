@@ -9,6 +9,7 @@ services:
       - 5432:5432
     env_file:
       - ./server/.env
+
   # Server service
   backend:
     image: backend-service
@@ -21,7 +22,8 @@ services:
       - 8080:8080
     depends_on:
       - postgres
-    # Client service
+      
+  # Client service
   frontend:
     image: frontend-service
     container_name: frontend
