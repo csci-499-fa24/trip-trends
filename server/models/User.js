@@ -24,10 +24,14 @@ const User = sequelize.define('user', {
         //     isEmail: true
         // }
     },
-    password: {
+    image: {
         type: DataTypes.STRING(255),
-        allowNull: false
+        allowNull: true
     }
+    // password: {
+    //     type: DataTypes.STRING(255),
+    //     allowNull: false
+    // }
 }, {
     tableName: 'users',
     timestamps: false

@@ -19,6 +19,9 @@ const Trip = sequelize.define("all_trips", {
     end_date: {
         type: DataTypes.DATEONLY,
         allowNull: false
+        // validate: {
+        //     isAfter: this.start_date
+        // }
     },
     budget: {
         type: DataTypes.DOUBLE,

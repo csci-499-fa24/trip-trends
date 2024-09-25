@@ -3,7 +3,7 @@ const sequelize = require('../config/db');
 const Trip = require('./Trip');
 
 // db schema to add a trip location
-const Location = sequelize.define('trip_locations', {
+const TripLocation = sequelize.define('TripLocation', {
     trip_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -19,11 +19,11 @@ const Location = sequelize.define('trip_locations', {
 }, {
     tableName: 'tlocation',
     timestamps: false,
-
     underscored: true
 });
-Location.removeAttribute('id');
-Trip.hasMany(Location, { foreignKey: 'trip_id' });
-Location.belongsTo(Trip, { foreignKey: 'trip_id' });
 
-module.exports = Location;
+TripLocation.removeAttribute('id');
+Trip.hasMany(TripLocation, { foreignKey: 'trip_id' });
+TripLocation.belongsTo(Trip, { foreignKey: 'trip_id' });
+
+module.exports = TripLocation;

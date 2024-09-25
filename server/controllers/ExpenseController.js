@@ -9,6 +9,8 @@ const createExpense = async (req, res) => {
         res.json({ data: newExpense });
     } catch (err) {
         console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
+
     }
 };
 
@@ -19,6 +21,7 @@ const getExpenses = async (req, res) => {
         res.json({ data: allExpenses });
     } catch (err) {
         console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
     }
 };
 
