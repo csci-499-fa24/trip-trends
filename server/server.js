@@ -82,9 +82,9 @@ const User = sequelize.define('user', {
         unique: true,
         allowNull: false
     },
-    password: {
+    image: {
         type: DataTypes.STRING(255),
-        allowNull: false
+        allowNull: true
     }
 }, {
     tableName: 'users',
