@@ -2,13 +2,14 @@ const User = require("../models/User");
 
 // post new user data into the db
 const createUser = async (req, res) => {
-    const { user_id, fname, lname, email, password } = req.body;
+    const { user_id, fname, lname, email, image} = req.body;
     try {
         // create a model instance 
-        const newUser = await User.create({ user_id, fname, lname, email, password });
-        res.json({ data: newUser });
+        const newUser = await User.create({ user_id, fname, lname, email, image });
+        res.status(201).json({ data: newUser });
     } catch (err) {
         console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
     }
 };
 
@@ -19,6 +20,7 @@ const getUsers = async (req, res) => {
         res.json({ data: allUsers });
     } catch (err) {
         console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
     }
 };
 

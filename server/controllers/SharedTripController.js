@@ -6,9 +6,10 @@ const createSharedTrip = async (req, res) => {
     try {
         // create a model instance 
         const newSharedTrip = await SharedTrip.create({ user_id, trip_id });
-        res.json({ data: newSharedTrip });
+        res.status(201).json({ data: newSharedTrip });
     } catch (err) {
         console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
     }
 };
 
@@ -19,6 +20,7 @@ const getSharedTrips = async (req, res) => {
         res.json({ data: allSharedTrips });
     } catch (err) {
         console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
     }
 };
 

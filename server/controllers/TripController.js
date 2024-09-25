@@ -1,5 +1,4 @@
 const Trip = require('../models/Trip');
-const { get } = require('../routes/userRoutes');
 
 // post new trip data into the db
 const createTrip = async (req, res) => {
@@ -7,9 +6,11 @@ const createTrip = async (req, res) => {
     try {
         // create a model instance 
         const newTrip = await Trip.create({ name, start_date, end_date, budget, image });
-        res.json({ data: newTrip });
+        res.status(201).json({ data: newTrip });
     } catch (err) {
         console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
+
     }
 };
 
@@ -20,6 +21,7 @@ const getTrips = async (req, res) => {
         res.json({ data: allTrips });
     } catch (err) {
         console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
     }
 };
 
