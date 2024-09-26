@@ -22,7 +22,6 @@ function Signup() {
                 // navigate to home page
             })
             .catch(error => {
-                console.log(token)
                 console.error(error)
                 // toast to user to say there's an error
             });
