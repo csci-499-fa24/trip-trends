@@ -14,7 +14,7 @@ function Signup() {
     const handleLoginSuccess = async (response) => {
         const token = {token: response.credential}
 
-        axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/auth/google`, token)
+        axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/auth/google`, token)
             .then(response => {
                 console.log(response)
                 window.location.href = '/homepage'; 
