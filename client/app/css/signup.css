@@ -12,8 +12,30 @@
 .logo {
     background-color: black;
     height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .signIn {
+    display: flex;
+    flex-direction: column; 
+    justify-content: center;
+    align-items: center; 
     margin-left: 10vw;
+    height: 100vh;
+}
+
+.signInGoogle {
+    margin-bottom: 2vw;
+}
+
+.welcome {
+    margin-bottom: 1vw;
+    margin-top: 2vw;
+}
+
+.description {
+    margin-bottom: 2vw;
+    margin-top: 1vw;
 }
