@@ -18,14 +18,15 @@ const inriaSans = Inria_Sans({
 function Signup() {
 
     const handleLoginSuccess = async (response) => {
-        const token = { token: response.credential }
+        const token = response.credential
+        const tokenBody = { token: response.credential }
 
-        axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/auth/google`, token)
+        axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/auth/google`, tokenBody)
             .then(response => {
                 console.log(response)
+                localStorage.setItem("token", token);
                 window.location.href = '/homepage';
                 // toast to tell user success
-                // navigate to home page
             })
             .catch(error => {
                 console.error(error)
