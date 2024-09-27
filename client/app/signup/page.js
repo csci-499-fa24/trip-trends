@@ -7,6 +7,8 @@ import logo from '../img/Logo.png'
 import '../css/signup.css'
 import axios from 'axios';
 import { Inria_Sans } from 'next/font/google';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const googleID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
@@ -24,23 +26,26 @@ function Signup() {
         axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/auth/google`, tokenBody)
             .then(response => {
                 console.log(response)
+                toast.success("Sign in successful!");
                 localStorage.setItem("token", token);
-                window.location.href = '/homepage';
-                // toast to tell user success
+                setTimeout(() => {
+                    window.location.href = '/homepage';
+                }, 2000);
             })
             .catch(error => {
                 console.error(error)
-                // toast to user to say there's an error
+                toast.error("Sign in failed. Please try again.");
             });
     };
 
     const handleLoginFailure = (error) => {
         console.error('Signup failed:', error);
-        // toast to user to say there's an error
+        toast.error("Sign in failed. Please try again.");
     };
 
     return (
         <GoogleOAuthProvider clientId={googleID}>
+            <ToastContainer hideProgressBar={true} />
             <div className={`container text-center ${inriaSans.className}`}>
                 <div className='row'>
                     <div className='col-md-6 logo'>
