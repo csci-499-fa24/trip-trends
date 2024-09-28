@@ -1,0 +1,9 @@
+.logout {
+    background-color: green;
+    color: white;
+    border: none; 
+    padding: 10px 20px;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}
