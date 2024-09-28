@@ -8,6 +8,7 @@ import '../css/signup.css'
 import axios from 'axios';
 import { Inria_Sans } from 'next/font/google';
 import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const googleID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
