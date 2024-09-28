@@ -4,5 +4,6 @@
 /client/.gitignore
 /server/node_modules
 /server/.env
+.DS_Store
 .gitignore
 .env
