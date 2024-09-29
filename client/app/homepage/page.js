@@ -41,6 +41,10 @@ function homepage() {
                 <div className="right-rectangle"></div>
             </header>
 
+            <GoogleOAuthProvider clientId={googleID}>
+                <button onClick={handleLogout} className='logout'>Logout</button>
+            </GoogleOAuthProvider>
+
             {/* Welcome Section */}
             <div className="welcome-section">
                 <h1>Welcome Back, [Name]!</h1>
@@ -66,10 +70,6 @@ function homepage() {
                 <p>No trips available for now.</p>
             </div>
         </div>
-
-        <GoogleOAuthProvider clientId={googleID}>
-            <button onClick={handleLogout} className='logout'>Logout</button>
-        </GoogleOAuthProvider>
     );
 }
 
