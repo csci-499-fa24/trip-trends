@@ -1,3 +1,58 @@
+=======
+/* Homepage.css */
+.dashboard {
+    width: 100%;
+    font-family: Arial, sans-serif;
+}
+
+.header {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #FFFFFF;
+    height: 150px;
+}
+
+.left-rectangle, .right-rectangle {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: black;
+    height: 25px; /* Height of the rectangle */
+}
+
+.left-rectangle {
+    left: 0;
+    width: 690px; /* Width of the left rectangle */
+}
+
+.right-rectangle {
+    right: 0;
+    width: 690px; /* Width of the right rectangle */
+}
+
+.welcome-section {
+    text-align: left;
+    padding: 20px;
+    background-color: #FFFFFF;
+    color: black;
+}
+
+.recent-trips {
+    padding: 10px;
+    background-color: black;
+    color: white;
+    height: auto; /* Adjusted for dynamic content */
+}
+
+.trip {
+    margin-bottom: 10px;
+    border: 1px solid white;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent white */
+}
+
 .logout {
     background-color: green;
     color: white;
@@ -7,3 +62,4 @@
     right: 20px;
     top: 20px;
 }
+
