@@ -8,6 +8,7 @@ import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { GoogleOAuthProvider, googleLogout } from '@react-oauth/google';
 
 // Import your custom pin icon
 import pinIcon from '../img/Pin.png'; // Change the path as needed
@@ -20,7 +21,15 @@ const custompinIcon = L.icon({
     popupAnchor: [1, -34], // Point from which the popup should open relative to the iconAnchor
 });
 
+const googleID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+
 function homepage() {
+    const handleLogout = () => {
+          googleLogout();
+          localStorage.removeItem("token");
+          window.location.href = '/signup';
+    };
+  
     return (
         <div className="dashboard">
             {/* Header Section */}
@@ -31,6 +40,10 @@ function homepage() {
                 <div className="left-rectangle"></div>
                 <div className="right-rectangle"></div>
             </header>
+
+            <GoogleOAuthProvider clientId={googleID}>
+                <button onClick={handleLogout} className='logout'>Logout</button>
+            </GoogleOAuthProvider>
 
             {/* Welcome Section */}
             <div className="welcome-section">
