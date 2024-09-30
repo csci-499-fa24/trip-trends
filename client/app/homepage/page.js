@@ -25,24 +25,28 @@ const googleID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
 function homepage() {
     const handleLogout = () => {
-          googleLogout();
-          localStorage.removeItem("token");
-          window.location.href = '/signup';
+        googleLogout();
+        localStorage.removeItem("token");
+        if (typeof window !== 'undefined') {
+            window.location.href = '/signup';
+        }
     };
     
     const [userName, setUserName] = useState("[NAME]");
 
     const handleToken = () => {
-        const token = localStorage.getItem("token"); // signed in user's access token
-        if (token) {
-            const userCredential = jwtDecode(token);
-            const userName = userCredential.given_name;
-            console.log(userCredential);
-            setUserName(userName);
-        } else {
-            // user is not authenticated
-            console.log("Token not found. Redirecting to sign in page.");
-            window.location.href = '/signin';
+        if (typeof window !== 'undefined') {
+            const token = localStorage.getItem("token"); // signed in user's access token
+            if (token) {
+                const userCredential = jwtDecode(token);
+                const userName = userCredential.given_name;
+                console.log(userCredential);
+                setUserName(userName);
+            } else {
+                // user is not authenticated
+                console.log("Token not found. Redirecting to sign in page.");
+                window.location.href = '/signin';
+            }
         }
     }
 
