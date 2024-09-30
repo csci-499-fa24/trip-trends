@@ -1,4 +1,3 @@
-=======
 /* Homepage.css */
 .dashboard {
     width: 100%;
@@ -34,7 +33,7 @@
 
 .welcome-section {
     text-align: left;
-    padding: 20px;
+    padding: 10px;
     background-color: #FFFFFF;
     color: black;
 }
@@ -54,7 +53,7 @@
 }
 
 .logout {
-    background-color: green;
+    background-color: #134a09;
     color: white;
     border: none; 
     padding: 10px 20px;
