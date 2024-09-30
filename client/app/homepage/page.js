@@ -24,13 +24,25 @@ const custompinIcon = L.icon({
 const googleID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
 function homepage() {
+    // states
+    const [userName, setUserName] = useState("[NAME]"); 
+    const [trips, setTrips] = useState([]);
+    const [expandedTripId, setExpandedTripId] = useState(null);
+    const [isPopUpVisible, setPopUpVisible] = useState(false);
+
+    const [newTripData, setNewTripData] = useState({
+        trip_name: '',
+        start_date: '',
+        end_date: '',
+        budget: '',
+        trip_locations: ''
+    });
+
     const handleLogout = () => {
           googleLogout();
           localStorage.removeItem("token");
           window.location.href = '/signup';
     };
-    
-    const [userName, setUserName] = useState("[NAME]");
 
     const handleToken = () => {
         const token = localStorage.getItem("token"); // signed in user's access token
@@ -46,12 +58,6 @@ function homepage() {
         }
     }
 
-    React.useEffect(() => {
-        handleToken();
-    }, []); 
-
-    const [trips, setTrips] = useState([]);
-    const [expandedTripId, setExpandedTripId] = useState(null); // State for the expanded trip
     const fetchTrips = async () => {
         try {
             const response = await axios.get('http://localhost:8080/api/trips/get-trips');
@@ -63,8 +69,10 @@ function homepage() {
         }
     };
     useEffect(() => {
+        handleToken();
         fetchTrips(); // Call the function to fetch trips on component mount
     }, []);
+
     // Toggle the expanded state of a trip
     const toggleTripDetails = (tripId) => {
         setExpandedTripId(prevId => (prevId === tripId ? null : tripId));
@@ -75,7 +83,7 @@ function homepage() {
             {/* Header Section */}
             <header className="header">
                 <div className="logo-container">
-                    <Image src={logo} alt="Logo" width={300} height={300} />
+                    <Image src={logo} alt="Logo" width={300} height={300}/>
                 </div>
                 <div className="left-rectangle"></div>
                 <div className="right-rectangle"></div>
@@ -85,13 +93,17 @@ function homepage() {
                 <button onClick={handleLogout} className='logout'>Logout</button>
             </GoogleOAuthProvider>
 
-            {/* Welcome Section */}
+            {/* Welcome section */}
             <div className="welcome-section">
                 <h1>Welcome Back, {userName}!</h1>
+                <br></br>
+                <button onClick={() => isFormVisible(true)} className='create-trip'>Create a Trip</button>
+                <br></br>
+                <br></br>
                 <p>See everywhere you've gone:</p>
             </div>
 
-             {/* Map Section */}
+             {/* Map section */}
              <MapContainer center={[40.7128, -74.0060]} zoom={13} style={{ height: '400px', width: '100%' }}>
                 <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -113,9 +125,10 @@ function homepage() {
                 ))}
             </MapContainer>
 
-           {/* Recent Trips Section */}
+           {/* Recent trips section */}
            <div className="recent-trips">
                 <h2>Recent Trips</h2>
+                <br></br>
                 {trips.length === 0 ? (
                     <p>Loading trips...</p>
                 ) : (
