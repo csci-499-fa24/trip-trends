@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import logo from '../img/Logo.png';
 import '../css/homepage.css';
@@ -10,11 +10,8 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { GoogleOAuthProvider, googleLogout } from '@react-oauth/google';
 import { GoogleLogin } from '@react-oauth/google';
-import { useState } from 'react';
 import { jwtDecode } from "jwt-decode";
-
-// Import your custom pin icon
-import pinIcon from '../img/Pin.png'; // Change the path as needed
+import pinIcon from '../img/Pin.png';
 
 // Create a custom icon
 const custompinIcon = L.icon({
@@ -32,7 +29,7 @@ function homepage() {
           localStorage.removeItem("token");
           window.location.href = '/signup';
     };
-
+    
     const [userName, setUserName] = useState("[NAME]");
 
     const handleToken = () => {
@@ -52,7 +49,27 @@ function homepage() {
     React.useEffect(() => {
         handleToken();
     }, []); 
-  
+
+    const [trips, setTrips] = useState([]);
+    const [expandedTripId, setExpandedTripId] = useState(null); // State for the expanded trip
+    const fetchTrips = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/trips/get-trips');
+            console.log(response.data); // Log the response to see its structure
+            setTrips(response.data.data); // Access the data property
+        } catch (err) {
+            console.error(err);
+            setTrips([]); // Set trips to an empty array in case of error
+        }
+    };
+    useEffect(() => {
+        fetchTrips(); // Call the function to fetch trips on component mount
+    }, []);
+    // Toggle the expanded state of a trip
+    const toggleTripDetails = (tripId) => {
+        setExpandedTripId(prevId => (prevId === tripId ? null : tripId));
+    };
+
     return (
         <div className="dashboard">
             {/* Header Section */}
@@ -80,17 +97,51 @@ function homepage() {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
-                <Marker position={[40.7128, -74.0060]} icon={custompinIcon}>
-                    <Popup>
-                        A marker for New York City!
-                    </Popup>
-                </Marker>
+                {/* Render markers for each trip */}
+                {trips.map(trip => (
+                    trip.latitude && trip.longitude ? ( // Check if latitude and longitude are defined
+                        <Marker
+                            key={trip.trip_id}
+                            position={[trip.latitude, trip.longitude]}
+                            icon={custompinIcon}
+                        >
+                            <Popup>
+                                {trip.name}: {trip.start_date} to {trip.end_date} - Budget: ${trip.budget}
+                            </Popup>
+                        </Marker>
+                    ) : null // Do not render a marker if coordinates are undefined
+                ))}
             </MapContainer>
 
            {/* Recent Trips Section */}
            <div className="recent-trips">
                 <h2>Recent Trips</h2>
-                <p>No trips available for now.</p>
+                {trips.length === 0 ? (
+                    <p>Loading trips...</p>
+                ) : (
+                    Array.isArray(trips) && trips.length > 0 ? (
+                        <ul>
+                            {trips.map(trip => (
+                                <li key={trip.trip_id}>
+                                    <div onClick={() => toggleTripDetails(trip.trip_id)} style={{ cursor: 'pointer', padding: '10px', border: '1px solid #ccc', marginBottom: '5px', backgroundColor: '#134a09' }}>
+                                        {trip.name}
+                                    </div>
+                                    {expandedTripId === trip.trip_id && (
+                                        <div style={{ padding: '10px', backgroundColor: '#134a09', border: '1px solid #ccc' }}>
+                                            <p>
+                                                <strong>Dates:</strong> {trip.start_date} - {trip.end_date}
+                                            </p>
+                                            <p><strong>Budget:</strong> ${trip.budget}</p>
+                                            {/* Add more details as needed */}
+                                        </div>
+                                    )}
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p>No trips available.</p>
+                    )
+                )}
             </div>
         </div>
     );
