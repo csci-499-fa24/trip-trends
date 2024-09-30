@@ -1,0 +1,222 @@
+/* Homepage.css */
+.dashboard {
+    width: 100%;
+    font-family: Arial, sans-serif;
+}
+
+.header {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #FFFFFF;
+    height: 150px;
+}
+
+.left-rectangle, .right-rectangle {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: black;
+    height: 25px; /* Height of the rectangle */
+}
+
+.left-rectangle {
+    left: 0;
+    width: 690px; /* Width of the left rectangle */
+}
+
+.right-rectangle {
+    right: 0;
+    width: 690px; /* Width of the right rectangle */
+}
+
+.welcome-section {
+    text-align: left;
+    padding: 20px;
+    background-color: #FFFFFF;
+    color: black;
+    font-size: 21px;
+}
+
+.recent-trips {
+    padding: 10px;
+    background-color: black;
+    color: white;
+    height: auto; /* Adjusted for dynamic content */
+}
+
+.trip {
+    margin-bottom: 10px;
+    border: 1px solid white;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent white */
+}
+
+.logo-container{
+    z-index: 1; 
+    position: relative; 
+}
+
+.logout {
+    background-color: #134a09;
+    color: white;
+    border: none; 
+    padding: 10px 20px;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.logout:hover{
+    background-color: green;
+    transition: 0.2s;
+}
+
+button{
+    box-shadow: 0 10px 20px -8px rgba(0, 0, 0, .7);
+}
+
+.create-trip {
+    background-color: #134a09;
+    position: relative;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.5s;
+    overflow: hidden; 
+}
+
+.create-trip:after {
+    content: '+';
+    position: absolute;
+    opacity: 0;
+    top: 50%;
+    right: -40px;
+    transform: translateY(-50%); 
+    transition: 0.2s ease-in-out;
+    font-size: 30px;
+    color: white;
+}
+
+.create-trip:hover {
+    color: transparent; /* hide text */
+    padding-right: 20px;
+}
+
+.create-trip:hover:after {
+    opacity: 1;
+    right: 50%; 
+    transform: translate(50%, -50%);
+}
+
+.modal {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    position: fixed;
+    z-index: 1000; /* equivalent to bring to front*/
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(2px);
+}
+
+/* popup window content */
+.modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    width: 400px;
+    max-width: 90%; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; 
+}
+
+.new-trip-title {
+    font-size: 24px;
+    color: black;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+/* container holding each label and field */
+.new-trip-field-label {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.new-trip-field-label input {
+    padding: 8px; 
+    margin-top: 5px; 
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    background-color: black; /* input bkgd will be white */
+    font-size: 15px; 
+    transition: border-color 0.3s ease;
+    width: 100%; 
+    color: white; /* text input will be black */
+    filter: invert(1);
+}
+
+/* the date input fields */
+.new-trip-field-label input[type="date"] {
+    cursor: pointer;
+}
+
+/* the container holding the dates */
+.date-fields {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+/* animation for the create trip button */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.submit-new-trip-button { 
+    padding: 8px; 
+    background-color: #134a09;
+    color: white;
+    border: none;
+    width: 40%; /* Width of the button */
+    border-radius: 10px;
+    font-size: 15px; 
+    cursor: pointer;
+    align-self: center;
+}
+
+.close {
+    position: relative;
+    font-weight: bold;
+    color: black; 
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 10000; 
+}
