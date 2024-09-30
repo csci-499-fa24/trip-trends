@@ -41,6 +41,7 @@ function homepage() {
 
     const [newTripLocation, setNewTripLocation] = useState({trip_locations: ''});
 
+    // handle events
     const handleLogout = () => {
           googleLogout();
           localStorage.removeItem("token");
@@ -78,7 +79,7 @@ function homepage() {
         setExpandedTripId(prevId => (prevId === tripId ? null : tripId));
     };
 
-    // captures new input instantly
+    // captures new input instantly in each popup field
     const newTripInputChange = (e) => {
         const { name, value } = e.target;
         setNewTripData({ ...newTripData, [name]: value });
@@ -104,6 +105,7 @@ function homepage() {
         }
     };
 
+    // updating the component after it renders
     useEffect(() => {
         handleToken();
         fetchTrips(); // Call the function to fetch trips on component mount
