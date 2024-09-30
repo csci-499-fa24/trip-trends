@@ -70,6 +70,15 @@
     cursor: pointer;
 }
 
+.logout:hover{
+    background-color: green;
+    transition: 0.2s;
+}
+
+button{
+    box-shadow: 0 10px 20px -8px rgba(0, 0, 0, .7);
+}
+
 .create-trip {
     background-color: #134a09;
     position: relative;
@@ -81,7 +90,6 @@
     cursor: pointer;
     text-align: center;
     transition: all 0.5s;
-    box-shadow: 0 10px 20px -8px rgba(0, 0, 0, .7);
     overflow: hidden; 
 }
 
@@ -98,7 +106,7 @@
 }
 
 .create-trip:hover {
-    color: transparent; 
+    color: transparent; /* hide text */
     padding-right: 20px;
 }
 
@@ -114,12 +122,12 @@
     flex-direction: column;
     align-items: center;
     position: fixed;
-    z-index: 1000; 
+    z-index: 1000; /* equivalent to bring to front*/
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    backdrop-filter: blur(1.5px);
+    backdrop-filter: blur(2px);
 }
 
 /* popup window content */
@@ -128,7 +136,7 @@
     padding: 30px;
     border-radius: 8px;
     width: 400px;
-    max-width: 90%; /* Adjusts for smaller screens */
+    max-width: 90%; 
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     animation: fadeIn 0.3s ease-in-out;
 }
@@ -136,7 +144,7 @@
 form {
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Space between fields */
+    gap: 15px; 
 }
 
 .new-trip-title {
@@ -147,6 +155,7 @@ form {
     margin-bottom: 15px;
 }
 
+/* container holding each label and field */
 .new-trip-field-label {
     display: block;
     font-size: 1rem;
@@ -159,21 +168,27 @@ form {
     margin-top: 5px; 
     border-radius: 10px;
     border: 1px solid #ccc;
-    background-color: white;
+    background-color: black; /* input bkgd will be white */
     font-size: 15px; 
     transition: border-color 0.3s ease;
     width: 100%; 
-    color: black;
+    color: white; /* text input will be black */
+    filter: invert(1);
 }
 
+/* the date input fields */
+.new-trip-field-label input[type="date"] {
+    cursor: pointer;
+}
+
+/* the container holding the dates */
 .date-fields {
     display: flex;
     justify-content: space-between;
     gap: 10px;
-    background-color: transparent;
-    color: black;
 }
 
+/* animation for the create trip button */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -185,7 +200,7 @@ form {
     }
 }
 
-.submit-new-trip-button{
+.submit-new-trip-button { 
     padding: 8px; 
     background-color: #134a09;
     color: white;
@@ -198,9 +213,7 @@ form {
 }
 
 .close {
-    position: absolute;
-    top: 15px; 
-    right: 20px;
+    position: relative;
     font-weight: bold;
     color: black; 
     font-size: 24px;
