@@ -12,6 +12,7 @@ import pinIcon from '../img/Pin.png';
 import { GoogleOAuthProvider, googleLogout } from '@react-oauth/google';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
+import pinIcon from '../img/Pin.png';
 
 // Create a custom icon
 const custompinIcon = L.icon({
