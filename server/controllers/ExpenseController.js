@@ -1,5 +1,4 @@
 const Expense = require('../models/Expense');
-const { get } = require('../routes/expenseRoutes');
 
 //  post new expense to the db
 const createExpense = async (req, res) => {
