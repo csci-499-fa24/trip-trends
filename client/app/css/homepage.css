@@ -52,13 +52,57 @@
     background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent white */
 }
 
+.logo-container{
+    z-index: 1; 
+    position: relative; 
+}
+
 .logout {
-    background-color: green;
+    background-color: #134a09;
     color: white;
     border: none; 
     padding: 10px 20px;
     position: absolute;
     right: 20px;
     top: 20px;
+    border-radius: 8px;
+    cursor: pointer;
 }
 
+.create-trip {
+    background-color: #134a09;
+    position: relative;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.5s;
+    box-shadow: 0 10px 20px -8px rgba(0, 0, 0, .7);
+    overflow: hidden; 
+}
+
+.create-trip:after {
+    content: '+';
+    position: absolute;
+    opacity: 0;
+    top: 50%;
+    right: -40px;
+    transform: translateY(-50%); 
+    transition: 0.3s ease-in-out;
+    font-size: 30px;
+    color: white;
+}
+
+.create-trip:hover {
+    color: transparent; 
+    padding-right: 20px;
+}
+
+.create-trip:hover:after {
+    opacity: 1;
+    right: 50%; 
+    transform: translate(50%, -50%);
+}
