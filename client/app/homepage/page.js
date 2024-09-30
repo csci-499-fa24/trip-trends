@@ -46,7 +46,7 @@ function homepage() {
         }
     }
 
-    React.useEffect(() => {
+    useEffect(() => {
         handleToken();
     }, []); 
 
