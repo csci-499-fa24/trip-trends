@@ -51,3 +51,14 @@
     padding: 10px;
     background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent white */
 }
+
+.logout {
+    background-color: green;
+    color: white;
+    border: none; 
+    padding: 10px 20px;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}
+
