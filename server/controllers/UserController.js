@@ -2,7 +2,7 @@ const User = require("../models/User");
 const jwt = require('jsonwebtoken');
 
 
-// post new user data into the db
+// POST new user data into the db
 const createUser = async (req, res) => {
     const { user_id, fname, lname, email, image } = req.body;
     try {
@@ -15,7 +15,7 @@ const createUser = async (req, res) => {
     }
 };
 
-// get all users data in the db
+// GET all user data in the db
 const getUsers = async (req, res) => {
     try {
         const allUsers = await User.findAll();
@@ -26,6 +26,56 @@ const getUsers = async (req, res) => {
     }
 };
 
+// GET specific user data by userId
+const getUserById = async (req, res) => {
+    const id = req.params.id;
+    try {
+        const user = await User.findByPk(id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.json({ data: user });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
+    }
+};
+
+// PUT request to update user data
+const updateUser = async (req, res) => {
+    const id = req.params.id;
+    const { fname, lname, email, image } = req.body;
+    try {
+        // find user by id
+        const user = await User.findByPk(id);
+        if (!user) {
+            return res.status(404).json();
+        }
+        // update user data
+        const updatedUser = await user.update({ fname, lname, email, image });
+        res.json({ data: updatedUser });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
+    }
+};
+
+// DELETE user data
+const deleteUser = async (req, res) => {
+    const id = req.params.id;
+    try {
+        // delete user by id
+        const deletedCount = await User.destroy({ where: { user_id: id } });
+        if (deletedCount === 0) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.status(204).json();
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
+    }
+};
+        
 // Endpoint to handle Google login/signup
 const createGoogleUser = async (req, res) => {
     const { token } = req.body;
@@ -67,5 +117,8 @@ const createGoogleUser = async (req, res) => {
 module.exports = {
     createUser,
     getUsers,
+    getUserById,
+    updateUser,
+    deleteUser,
     createGoogleUser
 };

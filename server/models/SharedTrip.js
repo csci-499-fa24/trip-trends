@@ -24,6 +24,10 @@ const SharedTrip = sequelize.define('sharedtrips', {
 }, {
     tableName: 'sharedtrips',
     timestamps: false,
+    indexes: [{
+        unique: true,
+        fields: ['user_id', 'trip_id']
+    }]
 });
 User.belongsToMany(Trip, {
     through: SharedTrip,

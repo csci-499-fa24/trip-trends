@@ -4,25 +4,35 @@ const sequelize = require('../config/db');
 //  db schema to add a user
 const User = sequelize.define('user', {
     user_id: {
+        // type: DataTypes.UUID,
+        // defaultValue: Sequelize.UUIDV4,
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true
     },
     fname: {
         type: DataTypes.STRING(50),
-        allowNull: false
+        allowNull: false,
+        validate: {
+            isAlpha: true,
+            len: [2, 50],
+        }
     },
     lname: {
         type: DataTypes.STRING(50),
-        allowNull: false
+        allowNull: false,
+        validate: {
+            isAlpha: true,
+            len: [2, 50],
+        }
     },
     email: {
         type: DataTypes.STRING(100),
         unique: true,
-        allowNull: false
-        // validate: {
-        //     isEmail: true
-        // }
+        allowNull: false,
+        validate: {
+            isEmail: true
+        }
     },
     image: {
         type: DataTypes.STRING(255),
