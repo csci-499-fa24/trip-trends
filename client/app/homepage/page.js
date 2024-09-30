@@ -9,6 +9,9 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { GoogleOAuthProvider, googleLogout } from '@react-oauth/google';
+import { GoogleLogin } from '@react-oauth/google';
+import { useState } from 'react';
+import { jwtDecode } from "jwt-decode";
 
 // Import your custom pin icon
 import pinIcon from '../img/Pin.png'; // Change the path as needed
@@ -29,6 +32,26 @@ function homepage() {
           localStorage.removeItem("token");
           window.location.href = '/signup';
     };
+
+    const [userName, setUserName] = useState("[NAME]");
+
+    const handleToken = () => {
+        const token = localStorage.getItem("token"); // signed in user's access token
+        if (token) {
+            const userCredential = jwtDecode(token);
+            const userName = userCredential.given_name;
+            console.log(userCredential);
+            setUserName(userName);
+        } else {
+            // user is not authenticated
+            console.log("Token not found. Redirecting to sign in page.");
+            window.location.href = '/signin';
+        }
+    }
+
+    React.useEffect(() => {
+        handleToken();
+    }, []); 
   
     return (
         <div className="dashboard">
@@ -47,7 +70,7 @@ function homepage() {
 
             {/* Welcome Section */}
             <div className="welcome-section">
-                <h1>Welcome Back, [Name]!</h1>
+                <h1>Welcome Back, {userName}!</h1>
                 <p>See everywhere you've gone:</p>
             </div>
 
