@@ -3,7 +3,7 @@ const User = require('../models/User');
 const { createUser } = require('../controllers/UserController');
 
 // mock User model
-jest.mock('../models/user');
+jest.mock('../models/User');
 
 describe('createUser', () => {
     let mockRequest;
