@@ -1,35 +1,41 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import logo from '../img/Logo.png';
 import '../css/homepage.css';
 import axios from 'axios';
-import dynamic from 'next/dynamic';
-// import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-// import L from 'leaflet';
-import pinIcon from '../img/Pin.png';
 import { GoogleOAuthProvider, googleLogout } from '@react-oauth/google';
-import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
 import pinIcon from '../img/Pin.png';
+import 'ol/ol.css'; // Import OpenLayers CSS
+import Map from 'ol/Map';
+import View from 'ol/View';
+import TileLayer from 'ol/layer/Tile';
+import OSM from 'ol/source/OSM';
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
+import { Icon, Style } from 'ol/style';
+import Feature from 'ol/Feature';
+import Point from 'ol/geom/Point';
+import { fromLonLat } from 'ol/proj';
 
-const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
-const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
-const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
-const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
+// Custom marker icon style
+const customIconStyle = new Style({
+    image: new Icon({
+        src: pinIcon.src,
+        scale: 0.1,
+    }),
+});
 
 const googleID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
 function homepage() {
-    // states
+    // States
     const [userName, setUserName] = useState("[NAME]"); 
     const [trips, setTrips] = useState([]);
     const [expandedTripId, setExpandedTripId] = useState(null);
     const [isPopUpVisible, setPopUpVisible] = useState(false);
-
-    // new trip form fields that match model attributes
     const [newTripData, setNewTripData] = useState({
         name: '',
         start_date: '',
@@ -37,43 +43,37 @@ function homepage() {
         budget: 0,
         image: null
     });
+    const [newTripLocation, setNewTripLocation] = useState({ trip_locations: '' });
+    const mapRef = useRef(null); // Reference for the map
 
-    const [newTripLocation, setNewTripLocation] = useState({trip_locations: ''});
-
-    // handle events
+    // Handle events
     const handleLogout = () => {
-        if (typeof window !== 'undefined') {
-            googleLogout();
-            localStorage.removeItem("token");
+        googleLogout();
+        localStorage.removeItem("token");
+        window.location.href = '/signup';
+    };
+
+    const handleToken = () => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            const userCredential = jwtDecode(token);
+            const userName = userCredential.given_name;
+            console.log(userCredential);
+            setUserName(userName);
+        } else {
+            console.log("Token not found. Redirecting to sign in page.");
             window.location.href = '/signup';
         }
     };
 
-    const handleToken = () => {
-        if (typeof window !== 'undefined') {
-            const token = localStorage.getItem("token"); // signed in user's access token
-            if (token) {
-                const userCredential = jwtDecode(token);
-                const userName = userCredential.given_name;
-                console.log(userCredential);
-                setUserName(userName);
-
-            } else {
-                // user is not authenticated
-                console.log("Token not found. Redirecting to sign in page.");
-                window.location.href = '/signup';
-            }
-        }
-    }
-
     const fetchTrips = async () => {
         try {
             const response = await axios.get('http://localhost:8080/api/trips/get-trips');
-            console.log(response.data); // Log the response to see its structure
-            setTrips(response.data.data); // Access the data property
+            console.log(response.data);
+            setTrips(response.data.data);
         } catch (err) {
             console.error(err);
-            setTrips([]); // Set trips to an empty array in case of error
+            setTrips([]);
         }
     };
 
@@ -82,7 +82,7 @@ function homepage() {
         setExpandedTripId(prevId => (prevId === tripId ? null : tripId));
     };
 
-    // captures new input instantly in each popup field
+    // Captures new input instantly in each popup field
     const newTripInputChange = (e) => {
         const { name, value } = e.target;
         setNewTripData({ ...newTripData, [name]: value });
@@ -98,24 +98,55 @@ function homepage() {
         try {
             console.log("New trip data", newTripData);
             await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/create-trip`, newTripData);
-            setPopUpVisible(false); // close the popup
-            setNewTripData({name: '', start_date: '', end_date: '', budget: ''}); // reset form fields
-            setNewTripLocation({trip_locations: ''})
-            fetchTrips(); // refresh trips after creating a new one
-
+            setPopUpVisible(false); // Close the popup
+            setNewTripData({ name: '', start_date: '', end_date: '', budget: '' }); // Reset form fields
+            setNewTripLocation({ trip_locations: '' });
+            fetchTrips(); // Refresh trips after creating a new one
         } catch (error) {
             console.error('Error creating trip:', error);
         }
     };
 
-    // updating the component after it renders
     useEffect(() => {
-        if (typeof window !== 'undefined') {
-            handleToken();
-            fetchTrips(); // Call the function to fetch trips on component mount
-        }
+        handleToken();
+        fetchTrips(); // Call the function to fetch trips on component mount
     }, []);
 
+    useEffect(() => {
+        // Initialize the OpenLayers map after the component mounts
+        if (mapRef.current) {
+            const features = trips.map(trip => {
+                if (trip.latitude && trip.longitude) {
+                    const feature = new Feature({
+                        geometry: new Point(fromLonLat([trip.longitude, trip.latitude])), // Note the order
+                    });
+                    feature.setStyle(customIconStyle);
+                    return feature;
+                }
+                return null;
+            }).filter(Boolean); // Remove any null values
+
+            const vectorSource = new VectorSource({ features });
+            const vectorLayer = new VectorLayer({ source: vectorSource });
+
+            const map = new Map({
+                target: mapRef.current,
+                layers: [
+                    new TileLayer({
+                        source: new OSM(),
+                    }),
+                    vectorLayer,
+                ],
+                view: new View({
+                    center: fromLonLat([-74.0060, 40.7128]), // New York City
+                    zoom: 13,
+                }),
+            });
+
+            // Cleanup function to remove the map instance on unmount
+            return () => map.setTarget(undefined);
+        }
+    }, [trips]);
 
     return (
         <div className="dashboard">
@@ -150,7 +181,6 @@ function homepage() {
                             <span className="close" onClick={() => setPopUpVisible(false)}>&times;</span>
                             <h2 className="new-trip-title">New Trip</h2>
                             <form onSubmit={submitNewTrip}>
-                                
                                 <label className="new-trip-field-label">
                                     Trip Name:
                                     <input type="text" name="name" value={newTripData.name} onChange={newTripInputChange} required />
@@ -184,31 +214,11 @@ function homepage() {
                 )}
             </div>
 
-            
-             {/* Map section */}
-             <MapContainer center={[40.7128, -74.0060]} zoom={13} style={{ height: '400px', width: '100%' }}>
-                <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                />
-                {/* Render markers for each trip */}
-                {trips.map(trip => (
-                    trip.latitude && trip.longitude ? ( // Check if latitude and longitude are defined
-                        <Marker
-                            key={trip.trip_id}
-                            position={[trip.latitude, trip.longitude]}
-                            icon={custompinIcon}
-                        >
-                            <Popup>
-                                {trip.name}: {trip.start_date} to {trip.end_date} - Budget: ${trip.budget}
-                            </Popup>
-                        </Marker>
-                    ) : null // Do not render a marker if coordinates are undefined
-                ))}
-            </MapContainer>
-            
-           {/* Recent trips section */}
-           <div className="recent-trips">
+            {/* Map section */}
+            <div ref={mapRef} style={{ height: '400px', width: '100%' }}></div>
+
+            {/* Recent trips section */}
+            <div className="recent-trips">
                 <br></br>
                 <h2>Recent Trips</h2>
                 <br></br>
