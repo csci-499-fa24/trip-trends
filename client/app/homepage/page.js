@@ -267,7 +267,7 @@ function homepage() {
                                 <div>
                                     {newTripLocation.trip_locations.map((location, index) => (
                                         <div key={index} className="selected-location">
-                                            {location}
+                                            <span className="location-text">{location}</span> {/* Styled in black */}
                                             <button onClick={() => {
                                                 setNewTripLocation(prev => ({
                                                     trip_locations: prev.trip_locations.filter((loc, i) => i !== index) // Remove selected location

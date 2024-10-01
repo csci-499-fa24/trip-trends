@@ -220,3 +220,26 @@ form {
     cursor: pointer;
     z-index: 10000; 
 }
+
+.dropdown-suggestion {
+    color: black;
+    background-color: white;
+    padding: 8px;
+    cursor: pointer;
+}
+
+.dropdown-suggestion:hover {
+    background-color: rgb(8, 148, 8);
+}
+
+.selected-location {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.location-text {
+    color: black; /* This will make the added location text black */
+    font-weight: bold;
+}
