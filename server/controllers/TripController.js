@@ -30,7 +30,7 @@ const getTrips = async (req, res) => {
 };
 
 // GET specific trip data by tripId
-const getTripByUserId = async (req, res) => {
+const getTripsByUserId = async (req, res) => {
     const { user_id } = req.params;
     const id = req.params.id;
     try {
@@ -101,7 +101,7 @@ const deleteTrip = async (req, res) => {
 module.exports = {
     createTrip,
     getTrips,
-    getTripByUserId,
+    getTripsByUserId,
     getTripById,
     updateTrip,
     deleteTrip
