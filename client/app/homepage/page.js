@@ -19,6 +19,7 @@ import { Icon, Style } from 'ol/style';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
 import { fromLonLat } from 'ol/proj';
+import Link from 'next/link';
 
 // Custom marker icon style
 const customIconStyle = new Style({
@@ -239,7 +240,9 @@ function homepage() {
                                                 <strong>Dates:</strong> {trip.start_date} - {trip.end_date}
                                             </p>
                                             <p><strong>Budget:</strong> ${trip.budget}</p>
-                                            {/* Add more details as needed */}
+                                            <Link href={`/singletrip`} style={{ color: 'white', textDecoration: 'underline' }}>
+                                                See more
+                                            </Link>
                                         </div>
                                     )}
                                 </li>
