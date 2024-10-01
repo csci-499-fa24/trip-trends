@@ -23,7 +23,58 @@ const getTripLocations = async (req, res) => {
     }
 };
 
+// GET specific trip location data by tripId
+const getTripLocationByTripId = async (req, res) => {
+    const id = req.params.id;
+    try {
+        const tripLocation = await TripLocation.findAll({ where: { trip_id: id } });
+        if (!tripLocation) {
+            return res.status(404).json({ message: "Trip Location not found" });
+        }
+        res.json({ data: tripLocation });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
+    }
+};
+
+// PUT request to update trip location data
+const updateTripLocation = async (req, res) => {
+    const id = req.params.id;
+    const { trip_id, location } = req.body;
+    try {
+        const tripLocation = await TripLocation.findAll({ where: { trip_id: id } });
+        if (!tripLocation) {
+            return res.status(404).json({ message: "Trip location not found" });
+        }
+        const updatedTripLocation = await tripLocation.update({ trip_id, location });
+        res.json({ data: updatedTripLocation });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
+    }
+};
+
+// DELETE trip location data
+const deleteTripLocation = async (req, res) => {
+    const id = req.params.id;
+    try {
+        // delete trip by id
+        const deletedCount = await TripLocation.destroy({ where: { trip_id: id } });
+        if (deletedCount === 0) {
+            return res.status(404).json({ message: "Trip Location not found" });
+        }
+        res.status(204).json();
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
+    }
+};
+
 module.exports = {
     createTripLocation,
     getTripLocations,
+    getTripLocationByTripId,
+    updateTripLocation,
+    deleteTripLocation
 };

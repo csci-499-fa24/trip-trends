@@ -30,7 +30,7 @@ function Signup() {
                 localStorage.setItem("token", token);
                 setTimeout(() => {
                     window.location.href = '/homepage';
-                }, 2000);
+                }, 1500);
             })
             .catch(error => {
                 console.error(error)
