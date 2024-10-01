@@ -46,6 +46,7 @@ function homepage() {
     });
     const [newTripLocation, setNewTripLocation] = useState({ trip_locations: '' });
     const mapRef = useRef(null); // Reference for the map
+    const [suggestions, setSuggestions] = useState([]);
 
     // Handle events
     const handleLogout = () => {
@@ -92,6 +93,33 @@ function homepage() {
     const newTripLocInputChange = (e) => {
         const { name, value } = e.target;
         setNewTripLocation({ ...newTripLocation, [name]: value });
+        fetchLocationSuggestions(value);
+    };
+
+    const fetchLocationSuggestions = async (query) => {
+        if (query) {
+            try {
+                const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json`, {
+                    params: {
+                        q: query,
+                        key: process.env.NEXT_PUBLIC_OPENCAGE_API_KEY,
+                        limit: 5 // Limit the number of suggestions
+                    }
+                });
+                const results = response.data.results.map(result => result.formatted); // Extract formatted addresses
+                setSuggestions(results); // <-- Set suggestions state
+            } catch (error) {
+                console.error('Error fetching location suggestions:', error);
+                setSuggestions([]); // Clear suggestions on error
+            }
+        } else {
+            setSuggestions([]); // Clear suggestions if input is empty
+        }
+    };
+
+    const selectSuggestion = (suggestion) => {
+        setNewTripLocation({ trip_locations: suggestion }); // Set selected suggestion as input
+        setSuggestions([]); // Clear suggestions after selection
     };
 
     const submitNewTrip = async (e) => {
@@ -202,6 +230,16 @@ function homepage() {
                                     Budget:
                                     <input type="number" name="budget" value={newTripData.budget} onChange={newTripInputChange} required />
                                 </label>
+
+                                {suggestions.length > 0 && (
+                                    <ul className="suggestions-list">
+                                        {suggestions.map((suggestion, index) => (
+                                            <li key={index} onClick={() => selectSuggestion(suggestion)}> { }
+                                                {suggestion}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
 
                                 <label className="new-trip-field-label">
                                     Locations:
