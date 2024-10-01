@@ -5,21 +5,19 @@ import Image from 'next/image';
 import logo from '../img/Logo.png';
 import '../css/homepage.css';
 import axios from 'axios';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import dynamic from 'next/dynamic';
+// import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+// import L from 'leaflet';
 import { GoogleOAuthProvider, googleLogout } from '@react-oauth/google';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
 import pinIcon from '../img/Pin.png';
 
-// Create a custom icon
-const custompinIcon = L.icon({
-    iconUrl: pinIcon.src,
-    iconSize: [25, 30], // Size of the icon
-    iconAnchor: [12, 41], // Point of the icon which will correspond to marker's location
-    popupAnchor: [1, -34], // Point from which the popup should open relative to the iconAnchor
-});
+const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
+const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
+const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
+const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
 
 const googleID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
@@ -43,24 +41,27 @@ function homepage() {
 
     // handle events
     const handleLogout = () => {
-        googleLogout();
-        localStorage.removeItem("token");
-        window.location.href = '/signup';
-        
+        if (typeof window !== 'undefined') {
+            googleLogout();
+            localStorage.removeItem("token");
+            window.location.href = '/signup';
+        }
     };
 
     const handleToken = () => {
-        const token = localStorage.getItem("token"); // signed in user's access token
-        if (token) {
-            const userCredential = jwtDecode(token);
-            const userName = userCredential.given_name;
-            console.log(userCredential);
-            setUserName(userName);
+        if (typeof window !== 'undefined') {
+            const token = localStorage.getItem("token"); // signed in user's access token
+            if (token) {
+                const userCredential = jwtDecode(token);
+                const userName = userCredential.given_name;
+                console.log(userCredential);
+                setUserName(userName);
 
-        } else {
-            // user is not authenticated
-            console.log("Token not found. Redirecting to sign in page.");
-            window.location.href = '/signup';
+            } else {
+                // user is not authenticated
+                console.log("Token not found. Redirecting to sign in page.");
+                window.location.href = '/signup';
+            }
         }
     }
 
@@ -108,8 +109,10 @@ function homepage() {
 
     // updating the component after it renders
     useEffect(() => {
-        handleToken();
-        fetchTrips(); // Call the function to fetch trips on component mount
+        if (typeof window !== 'undefined') {
+            handleToken();
+            fetchTrips(); // Call the function to fetch trips on component mount
+        }
     }, []);
 
 
@@ -180,7 +183,7 @@ function homepage() {
                 )}
             </div>
 
-
+            
              {/* Map section */}
              <MapContainer center={[40.7128, -74.0060]} zoom={13} style={{ height: '400px', width: '100%' }}>
                 <TileLayer
@@ -202,7 +205,7 @@ function homepage() {
                     ) : null // Do not render a marker if coordinates are undefined
                 ))}
             </MapContainer>
-
+            
            {/* Recent trips section */}
            <div className="recent-trips">
                 <br></br>
