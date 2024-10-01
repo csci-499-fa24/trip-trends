@@ -1,9 +1,9 @@
 {
   "devDependencies": {
     "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "react-router-dom": "^6.26.2"
   },
-
   "scripts": {
     "test": "jest"
   }
