@@ -129,13 +129,17 @@ function homepage() {
     };
 
     const addLocation = () => {
-        if (tempLocation && !newTripLocation.trip_locations.includes(tempLocation)) {
+        // Check if tempLocation is in the suggestions array
+        if (tempLocation && suggestions.includes(tempLocation) && !newTripLocation.trip_locations.includes(tempLocation)) {
             setNewTripLocation(prev => ({
                 trip_locations: [...prev.trip_locations, tempLocation] // Add the new location to the array
             }));
             setTempLocation(''); // Clear the input
+        } else {
+            alert("Please select a location from the suggestions."); // Feedback for invalid input
         }
     };
+    
 
     const submitNewTrip = async (e) => {
         e.preventDefault();
@@ -267,7 +271,7 @@ function homepage() {
                                 <div>
                                     {newTripLocation.trip_locations.map((location, index) => (
                                         <div key={index} className="selected-location">
-                                            <span className="location-text">{location}</span> {/* Styled in black */}
+                                            <span className="location-text">{location}</span>
                                             <button onClick={() => {
                                                 setNewTripLocation(prev => ({
                                                     trip_locations: prev.trip_locations.filter((loc, i) => i !== index) // Remove selected location

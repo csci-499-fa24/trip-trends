@@ -240,6 +240,6 @@ form {
 }
 
 .location-text {
-    color: black; /* This will make the added location text black */
+    color: black;
     font-weight: bold;
 }
