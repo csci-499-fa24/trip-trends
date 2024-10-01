@@ -8,7 +8,7 @@ import axios from 'axios';
 import { GoogleOAuthProvider, googleLogout } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
 import pinIcon from '../img/Pin.png';
-import 'ol/ol.css'; // Import OpenLayers CSS
+import 'ol/ol.css';
 import Map from 'ol/Map';
 import View from 'ol/View';
 import TileLayer from 'ol/layer/Tile';
@@ -44,7 +44,8 @@ function homepage() {
         budget: 0,
         image: null
     });
-    const [newTripLocation, setNewTripLocation] = useState({ trip_locations: '' });
+    const [newTripLocation, setNewTripLocation] = useState({ trip_locations: [] });
+    const [tempLocation, setTempLocation] = useState('');
     const mapRef = useRef(null); // Reference for the map
     const [suggestions, setSuggestions] = useState([]);
 
@@ -91,23 +92,23 @@ function homepage() {
     };
 
     const newTripLocInputChange = (e) => {
-        const { name, value } = e.target;
-        setNewTripLocation({ ...newTripLocation, [name]: value });
+        const value = e.target.value;
+        setTempLocation(value);
         fetchLocationSuggestions(value);
     };
-
+    
     const fetchLocationSuggestions = async (query) => {
         if (query) {
             try {
                 const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json`, {
                     params: {
                         q: query,
-                        key: process.env.NEXT_PUBLIC_OPENCAGE_API_KEY,
+                        key: process.env.NEXT_PUBLIC_OPENCAGE_API_KEY, // Using OpenCage API key
                         limit: 5 // Limit the number of suggestions
                     }
                 });
                 const results = response.data.results.map(result => result.formatted); // Extract formatted addresses
-                setSuggestions(results); // <-- Set suggestions state
+                setSuggestions(results); // Set suggestions state
             } catch (error) {
                 console.error('Error fetching location suggestions:', error);
                 setSuggestions([]); // Clear suggestions on error
@@ -118,18 +119,36 @@ function homepage() {
     };
 
     const selectSuggestion = (suggestion) => {
-        setNewTripLocation({ trip_locations: suggestion }); // Set selected suggestion as input
+        if (!newTripLocation.trip_locations.includes(suggestion)) {
+            setNewTripLocation(prev => ({
+                trip_locations: [...prev.trip_locations, suggestion] // Add selected suggestion to locations array
+            }));
+        }
         setSuggestions([]); // Clear suggestions after selection
+        setTempLocation(''); // Clear input field after selection
+    };
+
+    const addLocation = () => {
+        if (tempLocation && !newTripLocation.trip_locations.includes(tempLocation)) {
+            setNewTripLocation(prev => ({
+                trip_locations: [...prev.trip_locations, tempLocation] // Add the new location to the array
+            }));
+            setTempLocation(''); // Clear the input
+        }
     };
 
     const submitNewTrip = async (e) => {
         e.preventDefault();
         try {
-            console.log("New trip data", newTripData);
-            await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/create-trip`, newTripData);
+            const tripDataWithLocations = {
+                ...newTripData,
+                trip_locations: newTripLocation.trip_locations.join(', ') // Convert array to string
+            };
+            console.log("New trip data", tripDataWithLocations);
+            await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/create-trip`, tripDataWithLocations);
             setPopUpVisible(false); // Close the popup
             setNewTripData({ name: '', start_date: '', end_date: '', budget: '' }); // Reset form fields
-            setNewTripLocation({ trip_locations: '' });
+            setNewTripLocation({ trip_locations: [] }); // Reset locations
             fetchTrips(); // Refresh trips after creating a new one
         } catch (error) {
             console.error('Error creating trip:', error);
@@ -231,20 +250,46 @@ function homepage() {
                                     <input type="number" name="budget" value={newTripData.budget} onChange={newTripInputChange} required />
                                 </label>
 
-                                {suggestions.length > 0 && (
-                                    <ul className="suggestions-list">
-                                        {suggestions.map((suggestion, index) => (
-                                            <li key={index} onClick={() => selectSuggestion(suggestion)}> { }
-                                                {suggestion}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-
                                 <label className="new-trip-field-label">
                                     Locations:
-                                    <input type="text" name="trip_locations" placeholder="Enter city or country" value={newTripLocation.trip_locations} onChange={newTripLocInputChange} required />
+                                    <input
+                                        type="text"
+                                        name="trip_locations"
+                                        placeholder="Enter city or country"
+                                        value={tempLocation}
+                                        onChange={newTripLocInputChange}
+                                        onKeyDown={(e) => { if (e.key === 'Enter') addLocation(); }} // Allow adding on Enter
+                                        required
+                                    />
+                                    <button type="button" onClick={addLocation}>Add Location</button>
                                 </label>
+
+                                <div>
+                                    {newTripLocation.trip_locations.map((location, index) => (
+                                        <div key={index} className="selected-location">
+                                            {location}
+                                            <button onClick={() => {
+                                                setNewTripLocation(prev => ({
+                                                    trip_locations: prev.trip_locations.filter((loc, i) => i !== index) // Remove selected location
+                                                }));
+                                            }}>Remove</button>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {isPopUpVisible && (
+                                    <div className="dropdown-suggestions">
+                                        {suggestions.map((suggestion, index) => (
+                                            <div
+                                                key={index}
+                                                className="dropdown-suggestion"
+                                                onClick={() => selectSuggestion(suggestion)}
+                                            >
+                                                {suggestion}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                                 
                                 <button type="submit" className="submit-new-trip-button">Create</button>
                             </form>
