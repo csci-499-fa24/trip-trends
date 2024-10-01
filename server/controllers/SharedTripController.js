@@ -75,7 +75,7 @@ const updateSharedTrip = async (req, res) => {
 const deleteSharedTrip = async (req, res) => {
     const id = req.params.id;
     try {
-        const deletedCount = await SharedTrip.destroy({ where: { id } });
+        const deletedCount = await SharedTrip.destroy({ where: { trip_id: id } });
         if (deletedCount === 0) {
             return res.status(404).json({ message: "Shared trip not found" });
         }
