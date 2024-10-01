@@ -119,27 +119,30 @@ function homepage() {
     };
 
     const selectSuggestion = (suggestion) => {
-        if (!newTripLocation.trip_locations.includes(suggestion)) {
+        // Check if the suggestion is not already included and if the max limit is not reached
+        if (!newTripLocation.trip_locations.includes(suggestion) && newTripLocation.trip_locations.length < 10) {
             setNewTripLocation(prev => ({
                 trip_locations: [...prev.trip_locations, suggestion] // Add selected suggestion to locations array
             }));
+        } else if (newTripLocation.trip_locations.length >= 10) {
+            alert("You can only add a maximum of 10 locations."); // Alert if limit is reached
         }
         setSuggestions([]); // Clear suggestions after selection
         setTempLocation(''); // Clear input field after selection
-    };
+    };    
 
     const addLocation = () => {
-        // Check if tempLocation is in the suggestions array
-        if (tempLocation && suggestions.includes(tempLocation) && !newTripLocation.trip_locations.includes(tempLocation)) {
+        if (tempLocation && 
+            !newTripLocation.trip_locations.includes(tempLocation) && 
+            newTripLocation.trip_locations.length < 10) {
             setNewTripLocation(prev => ({
                 trip_locations: [...prev.trip_locations, tempLocation] // Add the new location to the array
             }));
             setTempLocation(''); // Clear the input
-        } else {
-            alert("Please select a location from the suggestions."); // Feedback for invalid input
+        } else if (newTripLocation.trip_locations.length >= 10) {
+            alert("You can only add a maximum of 10 locations."); // Alert if limit is reached
         }
-    };
-    
+    };   
 
     const submitNewTrip = async (e) => {
         e.preventDefault();
@@ -262,10 +265,27 @@ function homepage() {
                                         placeholder="Enter city or country"
                                         value={tempLocation}
                                         onChange={newTripLocInputChange}
-                                        onKeyDown={(e) => { if (e.key === 'Enter') addLocation(); }} // Allow adding on Enter
+                                        onKeyDown={(e) => { 
+                                            // Check if the Enter key is pressed and the limit has not been reached
+                                            if (e.key === 'Enter') {
+                                                if (newTripLocation.trip_locations.length < 10) {
+                                                    addLocation(); // Allow adding location
+                                                    e.preventDefault(); // Prevent form submission
+                                                } else {
+                                                    alert("You can only add a maximum of 10 locations."); // Alert if limit is reached
+                                                    e.preventDefault(); // Prevent form submission
+                                                }
+                                            }
+                                        }} 
                                         required
                                     />
-                                    <button type="button" onClick={addLocation}>Add Location</button>
+                                    <button 
+                                        type="button" 
+                                        onClick={addLocation} 
+                                        disabled={newTripLocation.trip_locations.length >= 10} // Disable button if limit reached
+                                    >
+                                        Add Location
+                                    </button>
                                 </label>
 
                                 <div>
