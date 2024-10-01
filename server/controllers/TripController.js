@@ -2,10 +2,14 @@ const Trip = require('../models/Trip');
 
 // POST new trip data into the db
 const createTrip = async (req, res) => {
+    const { user_id } = req.params
     const { name, start_date, end_date, budget, image } = req.body;
     try {
+        if (!user_id) {
+            return res.status(400).json({ message: "User ID is required" });
+        }
         // create a model instance 
-        const newTrip = await Trip.create({ name, start_date, end_date, budget, image });
+        const newTrip = await Trip.create({ user_id, name, start_date, end_date, budget, image });
         res.status(201).json({ data: newTrip });
     } catch (err) {
         console.error(err);
@@ -19,6 +23,25 @@ const getTrips = async (req, res) => {
     try {
         const allTrips = await Trip.findAll();
         res.json({ data: allTrips });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
+    }
+};
+
+// GET specific trip data by tripId
+const getTripByUserId = async (req, res) => {
+    const { user_id } = req.params;
+    const id = req.params.id;
+    try {
+        if (!user_id) {
+            return res.status(400).json({ message: "User ID is required" });
+        }
+        if (!trip) {
+            return res.status(404).json({ message: "Trip not found" });
+        }
+        const trip = await Trip.findAll({ where: { user_id: id } });
+        res.json({ data: trip });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });
@@ -78,6 +101,7 @@ const deleteTrip = async (req, res) => {
 module.exports = {
     createTrip,
     getTrips,
+    getTripByUserId,
     getTripById,
     updateTrip,
     deleteTrip

@@ -2,11 +2,19 @@ const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
 // db schema to add a trip
-const Trip = sequelize.define("all_trips", {
+const Trip = sequelize.define("trips", {
     trip_id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true
+    },
+    user_id: { 
+        type: DataTypes.UUID,
+        allowNull: false,
+        references: {
+            model: 'users', 
+            key: 'user_id', 
+        }
     },
     name: {
         type: DataTypes.STRING,
@@ -21,7 +29,11 @@ const Trip = sequelize.define("all_trips", {
         type: DataTypes.DATEONLY,
         allowNull: false,
         validate: {
-            isAfter: this.start_date
+            isAfterStartDate(value) {
+                if (new Date(value) <= new Date(this.start_date)) {
+                    throw new Error('End date must be after start date');
+                }
+            }
         }
     },
     budget: {
@@ -33,8 +45,10 @@ const Trip = sequelize.define("all_trips", {
         allowNull: true,
     }
 }, {
-    tableName: 'all_trips',
+    tableName: 'trips',
     timestamps: false
 });
+User.hasMany(Trip, { foreignKey: 'user_id' });
+Trip.belongsTo(User, { foreignKey: 'user_id' });
 
 module.exports = Trip;

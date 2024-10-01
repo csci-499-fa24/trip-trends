@@ -8,7 +8,7 @@ const TripLocation = sequelize.define('TripLocation', {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'all_trips',
+            model: 'trips',
             key: 'trip_id',
         },
     },
@@ -17,7 +17,7 @@ const TripLocation = sequelize.define('TripLocation', {
         allowNull: false,
     },
 }, {
-    tableName: 'tlocation',
+    tableName: 'triplocations',
     timestamps: false,
     underscored: true
 });
