@@ -14,12 +14,12 @@ const createTrip = async (req, res) => {
     } catch (err) {
         console.error("Error creating trip:", err);
         if (err.name === 'SequelizeValidationError') {
-            res.status(400).json({ message: "Validation Error", errors: err.errors.map(e => e.message) });
+            res.status(400).json({ message: "Validation Error", error: err.message });
         } else {
             res.status(500).json({ message: "Internal Server Error", error: err.message });
         }
     }
-  };
+};
 
 // GET all trip data in the db
 const getTrips = async (req, res) => {
@@ -54,9 +54,9 @@ const getTripsByUserId = async (req, res) => {
 
 // GET specific trip data by tripId
 const getTripById = async (req, res) => {
-    const id = req.params.id;
+    const tripId = req.params.tripId;
     try {
-        const trip = await Trip.findByPk(id);
+        const trip = await Trip.findByPk(tripId);
         if (!trip) {
             return res.status(404).json({ message: "Trip not found" });
         }
@@ -69,7 +69,7 @@ const getTripById = async (req, res) => {
 
 // PUT request to update trip data
 const updateTrip = async (req, res) => {
-    const id = req.params.id;
+    const tripId = req.params.tripId;
     const { trip_id, name, amount, category, currency, posted, notes, image } = req.body;
     try {
         // find trip by id
@@ -88,10 +88,10 @@ const updateTrip = async (req, res) => {
 
 // DELETE trip data
 const deleteTrip = async (req, res) => {
-    const id = req.params.id;
+    const tripId = req.params.tripId;
     try {
-        // delete trip by id
-        const deletedCount = await Trip.destroy({ where: { trip_id: id } });
+        // delete trip by tripId
+        const deletedCount = await Trip.destroy({ where: { trip_id: tripId } });
         if (deletedCount === 0) {
             return res.status(404).json({ message: "Trip not found" });
         }
