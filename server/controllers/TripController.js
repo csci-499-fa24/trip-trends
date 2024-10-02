@@ -1,22 +1,25 @@
 const Trip = require('../models/Trip');
+const SharedTrip = require('../models/SharedTrip');
 
 // POST new trip data into the db
 const createTrip = async (req, res) => {
-    const { user_id } = req.params
+    const userId = req.params['userId']; 
     const { name, start_date, end_date, budget, image } = req.body;
     try {
-        // create a model instance 
+        // create new model isntance
         const newTrip = await Trip.create({ name, start_date, end_date, budget, image });
-        console.log(newTrip);
-        const newSharedTrip = await SharedTrip.create({ user_id, trip_id: newTrip.trip_id });
-        console.log(newSharedTrip);
+        // create relationship b/w user and trip
+        await SharedTrip.create({ user_id: userId, trip_id: newTrip.trip_id });
         res.status(201).json({ data: newTrip });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Internal Server Error", error: err.message });
-
+        console.error("Error creating trip:", err);
+        if (err.name === 'SequelizeValidationError') {
+            res.status(400).json({ message: "Validation Error", errors: err.errors.map(e => e.message) });
+        } else {
+            res.status(500).json({ message: "Internal Server Error", error: err.message });
+        }
     }
-};
+  };
 
 // GET all trip data in the db
 const getTrips = async (req, res) => {
@@ -31,17 +34,18 @@ const getTrips = async (req, res) => {
 
 // GET specific trip data by UserId
 const getTripsByUserId = async (req, res) => {
-    const { user_id } = req.params;
-    const id = req.params.id;
+    const userId = req.params.userId;
     try {
-        if (!user_id) {
+        if (!userId) {
             return res.status(400).json({ message: "User ID is required" });
         }
-        if (!trip) {
+        const sharedTrips = await SharedTrip.findAll({ where: { user_id: userId } });
+        if (!sharedTrips || sharedTrips.length === 0) {
             return res.status(404).json({ message: "Trip not found" });
         }
-        const trip = await Trip.findAll({ where: { user_id: id } });
-        res.json({ data: trip });
+        const tripIds = sharedTrips.map(trip => trip.trip_id);
+        const trips = await Trip.findAll({ where: { trip_id: tripIds } });
+        res.json({ data: trips });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });
