@@ -1,21 +1,22 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
+const User = require('./User');
 
 // db schema to add a trip
-const Trip = sequelize.define("trips", {
+const Trip = sequelize.define("all_trips", {
     trip_id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true
     },
-    user_id: { 
-        type: DataTypes.UUID,
-        allowNull: false,
-        references: {
-            model: 'users', 
-            key: 'user_id', 
-        }
-    },
+    // user_id: { 
+    //     type: DataTypes.UUID,
+    //     allowNull: false,
+    //     references: {
+    //         model: 'users', 
+    //         key: 'user_id', 
+    //     }
+    // },
     name: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -45,10 +46,10 @@ const Trip = sequelize.define("trips", {
         allowNull: true,
     }
 }, {
-    tableName: 'trips',
+    tableName: 'all_trips',
     timestamps: false
 });
-User.hasMany(Trip, { foreignKey: 'user_id' });
-Trip.belongsTo(User, { foreignKey: 'user_id' });
+// User.hasMany(Trip, { foreignKey: 'user_id' });
+// Trip.belongsTo(User, { foreignKey: 'user_id' });
 
 module.exports = Trip;

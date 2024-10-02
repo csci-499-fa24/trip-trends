@@ -5,11 +5,11 @@ const createTrip = async (req, res) => {
     const { user_id } = req.params
     const { name, start_date, end_date, budget, image } = req.body;
     try {
-        if (!user_id) {
-            return res.status(400).json({ message: "User ID is required" });
-        }
         // create a model instance 
-        const newTrip = await Trip.create({ user_id, name, start_date, end_date, budget, image });
+        const newTrip = await Trip.create({ name, start_date, end_date, budget, image });
+        console.log(newTrip);
+        const newSharedTrip = await SharedTrip.create({ user_id, trip_id: newTrip.trip_id });
+        console.log(newSharedTrip);
         res.status(201).json({ data: newTrip });
     } catch (err) {
         console.error(err);
@@ -29,7 +29,7 @@ const getTrips = async (req, res) => {
     }
 };
 
-// GET specific trip data by tripId
+// GET specific trip data by UserId
 const getTripsByUserId = async (req, res) => {
     const { user_id } = req.params;
     const id = req.params.id;

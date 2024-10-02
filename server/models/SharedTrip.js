@@ -17,7 +17,7 @@ const SharedTrip = sequelize.define('sharedtrips', {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'trips',
+            model: 'all_trips',
             key: 'trip_id',
         },
     },
