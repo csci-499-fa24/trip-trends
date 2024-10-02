@@ -40,6 +40,24 @@ const getExpenseById = async (req, res) => {
     }
 };
 
+// GET specific expense data by TripId
+const getExpensesByTripId = async (req, res) => {
+    const tripId = req.params.tripId;
+    try {
+        if (!tripId) {
+            return res.status(400).json({ message: "Trip ID is required" });
+        }
+        const expense = await Expense.findAll({ where: { trip_id: tripId } });
+        if (!expense || expense.length === 0) {
+            return res.status(404).json({ message: "Expense not found" });
+        }
+        res.json({ data: expense });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
+    }
+};
+
 // PUT request to update expense data
 const updateExpense = async (req, res) => {
     const id = req.params.id;
@@ -79,6 +97,7 @@ module.exports = {
     createExpense,
     getExpenses,
     getExpenseById,
+    getExpensesByTripId,
     updateExpense,
     deleteExpense
 };

@@ -1,11 +1,11 @@
 const SharedTrip = require('../models/SharedTrip');
 
-// POST new shared trip to db
+// POST new shared trip for user
 const createSharedTrip = async (req, res) => {
-    const { user_id, trip_id } = req.body;
+    const { userId, tripId } = req.body;
     try {
-        // create a model instance 
-        const newSharedTrip = await SharedTrip.create({ user_id, trip_id });
+        // create new model instance 
+        const newSharedTrip = await SharedTrip.create({ userId, tripId });
         res.status(201).json({ data: newSharedTrip });
     } catch (err) {
         console.error(err);
@@ -13,7 +13,7 @@ const createSharedTrip = async (req, res) => {
     }
 };
 
-// GET all shared trips from db
+// GET all shared trips
 const getSharedTrips = async (req, res) => {
     try {
         const allSharedTrips = await SharedTrip.findAll();
@@ -26,9 +26,9 @@ const getSharedTrips = async (req, res) => {
 
 // GET specific shared trip data by userId
 const getSharedTripByUserId = async (req, res) => {
-    const id = req.params.id;
+    const userId = req.params.userId;
     try {
-        const sharedTrip = await SharedTrip.findAll({ where: { user_id: id } });
+        const sharedTrip = await SharedTrip.findAll({ where: { user_id: userId } });
         if (!sharedTrip) {
             return res.status(404).json({ message: "Shared Trip not found" });
         }
@@ -41,9 +41,9 @@ const getSharedTripByUserId = async (req, res) => {
 
 // GET specific shared trip data by tripId
 const getSharedTripByTripId = async (req, res) => {
-    const id = req.params.id;
+    const tripId = req.params.tripId;
     try {
-        const sharedTrip = await SharedTrip.findAll({ where: { trip_id: id } });
+        const sharedTrip = await SharedTrip.findAll({ where: { trip_id: tripId } });
         if (!sharedTrip) {
             return res.status(404).json({ message: "Shared Trip not found" });
         }
@@ -56,14 +56,13 @@ const getSharedTripByTripId = async (req, res) => {
 
 // PUT request to update shared trip data
 const updateSharedTrip = async (req, res) => {
-    const id = req.params.id;
-    const { user_id, trip_id } = req.body;
+    const { userId, tripId } = req.params;
     try {
-        const sharedTrip = await SharedTrip.findByPk(id);
+        const sharedTrip = await SharedTrip.findByPk({ where: { user_id: userId, trip_id: tripId } });
         if (!sharedTrip) {
             return res.status(404).json({ message: "Shared trip not found" });
         }
-        const updatedSharedTrip = await sharedTrip.update({ user_id, trip_id });
+        const updatedSharedTrip = await sharedTrip.update({ userId, tripId });
         res.json({ data: updatedSharedTrip });
     } catch (err) {
         console.error(err);
@@ -73,9 +72,9 @@ const updateSharedTrip = async (req, res) => {
 
 // DELETE shared trip data
 const deleteSharedTrip = async (req, res) => {
-    const id = req.params.id;
+    const { userId, tripId } = req.params;
     try {
-        const deletedCount = await SharedTrip.destroy({ where: { id } });
+        const deletedCount = await SharedTrip.destroy({ where: { user_id: userId, trip_id: tripId } });
         if (deletedCount === 0) {
             return res.status(404).json({ message: "Shared trip not found" });
         }
@@ -92,5 +91,5 @@ module.exports = {
     getSharedTripByUserId,
     getSharedTripByTripId,
     updateSharedTrip,
-    deleteSharedTrip,
+    deleteSharedTrip
 };

@@ -1,13 +1,12 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
+
 //  db schema to add a user
 const User = sequelize.define('user', {
     user_id: {
-        // type: DataTypes.UUID,
-        // defaultValue: Sequelize.UUIDV4,
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
+        type: DataTypes.UUID,
+        defaultValue: Sequelize.UUIDV4,
         primaryKey: true
     },
     fname: {
@@ -46,6 +45,7 @@ const User = sequelize.define('user', {
     tableName: 'users',
     timestamps: false
 });
+// User.beforeCreate(user => user.id = uuid());
 
 module.exports = User;
 

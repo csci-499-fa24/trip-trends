@@ -28,9 +28,9 @@ const getUsers = async (req, res) => {
 
 // GET specific user data by userId
 const getUserById = async (req, res) => {
-    const id = req.params.id;
+    const userId = req.params.userId;
     try {
-        const user = await User.findByPk(id);
+        const user = await User.findByPk(userId);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
@@ -43,11 +43,11 @@ const getUserById = async (req, res) => {
 
 // PUT request to update user data
 const updateUser = async (req, res) => {
-    const id = req.params.id;
+    const userId = req.params.userId;
     const { fname, lname, email, image } = req.body;
     try {
-        // find user by id
-        const user = await User.findByPk(id);
+        // find user by userId
+        const user = await User.findByPk(userId);
         if (!user) {
             return res.status(404).json();
         }
@@ -62,10 +62,10 @@ const updateUser = async (req, res) => {
 
 // DELETE user data
 const deleteUser = async (req, res) => {
-    const id = req.params.id;
+    const userId = req.params.userId;
     try {
-        // delete user by id
-        const deletedCount = await User.destroy({ where: { user_id: id } });
+        // delete user by userId
+        const deletedCount = await User.destroy({ where: { user_id: userId } });
         if (deletedCount === 0) {
             return res.status(404).json({ message: "User not found" });
         }
