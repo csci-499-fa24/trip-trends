@@ -96,7 +96,6 @@ const deleteTrip = async (req, res) => {
             return res.status(404).json({ message: "Trip not found" });
         }
         // update sharedtrips table
-        SharedTrip.destroy({ where: { trip_id: tripId } });
         res.status(204).json();
     } catch (err) {
         console.error(err);
