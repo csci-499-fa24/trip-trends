@@ -1,7 +1,7 @@
 const Trip = require('../models/Trip');
 const SharedTrip = require('../models/SharedTrip');
 
-// POST new trip data into the db
+// POST new trip data
 const createTrip = async (req, res) => {
     const userId = req.params['userId']; 
     const { name, start_date, end_date, budget, image } = req.body;
@@ -21,7 +21,7 @@ const createTrip = async (req, res) => {
     }
 };
 
-// GET all trip data in the db
+// GET all trips data
 const getTrips = async (req, res) => {
     try {
         const allTrips = await Trip.findAll();
@@ -70,15 +70,15 @@ const getTripById = async (req, res) => {
 // PUT request to update trip data
 const updateTrip = async (req, res) => {
     const tripId = req.params.tripId;
-    const { trip_id, name, amount, category, currency, posted, notes, image } = req.body;
+    const { name, amount, category, currency, posted, notes, image } = req.body;
     try {
-        // find trip by id
-        const trip = await Trip.findByPk(id);
+        // find trip by tripId
+        const trip = await Trip.findByPk(tripId);
         if (!trip) {
             return res.status(404).json();
         }
         // update trip data
-        const updatedTrip = await trip.update({ trip_id, name, amount, category, currency, posted, notes, image });
+        const updatedTrip = await trip.update({ name, amount, category, currency, posted, notes, image });
         res.json({ data: updatedTrip });
     } catch (err) {
         console.error(err);
@@ -95,6 +95,8 @@ const deleteTrip = async (req, res) => {
         if (deletedCount === 0) {
             return res.status(404).json({ message: "Trip not found" });
         }
+        // update sharedtrips table
+        SharedTrip.destroy({ where: { trip_id: tripId } });
         res.status(204).json();
     } catch (err) {
         console.error(err);
