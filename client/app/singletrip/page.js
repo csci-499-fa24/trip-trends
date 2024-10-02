@@ -84,13 +84,10 @@ function Singletrip() {
 
         axios.request(config)
             .then(response => {
-                // logCurrencyCodes(response.data); // Pass the response data to the function
                 if (response.data.success && response.data.symbols) {
-                    // Extracting currency codes and setting state
                     const codes = Object.keys(response.data.symbols);
                     setCurrencyCodes(codes);
 
-                    // Log the currency codes to the console
                     console.log("Fetched Currency Codes:", codes);
                 } else {
                     console.error("Failed to fetch currency symbols or symbols is undefined:", response);
@@ -103,7 +100,6 @@ function Singletrip() {
     }, []);
 
 
-    // Captures new input instantly in each popup field
     const newExpenseInputChange = (e) => {
         const { name, value } = e.target;
         setNewExpenseData({ ...newExpenseData, [name]: value });
@@ -112,15 +108,16 @@ function Singletrip() {
 
     const submitNewExpense = async (e) => {
         e.preventDefault();
-        // Example form submission logic (e.g., send data to backend)
-        console.log('New Expense Data:', newExpenseData);
-        console.log(tripId);
+        // console.log('New Expense Data:', newExpenseData);
+        // console.log(tripId);
+
         const updatedExpenseData = {
             ...newExpenseData,
-            trip_id: tripId // Set the trip_id to the new value
+            trip_id: tripId 
         };
+
         await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/create-expense`, updatedExpenseData);
-        // Clear form fields
+
         setNewExpenseData({
             trip_id: '',
             name: '',
@@ -130,8 +127,7 @@ function Singletrip() {
             posted: '',
             notes: ''
         });
-
-        // Hide the modal after submission
+        
         setPopUpVisible(false);
     };
 
