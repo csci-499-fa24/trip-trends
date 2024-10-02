@@ -21,7 +21,7 @@ function Singletrip() {
 
     useEffect(() => {
         if (tripId) {
-            axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/get-trip/${tripId}`)
+            axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`)
                 .then(response => {
                     setTripData(response.data);
                 })
