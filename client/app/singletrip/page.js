@@ -5,6 +5,9 @@ import '../css/singletrip.css';
 import axios from 'axios';
 import Table from 'react-bootstrap/Table';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Calendar from 'react-calendar'
+import 'react-calendar/dist/Calendar.css';
+import { parseISO, startOfDay, endOfDay } from 'date-fns';
 
 function Singletrip() {
     const [tripId, setTripId] = useState(null);
@@ -27,6 +30,26 @@ function Singletrip() {
                 });
         }
     }, [tripId]);
+
+    const getTripDates = () => {
+        if (!tripData) {
+            return { startDate: null, endDate: null };
+        }
+
+        const startDate = startOfDay(parseISO(tripData.data.start_date));
+        const endDate = endOfDay(parseISO(tripData.data.end_date));
+
+        return { startDate, endDate };
+    };
+
+    const { startDate, endDate } = getTripDates();
+
+    const isDateInRange = (date) => {
+        if (!startDate || !endDate) {
+            return false;
+        }
+        return date >= startDate && date <= endDate;
+    };
 
     return (
         <div>
@@ -51,10 +74,22 @@ function Singletrip() {
                             </tr>
                         </tbody>
                     </Table>
+                    <Calendar
+                        tileClassName={({ date }) => {
+                            if (isDateInRange(date)) {
+                                return 'highlighted-date';
+                            }
+                            if (date.toDateString() === endDate.toDateString()) {
+
+                                return 'highlighted-date';
+                            }
+                            return null;
+                        }}
+                    />
                     {tripData.data.image ? (
                         <p>{tripData.data.image}</p>
                     ) : (
-                        <p></p>
+                        <p>[Gallery of photos]</p>
                     )}
                 </div>
             ) : (

@@ -1,0 +1,42 @@
+.highlighted-date {
+    background-color: #77DD77 !important;
+    color: white !important;
+}
+
+.react-calendar__tile--active {
+    background-color: green !important;
+}
+
+.react-calendar__navigation button:hover {
+    background-color: green;
+}
+
+.react-calendar {
+    border: none;
+}
+
+.react-calendar__tile {
+    box-shadow: none;
+    transition: none;
+}
+
+.react-calendar__tile--active {
+    box-shadow: none;
+}
+
+
+.react-calendar__navigation {
+    background: none;
+    border: none;
+}
+
+.react-calendar__navigation button {
+    box-shadow: none;
+    background: none;
+}
+
+/* For the month name */
+.react-calendar__month-view__header {
+    box-shadow: none;
+    background: none;
+}
