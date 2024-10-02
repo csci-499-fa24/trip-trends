@@ -1,5 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
+const User = require('./User');
 
 // db schema to add a trip
 const Trip = sequelize.define("all_trips", {
@@ -10,7 +11,8 @@ const Trip = sequelize.define("all_trips", {
     },
     name: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true
     },
     start_date: {
         type: DataTypes.DATEONLY,
@@ -18,10 +20,14 @@ const Trip = sequelize.define("all_trips", {
     },
     end_date: {
         type: DataTypes.DATEONLY,
-        allowNull: false
-        // validate: {
-        //     isAfter: this.start_date
-        // }
+        allowNull: false,
+        validate: {
+            isAfterStartDate(value) {
+                if (new Date(value) <= new Date(this.start_date)) {
+                    throw new Error('End date must be after start date');
+                }
+            }
+        }
     },
     budget: {
         type: DataTypes.DOUBLE,
@@ -35,5 +41,7 @@ const Trip = sequelize.define("all_trips", {
     tableName: 'all_trips',
     timestamps: false
 });
+// User.hasMany(Trip, { foreignKey: 'user_id' });
+// Trip.belongsTo(User, { foreignKey: 'user_id' });
 
 module.exports = Trip;
