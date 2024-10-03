@@ -1,3 +1,170 @@
+/* singletrip.css */
+button {
+    box-shadow: 0 10px 20px -8px rgba(0, 0, 0, .7);
+}
+
+.create-expense {
+    background-color: #134a09;
+    position: relative;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.5s;
+    overflow: hidden;
+}
+
+.create-expense:after {
+    content: '+';
+    position: absolute;
+    opacity: 0;
+    top: 50%;
+    right: -40px;
+    transform: translateY(-50%);
+    transition: 0.2s ease-in-out;
+    font-size: 30px;
+    color: white;
+}
+
+.create-expense:hover {
+    color: transparent;
+    /* hide text */
+    padding-right: 20px;
+}
+
+.create-expense:hover:after {
+    opacity: 1;
+    right: 50%;
+    transform: translate(50%, -50%);
+}
+
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    max-width: 100vh;
+    max-height: 300vh;
+    overflow-y: auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.new-expense-title {
+    font-size: 24px;
+    color: black;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.new-expense-field-label {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.new-expense-field-label input {
+    padding: 8px;
+    margin-top: 5px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    background-color: black;
+    /* input bkgd will be white */
+    font-size: 15px;
+    transition: border-color 0.3s ease;
+    width: 100%;
+    color: white;
+    /* text input will be black */
+    filter: invert(1);
+}
+
+/* the date input fields */
+.new-expense-field-label input[type="date"] {
+    cursor: pointer;
+}
+
+/* the container holding the dates */
+.date-fields {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+/* animation for the create expense button */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.submit-new-expense-button {
+    padding: 8px;
+    background-color: #134a09;
+    color: white;
+    border: none;
+    width: 40%;
+    /* Width of the button */
+    border-radius: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    align-self: center;
+}
+
+.close {
+    position: relative;
+    font-weight: bold;
+    color: black;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 10000;
+}
+
+.new-expense-field-label select {
+    padding: 8px;
+    margin-top: 5px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    background-color: black;
+    color: white;
+    font-size: 15px;
+    transition: border-color 0.3s ease;
+    width: 100%;
+    filter: invert(1);
+}
+
+.highlighted-date {
+    background-color: #77DD77 !important;
+    color: white !important;
+}
+
 .highlighted-date {
     background-color: #77DD77 !important;
     color: white !important;
@@ -25,16 +192,22 @@
 }
 
 .react-calendar__navigation {
-    background: none;
+    background-color: white;
     border: none;
 }
 
 .react-calendar__navigation button {
+    color: black;
     box-shadow: none;
     background: none;
 }
 
 .react-calendar__month-view__header {
     box-shadow: none;
-    background: none;
+    background-color: white;
+    color: black;
+}
+
+.react-calendar__tile {
+    color: black;
 }
