@@ -11,6 +11,8 @@ const SharedTrip = sequelize.define('sharedtrips', {
         references: {
             model: 'users',
             key: 'user_id',
+            onUpdate: 'CASCADE', 
+            onDelete: 'CASCADE',
         },
     },
     trip_id: {
@@ -19,6 +21,8 @@ const SharedTrip = sequelize.define('sharedtrips', {
         references: {
             model: 'all_trips',
             key: 'trip_id',
+            onUpdate: 'CASCADE', 
+            onDelete: 'CASCADE',
         },
     },
 }, {

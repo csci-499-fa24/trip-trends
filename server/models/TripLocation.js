@@ -10,6 +10,8 @@ const TripLocation = sequelize.define('TripLocation', {
         references: {
             model: 'all_trips',
             key: 'trip_id',
+            onUpdate: 'CASCADE', 
+            onDelete: 'CASCADE',
         },
     },
     location: {

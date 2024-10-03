@@ -7,6 +7,9 @@ import Table from 'react-bootstrap/Table';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/homepage.css';
 
+import Calendar from 'react-calendar'
+import 'react-calendar/dist/Calendar.css';
+import { parseISO, startOfDay, endOfDay } from 'date-fns';
 
 function Singletrip() {
     const [tripId, setTripId] = useState(null);
@@ -27,6 +30,7 @@ function Singletrip() {
         "Accommodation",
         "Car Rentals",
         "Fuel",
+        "Food",
         "Groceries",
         "Restaurants",
         "Snacks",
@@ -63,7 +67,7 @@ function Singletrip() {
 
     useEffect(() => {
         if (tripId) {
-            axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/get-trip/${tripId}`)
+            axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`)
                 .then(response => {
                     setTripData(response.data);
                 })
@@ -88,7 +92,7 @@ function Singletrip() {
                     const codes = Object.keys(response.data.symbols);
                     setCurrencyCodes(codes);
 
-                    console.log("Fetched Currency Codes:", codes);
+                    // console.log("Fetched Currency Codes:", codes);
                 } else {
                     console.error("Failed to fetch currency symbols or symbols is undefined:", response);
                 }
@@ -113,10 +117,10 @@ function Singletrip() {
 
         const updatedExpenseData = {
             ...newExpenseData,
-            trip_id: tripId 
+            trip_id: tripId
         };
 
-        await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/create-expense`, updatedExpenseData);
+        await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses`, updatedExpenseData);
 
         setNewExpenseData({
             trip_id: '',
@@ -127,11 +131,31 @@ function Singletrip() {
             posted: '',
             notes: ''
         });
-        
+
         setPopUpVisible(false);
     };
 
 
+
+    const getTripDates = () => {
+        if (!tripData) {
+            return { startDate: null, endDate: null };
+        }
+
+        const startDate = startOfDay(parseISO(tripData.data.start_date));
+        const endDate = endOfDay(parseISO(tripData.data.end_date));
+
+        return { startDate, endDate };
+    };
+
+    const { startDate, endDate } = getTripDates();
+
+    const isDateInRange = (date) => {
+        if (!startDate || !endDate) {
+            return false;
+        }
+        return date >= startDate && date <= endDate;
+    };
 
     return (
         <div>
@@ -156,10 +180,22 @@ function Singletrip() {
                             </tr>
                         </tbody>
                     </Table>
+                    <Calendar
+                        tileClassName={({ date }) => {
+                            if (isDateInRange(date)) {
+                                return 'highlighted-date';
+                            }
+                            if (date.toDateString() === endDate.toDateString()) {
+
+                                return 'highlighted-date';
+                            }
+                            return null;
+                        }}
+                    />
                     {tripData.data.image ? (
                         <p>{tripData.data.image}</p>
                     ) : (
-                        <p></p>
+                        <p>[Gallery of photos]</p>
                     )}
                 </div>
             ) : (

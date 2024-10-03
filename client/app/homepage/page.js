@@ -71,7 +71,7 @@ function homepage() {
 
     const fetchTrips = async () => {
         try {
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/get-trips`);
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips`);
             console.log(response.data);
             setTrips(response.data.data);
         } catch (err) {
