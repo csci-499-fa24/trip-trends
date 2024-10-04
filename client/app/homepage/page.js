@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import logo from '../img/Logo.png';
 import '../css/homepage.css';
@@ -20,6 +20,7 @@ import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
 import { fromLonLat } from 'ol/proj';
 import Link from 'next/link';
+import { debounce } from 'lodash'; // for rate limiting when calling the OpenCage API on every keystroke
 
 // Custom marker icon style
 const customIconStyle = new Style({
@@ -48,14 +49,15 @@ function homepage() {
     const [tempLocation, setTempLocation] = useState('');
     const mapRef = useRef(null); // Reference for the map
     const [suggestions, setSuggestions] = useState([]);
+    const [locationsNotProvided, setLocationsNotProvided] = useState(false);
 
-    // Handle events
     const handleLogout = () => {
         googleLogout();
         localStorage.removeItem("token");
         window.location.href = '/signup';
     };
 
+    // Used to display user's name if token exists
     const handleToken = () => {
         const token = localStorage.getItem("token");
         if (token) {
@@ -97,7 +99,7 @@ function homepage() {
         fetchLocationSuggestions(value);
     };
     
-    const fetchLocationSuggestions = async (query) => {
+    const fetchLocationSuggestions = useCallback(debounce(async (query) => {
         if (query) {
             try {
                 const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json`, {
@@ -114,9 +116,10 @@ function homepage() {
                 setSuggestions([]); // Clear suggestions on error
             }
         } else {
-            setSuggestions([]); // Clear suggestions if input is empty
+            setSuggestions([]);
         }
-    };
+    }, 200), // debounce delay to reduce the number of API calls to avoid errors
+    []); 
 
     const selectSuggestion = (suggestion) => {
         // Check if the suggestion is not already included and if the max limit is not reached
@@ -139,6 +142,7 @@ function homepage() {
                 trip_locations: [...prev.trip_locations, tempLocation] // Add the new location to the array
             }));
             setTempLocation(''); // Clear the input
+            setSuggestions([]); // Clear suggestions after adding location either by entering or clicking the button
         } else if (newTripLocation.trip_locations.length >= 10) {
             alert("You can only add a maximum of 10 locations."); // Alert if limit is reached
         }
@@ -146,19 +150,30 @@ function homepage() {
 
     const submitNewTrip = async (e) => {
         e.preventDefault();
+        // no locations entered or selected
+        if (newTripLocation.trip_locations.length === 0){
+            setLocationsNotProvided(true);
+            alert("Please provide at least one location.")
+            return;
+        }
         try {
             const tripDataWithLocations = {
                 ...newTripData,
                 trip_locations: newTripLocation.trip_locations.join(', ') // Convert array to string
             };
             console.log("New trip data", tripDataWithLocations);
-            await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/create-trip`, tripDataWithLocations);
+
+            // Get user ID to create trip under it
+            const user_id = localStorage.getItem("user_id");
+            console.log("User ID:", user_id);
+            await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${user_id}`, newTripData); // locations not needed for a trip submission
             setPopUpVisible(false); // Close the popup
             setNewTripData({ name: '', start_date: '', end_date: '', budget: '' }); // Reset form fields
             setNewTripLocation({ trip_locations: [] }); // Reset locations
             fetchTrips(); // Refresh trips after creating a new one
+            setLocationsNotProvided(false); 
         } catch (error) {
-            console.error('Error creating trip:', error);
+            console.error("Error creating trip:", error);
         }
     };
 
@@ -268,20 +283,21 @@ function homepage() {
                                         onKeyDown={(e) => { 
                                             // Check if the Enter key is pressed and the limit has not been reached
                                             if (e.key === 'Enter') {
+                                                e.preventDefault(); // Prevent form submission
                                                 if (newTripLocation.trip_locations.length < 10) {
                                                     addLocation(); // Allow adding location
-                                                    e.preventDefault(); // Prevent form submission
+
                                                 } else {
                                                     alert("You can only add a maximum of 10 locations."); // Alert if limit is reached
-                                                    e.preventDefault(); // Prevent form submission
+                                                   
                                                 }
                                             }
                                         }} 
-                                        required
                                     />
                                     <button 
                                         type="button" 
                                         onClick={addLocation} 
+                                        style={{ marginTop: '8px' }}
                                         disabled={newTripLocation.trip_locations.length >= 10} // Disable button if limit reached
                                     >
                                         Add Location
