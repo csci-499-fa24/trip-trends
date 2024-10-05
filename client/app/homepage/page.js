@@ -71,7 +71,7 @@ function homepage() {
 
     const fetchTrips = async () => {
         try {
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/get-trips`);
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips`);
             console.log(response.data);
             setTrips(response.data.data);
         } catch (err) {
@@ -347,7 +347,7 @@ function homepage() {
                                                 <strong>Dates:</strong> {trip.start_date} - {trip.end_date}
                                             </p>
                                             <p><strong>Budget:</strong> ${trip.budget}</p>
-                                            <Link href={`/singletrip`} style={{ color: 'white', textDecoration: 'underline' }}>
+                                            <Link href={`/singletrip?tripId=${trip.trip_id}`} style={{ color: 'white', textDecoration: 'underline' }}>
                                                 See more
                                             </Link>
                                         </div>
