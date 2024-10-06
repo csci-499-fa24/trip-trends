@@ -211,3 +211,63 @@ form {
 .react-calendar__tile {
     color: black;
 }
+
+#tripName {
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.homeCorner {
+    position: absolute;
+    top: 100px;
+}
+
+.col {
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+}
+
+.meter-container {
+    border: 2px solid black;
+    border-radius: 8px;
+    width: 400px;
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#budgetTitle {
+    margin-top: 10px;
+    font-weight: 600;
+    margin-bottom: 0;
+}
+
+.logo-container{
+    z-index: 1; 
+    position: relative; 
+}
+
+.left-rectangle, .right-rectangle {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: black;
+    height: 25px; /* Height of the rectangle */
+}
+
+.left-rectangle {
+    left: 0;
+    width: 690px; /* Width of the left rectangle */
+}
+
+.right-rectangle {
+    right: 0;
+    width: 690px; /* Width of the right rectangle */
+}
+
+#budget-text{
+    margin-top: 0;
+}
