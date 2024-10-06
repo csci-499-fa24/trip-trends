@@ -4,9 +4,7 @@ const SharedTrip = require('../models/SharedTrip');
 const createSharedTrip = async (req, res) => {
     const userId = req.params.userId;
     const tripId = req.params.tripId;
-    console.log("userId:", userId); // Debugging line
-    console.log("tripId:", tripId); // Debugging line
-
+    
     try {
         if (!userId || !tripId) {
             return res.status(400).json({ message: "userId, tripId required" });
