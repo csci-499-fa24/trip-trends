@@ -271,3 +271,17 @@ form {
 #budget-text{
     margin-top: 0;
 }
+
+.download-trip-data-btn {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    background-color: #134a09;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+  
+.download-trip-data-btn:hover {
+    background-color: #45a049;
+}
