@@ -123,6 +123,26 @@ function Singletrip() {
 
     }, []);
 
+    const downloadTripData = async () => {
+        try {
+            const response = await axios({
+                url: `${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/download/${tripId}`,
+                method: 'GET',
+                responseType: 'blob' // important
+            });
+
+            // Create a blob from the CSV data
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `trip_${tripId}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+        } catch (error) {
+            console.error('Error downloading trip data:', error);
+        }
+    };
 
     const newExpenseInputChange = (e) => {
         const { name, value } = e.target;
@@ -285,30 +305,37 @@ function Singletrip() {
                     <br></br>
                     {/* Expense Table */}
                     {expenseData && expenseData.data ? (
-                        <Table striped bordered hover size="sm" responsive="sm">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Amount</th>
-                                    <th>Category</th>
-                                    <th>Currency</th>
-                                    <th>Date Posted</th>
-                                    <th>Notes</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {expenseData.data.map((expense) => (
-                                    <tr key={expense.expense_id}>
-                                        <td>{expense.name}</td>
-                                        <td>{expense.amount}</td>
-                                        <td>{expense.category}</td>
-                                        <td>{expense.currency}</td>
-                                        <td>{expense.posted}</td>
-                                        <td>{expense.notes}</td>
+                        <div>
+                            <Table striped bordered hover size="sm" responsive="sm">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Amount</th>
+                                        <th>Category</th>
+                                        <th>Currency</th>
+                                        <th>Date Posted</th>
+                                        <th>Notes</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </Table>
+                                </thead>
+                                <tbody>
+                                    {expenseData.data.map((expense) => (
+                                        <tr key={expense.expense_id}>
+                                            <td>{expense.name}</td>
+                                            <td>{expense.amount}</td>
+                                            <td>{expense.category}</td>
+                                            <td>{expense.currency}</td>
+                                            <td>{expense.posted}</td>
+                                            <td>{expense.notes}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </Table>
+
+                            {/* Add the Download Button */}
+                            <button onClick={downloadTripData} className="download-trip-data-btn">
+                                Download Trip Data
+                            </button>
+                        </div>
                     ) : (
                         <p>No expenses yet...</p>
                     )}
