@@ -32,6 +32,10 @@ const customIconStyle = new Style({
 
 const googleID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
+// Get user ID to create and get trip from onboarded user
+const user_id = localStorage.getItem("user_id");
+console.log("Logged in user:", user_id);
+
 function homepage() {
     // States
     const [userName, setUserName] = useState("[NAME]"); 
@@ -71,9 +75,9 @@ function homepage() {
         }
     };
 
-    const fetchTrips = async () => {
+    const fetchUserTrips = async () => {
         try {
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips`);
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/users/${user_id}`);
             console.log(response.data);
             setTrips(response.data.data);
         } catch (err) {
@@ -157,20 +161,36 @@ function homepage() {
             return;
         }
         try {
-            const tripDataWithLocations = {
-                ...newTripData,
-                trip_locations: newTripLocation.trip_locations.join(', ') // Convert array to string
-            };
-            console.log("New trip data", tripDataWithLocations);
+            // const tripDataWithLocations = {
+            //     ...newTripData,
+            //     trip_locations: newTripLocation.trip_locations.join(', ') // Convert array to string
+            // };
+            // console.log("New trip data", tripDataWithLocations);
 
-            // Get user ID to create trip under it
-            const user_id = localStorage.getItem("user_id");
             console.log("User ID:", user_id);
-            await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${user_id}`, newTripData); // locations not needed for a trip submission
+            const trip_submission_response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${user_id}`, newTripData); // locations not needed for a trip submission
+            const trip_id = trip_submission_response.data.data.trip_id;
+            console.log("Trip ID:", trip_id);
+            console.log("Trip Locations: ", newTripLocation.trip_locations);
+            const num_trip_locs = newTripLocation.trip_locations.length;
+            console.log(num_trip_locs);
+
+            // for every location, create a trip location entry
+            for (let i = 0; i < num_trip_locs; i++){
+                let a_trip_location = {trip_id: trip_id, location: newTripLocation.trip_locations[i]};
+                console.log(`Trip Location ${i+1}:`, a_trip_location);
+                axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations`, a_trip_location);
+            }
+
+            // a shared trip will be under the user who created the trip to support future shared trips
+            const shared_trip = {user_id: user_id, trip_id: trip_id};
+            console.log("Shared Trip:", shared_trip);
+            axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips`, shared_trip);
+
             setPopUpVisible(false); // Close the popup
             setNewTripData({ name: '', start_date: '', end_date: '', budget: '' }); // Reset form fields
             setNewTripLocation({ trip_locations: [] }); // Reset locations
-            fetchTrips(); // Refresh trips after creating a new one
+            fetchUserTrips(); // Refresh trips after creating a new one
             setLocationsNotProvided(false); 
         } catch (error) {
             console.error("Error creating trip:", error);
@@ -179,7 +199,7 @@ function homepage() {
 
     useEffect(() => {
         handleToken();
-        fetchTrips(); // Call the function to fetch trips on component mount
+        fetchUserTrips(); // Call the function to fetch trips on component mount
     }, []);
 
     useEffect(() => {
@@ -284,24 +304,24 @@ function homepage() {
                                             // Check if the Enter key is pressed and the limit has not been reached
                                             if (e.key === 'Enter') {
                                                 e.preventDefault(); // Prevent form submission
-                                                if (newTripLocation.trip_locations.length < 10) {
-                                                    addLocation(); // Allow adding location
+                                                // if (newTripLocation.trip_locations.length < 10) {
+                                                //     addLocation(); // Allow adding location
 
-                                                } else {
-                                                    alert("You can only add a maximum of 10 locations."); // Alert if limit is reached
+                                                // } else {
+                                                //     alert("You can only add a maximum of 10 locations."); // Alert if limit is reached
                                                    
-                                                }
+                                                // }
                                             }
                                         }} 
                                     />
-                                    <button 
+                                    {/* <button 
                                         type="button" 
                                         onClick={addLocation} 
                                         style={{ marginTop: '8px' }}
                                         disabled={newTripLocation.trip_locations.length >= 10} // Disable button if limit reached
                                     >
                                         Add Location
-                                    </button>
+                                    </button> */}
                                 </label>
 
                                 <div>
