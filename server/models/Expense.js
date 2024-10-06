@@ -14,6 +14,8 @@ const Expense = sequelize.define('expense', {
         references: {
             model: 'all_trips',
             key: 'trip_id',
+            onUpdate: 'CASCADE', 
+            onDelete: 'CASCADE',
         },
     },
     name: {
