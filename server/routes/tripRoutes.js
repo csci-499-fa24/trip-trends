@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const TripController = require('../controllers/TripController');
 
-router.post("/:userId", TripController.createTrip);
+router.post("/users/:userId", TripController.createTrip);
 router.get("/", TripController.getTrips);
 router.get("/users/:userId", TripController.getTripsByUserId);
 router.get("/:tripId", TripController.getTripById);

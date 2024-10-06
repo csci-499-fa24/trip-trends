@@ -2,10 +2,15 @@ const SharedTrip = require('../models/SharedTrip');
 
 // POST new shared trip for user
 const createSharedTrip = async (req, res) => {
-    const { userId, tripId } = req.body;
+    const userId = req.params.userId;
+    const tripId = req.params.tripId;
+    
     try {
+        if (!userId || !tripId) {
+            return res.status(400).json({ message: "userId, tripId required" });
+        }
         // create new model instance 
-        const newSharedTrip = await SharedTrip.create({ userId, tripId });
+        const newSharedTrip = await SharedTrip.create({ user_id: userId, trip_id: tripId });
         res.status(201).json({ data: newSharedTrip });
     } catch (err) {
         console.error(err);
