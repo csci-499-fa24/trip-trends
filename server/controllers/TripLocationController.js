@@ -25,9 +25,9 @@ const getTripLocations = async (req, res) => {
 
 // GET specific trip location data by tripId
 const getTripLocationByTripId = async (req, res) => {
-    const id = req.params.id;
+    const tripId = req.params.tripId;
     try {
-        const tripLocation = await TripLocation.findAll({ where: { trip_id: id } });
+        const tripLocation = await TripLocation.findAll({ where: { trip_id: tripId } });
         if (!tripLocation) {
             return res.status(404).json({ message: "Trip Location not found" });
         }
@@ -40,14 +40,14 @@ const getTripLocationByTripId = async (req, res) => {
 
 // PUT request to update trip location data
 const updateTripLocation = async (req, res) => {
-    const id = req.params.id;
-    const { trip_id, location } = req.body;
+    const tripId = req.params.tripId;
+    const tripLocationId = req.params.tripLocationId;
     try {
-        const tripLocation = await TripLocation.findAll({ where: { trip_id: id } });
+        const tripLocation = await TripLocation.findOne({ where: { trip_id: tripId, tlocation: tripLocationId} });
         if (!tripLocation) {
             return res.status(404).json({ message: "Trip location not found" });
         }
-        const updatedTripLocation = await tripLocation.update({ trip_id, location });
+        const updatedTripLocation = await tripLocation.update({ tripId, tripLocationId });
         res.json({ data: updatedTripLocation });
     } catch (err) {
         console.error(err);
@@ -57,10 +57,11 @@ const updateTripLocation = async (req, res) => {
 
 // DELETE trip location data
 const deleteTripLocation = async (req, res) => {
-    const id = req.params.id;
+    const tripId = req.params.tripId;
+    const tripLocationId = req.params.tripLocationId;
     try {
-        // delete trip by id
-        const deletedCount = await TripLocation.destroy({ where: { trip_id: id } });
+        // delete trip location by tripId
+        const deletedCount = await TripLocation.destroy({ where: { trip_id: tripId, tlocation: tripLocationId} });
         if (deletedCount === 0) {
             return res.status(404).json({ message: "Trip Location not found" });
         }
