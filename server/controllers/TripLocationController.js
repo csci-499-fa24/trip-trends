@@ -25,9 +25,9 @@ const getTripLocations = async (req, res) => {
 
 // GET specific trip location data by tripId
 const getTripLocationByTripId = async (req, res) => {
-    const id = req.params.id;
+    const tripId = req.params.tripId;
     try {
-        const tripLocation = await TripLocation.findAll({ where: { trip_id: id } });
+        const tripLocation = await TripLocation.findAll({ where: { trip_id: tripId } });
         if (!tripLocation) {
             return res.status(404).json({ message: "Trip Location not found" });
         }
@@ -40,10 +40,10 @@ const getTripLocationByTripId = async (req, res) => {
 
 // PUT request to update trip location data
 const updateTripLocation = async (req, res) => {
-    const id = req.params.id;
+    const tripId = req.params.tripId;
     const { trip_id, location } = req.body;
     try {
-        const tripLocation = await TripLocation.findAll({ where: { trip_id: id } });
+        const tripLocation = await TripLocation.findAll({ where: { trip_id: tripId } });
         if (!tripLocation) {
             return res.status(404).json({ message: "Trip location not found" });
         }
