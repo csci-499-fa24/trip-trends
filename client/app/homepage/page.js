@@ -32,10 +32,6 @@ const customIconStyle = new Style({
 
 const googleID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
-// Get user ID to create and get trip from onboarded user
-const user_id = localStorage.getItem("user_id");
-console.log("Logged in user:", user_id);
-
 function homepage() {
     // States
     const [userName, setUserName] = useState("[NAME]"); 
@@ -54,6 +50,7 @@ function homepage() {
     const mapRef = useRef(null); // Reference for the map
     const [suggestions, setSuggestions] = useState([]);
     const [locationsNotProvided, setLocationsNotProvided] = useState(false);
+    const [userId, setUserId] = useState(null);
 
     const handleLogout = () => {
         googleLogout();
@@ -75,9 +72,30 @@ function homepage() {
         }
     };
 
+    const getUserId = () => {
+        // Get user ID to create and get trip from onboarded user
+        const user_id = localStorage.getItem("user_id");
+        if (user_id){
+            setUserId(user_id);
+        }
+        else {
+            console.error("User ID not found.");
+        }
+    }
+
+    useEffect(() => {
+        handleToken();
+        getUserId();
+    }, []);
+
     const fetchUserTrips = async () => {
+        if (!userId){
+            console.error("User ID is not set.");
+            return;
+        }
+        console.log("Fetching trips for user ID:", userId);
         try {
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/users/${user_id}`);
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/users/${userId}`);
             console.log(response.data);
             setTrips(response.data.data);
         } catch (err) {
@@ -85,6 +103,10 @@ function homepage() {
             setTrips([]);
         }
     };
+
+    useEffect(() => {
+        fetchUserTrips(); // Call the function to fetch trips on component mount
+    }, [userId]);
 
     // Toggle the expanded state of a trip
     const toggleTripDetails = (tripId) => {
@@ -154,53 +176,47 @@ function homepage() {
 
     const submitNewTrip = async (e) => {
         e.preventDefault();
-        // no locations entered or selected
+        // No locations selected
         if (newTripLocation.trip_locations.length === 0){
             setLocationsNotProvided(true);
             alert("Please provide at least one location.")
             return;
         }
         try {
-            // const tripDataWithLocations = {
-            //     ...newTripData,
-            //     trip_locations: newTripLocation.trip_locations.join(', ') // Convert array to string
-            // };
-            // console.log("New trip data", tripDataWithLocations);
-
-            console.log("User ID:", user_id);
-            const trip_submission_response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${user_id}`, newTripData); // locations not needed for a trip submission
+            console.log("User ID:", userId);
+            const trip_submission_response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/users/${userId}`, newTripData); // locations not needed for a trip submission
             const trip_id = trip_submission_response.data.data.trip_id;
             console.log("Trip ID:", trip_id);
             console.log("Trip Locations: ", newTripLocation.trip_locations);
             const num_trip_locs = newTripLocation.trip_locations.length;
-            console.log(num_trip_locs);
 
-            // for every location, create a trip location entry
+            // For every location, create a trip location entry
             for (let i = 0; i < num_trip_locs; i++){
                 let a_trip_location = {trip_id: trip_id, location: newTripLocation.trip_locations[i]};
                 console.log(`Trip Location ${i+1}:`, a_trip_location);
-                axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations`, a_trip_location);
+                try {
+                    await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations`, a_trip_location);
+                }
+                catch (error){
+                    console.error(`Error creating trip location ${i+1}:`, error);
+                }
             }
 
-            // a shared trip will be under the user who created the trip to support future shared trips
-            const shared_trip = {user_id: user_id, trip_id: trip_id};
+            // A shared trip will be under the user who created the trip to support future shared trips
+            const shared_trip = {user_id: userId, trip_id: trip_id};
             console.log("Shared Trip:", shared_trip);
-            axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips`, shared_trip);
-
+            //await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/users/${userId}/trips/${trip_id}`, shared_trip);
+            
             setPopUpVisible(false); // Close the popup
             setNewTripData({ name: '', start_date: '', end_date: '', budget: '' }); // Reset form fields
             setNewTripLocation({ trip_locations: [] }); // Reset locations
-            fetchUserTrips(); // Refresh trips after creating a new one
+            await fetchUserTrips(); // Refresh trips after creating a new one
             setLocationsNotProvided(false); 
+
         } catch (error) {
             console.error("Error creating trip:", error);
         }
     };
-
-    useEffect(() => {
-        handleToken();
-        fetchUserTrips(); // Call the function to fetch trips on component mount
-    }, []);
 
     useEffect(() => {
         // Initialize the OpenLayers map after the component mounts
@@ -243,7 +259,7 @@ function homepage() {
             {/* Header section */}
             <header className="header">
                 <div className="logo-container">
-                    <Image src={logo} alt="Logo" width={300} height={300}/>
+                    <Image src={logo} alt="Logo" width={300} height={300} priority/>
                 </div>
                 <div className="left-rectangle"></div>
                 <div className="right-rectangle"></div>
@@ -301,34 +317,18 @@ function homepage() {
                                         value={tempLocation}
                                         onChange={newTripLocInputChange}
                                         onKeyDown={(e) => { 
-                                            // Check if the Enter key is pressed and the limit has not been reached
                                             if (e.key === 'Enter') {
                                                 e.preventDefault(); // Prevent form submission
-                                                // if (newTripLocation.trip_locations.length < 10) {
-                                                //     addLocation(); // Allow adding location
-
-                                                // } else {
-                                                //     alert("You can only add a maximum of 10 locations."); // Alert if limit is reached
-                                                   
-                                                // }
                                             }
                                         }} 
                                     />
-                                    {/* <button 
-                                        type="button" 
-                                        onClick={addLocation} 
-                                        style={{ marginTop: '8px' }}
-                                        disabled={newTripLocation.trip_locations.length >= 10} // Disable button if limit reached
-                                    >
-                                        Add Location
-                                    </button> */}
                                 </label>
 
                                 <div>
                                     {newTripLocation.trip_locations.map((location, index) => (
                                         <div key={index} className="selected-location">
                                             <span className="location-text">{location}</span>
-                                            <button onClick={() => {
+                                            <button type="button" onClick={() => {
                                                 setNewTripLocation(prev => ({
                                                     trip_locations: prev.trip_locations.filter((loc, i) => i !== index) // Remove selected location
                                                 }));
