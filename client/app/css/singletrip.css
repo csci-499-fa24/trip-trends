@@ -1,5 +1,5 @@
 /* singletrip.css */
-button {
+.button {
     box-shadow: 0 10px 20px -8px rgba(0, 0, 0, .7);
 }
 
@@ -66,7 +66,7 @@ button {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-form {
+.form {
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -364,6 +364,31 @@ form {
 .filter-option-button:hover {
     background-color: #134a09; 
     color: white; 
+}
+
+.applied-filter {
+    display: flex;
+    align-items: center;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    border-radius: 5px;
+    white-space: nowrap;
+}
+
+.clear-filter-btn {
+    background: none;
+    border: none;
+    color: #ff0000;
+    cursor: pointer;
+    font-size: 16px;
+    margin-left: 10px; 
+}
+
+.filter-section {
+    display: flex; 
+    align-items: center;
+    gap: 10px;
 }
 
 

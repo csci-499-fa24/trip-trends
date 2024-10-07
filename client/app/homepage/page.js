@@ -165,6 +165,7 @@ function homepage() {
     useEffect(() => {
         handleToken();
         fetchTrips(); // Call the function to fetch trips on component mount
+        localStorage.removeItem('selectedFilter');
     }, []);
 
     useEffect(() => {

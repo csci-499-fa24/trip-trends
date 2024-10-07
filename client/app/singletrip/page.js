@@ -24,6 +24,8 @@ function Singletrip() {
     const [currencyCodes, setCurrencyCodes] = useState([]);
     const [isPopUpVisible, setPopUpVisible] = useState(false);
     const [isFilterPopupVisible, setFilterPopupVisible] = useState(false);
+    const [originalData, setOriginalData] = useState([]);
+    const [selectedFilter, setSelectedFilter] = useState('');
     const [newExpenseData, setNewExpenseData] = useState({
         trip_id: '',
         name: '',
@@ -85,7 +87,13 @@ function Singletrip() {
             axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/trips/${tripId}`)
                 .then(response => {
                     // console.log(response.data.data)
-                    setExpenseData(response.data)
+                    setExpenseData(response.data);
+                    setOriginalData(response.data);
+
+                    const savedFilter = localStorage.getItem('selectedFilter');
+                    if (savedFilter) {
+                        applyFilter(savedFilter, response.data);
+                    }
 
                     const total = response.data.data.reduce((sum, expense) => {
                         const amount = parseFloat(expense.amount);
@@ -113,8 +121,6 @@ function Singletrip() {
                 if (response.data.success && response.data.symbols) {
                     const codes = Object.keys(response.data.symbols);
                     setCurrencyCodes(codes);
-
-                    // console.log("Fetched Currency Codes:", codes);
                 } else {
                     console.error("Failed to fetch currency symbols or symbols is undefined:", response);
                 }
@@ -203,27 +209,35 @@ function Singletrip() {
 
     const handleFilterChange = (filterValue) => {
         applyFilter(filterValue);
-        // console.log(filterValue);
         setFilterPopupVisible(false);
     };
 
-    const applyFilter = (filterOption) => {
+    const applyFilter = (filterOption, data = originalData) => {
         let sortedExpenses;
         if (filterOption === 'highest') {
-            sortedExpenses = [...expenseData.data].sort((a, b) => b.amount - a.amount);
-            // console.log("Sorted by highest amount:", sortedExpenses);
+            console.log(expenseData.data);
+            sortedExpenses = [...data.data].sort((a, b) => b.amount - a.amount);
         } else if (filterOption === 'lowest') {
-            sortedExpenses = [...expenseData.data].sort((a, b) => a.amount - b.amount);
-            // console.log("Sorted by lowest amount:", sortedExpenses);
+            sortedExpenses = [...data.data].sort((a, b) => a.amount - b.amount);
         } else if (filterOption === 'recent') {
-            sortedExpenses = [...expenseData.data].sort((a, b) => new Date(b.posted) - new Date(a.posted));
+            sortedExpenses = [...data.data].sort((a, b) => new Date(b.posted) - new Date(a.posted));
             console.log("Sorted by most recent:", sortedExpenses);
         } else if (filterOption === 'oldest') {
-            sortedExpenses = [...expenseData.data].sort((a, b) => new Date(a.posted) - new Date(b.posted));
-            // console.log("Sorted by oldest:", sortedExpenses);
+            sortedExpenses = [...data.data].sort((a, b) => new Date(a.posted) - new Date(b.posted));
         }
         setExpenseData({ data: sortedExpenses });
+        setSelectedFilter(filterOption);
+        localStorage.setItem('selectedFilter', filterOption);
     };
+
+    const clearFilter = () => {
+        setSelectedFilter('');
+        setExpenseData(originalData); // Reset to the original list
+
+        // Remove the filter from localStorage
+        localStorage.removeItem('selectedFilter');
+    };
+
 
     return (
         <div>
@@ -330,10 +344,20 @@ function Singletrip() {
                     </div>
 
                     <br></br>
-                    <button onClick={() => setPopUpVisible(true)} className='create-expense'>Create an Expense</button>
-                    <button className="filter-button" onClick={() => setFilterPopupVisible(true)}>
-                        <Image src={Filter} alt="Filter" className="filter-icon" />
-                    </button>
+                    <div className="filter-section">
+                        <button onClick={() => setPopUpVisible(true)} className='create-expense'>Create an Expense</button>
+                        <button className="filter-button" onClick={() => setFilterPopupVisible(true)}>
+                            <Image src={Filter} alt="Filter" className="filter-icon" />
+                        </button>
+                        {selectedFilter && (
+                            <div className="applied-filter">
+                                <span>{`Filter: ${selectedFilter}`}</span>
+                                <button className="clear-filter-btn" onClick={clearFilter}>
+                                    &times;
+                                </button>
+                            </div>
+                        )}
+                    </div>
                     <br></br>
                     <br></br>
 
