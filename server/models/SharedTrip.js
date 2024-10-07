@@ -6,7 +6,7 @@ const Trip = require('./Trip');
 //db schema to add a shared trip
 const SharedTrip = sequelize.define('sharedtrips', {
     user_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.UUID,
         allowNull: false,
         references: {
             model: 'users',
