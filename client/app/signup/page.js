@@ -27,6 +27,7 @@ function Signup() {
             .then(response => {
                 console.log(response)
                 toast.success("Sign in successful!");
+                localStorage.setItem("user_id", response.data.user.user_id);
                 localStorage.setItem("token", token);
                 setTimeout(() => {
                     window.location.href = '/homepage';

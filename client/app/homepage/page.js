@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import logo from '../img/Logo.png';
 import '../css/homepage.css';
@@ -20,6 +20,7 @@ import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
 import { fromLonLat } from 'ol/proj';
 import Link from 'next/link';
+import { debounce } from 'lodash'; // for rate limiting when calling the OpenCage API on every keystroke
 
 // Custom marker icon style
 const customIconStyle = new Style({
@@ -48,14 +49,16 @@ function homepage() {
     const [tempLocation, setTempLocation] = useState('');
     const mapRef = useRef(null); // Reference for the map
     const [suggestions, setSuggestions] = useState([]);
+    const [locationsNotProvided, setLocationsNotProvided] = useState(false);
+    const [userId, setUserId] = useState(null);
 
-    // Handle events
     const handleLogout = () => {
         googleLogout();
         localStorage.removeItem("token");
         window.location.href = '/signup';
     };
 
+    // Used to display user's name if token exists
     const handleToken = () => {
         const token = localStorage.getItem("token");
         if (token) {
@@ -69,9 +72,30 @@ function homepage() {
         }
     };
 
-    const fetchTrips = async () => {
+    const getUserId = () => {
+        // Get user ID to create and get trip from onboarded user
+        const user_id = localStorage.getItem("user_id");
+        if (user_id){
+            setUserId(user_id);
+        }
+        else {
+            console.error("User ID not found.");
+        }
+    }
+
+    useEffect(() => {
+        handleToken();
+        getUserId();
+    }, []);
+
+    const fetchUserTrips = async () => {
+        if (!userId){
+            console.error("User ID is not set.");
+            return;
+        }
+        console.log("Fetching trips for user ID:", userId);
         try {
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips`);
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/users/${userId}`);
             console.log(response.data);
             setTrips(response.data.data);
         } catch (err) {
@@ -79,6 +103,10 @@ function homepage() {
             setTrips([]);
         }
     };
+
+    useEffect(() => {
+        fetchUserTrips(); // Call the function to fetch trips on component mount
+    }, [userId]);
 
     // Toggle the expanded state of a trip
     const toggleTripDetails = (tripId) => {
@@ -97,7 +125,7 @@ function homepage() {
         fetchLocationSuggestions(value);
     };
     
-    const fetchLocationSuggestions = async (query) => {
+    const fetchLocationSuggestions = useCallback(debounce(async (query) => {
         if (query) {
             try {
                 const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json`, {
@@ -114,9 +142,10 @@ function homepage() {
                 setSuggestions([]); // Clear suggestions on error
             }
         } else {
-            setSuggestions([]); // Clear suggestions if input is empty
+            setSuggestions([]);
         }
-    };
+    }, 200), // debounce delay to reduce the number of API calls to avoid errors
+    []); 
 
     const selectSuggestion = (suggestion) => {
         // Check if the suggestion is not already included and if the max limit is not reached
@@ -139,6 +168,7 @@ function homepage() {
                 trip_locations: [...prev.trip_locations, tempLocation] // Add the new location to the array
             }));
             setTempLocation(''); // Clear the input
+            setSuggestions([]); // Clear suggestions after adding location either by entering or clicking the button
         } else if (newTripLocation.trip_locations.length >= 10) {
             alert("You can only add a maximum of 10 locations."); // Alert if limit is reached
         }
@@ -146,25 +176,54 @@ function homepage() {
 
     const submitNewTrip = async (e) => {
         e.preventDefault();
+        // No locations selected
+        if (newTripLocation.trip_locations.length === 0){
+            setLocationsNotProvided(true);
+            alert("Please provide at least one location.")
+            return;
+        }
         try {
-            const tripDataWithLocations = {
-                ...newTripData,
-                trip_locations: newTripLocation.trip_locations.join(', ') // Convert array to string
-            };
-            console.log("New trip data", tripDataWithLocations);
-            await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/create-trip`, tripDataWithLocations);
+            console.log("User ID:", userId);
+            const trip_submission_response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/users/${userId}`, newTripData); // locations not needed for a trip submission
+            const trip_id = trip_submission_response.data.data.trip_id;
+            console.log("Trip ID:", trip_id);
+            console.log("Trip Locations: ", newTripLocation.trip_locations);
+            const num_trip_locs = newTripLocation.trip_locations.length;
+
+            // For every location, create a trip location entry
+            for (let i = 0; i < num_trip_locs; i++){
+                let a_trip_location = {trip_id: trip_id, location: newTripLocation.trip_locations[i]};
+                console.log(`Trip Location ${i+1}:`, a_trip_location);
+                try {
+                    await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations`, a_trip_location);
+                }
+                catch (error){
+                    console.error(`Error creating trip location ${i+1}:`, error);
+                }
+            }
+
+            // A shared trip will be under the user who created the trip to support future shared trips
+            const shared_trip = {user_id: userId, trip_id: trip_id};
+            console.log("Shared Trip:", shared_trip);
+            // console.log("User ID:", userId, "Type:", typeof userId);
+            // console.log("Trip ID:", trip_id, "Type:", typeof trip_id);  
+            console.log(`Sending request to: ${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/users/${userId}/trips/${trip_id}`);
+            // await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/users/${userId}/trips/${trip_id}`, shared_trip);
+            
             setPopUpVisible(false); // Close the popup
             setNewTripData({ name: '', start_date: '', end_date: '', budget: '' }); // Reset form fields
             setNewTripLocation({ trip_locations: [] }); // Reset locations
-            fetchTrips(); // Refresh trips after creating a new one
+            await fetchUserTrips(); // Refresh trips after creating a new one
+            setLocationsNotProvided(false); 
+
         } catch (error) {
-            console.error('Error creating trip:', error);
+            console.error("Error creating trip:", error);
         }
     };
 
     useEffect(() => {
         handleToken();
-        fetchTrips(); // Call the function to fetch trips on component mount
+        getUserId();
         localStorage.removeItem('selectedFilter');
     }, []);
 
@@ -209,7 +268,7 @@ function homepage() {
             {/* Header section */}
             <header className="header">
                 <div className="logo-container">
-                    <Image src={logo} alt="Logo" width={300} height={300}/>
+                    <Image src={logo} alt="Logo" width={300} height={300} priority/>
                 </div>
                 <div className="left-rectangle"></div>
                 <div className="right-rectangle"></div>
@@ -267,33 +326,18 @@ function homepage() {
                                         value={tempLocation}
                                         onChange={newTripLocInputChange}
                                         onKeyDown={(e) => { 
-                                            // Check if the Enter key is pressed and the limit has not been reached
                                             if (e.key === 'Enter') {
-                                                if (newTripLocation.trip_locations.length < 10) {
-                                                    addLocation(); // Allow adding location
-                                                    e.preventDefault(); // Prevent form submission
-                                                } else {
-                                                    alert("You can only add a maximum of 10 locations."); // Alert if limit is reached
-                                                    e.preventDefault(); // Prevent form submission
-                                                }
+                                                e.preventDefault(); // Prevent form submission
                                             }
                                         }} 
-                                        required
                                     />
-                                    <button 
-                                        type="button" 
-                                        onClick={addLocation} 
-                                        disabled={newTripLocation.trip_locations.length >= 10} // Disable button if limit reached
-                                    >
-                                        Add Location
-                                    </button>
                                 </label>
 
                                 <div>
                                     {newTripLocation.trip_locations.map((location, index) => (
                                         <div key={index} className="selected-location">
                                             <span className="location-text">{location}</span>
-                                            <button onClick={() => {
+                                            <button type="button" onClick={() => {
                                                 setNewTripLocation(prev => ({
                                                     trip_locations: prev.trip_locations.filter((loc, i) => i !== index) // Remove selected location
                                                 }));
