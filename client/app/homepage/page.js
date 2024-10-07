@@ -205,7 +205,10 @@ function homepage() {
             // A shared trip will be under the user who created the trip to support future shared trips
             const shared_trip = {user_id: userId, trip_id: trip_id};
             console.log("Shared Trip:", shared_trip);
-            //await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/users/${userId}/trips/${trip_id}`, shared_trip);
+            // console.log("User ID:", userId, "Type:", typeof userId);
+            // console.log("Trip ID:", trip_id, "Type:", typeof trip_id);  
+            console.log(`Sending request to: ${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/users/${userId}/trips/${trip_id}`);
+            // await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/users/${userId}/trips/${trip_id}`, shared_trip);
             
             setPopUpVisible(false); // Close the popup
             setNewTripData({ name: '', start_date: '', end_date: '', budget: '' }); // Reset form fields
