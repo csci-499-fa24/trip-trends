@@ -12,6 +12,7 @@ import { parseISO, startOfDay, endOfDay } from 'date-fns';
 import ReactSpeedometer, { Transition } from 'react-d3-speedometer';
 import Image from 'next/image';
 import homeIcon from '../img/homeIcon.png';
+import Filter from '../img/Filter.png';
 import logo from '../img/Logo.png';
 import Link from 'next/link';
 
@@ -22,6 +23,9 @@ function Singletrip() {
     const [totalExpenses, setTotalExpenses] = useState(0);
     const [currencyCodes, setCurrencyCodes] = useState([]);
     const [isPopUpVisible, setPopUpVisible] = useState(false);
+    const [isFilterPopupVisible, setFilterPopupVisible] = useState(false);
+    const [originalData, setOriginalData] = useState([]);
+    const [selectedFilter, setSelectedFilter] = useState('');
     const [newExpenseData, setNewExpenseData] = useState({
         trip_id: '',
         name: '',
@@ -83,7 +87,13 @@ function Singletrip() {
             axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/trips/${tripId}`)
                 .then(response => {
                     // console.log(response.data.data)
-                    setExpenseData(response.data)
+                    setExpenseData(response.data);
+                    setOriginalData(response.data);
+
+                    const savedFilter = localStorage.getItem('selectedFilter');
+                    if (savedFilter) {
+                        applyFilter(savedFilter, response.data);
+                    }
 
                     const total = response.data.data.reduce((sum, expense) => {
                         const amount = parseFloat(expense.amount);
@@ -111,8 +121,6 @@ function Singletrip() {
                 if (response.data.success && response.data.symbols) {
                     const codes = Object.keys(response.data.symbols);
                     setCurrencyCodes(codes);
-
-                    // console.log("Fetched Currency Codes:", codes);
                 } else {
                     console.error("Failed to fetch currency symbols or symbols is undefined:", response);
                 }
@@ -199,6 +207,38 @@ function Singletrip() {
         return date >= startDate && date <= endDate;
     };
 
+    const handleFilterChange = (filterValue) => {
+        applyFilter(filterValue);
+        setFilterPopupVisible(false);
+    };
+
+    const applyFilter = (filterOption, data = originalData) => {
+        let sortedExpenses;
+        if (filterOption === 'highest') {
+            console.log(expenseData.data);
+            sortedExpenses = [...data.data].sort((a, b) => b.amount - a.amount);
+        } else if (filterOption === 'lowest') {
+            sortedExpenses = [...data.data].sort((a, b) => a.amount - b.amount);
+        } else if (filterOption === 'recent') {
+            sortedExpenses = [...data.data].sort((a, b) => new Date(b.posted) - new Date(a.posted));
+            console.log("Sorted by most recent:", sortedExpenses);
+        } else if (filterOption === 'oldest') {
+            sortedExpenses = [...data.data].sort((a, b) => new Date(a.posted) - new Date(b.posted));
+        }
+        setExpenseData({ data: sortedExpenses });
+        setSelectedFilter(filterOption);
+        localStorage.setItem('selectedFilter', filterOption);
+    };
+
+    const clearFilter = () => {
+        setSelectedFilter('');
+        setExpenseData(originalData); // Reset to the original list
+
+        // Remove the filter from localStorage
+        localStorage.removeItem('selectedFilter');
+    };
+
+
     return (
         <div>
             {/* Header section */}
@@ -214,7 +254,7 @@ function Singletrip() {
                 <div>
                     <div className='homeCorner'>
                         <Link href={`/homepage`}>
-                            <Image src={homeIcon} width={"50"} height={"50"} />
+                            <Image src={homeIcon} alt="homepage" width={"50"} height={"50"} />
                         </Link>
                     </div>
                     <h1 id='tripName'>{tripData.data.name}</h1>
@@ -302,7 +342,25 @@ function Singletrip() {
                             </div>
                         </div>
                     </div>
+
                     <br></br>
+                    <div className="filter-section">
+                        <button onClick={() => setPopUpVisible(true)} className='create-expense'>Create an Expense</button>
+                        <button className="filter-button" onClick={() => setFilterPopupVisible(true)}>
+                            <Image src={Filter} alt="Filter" className="filter-icon" />
+                        </button>
+                        {selectedFilter && (
+                            <div className="applied-filter">
+                                <span>{`Filter: ${selectedFilter}`}</span>
+                                <button className="clear-filter-btn" onClick={clearFilter}>
+                                    &times;
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                    <br></br>
+                    <br></br>
+
                     {/* Expense Table */}
                     {expenseData && expenseData.data ? (
                         <div>
@@ -349,8 +407,9 @@ function Singletrip() {
             ) : (
                 <p>Loading Trip Data...</p>
             )}
+
             {/* Create a expense popup form */}
-            <button onClick={() => setPopUpVisible(true)} className='create-expense'>Create an Expense</button>
+            {/* <button onClick={() => setPopUpVisible(true)} className='create-expense'>Create an Expense</button> */}
             <div className="expense-form">
                 {isPopUpVisible && (
                     <div className="modal">
@@ -458,7 +517,43 @@ function Singletrip() {
                 )}
             </div>
 
-
+            {/* Create a filter popup form */}
+            <div className="filter-container">
+                {isFilterPopupVisible && (
+                    <div className="filter-popup">
+                        <div className="filter-popup-content">
+                            <span className="filter-popup-close" onClick={() => setFilterPopupVisible(false)}>&times;</span>
+                            <h2 className="filter-popup-title">Filter Expenses</h2>
+                            <div className="filter-options">
+                                <button
+                                    className="filter-option-button"
+                                    onClick={() => handleFilterChange('highest')}
+                                >
+                                    Highest to Lowest
+                                </button>
+                                <button
+                                    className="filter-option-button"
+                                    onClick={() => handleFilterChange('lowest')}
+                                >
+                                    Lowest to Highest
+                                </button>
+                                <button
+                                    className="filter-option-button"
+                                    onClick={() => handleFilterChange('recent')}
+                                >
+                                    Most Recent
+                                </button>
+                                <button
+                                    className="filter-option-button"
+                                    onClick={() => handleFilterChange('oldest')}
+                                >
+                                    Oldest
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

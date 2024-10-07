@@ -222,6 +222,12 @@ function homepage() {
     };
 
     useEffect(() => {
+        handleToken();
+        getUserId();
+        localStorage.removeItem('selectedFilter');
+    }, []);
+
+    useEffect(() => {
         // Initialize the OpenLayers map after the component mounts
         if (mapRef.current) {
             const features = trips.map(trip => {
