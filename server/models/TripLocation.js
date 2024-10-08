@@ -18,6 +18,14 @@ const TripLocation = sequelize.define('TripLocation', {
         type: DataTypes.STRING(255),
         allowNull: false,
     },
+    longitude: {
+        type: DataTypes.DECIMAL(10,7),
+        allowNull: true
+    },
+    latitude: {
+        type: DataTypes.DECIMAL(10,7),
+        allowNull: true,
+    }
 }, {
     tableName: 'tlocation',
     timestamps: false,
@@ -25,7 +33,13 @@ const TripLocation = sequelize.define('TripLocation', {
 });
 
 TripLocation.removeAttribute('id');
-Trip.hasMany(TripLocation, { foreignKey: 'trip_id' });
-TripLocation.belongsTo(Trip, { foreignKey: 'trip_id' });
+Trip.hasMany(TripLocation, 
+    { foreignKey: 'trip_id', 
+    onDelete: 'CASCADE'}, 
+);
+TripLocation.belongsTo(Trip, 
+    { foreignKey: 'trip_id', 
+    onDelete: 'CASCADE'}
+);
 
 module.exports = TripLocation;
