@@ -1,18 +1,19 @@
 const TripLocation = require("../models/TripLocation");
 
-// post a trip location in db
+// POST trip location
 const createTripLocation = async (req, res) => {
-    const { trip_id, location } = req.body;
+    const tripId = req.params.tripId;
+    const { location } = req.body;
     try {
-        // create a model instance 
-        const newTripLocation = await TripLocation.create({ trip_id, location });
+        // create model instance 
+        const newTripLocation = await TripLocation.create({ trip_id: tripId, location: location });
         res.status(201).json({ data: newTripLocation });
     } catch (err) {
         console.error(err);
     }
 };
 
-// get all trip locations from db
+// GET all trip locations 
 const getTripLocations = async (req, res) => {
     try {
         const allTripLocations = await TripLocation.findAll();
@@ -42,12 +43,13 @@ const getTripLocationByTripId = async (req, res) => {
 const updateTripLocation = async (req, res) => {
     const tripId = req.params.tripId;
     const tripLocationId = req.params.tripLocationId;
+    const { location } = req.body;
     try {
-        const tripLocation = await TripLocation.findOne({ where: { trip_id: tripId, tlocation: tripLocationId} });
+        const tripLocation = await TripLocation.findOne({ where: { trip_id: tripId, location: tripLocationId} });
         if (!tripLocation) {
             return res.status(404).json({ message: "Trip location not found" });
         }
-        const updatedTripLocation = await tripLocation.update({ tripId, tripLocationId });
+        const updatedTripLocation = await tripLocation.update({ location: location });
         res.json({ data: updatedTripLocation });
     } catch (err) {
         console.error(err);
@@ -61,7 +63,7 @@ const deleteTripLocation = async (req, res) => {
     const tripLocationId = req.params.tripLocationId;
     try {
         // delete trip location by tripId
-        const deletedCount = await TripLocation.destroy({ where: { trip_id: tripId, tlocation: tripLocationId} });
+        const deletedCount = await TripLocation.destroy({ where: { trip_id: tripId, location: tripLocationId} });
         if (deletedCount === 0) {
             return res.status(404).json({ message: "Trip Location not found" });
         }

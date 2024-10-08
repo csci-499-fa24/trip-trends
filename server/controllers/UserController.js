@@ -2,12 +2,12 @@ const User = require("../models/User");
 const jwt = require('jsonwebtoken');
 
 
-// POST new user data into the db
+// POST new user data
 const createUser = async (req, res) => {
-    const { user_id, fname, lname, email, image } = req.body;
+    const { fName, lName, email, image } = req.body;
     try {
-        // create a model instance 
-        const newUser = await User.create({ user_id, fname, lname, email, image });
+        // create model instance 
+        const newUser = await User.create({ fname: fName, lname: lName, email, image });
         res.status(201).json({ data: newUser });
     } catch (err) {
         console.error(err);
@@ -15,7 +15,7 @@ const createUser = async (req, res) => {
     }
 };
 
-// GET all user data in the db
+// GET all user data
 const getUsers = async (req, res) => {
     try {
         const allUsers = await User.findAll();

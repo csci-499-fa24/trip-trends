@@ -133,6 +133,18 @@ function Singletrip() {
 
     }, []);
 
+    const deleteTrip = async () => {
+        if (window.confirm('Please confirm trip deletion. This action cannot be undone.')) {
+            try {
+                // delete trip
+                await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`);
+                window.location.href = '/homepage'; // redirect to homepage
+            } catch (error) {
+                console.error('Error deleting trip:', error);
+            }
+        }
+    };
+  
     const submitEditExpense = async (e) => {
         e.preventDefault(); 
         // API CALL
@@ -177,7 +189,7 @@ function Singletrip() {
         };
 
         try {
-            await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses`, updatedExpenseData);
+            await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/trips/${tripId}`, updatedExpenseData);
 
             setNewExpenseData({
                 trip_id: '',
@@ -249,6 +261,7 @@ function Singletrip() {
 
 
     return (
+        <div className="main-container">
         <div>
             {/* Header section */}
             <header className="header">
@@ -354,7 +367,7 @@ function Singletrip() {
 
                     <br></br>
                     <div className="filter-section">
-                        <button onClick={() => setPopUpVisible(true)} className='create-expense'>Create an Expense</button>
+                        <button onClick={() => setPopUpVisible(true)} className='create-expense'>Create Expense</button>
                         <button className="filter-button" onClick={() => setFilterPopupVisible(true)}>
                             <Image src={Filter} alt="Filter" className="filter-icon" />
                         </button>
@@ -484,7 +497,12 @@ function Singletrip() {
 
                             {/* Add the Download Button */}
                             <button onClick={downloadTripData} className="download-trip-data-btn">
-                                Download Trip Data
+                                Download Trip
+                            </button>
+
+                            {/* Add the Delete Button */}
+                            <button onClick={deleteTrip} className="delete-trip-button">
+                                Delete Trip
                             </button>
                         </div>
                     ) : (
@@ -647,6 +665,7 @@ function Singletrip() {
                     </div>
                 )}
             </div>
+        </div>
         </div>
     );
 }
