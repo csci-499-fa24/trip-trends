@@ -214,13 +214,21 @@ function homepage() {
                 catch (error) {
                     console.error("Error fetching geocode response using trip location.")
                 }
-                const trimmed_location = geocode_response.data.results[0].components._normalized_city;
-                // const flag = geocode_response.data.results[0].annotations.flag;
-                a_trip_location.location = trimmed_location;
+                let trimmed_location = null;
+                const location_type = geocode_response.data.results[0].components._type;
+                try {
+                    trimmed_location = geocode_response.data.results[0].components[location_type];
+                    a_trip_location.location = trimmed_location;
+                }
+                catch {
+                    trimmed_location = a_trip_location.location; // original location
+                }
+                
+                console.log("Trip Location:", a_trip_location.location);
                 
                 // POST trip location
                 try {
-                    await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations`, a_trip_location);
+                    await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${trip_id}`, a_trip_location);
                 }
                 catch (error){
                     console.error(`Error creating trip location ${i+1}:`, error);
