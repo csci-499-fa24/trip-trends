@@ -13,7 +13,7 @@ const createTripLocation = async (req, res) => {
     }
 };
 
-// GET all trip locations from db
+// GET all trip locations
 const getTripLocations = async (req, res) => {
     try {
         const allTripLocations = await TripLocation.findAll();
@@ -23,7 +23,6 @@ const getTripLocations = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error", error: err.message });
     }
 };
-
 // GET specific trip location data by tripId
 const getTripLocationByTripId = async (req, res) => {
     const tripId = req.params.tripId;
@@ -78,7 +77,7 @@ const updateTripLocation = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error", error: err.message });
     }
 };
-
+    
 // DELETE trip location data
 const deleteTripLocation = async (req, res) => {
     const tripId = req.params.tripId;

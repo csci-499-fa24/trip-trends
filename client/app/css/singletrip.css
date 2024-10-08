@@ -1,4 +1,10 @@
 /* singletrip.css */
+.main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .button {
     box-shadow: 0 10px 20px -8px rgba(0, 0, 0, .7);
 }
@@ -178,15 +184,19 @@
 
 .react-calendar__navigation button:hover {
     background-color: green;
+    
 }
 
 .react-calendar {
     border: none;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 .react-calendar__tile {
     box-shadow: none;
     transition: none;
+    border-radius: 6px;
 }
 
 .react-calendar__tile--active {
@@ -202,16 +212,19 @@
     color: black;
     box-shadow: none;
     background: none;
+    border-radius: 10px;
 }
 
 .react-calendar__month-view__header {
     box-shadow: none;
     background-color: white;
     color: black;
+    border-radius: 8px;
 }
 
 .react-calendar__tile {
     color: black;
+    border-radius: 5px;
 }
 
 #tripName {
@@ -282,13 +295,31 @@
     color: white;
     border: none;
     cursor: pointer;
+    border-radius: 8px;
 }
   
 .download-trip-data-btn:hover {
     background-color: #45a049;
 }
 
+.delete-trip-button {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    background-color: #a51414ab;
+    color: white;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    border-radius: 8px;
+    transition: all 0.5s;
+    overflow: hidden;
+}
 
+.delete-trip-button:hover {
+    background-color: #c91515f0;
+    padding-right: 20px;
+}
 
 .filter-button {
     background-color: transparent; 
@@ -391,4 +422,41 @@
     gap: 10px;
 }
 
+.edit-expense {
+    background-color: #134a09;
+    position: relative;
+    padding: 5px 10px;
+    font-size: 14px;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.5s;
+    overflow: hidden;
+    box-shadow: none;
+}
 
+.edit-expense:after {
+    content: '-';
+    position: absolute;
+    opacity: 0;
+    top: 50%;
+    right: -40px;
+    transform: translateY(-50%);
+    transition: 0.2s ease-in-out;
+    font-size: 30px;
+    color: white;
+}
+
+.edit-expense:hover {
+    color: transparent;
+    /* hide text */
+    padding-right: 10px;
+}
+
+.edit-expense:hover:after {
+    opacity: 1;
+    right: 50%;
+    transform: translate(50%, -50%);
+}

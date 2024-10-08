@@ -500,12 +500,12 @@ function homepage() {
                                         {trip.name}
                                     </div>
                                     {expandedTripId === trip.trip_id && (
-                                        <div style={{ padding: '10px', backgroundColor: '#134a09', border: '1px solid #ccc' }}>
+                                        <div style={{ padding: '10px', backgroundColor: '#134a09', border: '1px solid #ccc'}}>
                                             <p>
                                                 <strong>Dates:</strong> {trip.start_date} - {trip.end_date}
                                             </p>
                                             <p><strong>Budget:</strong> ${trip.budget}</p>
-                                            <Link href={`/singletrip?tripId=${trip.trip_id}`} style={{ color: 'white', textDecoration: 'underline' }}>
+                                            <Link href={`/singletrip?tripId=${trip.trip_id}`} style={{ color: 'white', textDecoration: 'underline'}}>
                                                 See more
                                             </Link>
                                         </div>
