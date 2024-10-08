@@ -391,4 +391,41 @@
     gap: 10px;
 }
 
+.edit-expense {
+    background-color: #134a09;
+    position: relative;
+    padding: 5px 10px;
+    font-size: 14px;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.5s;
+    overflow: hidden;
+    box-shadow: none;
+}
 
+.edit-expense:after {
+    content: '-';
+    position: absolute;
+    opacity: 0;
+    top: 50%;
+    right: -40px;
+    transform: translateY(-50%);
+    transition: 0.2s ease-in-out;
+    font-size: 30px;
+    color: white;
+}
+
+.edit-expense:hover {
+    color: transparent;
+    /* hide text */
+    padding-right: 10px;
+}
+
+.edit-expense:hover:after {
+    opacity: 1;
+    right: 50%;
+    transform: translate(50%, -50%);
+}
