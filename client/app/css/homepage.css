@@ -242,3 +242,16 @@ form {
     color: black;
     font-weight: bold;
 }
+
+.marker-tooltip {
+    position: absolute;
+    color: black;
+    background-color: white;
+    padding: 5px;
+    border-radius: 3px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1000; 
+    
+}
