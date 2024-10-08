@@ -1,4 +1,5 @@
 const TripLocation = require("../models/TripLocation");
+const SharedTrip = require('../models/SharedTrip');
 
 // post a trip location in db
 const createTripLocation = async (req, res) => {
@@ -12,7 +13,7 @@ const createTripLocation = async (req, res) => {
     }
 };
 
-// get all trip locations from db
+// GET all trip locations from db
 const getTripLocations = async (req, res) => {
     try {
         const allTripLocations = await TripLocation.findAll();
@@ -38,16 +39,39 @@ const getTripLocationByTripId = async (req, res) => {
     }
 };
 
+// GET trip location data by userId
+const getTripLocationByUserId = async (req, res) => {
+    const userId = req.params.userId;
+    try {
+        const sharedTrips = await SharedTrip.findAll({ where: { user_id: userId } });
+        if (!sharedTrips || sharedTrips.length === 0) {
+            return res.status(404).json({ message: "Trip not found" });
+        }
+        const tripIds = sharedTrips.map(trip => trip.trip_id);
+        const tripLocations = await TripLocation.findAll({ where: { trip_id: tripIds },});
+
+        if (!tripLocations || tripLocations.length === 0) {
+            return res.status(404).json({ message: "Trip locations not found" });
+        }
+        res.json({ data: tripLocations });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
+    }
+};
+
 // PUT request to update trip location data
 const updateTripLocation = async (req, res) => {
     const tripId = req.params.tripId;
     const tripLocationId = req.params.tripLocationId;
+    const { location } = req.body;
+    const { longitude, latitude } = req.body;
     try {
-        const tripLocation = await TripLocation.findOne({ where: { trip_id: tripId, tlocation: tripLocationId} });
+        const tripLocation = await TripLocation.findOne({ where: { trip_id: tripId, location: tripLocationId} });
         if (!tripLocation) {
             return res.status(404).json({ message: "Trip location not found" });
         }
-        const updatedTripLocation = await tripLocation.update({ tripId, tripLocationId });
+        const updatedTripLocation = await tripLocation.update({ location, longitude, latitude });
         res.json({ data: updatedTripLocation });
     } catch (err) {
         console.error(err);
@@ -61,7 +85,7 @@ const deleteTripLocation = async (req, res) => {
     const tripLocationId = req.params.tripLocationId;
     try {
         // delete trip location by tripId
-        const deletedCount = await TripLocation.destroy({ where: { trip_id: tripId, tlocation: tripLocationId} });
+        const deletedCount = await TripLocation.destroy({ where: { trip_id: tripId, location: tripLocationId} });
         if (deletedCount === 0) {
             return res.status(404).json({ message: "Trip Location not found" });
         }
@@ -76,6 +100,7 @@ module.exports = {
     createTripLocation,
     getTripLocations,
     getTripLocationByTripId,
+    getTripLocationByUserId,
     updateTripLocation,
     deleteTripLocation
 };
