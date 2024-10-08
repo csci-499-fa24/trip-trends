@@ -175,17 +175,28 @@ function homepage() {
             console.error("User ID is not available.");
             return;
         }
-        let locations_response = null;
         try {
-            locations_response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/users/${userId}`);
-
-        } catch (error) {
-            console.error("Error getting all trip locations from user:", error);
-        }
-        const loc_data = locations_response.data.data;
-        const locations = loc_data.map(location => {return {"trip_id": location.trip_id, "location": location.location, "latitude": location.latitude, "longitude": location.longitude}; });
-        console.log(locations);
-        setAllTripLocations(locations);
+            const locations_response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/users/${userId}`);
+            const loc_data = locations_response.data.data;
+          
+            if (!loc_data || loc_data.length === 0) {
+              console.log('No trip locations found.');
+              setAllTripLocations([]);    
+            } 
+            else {
+                const locations = loc_data.map(location => ({
+                trip_id: location.trip_id,
+                location: location.location,
+                latitude: location.latitude,
+                longitude: location.longitude
+              }));
+              console.log("Location Objects", locations);
+              setAllTripLocations(locations);
+            }
+          
+          } catch (error) {
+            console.error('Error fetching trip locations from user:', error);
+          }
     };
 
     const submitNewTrip = async (e) => {
@@ -226,17 +237,23 @@ function homepage() {
                 catch (error) {
                     console.error("Error fetching geocode response using trip location.")
                 }
+
                 let trimmed_location = null;
-                const location_type = geocode_response.data.results[0].components._type;
-                try {
-                    trimmed_location = geocode_response.data.results[0].components[location_type];
-                    a_trip_location.location = trimmed_location;
-                }
-                catch {
+                const components_result = geocode_response?.data?.results?.[0]?.components; // ensures error isn't thrown if null
+                const location_type = components_result?._type;
+                if (components_result && components_result[location_type] != null) {
+                    trimmed_location = components_result[location_type];
+                } 
+                else if (components_result && components_result._normalized_city != null) {
+                    trimmed_location = components_result._normalized_city;
+                } 
+                else {
                     trimmed_location = a_trip_location.location; // original location
                 }
-                
-                console.log("Trip Location:", a_trip_location.location);
+
+                a_trip_location.location = trimmed_location;
+
+                console.log("Final Trip Location:", a_trip_location.location);
                 
                 // POST trip location
                 try {
