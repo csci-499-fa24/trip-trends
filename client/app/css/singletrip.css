@@ -1,5 +1,5 @@
 /* singletrip.css */
-button {
+.button {
     box-shadow: 0 10px 20px -8px rgba(0, 0, 0, .7);
 }
 
@@ -15,6 +15,8 @@ button {
     text-align: center;
     transition: all 0.5s;
     overflow: hidden;
+    margin-left: 3vh;
+    margin-right: 3vh;
 }
 
 .create-expense:after {
@@ -64,7 +66,7 @@ button {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-form {
+.form {
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -271,3 +273,122 @@ form {
 #budget-text{
     margin-top: 0;
 }
+
+.download-trip-data-btn {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    background-color: #134a09;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+  
+.download-trip-data-btn:hover {
+    background-color: #45a049;
+}
+
+
+
+.filter-button {
+    background-color: transparent; 
+    border: none; 
+    box-shadow: none; 
+    outline: none; 
+    cursor: pointer; 
+    padding: 0; 
+    align-items: center; 
+    justify-content: center; 
+}
+
+
+.filter-icon {
+    width: 6vh; 
+    height: auto;
+}
+
+.filter-popup {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.filter-popup-content {
+    background-color: #fefefe;
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.filter-popup-close {
+    position: absolute;
+    top: 10px;
+    left: 20px; 
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.filter-popup-close:hover {
+    color: black;
+}
+
+.filter-popup-title {
+    font-size: 20px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.filter-option-button {
+    background-color: transparent; 
+    color: black;
+    padding: 10px 20px;
+    border: 2px solid black; 
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.filter-option-button:hover {
+    background-color: #134a09; 
+    color: white; 
+}
+
+.applied-filter {
+    display: flex;
+    align-items: center;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    border-radius: 5px;
+    white-space: nowrap;
+}
+
+.clear-filter-btn {
+    background: none;
+    border: none;
+    color: #ff0000;
+    cursor: pointer;
+    font-size: 16px;
+    margin-left: 10px; 
+}
+
+.filter-section {
+    display: flex; 
+    align-items: center;
+    gap: 10px;
+}
+
+
