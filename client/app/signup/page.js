@@ -21,6 +21,7 @@ function Signup() {
 
     const handleLoginSuccess = async (response) => {
         const token = response.credential
+        console.log(token)
         const tokenBody = { token: response.credential }
 
         axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/auth/google`, tokenBody)
