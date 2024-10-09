@@ -44,7 +44,7 @@ const googleID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
 function homepage() {
     // States
-    const [userName, setUserName] = useState("[NAME]");
+    const [userName, setUserName] = useState(""); 
     const [trips, setTrips] = useState([]);
     const [allTripLocations, setAllTripLocations] = useState([]);
     // const [allTripLocationFlags, setAllTripLocationFlags] = useState(new Array(allTripLocations.length).fill(""));

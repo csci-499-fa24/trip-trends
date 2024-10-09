@@ -33,13 +33,13 @@ const TripLocation = sequelize.define('TripLocation', {
 });
 
 TripLocation.removeAttribute('id');
-Trip.hasMany(TripLocation, 
-    { foreignKey: 'trip_id', 
-    onDelete: 'CASCADE'}, 
-);
-TripLocation.belongsTo(Trip, 
-    { foreignKey: 'trip_id', 
-    onDelete: 'CASCADE'}
-);
+// Trip.hasMany(TripLocation, 
+//     { foreignKey: 'trip_id', 
+//     onDelete: 'CASCADE'}, 
+// );
+// TripLocation.belongsTo(Trip, 
+//     { foreignKey: 'trip_id', 
+//     onDelete: 'CASCADE'}
+// );
 
 module.exports = TripLocation;
