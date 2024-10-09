@@ -14,6 +14,7 @@ import Image from 'next/image';
 import homeIcon from '../img/homeIcon.png';
 import logo from '../img/Logo.png';
 import Link from 'next/link';
+import uplodimg from '../img/uploadImg.png';
 
 function Singletrip() {
     const [tripId, setTripId] = useState(null);
@@ -31,6 +32,8 @@ function Singletrip() {
         posted: '',
         notes: ''
     });
+    const [uploadedImage, setUploadedImage] = useState(null);
+    const inputRef = useRef(null);
     const [expenseCategories] = useState([
         "Flights",
         "Accommodation",
@@ -199,6 +202,51 @@ function Singletrip() {
         return date >= startDate && date <= endDate;
     };
 
+    const handleImageClick = () => {
+        inputRef.current.click();
+    };
+
+// saving image in database:
+    // const handleImageUpload = async (event) => {
+    //     const file = event.target.files[0];
+    //     if (file) {
+    //         const formData = new FormData();
+    //         formData.append('file', file);
+    //         formData.append('tripId', tripId);
+    
+    //         try {
+    //             const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/upload`, formData, {
+    //                 headers: {
+    //                     'Content-Type': 'multipart/form-data',
+    //                 },
+    //             });
+
+    //             setUploadedImage(response.data.imageUrl);
+    //         } catch (error) {
+    //             console.error("Error uploading image:", error);
+    //         }
+    //     }
+    // };
+
+// saving image in local storage:
+    useEffect(() => {
+        if (tripId) {
+            const savedImage = localStorage.getItem(`uploadedImage_${tripId}`);
+            if (savedImage) {
+                setUploadedImage(savedImage);
+            }
+        }
+    }, [tripId]);
+
+    const handleImageUpload = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const imageUrl = URL.createObjectURL(file);
+            localStorage.setItem(`uploadedImage_${tripId}`, imageUrl);
+            setUploadedImage(imageUrl);
+        }
+    };
+
     return (
         <div>
             {/* Header section */}
@@ -339,12 +387,17 @@ function Singletrip() {
                     ) : (
                         <p>No expenses yet...</p>
                     )}
-                    {/* Gallery of Photos like Google Photos or Photos on iPhone*/}
-                    {tripData.data.image ? (
-                        <p>{tripData.data.image}</p>
-                    ) : (
-                        <p>[Gallery of photos]</p>
-                    )}
+                    
+                    {/* Gallery of Photos like Google Photos or Photos on iPhone */}
+                    <div onClick={handleImageClick} style={{ marginLeft: "210px" }}>
+                        {uploadedImage ? (
+                            <Image src={uploadedImage} alt="" width={"350"} height={"300"}/>
+                        ) : (
+                            <Image src={uplodimg} width={"400"} height={"400"} />
+                        )}
+                        <input type="file" accept="image/*" ref={inputRef} onChange={handleImageUpload} style={{display: "none"}}/>
+                    </div>
+
                 </div>
             ) : (
                 <p>Loading Trip Data...</p>
