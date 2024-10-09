@@ -9,7 +9,6 @@ const SharedTrip = require('../models/SharedTrip');
 jest.mock('../models/Trip');
 jest.mock('../models/SharedTrip');
 
-
 describe('createTrip', () => {
     let mockRequest, mockResponse;
     
