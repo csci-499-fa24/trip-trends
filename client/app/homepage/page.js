@@ -22,6 +22,8 @@ import { boundingExtent } from 'ol/extent';
 import { fromLonLat } from 'ol/proj';
 import Link from 'next/link';
 import { debounce } from 'lodash'; // for rate limiting when calling the OpenCage API on every keystroke
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Custom marker icon style
 const customDefaultMarker = new Style({
@@ -42,7 +44,7 @@ const googleID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
 function homepage() {
     // States
-    const [userName, setUserName] = useState("[NAME]"); 
+    const [userName, setUserName] = useState("[NAME]");
     const [trips, setTrips] = useState([]);
     const [allTripLocations, setAllTripLocations] = useState([]);
     // const [allTripLocationFlags, setAllTripLocationFlags] = useState(new Array(allTripLocations.length).fill(""));
@@ -85,7 +87,7 @@ function homepage() {
     const getUserId = () => {
         // Get user ID to create and get trip from onboarded user
         const user_id = localStorage.getItem("user_id");
-        if (user_id){
+        if (user_id) {
             setUserId(user_id);
         }
         else {
@@ -99,7 +101,7 @@ function homepage() {
     }, []);
 
     const fetchUserTrips = async () => {
-        if (!userId){
+        if (!userId) {
             console.error("User ID is not set.");
             return;
         }
@@ -134,7 +136,7 @@ function homepage() {
         setTempLocation(value);
         fetchLocationSuggestions(value);
     };
-    
+
     const fetchLocationSuggestions = useCallback(debounce(async (query) => {
         if (query) {
             try {
@@ -155,7 +157,7 @@ function homepage() {
             setSuggestions([]);
         }
     }, 200), // debounce delay to reduce the number of API calls to avoid errors
-    []); 
+        []);
 
     const selectSuggestion = (suggestion) => {
         // Check if the suggestion is not already included and if the max limit is not reached
@@ -168,16 +170,16 @@ function homepage() {
         }
         setSuggestions([]); // Clear suggestions after selection
         setTempLocation(''); // Clear input field after selection
-    };    
+    };
 
     const fetchTripLocations = async () => {
-        if (!userId){
+        if (!userId) {
             console.error("User ID is not available.");
             return;
         }
         const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/users/${userId}`);
         const loc_data = response.data.data;
-        const locations = loc_data.map(location => {return {"trip_id": location.trip_id, "location": location.location, "latitude": location.latitude, "longitude": location.longitude}; });
+        const locations = loc_data.map(location => { return { "trip_id": location.trip_id, "location": location.location, "latitude": location.latitude, "longitude": location.longitude }; });
         console.log(locations);
         setAllTripLocations(locations);
     };
@@ -185,7 +187,7 @@ function homepage() {
     const submitNewTrip = async (e) => {
         e.preventDefault();
         // No locations selected
-        if (newTripLocation.trip_locations.length === 0){
+        if (newTripLocation.trip_locations.length === 0) {
             setLocationsNotProvided(true);
             alert("Please provide at least one location.")
             return;
@@ -199,9 +201,9 @@ function homepage() {
             const num_trip_locs = newTripLocation.trip_locations.length;
 
             // For every location, create a trip location entry
-            for (let i = 0; i < num_trip_locs; i++){
-                let a_trip_location = {trip_id: trip_id, location: newTripLocation.trip_locations[i]};
-                console.log(`Trip Location ${i+1}:`, a_trip_location);
+            for (let i = 0; i < num_trip_locs; i++) {
+                let a_trip_location = { trip_id: trip_id, location: newTripLocation.trip_locations[i] };
+                console.log(`Trip Location ${i + 1}:`, a_trip_location);
                 let geocode_response = null;
                 try {
                     geocode_response = await axios.get(`https://api.opencagedata.com/geocode/v1/json`, {
@@ -223,15 +225,15 @@ function homepage() {
                 catch {
                     trimmed_location = a_trip_location.location; // original location
                 }
-                
+
                 console.log("Trip Location:", a_trip_location.location);
-                
+
                 // POST trip location
                 try {
                     await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${trip_id}`, a_trip_location);
                 }
-                catch (error){
-                    console.error(`Error creating trip location ${i+1}:`, error);
+                catch (error) {
+                    console.error(`Error creating trip location ${i + 1}:`, error);
                 }
 
                 // UPDATE the trip location with location coordinates
@@ -239,33 +241,35 @@ function homepage() {
                 const long = geocode_response.data.results[0].geometry.lng;
                 console.log("Latitude:", lat);
                 console.log("Longitude:", long);
-                const coordinates = {"latitude": lat, "longitude": long};
+                const coordinates = { "latitude": lat, "longitude": long };
                 try {
                     await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${trip_id}/${a_trip_location.location}`, coordinates);
                 } catch (error) {
                     console.error("Error updating trip location with coordinates");
                 }
-                    
+
             }
 
             // A shared trip will be under the user who created the trip to support future shared trips
-            const shared_trip = {user_id: userId, trip_id: trip_id};
+            const shared_trip = { user_id: userId, trip_id: trip_id };
             console.log("Shared Trip:", shared_trip);
             // console.log("User ID:", userId, "Type:", typeof userId);
             // console.log("Trip ID:", trip_id, "Type:", typeof trip_id);  
             console.log(`Sending request to: ${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/users/${userId}/trips/${trip_id}`);
             // await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/users/${userId}/trips/${trip_id}`, shared_trip);
-            
+
             setPopUpVisible(false); // Close the popup
+            toast.success("Trip successfully created!");
             setNewTripData({ name: '', start_date: '', end_date: '', budget: '' }); // Reset form fields
             setNewTripLocation({ trip_locations: [] }); // Reset locations
 
             // Refresh trips and trip locations
-            await fetchUserTrips(); 
+            await fetchUserTrips();
             await fetchTripLocations();
-            setLocationsNotProvided(false); 
+            setLocationsNotProvided(false);
 
         } catch (error) {
+            toast.error("There was an error creating your trip.");
             console.error("Error creating trip:", error);
         }
 
@@ -286,7 +290,7 @@ function homepage() {
             const features = allTripLocations.map(location => {
                 if (location.latitude && location.longitude) {
                     const feature = new Feature({
-                        geometry: new Point(fromLonLat([parseFloat(location.longitude), parseFloat(location.latitude)])), 
+                        geometry: new Point(fromLonLat([parseFloat(location.longitude), parseFloat(location.latitude)])),
                     });
                     feature.set("trip_id", location.trip_id);
                     feature.setStyle(customDefaultMarker);
@@ -315,7 +319,7 @@ function homepage() {
             // Zoom out to fit all the markers
             const extent = boundingExtent(features.map(feature => feature.getGeometry().getCoordinates()));
             // Validate extent
-            if (extent.length === 4 && 
+            if (extent.length === 4 &&
                 extent.every(coord => Number.isFinite(coord))) {
                 try {
                     map.getView().fit(extent, { padding: [40, 40, 40, 40], maxZoom: 15 });
@@ -330,18 +334,18 @@ function homepage() {
             map.on('singleclick', (event) => {
                 const feature = map.forEachFeatureAtPixel(event.pixel, (feat) => feat);
                 if (feature) {
-                    const tripId = feature.get('trip_id'); 
-                    console.log('Clicked marker:', tripId); 
-                    
+                    const tripId = feature.get('trip_id');
+                    console.log('Clicked marker:', tripId);
+
                     // Scroll to the Recent Trips section and expand the clicked trip
                     const tripElement = document.getElementById(`trip-${tripId}`); // Use a unique ID to target the trip divider
                     if (tripElement) {
                         tripElement.scrollIntoView({ behavior: 'smooth' });
                     }
-            
+
                     toggleTripDetails(tripId);
                 } else {
-                    console.log('No marker found.'); 
+                    console.log('No marker found.');
                 }
             });
 
@@ -361,9 +365,9 @@ function homepage() {
 
                 if (feature) {
                     const coordinates = feature.getGeometry().getCoordinates();
-                    const location = allTripLocations.find(loc => 
+                    const location = allTripLocations.find(loc =>
                         fromLonLat([parseFloat(loc.longitude), parseFloat(loc.latitude)])
-                        .toString() === coordinates.toString()
+                            .toString() === coordinates.toString()
                     )?.location; // Get location name based on the coordinates matching the marker hovered over
 
                     feature.setStyle(customHoverMarker);
@@ -371,9 +375,9 @@ function homepage() {
                     tooltip.innerHTML = location || 'Unknown Location';
                     tooltip.style.left = `${e.originalEvent.pageX + 10}px`;
                     tooltip.style.top = `${e.originalEvent.pageY + 10}px`;
-                    tooltip.style.opacity = 1; 
+                    tooltip.style.opacity = 1;
                 } else {
-                    tooltip.style.opacity = 0; 
+                    tooltip.style.opacity = 0;
                 }
             });
 
@@ -384,10 +388,11 @@ function homepage() {
 
     return (
         <div className="dashboard">
+            <ToastContainer hideProgressBar={true} />
             {/* Header section */}
             <header className="header">
                 <div className="logo-container">
-                    <Image src={logo} alt="Logo" width={300} height={300} priority/>
+                    <Image src={logo} alt="Logo" width={300} height={300} priority />
                 </div>
                 <div className="left-rectangle"></div>
                 <div className="right-rectangle"></div>
@@ -419,7 +424,7 @@ function homepage() {
                                     Trip Name:
                                     <input type="text" name="name" value={newTripData.name} onChange={newTripInputChange} required />
                                 </label>
-                                
+
                                 <div className="date-fields">
                                     <label className="new-trip-field-label">
                                         Start Date:
@@ -444,11 +449,11 @@ function homepage() {
                                         placeholder="Enter city or country"
                                         value={tempLocation}
                                         onChange={newTripLocInputChange}
-                                        onKeyDown={(e) => { 
+                                        onKeyDown={(e) => {
                                             if (e.key === 'Enter') {
                                                 e.preventDefault(); // Prevent form submission
                                             }
-                                        }} 
+                                        }}
                                     />
                                 </label>
 
@@ -478,7 +483,7 @@ function homepage() {
                                         ))}
                                     </div>
                                 )}
-                                
+
                                 <button type="submit" className="submit-new-trip-button">Create</button>
                             </form>
                         </div>
@@ -502,18 +507,18 @@ function homepage() {
                         <ul>
                             {trips.map(trip => (
                                 <li key={trip.trip_id}>
-                                    <div 
-                                    id={`trip-${trip.trip_id}`} // unique ID for each trip 
-                                    onClick={() => toggleTripDetails(trip.trip_id)} style={{ cursor: 'pointer', padding: '10px', border: '1px solid #ccc', marginBottom: '5px', backgroundColor: '#134a09' }}>
+                                    <div
+                                        id={`trip-${trip.trip_id}`} // unique ID for each trip 
+                                        onClick={() => toggleTripDetails(trip.trip_id)} style={{ cursor: 'pointer', padding: '10px', border: '1px solid #ccc', marginBottom: '5px', backgroundColor: '#134a09' }}>
                                         {trip.name}
                                     </div>
                                     {expandedTripId === trip.trip_id && (
-                                        <div style={{ padding: '10px', backgroundColor: '#134a09', border: '1px solid #ccc'}}>
+                                        <div style={{ padding: '10px', backgroundColor: '#134a09', border: '1px solid #ccc' }}>
                                             <p>
                                                 <strong>Dates:</strong> {trip.start_date} - {trip.end_date}
                                             </p>
                                             <p><strong>Budget:</strong> ${trip.budget}</p>
-                                            <Link href={`/singletrip?tripId=${trip.trip_id}`} style={{ color: 'white', textDecoration: 'underline'}}>
+                                            <Link href={`/singletrip?tripId=${trip.trip_id}`} style={{ color: 'white', textDecoration: 'underline' }}>
                                                 See more
                                             </Link>
                                         </div>
