@@ -1,4 +1,6 @@
-require('dotenv').config();
+// require('dotenv').config();
+require('dotenv').config({ path: 'server/.env' });
+
 const { createTrip } = require('../controllers/TripController');
 const Trip = require('../models/Trip');
 const SharedTrip = require('../models/SharedTrip');
