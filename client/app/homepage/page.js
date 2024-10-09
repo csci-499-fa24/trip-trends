@@ -177,13 +177,6 @@ function homepage() {
             console.error("User ID is not available.");
             return;
         }
-<<<<<<< HEAD
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/users/${userId}`);
-        const loc_data = response.data.data;
-        const locations = loc_data.map(location => { return { "trip_id": location.trip_id, "location": location.location, "latitude": location.latitude, "longitude": location.longitude }; });
-        console.log(locations);
-        setAllTripLocations(locations);
-=======
         try {
             const locations_response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/users/${userId}`);
             const loc_data = locations_response.data.data;
@@ -206,7 +199,6 @@ function homepage() {
           } catch (error) {
             console.error('Error fetching trip locations from user:', error);
           }
->>>>>>> fbeb7502239e8b88e96cbbac3f076dd135e641fc
     };
 
     const submitNewTrip = async (e) => {
@@ -261,15 +253,10 @@ function homepage() {
                     trimmed_location = a_trip_location.location; // original location
                 }
 
-<<<<<<< HEAD
-                console.log("Trip Location:", a_trip_location.location);
-
-=======
                 a_trip_location.location = trimmed_location;
 
                 console.log("Final Trip Location:", a_trip_location.location);
                 
->>>>>>> fbeb7502239e8b88e96cbbac3f076dd135e641fc
                 // POST trip location
                 try {
                     await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${trip_id}`, a_trip_location);
