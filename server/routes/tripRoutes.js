@@ -9,5 +9,6 @@ router.get("/:tripId", TripController.getTripById);
 router.put("/:tripId", TripController.updateTrip);
 router.delete("/:tripId", TripController.deleteTrip);
 router.get('/download/:tripId', TripController.downloadTripData);
+// router.post('/upload', TripController.uploadImage);
 
 module.exports = router;

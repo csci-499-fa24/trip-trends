@@ -2,6 +2,20 @@ const Trip = require('../models/Trip');
 const SharedTrip = require('../models/SharedTrip');
 const Expense = require('../models/Expense');
 const { parse } = require('json2csv');
+// const multer = require('multer');
+// const path = require('path')
+
+// // Set up multer storage
+// const storage = multer.diskStorage({
+//     destination: (req, file, cb) => {
+//         cb(null, 'img');
+//     },
+//     filename: (req, file, cb) => {
+//         console.log(file);
+//         cb(null, Date.now() + path.extname(file.originalname));
+//     }
+// });
+// const upload = multer({ storage: storage });
 
 // POST new trip data
 const createTrip = async (req, res) => {
@@ -157,6 +171,21 @@ const downloadTripData = async (req, res) => {
     }
 };
 
+//handle image uploads
+// const uploadImage = async (req, res) => {
+//     try {
+//         const imageUrl = req.file.path;
+//         const tripId = req.body.tripId;
+//         //saving the image URL to the trip
+//         await Trip.update({ image: imageUrl }, { where: { trip_id: tripId } }); 
+//         //sending the image URL back as a response
+//         res.json({ imageUrl });
+//     } catch (error) {
+//         console.error("Error uploading image:", error);
+//         res.status(500).json({ error: 'Failed to upload image' });
+//     }
+// };
+
 module.exports = {
     createTrip,
     getTrips,
@@ -164,6 +193,7 @@ module.exports = {
     getTripById,
     updateTrip,
     deleteTrip,
-    downloadTripData
+    downloadTripData,
+    // uploadImage
 };
 
