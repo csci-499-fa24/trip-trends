@@ -1,11 +1,12 @@
 const Expense = require('../models/Expense');
 
-//  post new expense to the db
+// POST new expense data
 const createExpense = async (req, res) => {
-    const { expense_id, trip_id, name, amount, category, currency, posted, notes, image } = req.body;
+    const tripId = req.params.tripId;
+    const { expenseId, name, amount, category, currency, posted, notes, image } = req.body;
     try {
         // create a model instance 
-        const newExpense = await Expense.create({ expense_id, trip_id, name, amount, category, currency, posted, notes, image });
+        const newExpense = await Expense.create({ expense_id: expenseId, trip_id: tripId, name, amount, category, currency, posted, notes, image });
         res.status(201).json({ data: newExpense });
     } catch (err) {
         console.error(err);
@@ -14,7 +15,7 @@ const createExpense = async (req, res) => {
     }
 };
 
-// get all expenses from db
+// GET all expense data
 const getExpenses = async (req, res) => {
     try {
         const allExpenses = await Expense.findAll();
@@ -27,10 +28,28 @@ const getExpenses = async (req, res) => {
 
 // GET specific expense data by expenseId
 const getExpenseById = async (req, res) => {
-    const id = req.params.id;
+    const expenseId = req.params.expenseId;
     try {
-        const expense = await Expense.findByPk(id);
+        const expense = await Expense.findByPk(expenseId);
         if (!expense) {
+            return res.status(404).json({ message: "Expense not found" });
+        }
+        res.json({ data: expense });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
+    }
+};
+
+// GET specific expense data by TripId
+const getExpensesByTripId = async (req, res) => {
+    const tripId = req.params.tripId;
+    try {
+        if (!tripId) {
+            return res.status(400).json({ message: "Trip ID is required" });
+        }
+        const expense = await Expense.findAll({ where: { trip_id: tripId } });
+        if (!expense || expense.length === 0) {
             return res.status(404).json({ message: "Expense not found" });
         }
         res.json({ data: expense });
@@ -42,16 +61,16 @@ const getExpenseById = async (req, res) => {
 
 // PUT request to update expense data
 const updateExpense = async (req, res) => {
-    const id = req.params.id;
-    const { trip_id, name, amount, category, currency, posted, notes, image } = req.body;
+    const expenseId = req.params.expenseId;
+    const { tripId, name, amount, category, currency, posted, notes, image } = req.body;
     try {
         // find expense by id
-        const expense = await Expense.findByPk(id);
+        const expense = await Expense.findByPk(expenseId);
         if (!expense) {
             return res.status(404).json();
         }
         // update expense data
-        const updatedExpense = await expense.update({ trip_id, name, amount, category, currency, posted, notes, image });
+        const updatedExpense = await expense.update({ tripId, name, amount, category, currency, posted, notes, image });
         res.json({ data: updatedExpense });
     } catch (err) {
         console.error(err);
@@ -61,10 +80,10 @@ const updateExpense = async (req, res) => {
 
 // DELETE expense data
 const deleteExpense = async (req, res) => {
-    const id = req.params.id;
+    const expenseId = req.params.expenseId;
     try {
-        // delete expense by id
-        const deletedCount = await Expense.destroy({ where: { expense_id: id } });
+        // delete expense by expenseId
+        const deletedCount = await Expense.destroy({ where: { expense_id: expenseId } });
         if (deletedCount === 0) {
             return res.status(404).json({ message: "Expense not found" });
         }
@@ -79,6 +98,7 @@ module.exports = {
     createExpense,
     getExpenses,
     getExpenseById,
+    getExpensesByTripId,
     updateExpense,
     deleteExpense
 };
