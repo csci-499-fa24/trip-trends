@@ -1,6 +1,5 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
-const Trip = require('./Trip');
 
 // db schema to add a trip location
 const TripLocation = sequelize.define('TripLocation', {

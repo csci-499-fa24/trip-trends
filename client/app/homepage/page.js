@@ -61,7 +61,7 @@ function homepage() {
     const [suggestions, setSuggestions] = useState([]);
     const [locationsNotProvided, setLocationsNotProvided] = useState(false);
     const [userId, setUserId] = useState(null);
-    const [extendedTripLocation, setExtendedTripLocatiom] = useState({ trip_locations: [] });
+    const [tripImage, setTripImage] = useState(null);
 
     const handleLogout = () => {
         googleLogout();

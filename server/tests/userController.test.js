@@ -1,4 +1,7 @@
-require('dotenv').config();
+// require('dotenv').config();
+require('dotenv').config({ path: 'server/.env' });
+
+const { v4: uuidv4 } = require('uuid');
 const User = require('../models/User');
 const { createUser } = require('../controllers/UserController');
 
