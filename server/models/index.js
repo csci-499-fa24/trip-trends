@@ -3,11 +3,11 @@ const { Sequelize } = require('sequelize');
 const sequelize = require('../config/db');
 
 // import models
-const User = require('../models/User');
-const Trip = require('../models/Trip');
-const SharedTrip = require('../models/SharedTrip');
-const TripLocation = require('../models/TripLocation');
-const Expense = require('../models/Expense');
+const User = require('./User');
+const Trip = require('./Trip');
+const SharedTrip = require('./SharedTrip');
+const TripLocation = require('./TripLocation');
+const Expense = require('./Expense');
 
 // define associations
 // SharedTrip associations
