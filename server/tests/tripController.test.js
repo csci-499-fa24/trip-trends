@@ -1,4 +1,7 @@
-require('dotenv').config();
+// require('dotenv').config();
+require('dotenv').config({ path: 'server/.env' });
+const { ValidationError } = require('sequelize');
+
 const { createTrip } = require('../controllers/TripController');
 const Trip = require('../models/Trip');
 const SharedTrip = require('../models/SharedTrip');
@@ -6,7 +9,6 @@ const SharedTrip = require('../models/SharedTrip');
 // mock Trip, SharedTrip models
 jest.mock('../models/Trip');
 jest.mock('../models/SharedTrip');
-
 
 describe('createTrip', () => {
     let mockRequest, mockResponse;
@@ -54,6 +56,35 @@ describe('createTrip', () => {
         expect(Trip.create).toHaveBeenCalledWith(inputTrip); // check if Trip.create called with inputTrip
         expect(mockResponse.status).toHaveBeenCalledWith(201); // check for response 201
         expect(mockResponse.json).toHaveBeenCalledWith({ data: createdTrip }); // check reponse data
+    });
+
+    it('should return 400 status for invalid date range', async () => {
+        const mockUserId = 'b3c249e7-26ae-4818-83de-ca8f5b4f4bb6';
+        mockRequest.params = { userId: mockUserId }; // set userId in request params
+
+        mockRequest.body = {
+            name: 'Paris',
+            start_date: '2025-03-10',
+            end_date: '2024-08-01',
+            budget: '123',
+            image: 'image.jpg'
+        };
+        
+        const validationError = new Error('Start date cannot be after end date.');
+        validationError.name = 'SequelizeValidationError';
+
+        // arrange
+        Trip.create.mockRejectedValue(validationError);
+
+        // act
+        await createTrip(mockRequest, mockResponse); // call createTrip function
+
+        // assert
+        expect(mockResponse.status).toHaveBeenCalledWith(400); // check for 400 status
+        expect(mockResponse.json).toHaveBeenCalledWith({ 
+            message: 'Validation Error',
+            error: 'Start date cannot be after end date.',
+        }); // check response message
     });
 
     it('should handle errors and return 500 status', async () => {
