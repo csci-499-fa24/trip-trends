@@ -1,8 +1,8 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
 // db schema to add a trip
-const Trip = sequelize.define('all_trips', {
+const Trip = sequelize.define("all_trips", {
     trip_id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,

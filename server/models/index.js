@@ -1,12 +1,13 @@
 const { Sequelize } = require('sequelize');
-const sequelize = new Sequelize(process.env.DATABASE_URL);
+// const sequelize = new Sequelize(process.env.DATABASE_URL);
+const sequelize = require('../config/db');
 
 // import models
-const User = require('./User')(sequelize, Sequelize.DataTypes);
-const Trip = require('./Trip')(sequelize, Sequelize.DataTypes);
-const SharedTrip = require('./SharedTrip')(sequelize, Sequelize.DataTypes);
-const TripLocation = require('./TripLocation')(sequelize, Sequelize.DataTypes);
-const Expense = require('./Expense')(sequelize, Sequelize.DataTypes);
+const User = require('../models/User');
+const Trip = require('../models/Trip');
+const SharedTrip = require('../models/SharedTrip');
+const TripLocation = require('../models/TripLocation');
+const Expense = require('../models/Expense');
 
 // define associations
 // SharedTrip associations
@@ -15,7 +16,6 @@ User.belongsToMany(Trip, {
     foreignKey: 'user_id',
     otherKey: 'trip_id',
     onDelete: 'CASCADE',
-    
 });
 
 Trip.belongsToMany(User, {
@@ -26,14 +26,15 @@ Trip.belongsToMany(User, {
 });
 
 // TripLocation associations
+// TripLocation.removeAttribute('id');
 Trip.hasMany(TripLocation, 
     { foreignKey: 'trip_id', 
-    onDelete: 'CASCADE'}, 
+        onDelete: 'CASCADE'}, 
 );
 
 TripLocation.belongsTo(Trip, 
     { foreignKey: 'trip_id', 
-    onDelete: 'CASCADE'}
+        onDelete: 'CASCADE'}
 );
 
 // export models and sequelize instance
