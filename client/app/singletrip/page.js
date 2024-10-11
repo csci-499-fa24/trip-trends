@@ -149,7 +149,7 @@ function Singletrip() {
         // Fetch currency for the first trip location and other locations
         if (tripLocations.length > 0 && tripLocations[0]) {
             fetchCurrency(tripLocations[0]);
-            const remainingLocations = tripLocations.slice(1);
+            const remainingLocations = tripLocations;
             fetchOtherCurrencies(remainingLocations);
         } else {
             console.log('No valid trip locations found');
@@ -239,6 +239,9 @@ function Singletrip() {
 
     const newExpenseInputChange = (e) => {
         const { name, value } = e.target;
+        if (name === 'currency') {
+            setSelectedCurrency(value); // Update selected currency
+        }
         setNewExpenseData({ ...newExpenseData, [name]: value });
     };
 
@@ -247,7 +250,8 @@ function Singletrip() {
 
         const updatedExpenseData = {
             ...newExpenseData,
-            trip_id: tripId
+            trip_id: tripId,
+            currency: selectedCurrency || 'USD',
         };
 
         try {
@@ -608,31 +612,47 @@ function Singletrip() {
                                             Currency:
                                             <select
                                                 name="currency"
-                                                value={selectedCurrency} // Prepopulate with selectedCurrency
-                                                onChange={newExpenseInputChange} // Handle change correctly
+                                                value={selectedCurrency}
+                                                onChange={(e) => {
+                                                    setSelectedCurrency(e.target.value); // Update selected currency state
+                                                    newExpenseInputChange(e); // Call your input change handler
+                                                }}
                                                 required
                                             >
                                                 <option value="">Select Currency</option>
 
-                                                {/* Place selectedCurrency at the top if it's not USD */}
+                                                {/* Display the selected currency at the top if it exists and it's not USD */}
                                                 {selectedCurrency && selectedCurrency !== "USD" && (
-                                                    <option value={selectedCurrency}>{selectedCurrency}</option>
+                                                        <option value={selectedCurrency}>{selectedCurrency}</option>
                                                 )}
 
-                                                {/* Options from otherCurrencies */}
-                                                {otherCurrencies.map((code, index) => (
-                                                    <option key={`other-${index}`} value={code}>{code}</option>
-                                                ))}
+                                                {/* Recommended currencies section */}
+                                                {otherCurrencies
+                                                    .filter(code => code !== selectedCurrency) // Exclude selected currency
+                                                    .length > 0 && (
+                                                        <optgroup label="Recommended">
+                                                            {otherCurrencies
+                                                                .filter(code => code !== selectedCurrency) // Exclude selected currency
+                                                                .map((code, index) => (
+                                                                    <option key={`other-${index}`} value={code}>{code}</option>
+                                                                ))}
+                                                        </optgroup>
+                                                    )}
 
-                                                {/* Always place USD after otherCurrencies */}
-                                                <option value="USD">USD</option>
+                                                {/* Always place USD after other currencies */}
+                                                <optgroup label="Other">
+                                                    <option value="USD">USD</option>
 
-                                                {/* Options from currencyCodes */}
-                                                {currencyCodes.map((code) => (
-                                                    <option key={code} value={code}>{code}</option>
-                                                ))}
+                                                    {/* Display remaining currency codes, excluding selectedCurrency and other currencies */}
+                                                    {currencyCodes
+                                                        .filter(code => code !== selectedCurrency && code !== "USD" && !otherCurrencies.includes(code))
+                                                        .map((code) => (
+                                                            <option key={code} value={code}>{code}</option>
+                                                        ))}
+                                                </optgroup>
                                             </select>
                                         </label>
+
                                     </div>
 
                                     <div className="field-pair">
@@ -715,8 +735,8 @@ function Singletrip() {
                         </div>
                     )}
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }
 
