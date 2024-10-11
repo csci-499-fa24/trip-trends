@@ -67,7 +67,6 @@ function Singletrip() {
         "Medication",
         "First Aid",
         "Other"
-        // Add more categories as needed
     ]);
 
     useEffect(() => {
@@ -88,7 +87,6 @@ function Singletrip() {
 
             axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/trips/${tripId}`)
                 .then(response => {
-                    // console.log(response.data.data)
                     setExpenseData(response.data);
                     setOriginalData(response.data);
 
@@ -157,14 +155,23 @@ function Singletrip() {
             const response = await axios({
                 url: `${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/download/${tripId}`,
                 method: 'GET',
-                responseType: 'blob' // important
+                responseType: 'blob'
             });
+
+            console.log(response.headers)
+
+            const contentDisposition = response.headers['content-disposition'];
+            let filename = `trip_${tripId}.csv`; // Default filename
+            if (contentDisposition && contentDisposition.includes('filename=')) {
+                const filenamePart = contentDisposition.split('filename=')[1];
+                filename = filenamePart.replace(/"/g, ''); // Clean up the filename
+            }
 
             // Create a blob from the CSV data
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', `trip_${tripId}.csv`);
+            link.setAttribute('download', filename);
             document.body.appendChild(link);
             link.click();
             link.parentNode.removeChild(link);
@@ -180,8 +187,6 @@ function Singletrip() {
 
     const submitNewExpense = async (e) => {
         e.preventDefault();
-        // console.log('New Expense Data:', newExpenseData);
-        // console.log(tripId);
 
         const updatedExpenseData = {
             ...newExpenseData,
@@ -236,13 +241,11 @@ function Singletrip() {
     const applyFilter = (filterOption, data = originalData) => {
         let sortedExpenses;
         if (filterOption === 'highest') {
-            console.log(expenseData.data);
             sortedExpenses = [...data.data].sort((a, b) => b.amount - a.amount);
         } else if (filterOption === 'lowest') {
             sortedExpenses = [...data.data].sort((a, b) => a.amount - b.amount);
         } else if (filterOption === 'recent') {
             sortedExpenses = [...data.data].sort((a, b) => new Date(b.posted) - new Date(a.posted));
-            console.log("Sorted by most recent:", sortedExpenses);
         } else if (filterOption === 'oldest') {
             sortedExpenses = [...data.data].sort((a, b) => new Date(a.posted) - new Date(b.posted));
         }
@@ -422,7 +425,6 @@ function Singletrip() {
                                                                             type="text"
                                                                             name="name"
                                                                             value={selectedExpense.name}
-                                                                            // onChange={newExpenseInputChange}
                                                                             required
                                                                         />
                                                                     </label>
@@ -432,7 +434,6 @@ function Singletrip() {
                                                                             type="number"
                                                                             name="amount"
                                                                             value={selectedExpense.amount}
-                                                                            // onChange={newExpenseInputChange}
                                                                             required
                                                                         />
                                                                     </label>
@@ -441,7 +442,6 @@ function Singletrip() {
                                                                         <select
                                                                             name="currency"
                                                                             value={selectedExpense.currency}
-                                                                            // onChange={newExpenseInputChange}
                                                                             required
                                                                         >
                                                                             <option value="">Select Currency</option>
@@ -455,7 +455,6 @@ function Singletrip() {
                                                                         <select
                                                                             name="category"
                                                                             value={selectedExpense.category}
-                                                                            // onChange={newExpenseInputChange}
                                                                             required
                                                                         >
                                                                             <option value="">Select Category</option>
@@ -470,7 +469,6 @@ function Singletrip() {
                                                                             type="date"
                                                                             name="posted"
                                                                             value={selectedExpense.posted}
-                                                                            // onChange={newExpenseInputChange}
                                                                             required
                                                                         />
                                                                     </label>
@@ -480,7 +478,6 @@ function Singletrip() {
                                                                             type="text"
                                                                             name="notes"
                                                                             value={selectedExpense.notes}
-                                                                        // onChange={newExpenseInputChange}
                                                                         />
                                                                     </label>
                                                                     <button type="submit" className="submit-edit-expense-button">Edit</button>
@@ -516,11 +513,10 @@ function Singletrip() {
                     )}
                 </div>
             ) : (
-                <p>Loading Trip Data...</p>
+                <p>No Trip Data Found.</p>
             )}
 
             {/* Create a expense popup form */}
-            {/* <button onClick={() => setPopUpVisible(true)} className='create-expense'>Create an Expense</button> */}
             <div className="expense-form">
                 {isPopUpVisible && (
                     <div className="modal">
@@ -549,17 +545,6 @@ function Singletrip() {
                                     />
                                 </label>
 
-                                {/* <label className="new-expense-field-label">
-                                    Currency:
-                                    <input
-                                        type="text"
-                                        name="currency"
-                                        value={newExpenseData.currency}
-                                        onChange={newExpenseInputChange}
-                                        required
-                                    />
-                                </label> */}
-
                                 <label className="new-expense-field-label">
                                     Currency:
                                     <select
@@ -574,17 +559,6 @@ function Singletrip() {
                                         ))}
                                     </select>
                                 </label>
-
-                                {/* <label className="new-expense-field-label">
-                                    Category:
-                                    <input
-                                        type="text"
-                                        name="category"
-                                        value={newExpenseData.category}
-                                        onChange={newExpenseInputChange}
-                                        required
-                                    />
-                                </label> */}
 
                                 <label className="new-expense-field-label">
                                     Category:
