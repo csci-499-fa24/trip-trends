@@ -83,7 +83,7 @@ function Singletrip() {
                 const [latitude, longitude] = coord.split(',');
                 return { latitude, longitude };
             });
-            console.log('Parsed Locations:', parsedLocations);
+            //console.log('Parsed Locations:', parsedLocations);
             setTripLocations(parsedLocations);
         }
     }, []);

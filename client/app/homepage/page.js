@@ -122,7 +122,6 @@ function homepage() {
         try {
             const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${tripId}`);
 
-            console.log('Response Data:', response.data.data);
             setExtendedTripLocatiom({ trip_locations: response.data.data });
 
         } catch (error) {
@@ -130,7 +129,7 @@ function homepage() {
         }
     };
     useEffect(() => {
-        console.log('Updated extendedTripLocation:', extendedTripLocation);
+        //console.log('Updated extendedTripLocation:', extendedTripLocation);
     }, [extendedTripLocation]); // Runs every time extendedTripLocation changes
 
 
