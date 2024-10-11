@@ -22,6 +22,8 @@ function Singletrip() {
     const [expenseData, setExpenseData] = useState([]);
     const [totalExpenses, setTotalExpenses] = useState(0);
     const [currencyCodes, setCurrencyCodes] = useState([]);
+    const [selectedCurrency, setSelectedCurrency] = useState('');
+    const [otherCurrencies, setOtherCurrencies] = useState([]);
     const [isPopUpVisible, setPopUpVisible] = useState(false);
     const [isFilterPopupVisible, setFilterPopupVisible] = useState(false);
     const [isEditPopupVisible, setEditPopupVisible] = useState(false);
@@ -87,6 +89,8 @@ function Singletrip() {
     }, []);
 
 
+
+
     useEffect(() => {
         if (tripId) {
             axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`)
@@ -141,7 +145,48 @@ function Singletrip() {
                 console.error("Error fetching currency symbols:", error);
             });
 
-    }, []);
+
+        // Fetch currency for the first trip location and other locations
+        if (tripLocations.length > 0 && tripLocations[0]) {
+            fetchCurrency(tripLocations[0]);
+            const remainingLocations = tripLocations.slice(1);
+            fetchOtherCurrencies(remainingLocations);
+        } else {
+            console.log('No valid trip locations found');
+        }
+
+    }, [tripLocations]);
+
+    const fetchCurrency = (location) => {
+        fetch(`https://api.opencagedata.com/geocode/v1/json?q=${location.latitude}+${location.longitude}&key=${process.env.NEXT_PUBLIC_OPENCAGE_API_KEY}`)
+            .then(response => response.json())
+            .then(data => {
+                const currencyCode = data.results[0].annotations.currency.iso_code;
+                setSelectedCurrency(currencyCode);
+            })
+            .catch(error => {
+                console.error('Error fetching first location currency:', error);
+            });
+    };
+
+    const fetchOtherCurrencies = (remainingLocations) => {
+        const currencyPromises = remainingLocations.map(location => {
+            return fetch(`https://api.opencagedata.com/geocode/v1/json?q=${location.latitude}+${location.longitude}&key=${process.env.NEXT_PUBLIC_OPENCAGE_API_KEY}`)
+                .then(response => response.json())
+                .then(data => data.results[0].annotations.currency.iso_code)
+                .catch(error => {
+                    console.error('Error fetching other location currencies:', error);
+                    return null; // Return null in case of an error
+                });
+        });
+
+        Promise.all(currencyPromises).then(currencies => {
+            const validCurrencies = currencies.filter(Boolean);
+            //  console.log(validCurrencies);
+            setOtherCurrencies(validCurrencies);
+        });
+    };
+
 
     const deleteTrip = async () => {
         if (window.confirm('Please confirm trip deletion. This action cannot be undone.')) {
@@ -563,11 +608,26 @@ function Singletrip() {
                                             Currency:
                                             <select
                                                 name="currency"
-                                                value={newExpenseData.currency}
-                                                onChange={newExpenseInputChange}
+                                                value={selectedCurrency} // Prepopulate with selectedCurrency
+                                                onChange={newExpenseInputChange} // Handle change correctly
                                                 required
                                             >
                                                 <option value="">Select Currency</option>
+
+                                                {/* Place selectedCurrency at the top if it's not USD */}
+                                                {selectedCurrency && selectedCurrency !== "USD" && (
+                                                    <option value={selectedCurrency}>{selectedCurrency}</option>
+                                                )}
+
+                                                {/* Options from otherCurrencies */}
+                                                {otherCurrencies.map((code, index) => (
+                                                    <option key={`other-${index}`} value={code}>{code}</option>
+                                                ))}
+
+                                                {/* Always place USD after otherCurrencies */}
+                                                <option value="USD">USD</option>
+
+                                                {/* Options from currencyCodes */}
                                                 {currencyCodes.map((code) => (
                                                     <option key={code} value={code}>{code}</option>
                                                 ))}
