@@ -3,17 +3,17 @@ const jwt = require('jsonwebtoken');
 
 
 // POST new user data
-const createUser = async (req, res) => {
-    const { fName, lName, email, image } = req.body;
-    try {
-        // create model instance 
-        const newUser = await User.create({ fname: fName, lname: lName, email, image });
-        res.status(201).json({ data: newUser });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Internal Server Error", error: err.message });
-    }
-};
+// const createUser = async (req, res) => {
+//     const { fName, lName, email, image } = req.body;
+//     try {
+//         // create model instance 
+//         const newUser = await User.create({ fname: fName, lname: lName, email, image });
+//         res.status(201).json({ data: newUser });
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).json({ message: "Internal Server Error", error: err.message });
+//     }
+// };
 
 // GET all user data
 const getUsers = async (req, res) => {
@@ -115,7 +115,7 @@ const createGoogleUser = async (req, res) => {
 };
 
 module.exports = {
-    createUser,
+    //createUser,
     getUsers,
     getUserById,
     updateUser,
