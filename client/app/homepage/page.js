@@ -60,7 +60,7 @@ function homepage() {
     const [suggestions, setSuggestions] = useState([]);
     const [locationsNotProvided, setLocationsNotProvided] = useState(false);
     const [userId, setUserId] = useState(null);
-    const [tripImage, setTripImage] = useState(null);
+    const [extendedTripLocation, setExtendedTripLocatiom] = useState({ trip_locations: [] });
 
     const handleLogout = () => {
         googleLogout();
@@ -355,6 +355,7 @@ function homepage() {
                 const feature = map.forEachFeatureAtPixel(event.pixel, (feat) => feat);
                 if (feature) {
                     const tripId = feature.get('trip_id'); 
+                    console.log('Clicked marker:', tripId); 
                     
                     // Scroll to the Recent Trips section and expand the clicked trip
                     const tripElement = document.getElementById(`trip-${tripId}`); // Use a unique ID to target the trip divider
