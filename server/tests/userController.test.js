@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 
 // mock User model
 jest.mock('../models/User');
+console.error = jest.fn(); // suppress error logs
 
 const app = express();
 app.use(express.json());

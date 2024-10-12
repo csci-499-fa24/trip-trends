@@ -41,7 +41,7 @@ const Trip = sequelize.define("all_trips", {
     tableName: 'all_trips',
     timestamps: false
 });
-// User.hasMany(Trip, { foreignKey: 'user_id' });
-// Trip.belongsTo(User, { foreignKey: 'user_id' });
+ User.hasMany(Trip, { foreignKey: 'user_id' });
+ Trip.belongsTo(User, { foreignKey: 'user_id' });
 
 module.exports = Trip;
