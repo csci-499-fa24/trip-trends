@@ -150,9 +150,9 @@ function Singletrip() {
 
         // Fetch currency for the first trip location and other locations
         if (tripLocations.length > 0 && tripLocations[0]) {
-            fetchCurrency(tripLocations[0]);
+           // fetchCurrency(tripLocations[0]);
             const remainingLocations = tripLocations;
-            fetchOtherCurrencies(remainingLocations);
+           // fetchOtherCurrencies(remainingLocations);
         } else {
             console.log('No valid trip locations found');
         }
