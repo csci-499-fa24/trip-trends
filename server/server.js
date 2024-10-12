@@ -13,10 +13,6 @@ const tripLocationRoutes = require('./routes/tripLocationRoutes');
 
 app.use(cors());
 app.use(express.json());
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
-    next();
-});
 
 // connect to db and authenticate
 db.authenticate().then(() => {
