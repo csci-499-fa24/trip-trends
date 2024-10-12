@@ -25,7 +25,11 @@ const TripLocation = sequelize.define('TripLocation', {
     latitude: {
         type: DataTypes.DECIMAL(10,7),
         allowNull: true,
-    }
+    },
+    currency_code: {
+        type: DataTypes.STRING(3),
+        allowNull: true, // This makes the column nullable
+    },
 }, {
     tableName: 'tlocation',
     timestamps: false,

@@ -37,7 +37,6 @@ function Singletrip() {
     const [selectedExpense, setSelectedExpense] = useState(null);
     const [originalData, setOriginalData] = useState([]);
     const [selectedFilter, setSelectedFilter] = useState('');
-    const [tripLocations, setTripLocations] = useState([]);
     const [newExpenseData, setNewExpenseData] = useState({
         trip_id: '',
         name: '',
@@ -83,16 +82,7 @@ function Singletrip() {
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get('tripId');
         setTripId(id);
-        const coordinates = urlParams.get('coordinates');
-
-        if (coordinates) {
-            const parsedLocations = coordinates.split(';').map(coord => {
-                const [latitude, longitude] = coord.split(',');
-                return { latitude, longitude };
-            });
-            //console.log('Parsed Locations:', parsedLocations);
-            setTripLocations(parsedLocations);
-        }
+       
     }, []);
 
 
@@ -125,8 +115,22 @@ function Singletrip() {
                     }, 0);
 
                     setTotalExpenses(total);
-                    console.log(fetchedExpenses);
                     fetchCurrencyRates(fetchedExpenses);
+                })
+                .catch(error => {
+                    console.error('Error fetching trip data:', error);
+                });
+
+            axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${tripId}`)
+                .then(response => {
+                      console.log(response.data);
+                      setSelectedCurrency(response.data.data[0].currency_code)
+
+                      const locations = response.data.data;
+                      const currencyCodes = locations.map(location => location.currency_code);
+      
+                      setOtherCurrencies(currencyCodes);
+
                 })
                 .catch(error => {
                     console.error('Error fetching trip data:', error);
@@ -183,7 +187,7 @@ function Singletrip() {
                     }]
                 });
 
-                console.log('Converted expenses:', convertedExpenses);
+                // console.log('Converted expenses:', convertedExpenses);
             } else {
                 console.warn('No valid currencies found for conversion.');
             }
@@ -191,61 +195,6 @@ function Singletrip() {
         } catch (error) {
             console.error('Error fetching currency rates:', error);
         }
-    };
-
-
-
-
-    const fetchCurrency = async (location) => {
-        const cacheKey = `${location.latitude},${location.longitude}`;
-
-        // Check if currency is already cached
-        if (currencyCache[cacheKey]) {
-            setSelectedCurrency(currencyCache[cacheKey]);
-            return; // Return early if currency is cached
-        }
-
-        try {
-            const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${location.latitude}+${location.longitude}&key=${process.env.NEXT_PUBLIC_OPENCAGE_API_KEY_PERSONAL}`);
-            const data = await response.json();
-            const currencyCode = data.results[0]?.annotations?.currency?.iso_code;
-
-            if (currencyCode) {
-                setSelectedCurrency(currencyCode);
-                setCurrencyCache(prev => ({ ...prev, [cacheKey]: currencyCode })); // Cache the currency code
-            }
-        } catch (error) {
-            console.error('Error fetching first location currency:', error);
-        }
-    };
-
-    const fetchOtherCurrencies = async (remainingLocations) => {
-        const currencies = await Promise.all(remainingLocations.map(async (location) => {
-            const cacheKey = `${location.latitude},${location.longitude}`;
-            // Check if currency is already cached
-            if (currencyCache[cacheKey]) {
-                return currencyCache[cacheKey]; // Return cached currency code
-            }
-
-            try {
-                const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${location.latitude}+${location.longitude}&key=${process.env.NEXT_PUBLIC_OPENCAGE_API_KEY_PERSONAL}`);
-                const data = await response.json();
-                const currencyCode = data.results[0]?.annotations?.currency?.iso_code;
-
-                // Cache the currency code
-                if (currencyCode) {
-                    setCurrencyCache(prev => ({ ...prev, [cacheKey]: currencyCode }));
-                }
-
-                return currencyCode; // Return the fetched currency code
-            } catch (error) {
-                console.error('Error fetching other location currencies:', error);
-                return null; // Return null in case of an error
-            }
-        }));
-
-        const validCurrencies = currencies.filter(Boolean);
-        setOtherCurrencies(validCurrencies);
     };
 
     useEffect(() => {
@@ -269,16 +218,8 @@ function Singletrip() {
                 console.error("Error fetching currency symbols:", error);
             });
 
-        // Fetch currency for the first trip location
-        if (tripLocations.length > 0 && tripLocations[0]) {
-            // fetchCurrency(tripLocations[0]);
-            const remainingLocations = tripLocations.slice(1); // Skip the first location for other currencies
-            // fetchOtherCurrencies(remainingLocations);
-        } else {
-            console.log('No valid trip locations found');
-        }
+    }, [tripId]);
 
-    }, [tripLocations]);
 
     const deleteTrip = async () => {
         if (window.confirm('Please confirm trip deletion. This action cannot be undone.')) {
