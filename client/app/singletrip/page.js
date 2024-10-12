@@ -24,7 +24,6 @@ function Singletrip() {
     const [currencyCodes, setCurrencyCodes] = useState([]);
     const [selectedCurrency, setSelectedCurrency] = useState('');
     const [otherCurrencies, setOtherCurrencies] = useState([]);
-    const [exchangeRates, setExchangeRates] = useState({});
     const [isPopUpVisible, setPopUpVisible] = useState(false);
     const [isFilterPopupVisible, setFilterPopupVisible] = useState(false);
     const [isEditPopupVisible, setEditPopupVisible] = useState(false);
@@ -149,19 +148,17 @@ function Singletrip() {
 
         // Fetch currency for the first trip location and other locations
         if (tripLocations.length > 0 && tripLocations[0]) {
-            fetchCurrency(tripLocations[0]);
+            //fetchCurrency(tripLocations[0]);
             const remainingLocations = tripLocations;
-            fetchOtherCurrencies(remainingLocations);
+            //fetchOtherCurrencies(remainingLocations);
         } else {
             console.log('No valid trip locations found');
         }
 
-        getExchangeRates();
-
-    }, [tripLocations, otherCurrencies]);
+    }, [tripLocations]);
 
     const fetchCurrency = (location) => {
-        fetch(`https://api.opencagedata.com/geocode/v1/json?q=${location.latitude}+${location.longitude}&key=${process.env.NEXT_PUBLIC_OPENCAGE_API_KEY}`)
+        fetch(`https://api.opencagedata.com/geocode/v1/json?q=${location.latitude}+${location.longitude}&key=${process.env.NEXT_PUBLIC_OPENCAGE_API_KEY_PERSONAL}`)
             .then(response => response.json())
             .then(data => {
                 const currencyCode = data.results[0].annotations.currency.iso_code;
@@ -174,7 +171,7 @@ function Singletrip() {
 
     const fetchOtherCurrencies = (remainingLocations) => {
         const currencyPromises = remainingLocations.map(location => {
-            return fetch(`https://api.opencagedata.com/geocode/v1/json?q=${location.latitude}+${location.longitude}&key=${process.env.NEXT_PUBLIC_OPENCAGE_API_KEY}`)
+            return fetch(`https://api.opencagedata.com/geocode/v1/json?q=${location.latitude}+${location.longitude}&key=${process.env.NEXT_PUBLIC_OPENCAGE_API_KEY_PERSONAL}`)
                 .then(response => response.json())
                 .then(data => data.results[0].annotations.currency.iso_code)
                 .catch(error => {
@@ -188,34 +185,6 @@ function Singletrip() {
             //  console.log(validCurrencies);
             setOtherCurrencies(validCurrencies);
         });
-    };
-
-
-    const getExchangeRates = async () => {
-        const rates = {};
-
-        try {
-            for (let currency of otherCurrencies) {
-                const response = await axios.get(`https://hexarate.paikama.co/api/rates/latest/USD`, {
-                    params: {
-                        target: currency
-                    }
-                });
-
-                // Log the full response to confirm structure
-                console.log('API Response:', response.data);
-
-                // Extract the rate from data.mid
-                if (response.data && response.data.data && response.data.data.mid) {
-                    rates[currency] = response.data.data.mid;
-                } else {
-                    console.error('Invalid response structure:', response.data);
-                }
-            }
-            setExchangeRates(rates);
-        } catch (error) {
-            console.error('Error fetching exchange rates:', error);
-        }
     };
 
 
@@ -654,7 +623,7 @@ function Singletrip() {
 
                                                 {/* Display the selected currency at the top if it exists and it's not USD */}
                                                 {selectedCurrency && selectedCurrency !== "USD" && (
-                                                    <option value={selectedCurrency}>{selectedCurrency}</option>
+                                                        <option value={selectedCurrency}>{selectedCurrency}</option>
                                                 )}
 
                                                 {/* Recommended currencies section */}
@@ -766,33 +735,6 @@ function Singletrip() {
                         </div>
                     )}
                 </div>
-
-
-
-                {/* Exchange Rate Table */}
-                <div className="exchange-rates-container">
-                    <table className="exchange-rates-table">
-                        <thead>
-                            <tr>
-                                <th>Currency</th>
-                                <th>Rate (Relative to USD)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {Object.keys(exchangeRates).map((currency) => (
-                                <tr key={currency}>
-                                    <td>{currency}</td>
-                                    <td>{exchangeRates[currency]}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-
-
-
-
-
             </div >
         </div >
     );
