@@ -4,13 +4,11 @@ import React, {useEffect, useState} from 'react'
 export default function Home() {
   
   const [message, setMessage] = useState("Loading")
-  console.log(process.env.NEXT_PUBLIC_SERVER_URL + "/api/home")
   useEffect(() => {
     fetch(process.env.NEXT_PUBLIC_SERVER_URL + "/api/home").then(
       response => response.json()
     ).then(
       data => {
-        console.log(data)
         setMessage(data.message)
       }
     )

@@ -15,8 +15,6 @@ import homeIcon from '../img/homeIcon.png';
 import Filter from '../img/Filter.png';
 import logo from '../img/Logo.png';
 import Link from 'next/link';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 function Singletrip() {
     const [tripId, setTripId] = useState(null);
@@ -24,12 +22,15 @@ function Singletrip() {
     const [expenseData, setExpenseData] = useState([]);
     const [totalExpenses, setTotalExpenses] = useState(0);
     const [currencyCodes, setCurrencyCodes] = useState([]);
+    const [selectedCurrency, setSelectedCurrency] = useState('');
+    const [otherCurrencies, setOtherCurrencies] = useState([]);
     const [isPopUpVisible, setPopUpVisible] = useState(false);
     const [isFilterPopupVisible, setFilterPopupVisible] = useState(false);
     const [isEditPopupVisible, setEditPopupVisible] = useState(false);
     const [selectedExpense, setSelectedExpense] = useState(null);
     const [originalData, setOriginalData] = useState([]);
     const [selectedFilter, setSelectedFilter] = useState('');
+    const [tripLocations, setTripLocations] = useState([]);
     const [newExpenseData, setNewExpenseData] = useState({
         trip_id: '',
         name: '',
@@ -69,14 +70,26 @@ function Singletrip() {
         "Medication",
         "First Aid",
         "Other"
-        // Add more categories as needed
     ]);
 
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get('tripId');
         setTripId(id);
+        const coordinates = urlParams.get('coordinates');
+
+        if (coordinates) {
+            const parsedLocations = coordinates.split(';').map(coord => {
+                const [latitude, longitude] = coord.split(',');
+                return { latitude, longitude };
+            });
+            //console.log('Parsed Locations:', parsedLocations);
+            setTripLocations(parsedLocations);
+        }
     }, []);
+
+
+
 
     useEffect(() => {
         if (tripId) {
@@ -90,7 +103,6 @@ function Singletrip() {
 
             axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/trips/${tripId}`)
                 .then(response => {
-                    // console.log(response.data.data)
                     setExpenseData(response.data);
                     setOriginalData(response.data);
 
@@ -133,7 +145,48 @@ function Singletrip() {
                 console.error("Error fetching currency symbols:", error);
             });
 
-    }, []);
+
+        // Fetch currency for the first trip location and other locations
+        if (tripLocations.length > 0 && tripLocations[0]) {
+            fetchCurrency(tripLocations[0]);
+            const remainingLocations = tripLocations;
+            fetchOtherCurrencies(remainingLocations);
+        } else {
+            console.log('No valid trip locations found');
+        }
+
+    }, [tripLocations]);
+
+    const fetchCurrency = (location) => {
+        fetch(`https://api.opencagedata.com/geocode/v1/json?q=${location.latitude}+${location.longitude}&key=${process.env.NEXT_PUBLIC_OPENCAGE_API_KEY}`)
+            .then(response => response.json())
+            .then(data => {
+                const currencyCode = data.results[0].annotations.currency.iso_code;
+                setSelectedCurrency(currencyCode);
+            })
+            .catch(error => {
+                console.error('Error fetching first location currency:', error);
+            });
+    };
+
+    const fetchOtherCurrencies = (remainingLocations) => {
+        const currencyPromises = remainingLocations.map(location => {
+            return fetch(`https://api.opencagedata.com/geocode/v1/json?q=${location.latitude}+${location.longitude}&key=${process.env.NEXT_PUBLIC_OPENCAGE_API_KEY}`)
+                .then(response => response.json())
+                .then(data => data.results[0].annotations.currency.iso_code)
+                .catch(error => {
+                    console.error('Error fetching other location currencies:', error);
+                    return null; // Return null in case of an error
+                });
+        });
+
+        Promise.all(currencyPromises).then(currencies => {
+            const validCurrencies = currencies.filter(Boolean);
+            //  console.log(validCurrencies);
+            setOtherCurrencies(validCurrencies);
+        });
+    };
+
 
     const deleteTrip = async () => {
         if (window.confirm('Please confirm trip deletion. This action cannot be undone.')) {
@@ -159,14 +212,23 @@ function Singletrip() {
             const response = await axios({
                 url: `${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/download/${tripId}`,
                 method: 'GET',
-                responseType: 'blob' // important
+                responseType: 'blob'
             });
+
+            console.log(response.headers)
+
+            const contentDisposition = response.headers['content-disposition'];
+            let filename = `trip_${tripId}.csv`; // Default filename
+            if (contentDisposition && contentDisposition.includes('filename=')) {
+                const filenamePart = contentDisposition.split('filename=')[1];
+                filename = filenamePart.replace(/"/g, ''); // Clean up the filename
+            }
 
             // Create a blob from the CSV data
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', `trip_${tripId}.csv`);
+            link.setAttribute('download', filename);
             document.body.appendChild(link);
             link.click();
             link.parentNode.removeChild(link);
@@ -177,17 +239,19 @@ function Singletrip() {
 
     const newExpenseInputChange = (e) => {
         const { name, value } = e.target;
+        if (name === 'currency') {
+            setSelectedCurrency(value); // Update selected currency
+        }
         setNewExpenseData({ ...newExpenseData, [name]: value });
     };
 
     const submitNewExpense = async (e) => {
         e.preventDefault();
-        // console.log('New Expense Data:', newExpenseData);
-        // console.log(tripId);
 
         const updatedExpenseData = {
             ...newExpenseData,
-            trip_id: tripId
+            trip_id: tripId,
+            currency: selectedCurrency || 'USD',
         };
 
         try {
@@ -202,13 +266,10 @@ function Singletrip() {
                 posted: '',
                 notes: ''
             });
-            toast.success("Expense added!");
-            setTimeout(() => {
-                window.location.reload();
-            }, 800);
+
+            window.location.reload();
             setPopUpVisible(false);
         } catch (error) {
-            toast.error("There was an error creating your expense.");
             console.error("Error fetching currency symbols:", error);
         }
     };
@@ -241,13 +302,11 @@ function Singletrip() {
     const applyFilter = (filterOption, data = originalData) => {
         let sortedExpenses;
         if (filterOption === 'highest') {
-            console.log(expenseData.data);
             sortedExpenses = [...data.data].sort((a, b) => b.amount - a.amount);
         } else if (filterOption === 'lowest') {
             sortedExpenses = [...data.data].sort((a, b) => a.amount - b.amount);
         } else if (filterOption === 'recent') {
             sortedExpenses = [...data.data].sort((a, b) => new Date(b.posted) - new Date(a.posted));
-            console.log("Sorted by most recent:", sortedExpenses);
         } else if (filterOption === 'oldest') {
             sortedExpenses = [...data.data].sort((a, b) => new Date(a.posted) - new Date(b.posted));
         }
@@ -264,9 +323,10 @@ function Singletrip() {
         localStorage.removeItem('selectedFilter');
     };
 
+
+
     return (
         <div className="main-container">
-            <ToastContainer hideProgressBar={true} />
             <div>
                 {/* Header section */}
                 <header className="header">
@@ -427,7 +487,6 @@ function Singletrip() {
                                                                                 type="text"
                                                                                 name="name"
                                                                                 value={selectedExpense.name}
-                                                                                // onChange={newExpenseInputChange}
                                                                                 required
                                                                             />
                                                                         </label>
@@ -437,7 +496,6 @@ function Singletrip() {
                                                                                 type="number"
                                                                                 name="amount"
                                                                                 value={selectedExpense.amount}
-                                                                                // onChange={newExpenseInputChange}
                                                                                 required
                                                                             />
                                                                         </label>
@@ -446,7 +504,6 @@ function Singletrip() {
                                                                             <select
                                                                                 name="currency"
                                                                                 value={selectedExpense.currency}
-                                                                                // onChange={newExpenseInputChange}
                                                                                 required
                                                                             >
                                                                                 <option value="">Select Currency</option>
@@ -460,7 +517,6 @@ function Singletrip() {
                                                                             <select
                                                                                 name="category"
                                                                                 value={selectedExpense.category}
-                                                                                // onChange={newExpenseInputChange}
                                                                                 required
                                                                             >
                                                                                 <option value="">Select Category</option>
@@ -475,7 +531,6 @@ function Singletrip() {
                                                                                 type="date"
                                                                                 name="posted"
                                                                                 value={selectedExpense.posted}
-                                                                                // onChange={newExpenseInputChange}
                                                                                 required
                                                                             />
                                                                         </label>
@@ -485,7 +540,6 @@ function Singletrip() {
                                                                                 type="text"
                                                                                 name="notes"
                                                                                 value={selectedExpense.notes}
-                                                                            // onChange={newExpenseInputChange}
                                                                             />
                                                                         </label>
                                                                         <button type="submit" className="submit-edit-expense-button">Edit</button>
@@ -521,11 +575,10 @@ function Singletrip() {
                         )}
                     </div>
                 ) : (
-                    <p>Loading Trip Data...</p>
+                    <p>No Trip Data Found.</p>
                 )}
 
                 {/* Create a expense popup form */}
-                {/* <button onClick={() => setPopUpVisible(true)} className='create-expense'>Create an Expense</button> */}
                 <div className="expense-form">
                     {isPopUpVisible && (
                         <div className="modal">
@@ -543,79 +596,91 @@ function Singletrip() {
                                             required
                                         />
                                     </label>
-                                    <label className="new-expense-field-label">
-                                        Amount:
-                                        <input
-                                            type="number"
-                                            name="amount"
-                                            value={newExpenseData.amount}
-                                            onChange={newExpenseInputChange}
-                                            required
-                                        />
-                                    </label>
 
-                                    {/* <label className="new-expense-field-label">
-                                    Currency:
-                                    <input
-                                        type="text"
-                                        name="currency"
-                                        value={newExpenseData.currency}
-                                        onChange={newExpenseInputChange}
-                                        required
-                                    />
-                                </label> */}
+                                    <div className="field-pair">
+                                        <label className="new-expense-field-label half-width">
+                                            Amount:
+                                            <input
+                                                type="number"
+                                                name="amount"
+                                                value={newExpenseData.amount}
+                                                onChange={newExpenseInputChange}
+                                                required
+                                            />
+                                        </label>
+                                        <label className="new-expense-field-label half-width">
+                                            Currency:
+                                            <select
+                                                name="currency"
+                                                value={selectedCurrency}
+                                                onChange={(e) => {
+                                                    setSelectedCurrency(e.target.value); // Update selected currency state
+                                                    newExpenseInputChange(e); // Call your input change handler
+                                                }}
+                                                required
+                                            >
+                                                <option value="">Select Currency</option>
 
-                                    <label className="new-expense-field-label">
-                                        Currency:
-                                        <select
-                                            name="currency"
-                                            value={newExpenseData.currency}
-                                            onChange={newExpenseInputChange}
-                                            required
-                                        >
-                                            <option value="">Select Currency</option>
-                                            {currencyCodes.map((code) => (
-                                                <option key={code} value={code}>{code}</option>
-                                            ))}
-                                        </select>
-                                    </label>
+                                                {/* Display the selected currency at the top if it exists and it's not USD */}
+                                                {selectedCurrency && selectedCurrency !== "USD" && (
+                                                        <option value={selectedCurrency}>{selectedCurrency}</option>
+                                                )}
 
-                                    {/* <label className="new-expense-field-label">
-                                    Category:
-                                    <input
-                                        type="text"
-                                        name="category"
-                                        value={newExpenseData.category}
-                                        onChange={newExpenseInputChange}
-                                        required
-                                    />
-                                </label> */}
+                                                {/* Recommended currencies section */}
+                                                {otherCurrencies
+                                                    .filter(code => code !== selectedCurrency) // Exclude selected currency
+                                                    .length > 0 && (
+                                                        <optgroup label="Recommended">
+                                                            {otherCurrencies
+                                                                .filter(code => code !== selectedCurrency) // Exclude selected currency
+                                                                .map((code, index) => (
+                                                                    <option key={`other-${index}`} value={code}>{code}</option>
+                                                                ))}
+                                                        </optgroup>
+                                                    )}
 
-                                    <label className="new-expense-field-label">
-                                        Category:
-                                        <select
-                                            name="category"
-                                            value={newExpenseData.category}
-                                            onChange={newExpenseInputChange}
-                                            required
-                                        >
-                                            <option value="">Select Category</option>
-                                            {expenseCategories.map((category) => (
-                                                <option key={category} value={category}>{category}</option>
-                                            ))}
-                                        </select>
-                                    </label>
+                                                {/* Always place USD after other currencies */}
+                                                <optgroup label="Other">
+                                                    <option value="USD">USD</option>
 
-                                    <label className="new-expense-field-label">
-                                        Date:
-                                        <input
-                                            type="date"
-                                            name="posted"
-                                            value={newExpenseData.posted}
-                                            onChange={newExpenseInputChange}
-                                            required
-                                        />
-                                    </label>
+                                                    {/* Display remaining currency codes, excluding selectedCurrency and other currencies */}
+                                                    {currencyCodes
+                                                        .filter(code => code !== selectedCurrency && code !== "USD" && !otherCurrencies.includes(code))
+                                                        .map((code) => (
+                                                            <option key={code} value={code}>{code}</option>
+                                                        ))}
+                                                </optgroup>
+                                            </select>
+                                        </label>
+
+                                    </div>
+
+                                    <div className="field-pair">
+                                        <label className="new-expense-field-label half-width">
+                                            Category:
+                                            <select
+                                                name="category"
+                                                value={newExpenseData.category}
+                                                onChange={newExpenseInputChange}
+                                                required
+                                            >
+                                                <option value="">Select Category</option>
+                                                {expenseCategories.map((category) => (
+                                                    <option key={category} value={category}>{category}</option>
+                                                ))}
+                                            </select>
+                                        </label>
+                                        <label className="new-expense-field-label half-width">
+                                            Date:
+                                            <input
+                                                type="date"
+                                                name="posted"
+                                                value={newExpenseData.posted}
+                                                onChange={newExpenseInputChange}
+                                                required
+                                            />
+                                        </label>
+                                    </div>
 
                                     <label className="new-expense-field-label">
                                         Notes:
@@ -670,8 +735,8 @@ function Singletrip() {
                         </div>
                     )}
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }
 

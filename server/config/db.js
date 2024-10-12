@@ -6,7 +6,7 @@ const { Sequelize } = require('sequelize');
 // create new instance of sequelize
 const sequelize = new Sequelize(process.env.DB_URL, {
     dialect: "postgres",
-    logging: console.log, // update to false to turn off logging
+    logging: false,
     dialectOptions: {
         ssl: {
             require: true,

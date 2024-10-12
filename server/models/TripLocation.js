@@ -1,5 +1,6 @@
-const { DataTypes } = require('sequelize');
+const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
+const Trip = require('./Trip');
 
 // db schema to add a trip location
 const TripLocation = sequelize.define('TripLocation', {
@@ -32,13 +33,13 @@ const TripLocation = sequelize.define('TripLocation', {
 });
 
 TripLocation.removeAttribute('id');
-// Trip.hasMany(TripLocation, 
-//     { foreignKey: 'trip_id', 
-//     onDelete: 'CASCADE'}, 
-// );
-// TripLocation.belongsTo(Trip, 
-//     { foreignKey: 'trip_id', 
-//     onDelete: 'CASCADE'}
-// );
+Trip.hasMany(TripLocation, 
+    { foreignKey: 'trip_id', 
+    onDelete: 'CASCADE'}, 
+);
+TripLocation.belongsTo(Trip, 
+    { foreignKey: 'trip_id', 
+    onDelete: 'CASCADE'}
+);
 
 module.exports = TripLocation;
