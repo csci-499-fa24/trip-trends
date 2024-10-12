@@ -8,6 +8,38 @@
 .button {
     box-shadow: 0 10px 20px -8px rgba(0, 0, 0, .7);
 }
+.field-pair {
+    display: flex;
+    gap: 15px;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.half-width {
+    flex: 1;
+}
+
+.new-expense-field-label input, 
+.new-expense-field-label select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    background-color: black;
+    color: white;
+    font-size: 15px;
+    transition: border-color 0.3s ease;
+    filter: invert(1);
+}
+
+/* Ensure all inputs have equal height */
+.new-expense-field-label input, 
+.new-expense-field-label select, 
+.new-expense-field-label input[type="date"] {
+    box-sizing: border-box;
+    height: 40px;
+}
 
 .create-expense {
     background-color: #134a09;
@@ -93,20 +125,7 @@
     color: #333;
 }
 
-.new-expense-field-label input {
-    padding: 8px;
-    margin-top: 5px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    background-color: black;
-    /* input bkgd will be white */
-    font-size: 15px;
-    transition: border-color 0.3s ease;
-    width: 100%;
-    color: white;
-    /* text input will be black */
-    filter: invert(1);
-}
+
 
 /* the date input fields */
 .new-expense-field-label input[type="date"] {
@@ -155,18 +174,6 @@
     z-index: 10000;
 }
 
-.new-expense-field-label select {
-    padding: 8px;
-    margin-top: 5px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    background-color: black;
-    color: white;
-    font-size: 15px;
-    transition: border-color 0.3s ease;
-    width: 100%;
-    filter: invert(1);
-}
 
 .highlighted-date {
     background-color: #77DD77 !important;
