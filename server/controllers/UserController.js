@@ -19,7 +19,7 @@ const jwt = require('jsonwebtoken');
 const getUsers = async (req, res) => {
     try {
         const allUsers = await User.findAll();
-        res.json({ data: allUsers });
+        res.status(200).json({ data: allUsers });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });
@@ -34,7 +34,7 @@ const getUserById = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-        res.json({ data: user });
+        res.status(200).json({ data: user });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });
@@ -49,7 +49,7 @@ const updateUser = async (req, res) => {
         // find user by userId
         const user = await User.findByPk(userId);
         if (!user) {
-            return res.status(404).json();
+            return res.status(404).send();
         }
         // update user data
         const updatedUser = await user.update({ fname, lname, email, image });
