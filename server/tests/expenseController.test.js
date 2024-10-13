@@ -1,6 +1,5 @@
 require('dotenv').config({ path: 'server/.env' });
 const Expense = require('../models/Expense');
-const Trip = require('../models/Trip');
 const { 
     createExpense,
     getExpenses,
