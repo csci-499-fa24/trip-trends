@@ -269,6 +269,20 @@ function Singletrip() {
         setEditPopupVisible(false);
     };
 
+    const deleteExpense = async (expenseID) => {
+        if (window.confirm('Please confirm expense deletion. This action cannot be undone.')) {
+            axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/${expenseID}`)
+                .then(response => {
+                    console.log(response)
+                })
+                .catch(error => {
+                    console.error('Error deleting expense:', error);
+                });
+        }
+        setEditPopupVisible(false);
+        window.location.reload();
+    };
+
     const downloadTripData = async () => {
         try {
             const response = await axios({
@@ -604,7 +618,16 @@ function Singletrip() {
                                                                                 value={selectedExpense.notes}
                                                                             />
                                                                         </label>
-                                                                        <button type="submit" className="submit-edit-expense-button">Edit</button>
+                                                                        <div className='container'>
+                                                                            <div className='row'>
+                                                                                <div className='col'>
+                                                                                    <button type="submit" className="submit-edit-expense-button">Edit</button>
+                                                                                </div>
+                                                                                <div className='col'>
+                                                                                    <button type="button" onClick={() => deleteExpense(expense.expense_id)} className="delete-expense-button">Delete</button>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
                                                                     </form>
                                                                 </div>
                                                             </div>
