@@ -60,6 +60,8 @@ function homepage() {
     const [suggestions, setSuggestions] = useState([]);
     const [locationsNotProvided, setLocationsNotProvided] = useState(false);
     const [userId, setUserId] = useState(null);
+    const [profileDropdownVisible, setProfileDropdownVisible] = useState(false);
+    const [profileImageUrl, setProfileImageUrl] = useState('');
 
     const handleLogout = () => {
         googleLogout();
@@ -73,7 +75,9 @@ function homepage() {
         if (token) {
             const userCredential = jwtDecode(token);
             const userName = userCredential.given_name;
+            const userProfileImage = userCredential.picture;
             setUserName(userName);
+            setProfileImageUrl(userProfileImage);
         } else {
             console.log("Token not found. Redirecting to sign in page.");
             window.location.href = '/signup';
@@ -401,151 +405,170 @@ function homepage() {
         }
     }, [allTripLocations]); // rerenders when trip locations are updated
 
+    const toggleProfileDropdown = () => {
+        setProfileDropdownVisible(!profileDropdownVisible);
+    };
+
     return (
-        <div className="dashboard">
-            {/* Header section */}
-            <header className="header">
-                <div className="logo-container">
-                    <Image src={logo} alt="Logo" width={300} height={300} priority />
+        <GoogleOAuthProvider clientId={googleID}>
+             <div className="dashboard">
+                {/* Header section */}
+                <header className="header">
+                    <div class="left-rectangle"></div> 
+                    <div className="logo-container">
+                        <Image src={logo} alt="Logo" width={300} height={300} priority />
+                    </div>
+                    <div className="right-rectangle"></div>
+                    
+                    {/* Profile Container on the right */}
+                    <div className="profile-container">
+                        <Image
+                            className="profile-icon"
+                            src={profileImageUrl} // User's Google profile image
+                            alt="Profile"
+                            width={40}
+                            height={40}
+                            onClick={toggleProfileDropdown} // Toggle dropdown on click
+                        />
+                        {profileDropdownVisible && (
+                            <div className="dropdown">
+                                <button className="dropdown-item" onClick={handleLogout}>Logout</button>
+                            </div>
+                        )}
+                    </div>
+                </header>
+
+                {/* Welcome section */}
+                <div className="welcome-section">
+                    <h1>Welcome Back, {userName}!</h1>
+                    <br></br>
+                    <button onClick={() => setPopUpVisible(true)} className='create-trip'>Create a Trip</button>
+                    <br></br>
+                    <br></br>
+                    <p>See everywhere you've gone:</p>
                 </div>
-                <div className="left-rectangle"></div>
-                <div className="right-rectangle"></div>
-            </header>
 
-            <GoogleOAuthProvider clientId={googleID}>
-                <button onClick={handleLogout} className='logout'>Logout</button>
-            </GoogleOAuthProvider>
-
-            {/* Welcome section */}
-            <div className="welcome-section">
-                <h1>Welcome Back, {userName}!</h1>
-                <br></br>
-                <button onClick={() => setPopUpVisible(true)} className='create-trip'>Create a Trip</button>
-                <br></br>
-                <br></br>
-                <p>See everywhere you've gone:</p>
-            </div>
-
-            {/* Create a trip popup form */}
-            <div className="trip-form">
-                {isPopUpVisible && (
-                    <div className="modal">
-                        <div className="modal-content">
-                            <span className="close" onClick={() => setPopUpVisible(false)}>&times;</span>
-                            <h2 className="new-trip-title">New Trip</h2>
-                            <form onSubmit={submitNewTrip}>
-                                <label className="new-trip-field-label">
-                                    Trip Name:
-                                    <input type="text" name="name" value={newTripData.name} onChange={newTripInputChange} required />
-                                </label>
-
-                                <div className="date-fields">
+                {/* Create a trip popup form */}
+                <div className="trip-form">
+                    {isPopUpVisible && (
+                        <div className="modal">
+                            <div className="modal-content">
+                                <span className="close" onClick={() => setPopUpVisible(false)}>&times;</span>
+                                <h2 className="new-trip-title">New Trip</h2>
+                                <form onSubmit={submitNewTrip}>
                                     <label className="new-trip-field-label">
-                                        Start Date:
-                                        <input type="date" name="start_date" value={newTripData.start_date} onChange={newTripInputChange} required />
+                                        Trip Name:
+                                        <input type="text" name="name" value={newTripData.name} onChange={newTripInputChange} required />
                                     </label>
+
+                                    <div className="date-fields">
+                                        <label className="new-trip-field-label">
+                                            Start Date:
+                                            <input type="date" name="start_date" value={newTripData.start_date} onChange={newTripInputChange} required />
+                                        </label>
+                                        <label className="new-trip-field-label">
+                                            End Date:
+                                            <input type="date" name="end_date" value={newTripData.end_date} onChange={newTripInputChange} required />
+                                        </label>
+                                    </div>
+
                                     <label className="new-trip-field-label">
-                                        End Date:
-                                        <input type="date" name="end_date" value={newTripData.end_date} onChange={newTripInputChange} required />
+                                        Budget:
+                                        <input type="number" name="budget" value={newTripData.budget} onChange={newTripInputChange} required />
                                     </label>
-                                </div>
 
-                                <label className="new-trip-field-label">
-                                    Budget:
-                                    <input type="number" name="budget" value={newTripData.budget} onChange={newTripInputChange} required />
-                                </label>
+                                    <label className="new-trip-field-label">
+                                        Locations:
+                                        <input
+                                            type="text"
+                                            name="trip_locations"
+                                            placeholder="Enter city or country"
+                                            value={tempLocation}
+                                            onChange={newTripLocInputChange}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault(); // Prevent form submission
+                                                }
+                                            }}
+                                        />
+                                    </label>
 
-                                <label className="new-trip-field-label">
-                                    Locations:
-                                    <input
-                                        type="text"
-                                        name="trip_locations"
-                                        placeholder="Enter city or country"
-                                        value={tempLocation}
-                                        onChange={newTripLocInputChange}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                e.preventDefault(); // Prevent form submission
-                                            }
-                                        }}
-                                    />
-                                </label>
-
-                                <div>
-                                    {newTripLocation.trip_locations.map((location, index) => (
-                                        <div key={index} className="selected-location">
-                                            <span className="location-text">{location}</span>
-                                            <button type="button" onClick={() => {
-                                                setNewTripLocation(prev => ({
-                                                    trip_locations: prev.trip_locations.filter((loc, i) => i !== index) // Remove selected location
-                                                }));
-                                            }}>Remove</button>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                {isPopUpVisible && (
-                                    <div className="dropdown-suggestions">
-                                        {suggestions.map((suggestion, index) => (
-                                            <div
-                                                key={index}
-                                                className="dropdown-suggestion"
-                                                onClick={() => selectSuggestion(suggestion)}
-                                            >
-                                                {suggestion}
+                                    <div>
+                                        {newTripLocation.trip_locations.map((location, index) => (
+                                            <div key={index} className="selected-location">
+                                                <span className="location-text">{location}</span>
+                                                <button type="button" onClick={() => {
+                                                    setNewTripLocation(prev => ({
+                                                        trip_locations: prev.trip_locations.filter((loc, i) => i !== index) // Remove selected location
+                                                    }));
+                                                }}>Remove</button>
                                             </div>
                                         ))}
                                     </div>
-                                )}
 
-                                <button type="submit" className="submit-new-trip-button">Create</button>
-                            </form>
-                        </div>
-                    </div>
-                )}
-            </div>
-
-            {/* Map section */}
-            <div ref={mapRef} style={{ height: '400px', width: '100%' }}></div>
-
-            {/* Recent trips section */}
-            <div className="recent-trips">
-                <br></br>
-                <h2>Recent Trips</h2>
-                <br></br>
-                <br></br>
-                {trips.length === 0 ? (
-                    <p>No trips created.</p>
-                ) : (
-                    Array.isArray(trips) && trips.length > 0 ? (
-                        <ul>
-                            {trips.map(trip => (
-                                <li key={trip.trip_id}>
-                                    <div
-                                        id={`trip-${trip.trip_id}`} // unique ID for each trip 
-                                        onClick={() => toggleTripDetails(trip.trip_id)} style={{ cursor: 'pointer', padding: '10px', border: '1px solid #ccc', marginBottom: '5px', backgroundColor: '#134a09' }}>
-                                        {trip.name}
-                                    </div>
-                                    {expandedTripId === trip.trip_id && (
-                                        <div style={{ padding: '10px', backgroundColor: '#134a09', border: '1px solid #ccc' }}>
-                                            <p>
-                                                <strong>Dates:</strong> {trip.start_date} - {trip.end_date}
-                                            </p>
-                                            <p><strong>Budget:</strong> ${trip.budget}</p>
-                                            <Link href={`/singletrip?tripId=${trip.trip_id}`} style={{ color: 'white', textDecoration: 'underline' }}>
-                                                See more
-                                            </Link>
+                                    {isPopUpVisible && (
+                                        <div className="dropdown-suggestions">
+                                            {suggestions.map((suggestion, index) => (
+                                                <div
+                                                    key={index}
+                                                    className="dropdown-suggestion"
+                                                    onClick={() => selectSuggestion(suggestion)}
+                                                >
+                                                    {suggestion}
+                                                </div>
+                                            ))}
                                         </div>
                                     )}
-                                </li>
-                            ))}
-                        </ul>
+
+                                    <button type="submit" className="submit-new-trip-button">Create</button>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Map section */}
+                <div ref={mapRef} style={{ height: '400px', width: '100%' }}></div>
+
+                {/* Recent trips section */}
+                <div className="recent-trips">
+                    <br></br>
+                    <h2>Recent Trips</h2>
+                    <br></br>
+                    <br></br>
+                    {trips.length === 0 ? (
+                        <p>No trips created.</p>
                     ) : (
-                        <p>No trips available.</p>
-                    )
-                )}
+                        Array.isArray(trips) && trips.length > 0 ? (
+                            <ul>
+                                {trips.map(trip => (
+                                    <li key={trip.trip_id}>
+                                        <div
+                                            id={`trip-${trip.trip_id}`} // unique ID for each trip 
+                                            onClick={() => toggleTripDetails(trip.trip_id)} style={{ cursor: 'pointer', padding: '10px', border: '1px solid #ccc', marginBottom: '5px', backgroundColor: '#134a09' }}>
+                                            {trip.name}
+                                        </div>
+                                        {expandedTripId === trip.trip_id && (
+                                            <div style={{ padding: '10px', backgroundColor: '#134a09', border: '1px solid #ccc' }}>
+                                                <p>
+                                                    <strong>Dates:</strong> {trip.start_date} - {trip.end_date}
+                                                </p>
+                                                <p><strong>Budget:</strong> ${trip.budget}</p>
+                                                <Link href={`/singletrip?tripId=${trip.trip_id}`} style={{ color: 'white', textDecoration: 'underline' }}>
+                                                    See more
+                                                </Link>
+                                            </div>
+                                        )}
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p>No trips available.</p>
+                        )
+                    )}
+                </div>
             </div>
-        </div>
+        </GoogleOAuthProvider>
     );
 }
 

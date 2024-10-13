@@ -5,30 +5,31 @@
 }
 
 .header {
-    position: relative;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #FFFFFF;
-    height: 150px;
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 0; 
+    height: 150px; 
+    background-color: white;
+    position: relative;
 }
 
-.left-rectangle, .right-rectangle {
+.left-rectangle,
+.right-rectangle {
     position: absolute;
     top: 50%;
-    transform: translateY(-50%);
+    height: 20px; 
+    width: 40%; 
     background-color: black;
-    height: 25px; /* Height of the rectangle */
+    transform: translateY(-50%);
 }
 
 .left-rectangle {
     left: 0;
-    width: 690px; /* Width of the left rectangle */
 }
 
 .right-rectangle {
     right: 0;
-    width: 690px; /* Width of the right rectangle */
 }
 
 .welcome-section {
@@ -43,19 +44,22 @@
     padding: 10px;
     background-color: black;
     color: white;
-    height: auto; /* Adjusted for dynamic content */
+    height: auto; 
 }
 
 .trip {
     margin-bottom: 10px;
     border: 1px solid white;
     padding: 10px;
-    background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent white */
+    background-color: rgba(255, 255, 255, 0.1); 
 }
 
-.logo-container{
-    z-index: 1; 
-    position: relative; 
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1; 
+    text-align: center;
 }
 
 .logout {
@@ -265,9 +269,41 @@ form {
     position: relative;
     z-index: 0;
     overflow: hidden;
-    pointer-events: none; /* Allow scrolling */
+    pointer-events: none; 
 }
 
 .map-container.active {
-    pointer-events: all; /* Activate map interactions */
+    pointer-events: all; 
+}
+
+.dropdown {
+    position: absolute; 
+    right: 0; 
+    background-color: white; 
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); 
+    z-index: 1000;
+}
+
+.dropdown-item {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #134a09;
+}
+
+.dropdown-item:hover {
+    background-color: rgb(8, 148, 8);
+}
+
+.profile-container {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+}
+
+.profile-icon {
+    width: 40px; 
+    height: 40px; 
+    cursor: pointer;
+    border-radius: 50%;
 }
