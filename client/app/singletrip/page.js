@@ -22,7 +22,6 @@ Chart.register(ArcElement, Tooltip, Legend);
 
 
 function Singletrip() {
-    const [currencyCache, setCurrencyCache] = useState({});
     const [categoryData, setCategoryData] = useState({ labels: [], datasets: [] });
     const [tripId, setTripId] = useState(null);
     const [tripData, setTripData] = useState(null);
@@ -31,6 +30,7 @@ function Singletrip() {
     const [currencyCodes, setCurrencyCodes] = useState([]);
     const [selectedCurrency, setSelectedCurrency] = useState('');
     const [otherCurrencies, setOtherCurrencies] = useState([]);
+    const [exchangeRates, setExchangeRates] = useState({});
     const [isPopUpVisible, setPopUpVisible] = useState(false);
     const [isFilterPopupVisible, setFilterPopupVisible] = useState(false);
     const [isEditPopupVisible, setEditPopupVisible] = useState(false);
@@ -82,7 +82,7 @@ function Singletrip() {
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get('tripId');
         setTripId(id);
-       
+
     }, []);
 
 
@@ -123,20 +123,49 @@ function Singletrip() {
 
             axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${tripId}`)
                 .then(response => {
-                      console.log(response.data);
-                      setSelectedCurrency(response.data.data[0].currency_code)
+                    // console.log(response.data);
+                    setSelectedCurrency(response.data.data[0].currency_code)
 
-                      const locations = response.data.data;
-                      const currencyCodes = locations.map(location => location.currency_code);
-      
-                      setOtherCurrencies(currencyCodes);
+                    const locations = response.data.data;
+                    const currencyCodes = locations.map(location => location.currency_code);
+
+                    setOtherCurrencies(currencyCodes);
 
                 })
                 .catch(error => {
                     console.error('Error fetching trip data:', error);
                 });
+
         }
     }, [tripId]);
+
+    useEffect(() => {
+        const getExchangeRates = async () => {
+            const rates = {};
+
+            try {
+                for (let currency of otherCurrencies) {
+                    const response = await axios.get(`https://hexarate.paikama.co/api/rates/latest/USD`, {
+                        params: {
+                            target: currency
+                        }
+                    });
+                    //console.log('API Response:', response.data);
+
+                    if (response.data && response.data.data && response.data.data.mid) {
+                        rates[currency] = response.data.data.mid;
+                    } else {
+                        console.error('Invalid response structure:', response.data);
+                    }
+                }
+                setExchangeRates(rates);
+            } catch (error) {
+                console.error('Error fetching exchange rates:', error);
+            }
+        };
+
+        getExchangeRates();
+    }, [selectedCurrency]);
 
     const fetchCurrencyRates = async (expenses) => {
         try {
@@ -238,6 +267,20 @@ function Singletrip() {
         // API CALL
         alert("Editing is still a WIP :)");
         setEditPopupVisible(false);
+    };
+
+    const deleteExpense = async (expenseID) => {
+        if (window.confirm('Please confirm expense deletion. This action cannot be undone.')) {
+            axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/${expenseID}`)
+                .then(response => {
+                    console.log(response)
+                })
+                .catch(error => {
+                    console.error('Error deleting expense:', error);
+                });
+        }
+        setEditPopupVisible(false);
+        window.location.reload();
     };
 
     const downloadTripData = async () => {
@@ -590,7 +633,16 @@ function Singletrip() {
                                                                                 value={selectedExpense.notes}
                                                                             />
                                                                         </label>
-                                                                        <button type="submit" className="submit-edit-expense-button">Edit</button>
+                                                                        <div className='container'>
+                                                                            <div className='row'>
+                                                                                <div className='col'>
+                                                                                    <button type="submit" className="submit-edit-expense-button">Edit</button>
+                                                                                </div>
+                                                                                <div className='col'>
+                                                                                    <button type="button" onClick={() => deleteExpense(expense.expense_id)} className="delete-expense-button">Delete</button>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
                                                                     </form>
                                                                 </div>
                                                             </div>
@@ -606,11 +658,6 @@ function Singletrip() {
                                 <button onClick={downloadTripData} className="download-trip-data-btn">
                                     Download Trip
                                 </button>
-
-                                {/* Add the Delete Button */}
-                                <button onClick={deleteTrip} className="delete-trip-button">
-                                    Delete Trip
-                                </button>
                             </div>
                         ) : (
                             <p>No expenses yet...</p>
@@ -621,6 +668,10 @@ function Singletrip() {
                         ) : (
                             <p>[Gallery of photos]</p>
                         )}
+                        {/* Add the Delete Button */}
+                        <button onClick={deleteTrip} className="delete-trip-button">
+                            Delete Trip
+                        </button>
                     </div>
                 ) : (
                     <p>No Trip Data Found.</p>
@@ -787,13 +838,30 @@ function Singletrip() {
 
                 {/* Pie Chart */}
                 <div>
-                    <h2>Expenses by Category</h2>
                     <div className="pie-chart-container">
                         <Pie data={categoryData} />
                     </div>
                 </div>
 
-
+                {/* Exchange Rate Table */}
+                <div className="exchange-rates-container">
+                    <table className="exchange-rates-table">
+                        <thead>
+                            <tr>
+                                <th>Currency</th>
+                                <th>Rate (Relative to USD)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {Object.keys(exchangeRates).map((currency) => (
+                                <tr key={currency}>
+                                    <td>{currency}</td>
+                                    <td>{exchangeRates[currency]}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
 
 
 

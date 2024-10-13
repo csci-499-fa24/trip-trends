@@ -10,6 +10,7 @@ const createTripLocation = async (req, res) => {
         res.status(201).json({ data: newTripLocation });
     } catch (err) {
         console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
     }
 };
 
@@ -17,7 +18,7 @@ const createTripLocation = async (req, res) => {
 const getTripLocations = async (req, res) => {
     try {
         const allTripLocations = await TripLocation.findAll();
-        res.json({ data: allTripLocations });
+        res.status(200).json({ data: allTripLocations });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });
@@ -28,10 +29,10 @@ const getTripLocationByTripId = async (req, res) => {
     const tripId = req.params.tripId;
     try {
         const tripLocation = await TripLocation.findAll({ where: { trip_id: tripId } });
-        if (!tripLocation) {
+        if (tripLocation.length === 0) {
             return res.status(404).json({ message: "Trip Location not found" });
         }
-        res.json({ data: tripLocation });
+        res.status(200).json({ data: tripLocation });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });
@@ -52,7 +53,7 @@ const getTripLocationByUserId = async (req, res) => {
         if (!tripLocations || tripLocations.length === 0) {
             return res.status(404).json({ message: "Trip locations not found" });
         }
-        res.json({ data: tripLocations });
+        res.status(200).json({ data: tripLocations });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });
@@ -70,7 +71,7 @@ const updateTripLocation = async (req, res) => {
             return res.status(404).json({ message: "Trip location not found" });
         }
         const updatedTripLocation = await tripLocation.update({ location, longitude, latitude, currency_code });
-        res.json({ data: updatedTripLocation });
+        res.status(200).json({ data: updatedTripLocation });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });
