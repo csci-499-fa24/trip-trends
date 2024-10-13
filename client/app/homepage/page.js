@@ -56,7 +56,7 @@ function homepage() {
     });
     const [newTripLocation, setNewTripLocation] = useState({ trip_locations: [] });
     const [tempLocation, setTempLocation] = useState('');
-    const mapRef = useRef(null);
+    const mapRef = useRef(null); 
     const [suggestions, setSuggestions] = useState([]);
     const [locationsNotProvided, setLocationsNotProvided] = useState(false);
     const [userId, setUserId] = useState(null);
@@ -188,7 +188,7 @@ function homepage() {
             console.error("Error getting all trip locations from user:", error);
         }
         const loc_data = locations_response.data.data;
-        const locations = loc_data.map(location => { return { "trip_id": location.trip_id, "location": location.location, "latitude": location.latitude, "longitude": location.longitude }; });
+        const locations = loc_data.map(location => {return {"trip_id": location.trip_id, "location": location.location, "latitude": location.latitude, "longitude": location.longitude}; });
         setAllTripLocations(locations);
     };
 
@@ -212,8 +212,8 @@ function homepage() {
             const num_trip_locs = newTripLocation.trip_locations.length;
 
             // For every location, create a trip location entry
-            for (let i = 0; i < num_trip_locs; i++) {
-                let a_trip_location = { trip_id: trip_id, location: newTripLocation.trip_locations[i] };
+            for (let i = 0; i < num_trip_locs; i++){
+                let a_trip_location = {trip_id: trip_id, location: newTripLocation.trip_locations[i]};
                 let geocode_response = null;
                 try {
                     geocode_response = await axios.get(`https://api.opencagedata.com/geocode/v1/json`, {
@@ -235,7 +235,7 @@ function homepage() {
                 catch {
                     trimmed_location = a_trip_location.location; // original location
                 }
-
+                
                 // POST trip location
                 try {
                     await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${trip_id}`, a_trip_location);
@@ -248,7 +248,7 @@ function homepage() {
                 const lat = geocode_response.data.results[0].geometry.lat;
                 const long = geocode_response.data.results[0].geometry.lng;
                 const currency = geocode_response.data.results[0].annotations.currency.iso_code;
-                const coordinates = { "latitude": lat, "longitude": long, "currency_code": currency };
+                const coordinates = {"latitude": lat, "longitude": long, "currency_code": currency};
                 try {
                     await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${trip_id}/${a_trip_location.location}`, coordinates);
                 } catch (error) {
@@ -258,8 +258,8 @@ function homepage() {
             }
 
             // A shared trip will be under the user who created the trip to support future shared trips
-            const shared_trip = { user_id: userId, trip_id: trip_id };
-
+            const shared_trip = {user_id: userId, trip_id: trip_id};
+            
             setPopUpVisible(false); // Close the popup
             setNewTripData({ name: '', start_date: '', end_date: '', budget: '' }); // Reset form fields
             setNewTripLocation({ trip_locations: [] }); // Reset locations
@@ -349,8 +349,9 @@ function homepage() {
             map.on('singleclick', (event) => {
                 const feature = map.forEachFeatureAtPixel(event.pixel, (feat) => feat);
                 if (feature) {
-                    const tripId = feature.get('trip_id');
-
+                    const tripId = feature.get('trip_id'); 
+                    console.log('Clicked marker:', tripId); 
+                    
                     // Scroll to the Recent Trips section and expand the clicked trip
                     const tripElement = document.getElementById(`trip-${tripId}`); // Use a unique ID to target the trip divider
                     if (tripElement) {
