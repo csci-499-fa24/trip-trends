@@ -247,7 +247,7 @@ function homepage() {
                 // UPDATE the trip location with location coordinates
                 const lat = geocode_response.data.results[0].geometry.lat;
                 const long = geocode_response.data.results[0].geometry.lng;
-                const currency = geocode_response.results[0].annotations.currency.iso_code
+                const currency = geocode_response.data.results[0].annotations.currency.iso_code;
                 const coordinates = { "latitude": lat, "longitude": long, "currency_code": currency };
                 try {
                     await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${trip_id}/${a_trip_location.location}`, coordinates);
