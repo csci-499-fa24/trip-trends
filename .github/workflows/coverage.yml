@@ -6,7 +6,7 @@ on:
             - dev
     push:
         branches:
-            - jest
+            - delete-trip
 jobs:
     coverage:
         runs-on: ubuntu-latest
