@@ -48,35 +48,24 @@ function Singletrip() {
     });
     const [expenseCategories] = useState([
         "Flights",
-        "Accommodation",
-        "Car Rentals",
-        "Fuel",
-        "Food",
-        "Groceries",
-        "Restaurants",
-        "Snacks",
-        "Beverages",
-        "Tours",
-        "Tickets",
-        "Entertainment",
-        "Public Transport",
-        "Taxis/Rideshares",
-        "Parking",
-        "Hotels",
-        "Hostels",
-        "Vacation Rentals",
-        "Souvenirs",
-        "Clothing",
-        "Essentials",
-        "Tips",
-        "Travel Insurance",
-        "Phone Roaming",
-        "Internet/Wi-Fi",
-        "Phone Calls",
-        "Medication",
-        "First Aid",
+        "Accommodations",
+        "Food/Drink",
+        "Transport",
+        "Activities",
+        "Shopping",
+        "Phone/Internet",
+        "Health/Safety",
+        "Accommodations",
+        "Food/Drink",
+        "Transport",
+        "Activities",
+        "Shopping",
+        "Phone/Internet",
+        "Health/Safety",
         "Other"
     ]);
+    const userId = localStorage.getItem("user_id");
+    const [userRole, setUserRole] = useState(null);
 
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
@@ -138,6 +127,23 @@ function Singletrip() {
 
         }
     }, [tripId]);
+
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            try {
+                const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/sharedtrips/`, {
+                    params: { userId: userId, tripId: tripData.data.trip_id }
+                });
+                if (response.data && response.data.role) {
+                    setUserRole(response.data.role);
+                }
+            } catch (error) {
+                console.error('Error fetching user role:', error);
+            }
+        };
+
+        fetchUserRole();
+    }, [tripData.data.trip_id, userId]);
 
     useEffect(() => {
         const getExchangeRates = async () => {
@@ -399,7 +405,26 @@ function Singletrip() {
         localStorage.removeItem('selectedFilter');
     };
 
-
+    const shareTrip = async (newUserId, role) => {
+        try {
+            if (!userId) {
+                console.error('User not authenticated. Cannot share trip.');
+                return;
+            }
+            if (!tripId) {
+                console.error('Trip ID not found. Cannot share trip.');
+                return;
+            }
+            const requestBody = {
+                newUserId, 
+                role        
+            };
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/${userId}/trips/${tripId}/`, requestBody);
+            console.log('Trip shared successfully:', response.data);
+        } catch (error) {
+            console.error('Error sharing trip:', error.response?.data || error.message);
+        }
+    };
 
     return (
         <div className="main-container">
@@ -657,6 +682,11 @@ function Singletrip() {
                                 {/* Add the Download Button */}
                                 <button onClick={downloadTripData} className="download-trip-data-btn">
                                     Download Trip
+                                </button>
+                                
+                                {/* Add the Delete Button */}
+                                <button onClick={deleteTrip} className="delete-trip-button">
+                                    Delete Trip
                                 </button>
                             </div>
                         ) : (

@@ -1,22 +1,45 @@
 const SharedTrip = require('../models/SharedTrip');
 
-// POST new shared trip for user
+// POST new trip for user
 const createSharedTrip = async (req, res) => {
     const userId = req.params.userId;
     const tripId = req.params.tripId;
-    
+
     try {
         if (!userId || !tripId) {
             return res.status(400).json({ message: "userId, tripId required" });
         }
         // create new model instance 
-        const newSharedTrip = await SharedTrip.create({ user_id: userId, trip_id: tripId });
+        const newSharedTrip = await SharedTrip.create({ user_id: newUserId, trip_id: tripId });
         res.status(201).json({ data: newSharedTrip });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });
     }
 };
+
+// POST new shared trip for user
+const addSharedTrip = async (req, res) => {
+    const userId = req.params.userId; // owner
+    const tripId = req.params.tripId; 
+    const { newUserId, role } = req.body; // newUserId: user to share with
+    try {
+        if (!userId || !tripId) {
+            return res.status(400).json({ message: "userId, tripId required" });
+        }
+        // check if user is owner of trip
+        const sharedTrip = await SharedTrip.findOne({ where: { user_id: userId, trip_id: tripId } });
+        if (!sharedTrip || sharedTrip.role !== 'owner') {
+            return res.status(403).json({ message: "You do not have permission to share this trip" });
+        }
+        // create new model instance 
+        const newSharedTrip = await SharedTrip.create({ user_id: newUserId, trip_id: tripId, role: role });
+        res.status(201).json({ data: newSharedTrip });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
+    }
+}
 
 // GET all shared trips
 const getSharedTrips = async (req, res) => {
@@ -94,6 +117,7 @@ const deleteSharedTrip = async (req, res) => {
 
 module.exports = {
     createSharedTrip,
+    addSharedTrip,
     getSharedTrips,
     getSharedTripsByUserId,
     getSharedTripsByTripId,
