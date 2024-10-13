@@ -1,134 +1,175 @@
 require('dotenv').config({ path: 'server/.env' });
 const User = require('../models/User');
-const request = require('supertest');
-const express = require('express');
 const { getUsers, getUserById, updateUser, deleteUser, createGoogleUser } = require('../controllers/UserController');
 const jwt = require('jsonwebtoken');
 
-// mock User model
+// Mock User model
 jest.mock('../models/User');
-console.error = jest.fn(); // suppress error logs
-
-const app = express();
-app.use(express.json());
-app.get('/users', getUsers);
-app.get('/users/:userId', getUserById);
-app.put('/users/:userId', updateUser);
-app.delete('/users/:userId', deleteUser);
-app.post('/users/google', createGoogleUser);
+console.error = jest.fn(); // Suppress error logs
 
 describe('User Controller', () => {
+    let mockRequest, mockResponse;
+    
     beforeEach(() => {
+        mockRequest = {
+            body: {},
+            params: {}
+        };
+        mockResponse = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            send: jest.fn(),
+        };
+        console.error = jest.fn(); // suppress error logs
+    });
+
+    afterEach(() => {
         jest.clearAllMocks();
     });
 
-    test('GET /users should return all users', async () => {
-        const mockUsers = [{ user_id: 1, fname: 'John', lname: 'Doe' }];
+    it('should return all users on GET /users', async () => {
+        const mockUsers = [{ user_id: 1, fname: 'Santa', lname: 'Claus' }];
         User.findAll.mockResolvedValue(mockUsers);
 
-        const response = await request(app).get('/users');
+        await getUsers(mockRequest, mockResponse);
 
-        expect(response.status).toBe(200);
-        expect(response.body).toEqual({ data: mockUsers });
+        expect(mockResponse.status).toHaveBeenCalledWith(200);
+        expect(mockResponse.json).toHaveBeenCalledWith({ data: mockUsers });
     });
 
-    test('GET /users/:userId should return a specific user', async () => {
-        const mockUser = { user_id: 1, fname: 'John', lname: 'Doe' };
+    it('should return a specific user on GET /users/:userId', async () => {
+        const mockUser = { user_id: 1, fname: 'Santa', lname: 'Claus' };
         User.findByPk.mockResolvedValue(mockUser);
+        mockRequest.params.userId = '1'; // Set the userId parameter
 
-        const response = await request(app).get('/users/1');
+        await getUserById(mockRequest, mockResponse);
 
-        expect(response.status).toBe(200);
-        expect(response.body).toEqual({ data: mockUser });
+        expect(mockResponse.status).toHaveBeenCalledWith(200);
+        expect(mockResponse.json).toHaveBeenCalledWith({ data: mockUser });
     });
 
-    test('GET /users/:userId should return 404 if user not found', async () => {
+    it('should return 404 if user not found on GET /users/:userId', async () => {
         User.findByPk.mockResolvedValue(null);
+        mockRequest.params.userId = '1'; // Set the userId parameter
 
-        const response = await request(app).get('/users/1');
+        await getUserById(mockRequest, mockResponse);
 
-        expect(response.status).toBe(404);
-        expect(response.body).toEqual({ message: "User not found" });
+        expect(mockResponse.status).toHaveBeenCalledWith(404);
+        expect(mockResponse.json).toHaveBeenCalledWith({ message: "User not found" });
     });
 
-    test('DELETE /users/:userId should delete a user', async () => {
+    it('should update user and return the updated user data', async () => {
+        const userId = '1';
+        const mockUpdatedUser = { user_id: userId, fname: 'Santa', lname: 'Claus', email: 'santa.claus@example.com', image: 'http://example.com/pic.jpg' };
+    
+        // Mock request and response
+        mockRequest.params.userId = userId; // Set userId parameter
+        mockRequest.body = { fname: 'Santa', lname: 'Claus', email: 'santa.claus@example.com', image: 'http://example.com/pic.jpg' };
+    
+        User.findByPk.mockResolvedValue({
+            update: jest.fn().mockResolvedValue(mockUpdatedUser) // Mock the update method
+        });
+    
+        await updateUser(mockRequest, mockResponse);
+    
+        expect(User.findByPk).toHaveBeenCalledWith(userId); // Check if the user was found by ID
+        expect(mockResponse.json).toHaveBeenCalledWith({ data: mockUpdatedUser }); // Check if the response is correct
+    });
+    
+    it('should return 404 if user not found', async () => {
+        const userId = '1';
+        mockRequest.params.userId = userId; // Set userId parameter
+    
+        User.findByPk.mockResolvedValue(null); // Simulate user not found
+    
+        await updateUser(mockRequest, mockResponse);
+    
+        expect(mockResponse.status).toHaveBeenCalledWith(404); // Check if the correct status is returned
+        expect(mockResponse.json).not.toHaveBeenCalled(); // Ensure no JSON response is sent
+    });
+    
+    it('should return 500 if there is an error', async () => {
+        const userId = '1';
+        mockRequest.params.userId = userId; // Set userId parameter
+        mockRequest.body = { fname: 'Santa', lname: 'Claus', email: 'santa.claus@example.com', image: 'http://example.com/pic.jpg' };
+    
+        User.findByPk.mockResolvedValue({
+            update: jest.fn().mockRejectedValue(new Error('Database error')) // Simulate an error during update
+        });
+    
+        await updateUser(mockRequest, mockResponse);
+    
+        expect(mockResponse.status).toHaveBeenCalledWith(500); // Check if the correct status is returned
+        expect(mockResponse.json).toHaveBeenCalledWith({ message: "Internal Server Error", error: 'Database error' }); // Ensure correct error response
+    });    
+
+    it('should delete a user on DELETE /users/:userId', async () => {
         User.destroy.mockResolvedValue(1); // Mock user deletion
+        mockRequest.params.userId = '1'; // Set the userId parameter
 
-        const response = await request(app).delete('/users/1');
+        await deleteUser(mockRequest, mockResponse);
 
-        expect(response.status).toBe(204);
+        expect(mockResponse.status).toHaveBeenCalledWith(204);
     });
 
-    test('DELETE /users/:userId should return 404 if user not found', async () => {
+    it('should return 404 if user not found on DELETE /users/:userId', async () => {
         User.destroy.mockResolvedValue(0); // No user deleted
+        mockRequest.params.userId = '1'; // Set the userId parameter
 
-        const response = await request(app).delete('/users/1');
+        await deleteUser(mockRequest, mockResponse);
 
-        expect(response.status).toBe(404);
-        expect(response.body).toEqual({ message: "User not found" });
+        expect(mockResponse.status).toHaveBeenCalledWith(404);
+        expect(mockResponse.json).toHaveBeenCalledWith({ message: "User not found" });
     });
 
-    test('POST /users/google should return existing user if already present', async () => {
-        // Mocking the decoded token data
+    it('should return existing user if already present on POST /users/google', async () => {
         const mockDecodedToken = {
-            email: 'john.doe@example.com',
-            name: 'John Doe',
+            email: 'santa.claus@example.com',
+            name: 'Santa Claus',
             picture: 'http://example.com/pic.jpg',
         };
 
-        // Mocking jwt.decode to return the mock decoded token
         jest.spyOn(jwt, 'decode').mockReturnValue(mockDecodedToken);
-
-        // Mocking the existing user in the database
-        const mockExistingUser = { user_id: 1, fname: 'John', lname: 'Doe', email: 'john.doe@example.com', image: mockDecodedToken.picture };
+        const mockExistingUser = { user_id: 1, fname: 'Santa', lname: 'Claus', email: 'santa.claus@example.com', image: mockDecodedToken.picture };
         User.findOne.mockResolvedValue(mockExistingUser); // Simulating an existing user
 
-        // Create a valid token for testing
-        const token = 'your_test_token'; // Replace with actual token string used in production
+        mockRequest.body.token = 'your_test_token'; // Set token in request body
 
-        // Send the request with the token
-        const response = await request(app).post('/users/google').send({ token });
+        await createGoogleUser(mockRequest, mockResponse);
 
-        // Assert the response status and body
-        expect(response.status).toBe(200);
-        expect(response.body).toEqual({ message: 'User Already Exists', user: mockExistingUser });
+        expect(mockResponse.status).toHaveBeenCalledWith(200);
+        expect(mockResponse.json).toHaveBeenCalledWith({ message: 'User Already Exists', user: mockExistingUser });
     });
 
-    test('POST /users/google should create a new user if not present', async () => {
-        // Mocking the decoded token data
+    it('should create a new user if not present on POST /users/google', async () => {
         const mockDecodedToken = {
-            email: 'jane.doe@example.com',
-            name: 'Jane Doe',
-            picture: 'http://example.com/jane-pic.jpg',
+            email: 'mrs.claus@example.com',
+            name: 'Mrs Claus',
+            picture: 'http://example.com/mrsclaus-pic.jpg',
         };
 
-        // Mocking jwt.decode to return the mock decoded token
         jest.spyOn(jwt, 'decode').mockReturnValue(mockDecodedToken);
-
-        // Mocking User.findOne to return null to simulate user not found
         User.findOne.mockResolvedValue(null); // Simulating no existing user
 
-        // Mocking User.create to simulate user creation
-        const mockNewUser = { user_id: 2, fname: 'Jane', lname: 'Doe', email: 'jane.doe@example.com', image: mockDecodedToken.picture };
+        const mockNewUser = { user_id: 2, fname: 'Mrs', lname: 'Claus', email: 'mrs.claus@example.com', image: mockDecodedToken.picture };
         User.create.mockResolvedValue(mockNewUser); // Simulating a new user being created
 
-        // Create a valid token for testing
-        const token = 'your_test_token'; // Replace with actual token string used in production
+        mockRequest.body.token = 'your_test_token'; // Set token in request body
 
-        // Send the request with the token
-        const response = await request(app).post('/users/google').send({ token });
+        await createGoogleUser(mockRequest, mockResponse);
 
-        // Assert the response status and body
-        expect(response.status).toBe(201);
-        expect(response.body).toEqual({ message: 'User created successfully', user: mockNewUser });
+        expect(mockResponse.status).toHaveBeenCalledWith(201);
+        expect(mockResponse.json).toHaveBeenCalledWith({ message: 'User created successfully', user: mockNewUser });
     });
 
-    test('POST /users/google should handle errors', async () => {
+    it('should handle errors on POST /users/google', async () => {
         User.findOne.mockRejectedValue(new Error('Database error')); // Simulate database error
 
-        const response = await request(app).post('/users/google').send({ token: 'token' });
+        mockRequest.body.token = 'token'; // Set token in request body
 
-        expect(response.status).toBe(500);
-        expect(response.body).toEqual({ message: 'Error processing request' });
+        await createGoogleUser(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(500);
+        expect(mockResponse.json).toHaveBeenCalledWith({ message: 'Error processing request' });
     });
 });
