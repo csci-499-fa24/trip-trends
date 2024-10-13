@@ -1,21 +1,48 @@
 require('dotenv').config({ path: 'server/.env' });
+const request = require('supertest');
+const express = require('express');
+const { Sequelize } = require('sequelize');
 const Trip = require('../models/Trip');
 const SharedTrip = require('../models/SharedTrip');
 const Expense = require('../models/Expense');
-const request = require('supertest');
-const express = require('express');
-const tripController = require('../controllers/TripController');
+const User = require('../models/User');
 
 // mock Trip, SharedTrip, Expense models
 jest.mock('../models/Trip');
 jest.mock('../models/SharedTrip');
 jest.mock('../models/Expense');
+jest.mock('../models/User');
 
 const app = express();
 app.use(express.json());
-app.use('/trips', tripController);
+const sequelize = new Sequelize('sqlite::memory:');
+
+// Initialize models
+const TripModel = Trip(sequelize, Sequelize.DataTypes);
+const SharedTripModel = SharedTrip(sequelize, Sequelize.DataTypes);
+const ExpenseModel = Expense(sequelize, Sequelize.DataTypes);
+const UserModel = User(sequelize, Sequelize.DataTypes);
+
+// Define associations after all models are initialized
+UserModel.belongsToMany(TripModel, {
+    through: SharedTripModel,
+    foreignKey: 'user_id',
+    otherKey: 'trip_id',
+    onDelete: 'CASCADE',
+});
+
+TripModel.belongsToMany(UserModel, {
+    through: SharedTripModel,
+    foreignKey: 'trip_id',
+    otherKey: 'user_id',
+    onDelete: 'CASCADE',
+});
 
 describe('Trip Controller', () => {
+    beforeAll(async () => {
+        await sequelize.sync({ force: true }); // Creates the tables in the test database
+    });
+    
     beforeEach(() => {
         jest.clearAllMocks(); // Clear mocks before each test
     });

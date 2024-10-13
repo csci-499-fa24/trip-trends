@@ -1,169 +1,168 @@
+require('dotenv').config({ path: 'server/.env' });
+const request = require('supertest');
+const express = require('express');
+const { Sequelize } = require('sequelize');
 const Trip = require('../models/Trip');
 const SharedTrip = require('../models/SharedTrip');
 const Expense = require('../models/Expense');
-const { parse } = require('json2csv');
+const tripController = require('../controllers/TripController');
 
-// POST new trip data
-const createTrip = async (req, res) => {
-    const userId = req.params['userId']; 
-    const { name, start_date, end_date, budget, image } = req.body;
-    try {
-        // create new model isntance
-        const newTrip = await Trip.create({ name, start_date, end_date, budget, image });
-        // create relationship b/w user and trip
-        await SharedTrip.create({ user_id: userId, trip_id: newTrip.trip_id });
-        res.status(201).json({ data: newTrip });
-    } catch (err) {
-        console.error("Error creating trip:", err);
-        if (err.name === 'SequelizeValidationError') {
-            res.status(400).json({ message: "Validation Error", error: err.message });
-        } else {
-            res.status(500).json({ message: "Internal Server Error", error: err.message });
-        }
-    }
-};
+// Mock models
+jest.mock('../models/Trip');
+jest.mock('../models/SharedTrip');
+jest.mock('../models/Expense');
 
-// GET all trips data
-const getTrips = async (req, res) => {
-    try {
-        const allTrips = await Trip.findAll();
-        res.json({ data: allTrips });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Internal Server Error", error: err.message });
-    }
-};
+const app = express();
+app.use(express.json());
 
-// GET specific trip data by UserId
-const getTripsByUserId = async (req, res) => {
-    const userId = req.params.userId;
-    try {
-        if (!userId) {
-            return res.status(400).json({ message: "User ID is required" });
-        }
-        const sharedTrips = await SharedTrip.findAll({ where: { user_id: userId } });
-        if (!sharedTrips || sharedTrips.length === 0) {
-            return res.status(404).json({ message: "Trip not found" });
-        }
-        const tripIds = sharedTrips.map(trip => trip.trip_id);
-        const trips = await Trip.findAll({ where: { trip_id: tripIds } });
-        res.json({ data: trips });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Internal Server Error", error: err.message });
-    }
-};
+// Define routes for testing
+app.post('/trips/:userId', tripController.createTrip);
+app.get('/trips', tripController.getTrips);
+app.get('/trips/user/:userId', tripController.getTripsByUserId);
+app.get('/trips/:tripId', tripController.getTripById);
+app.put('/trips/:tripId', tripController.updateTrip);
+app.delete('/trips/:tripId', tripController.deleteTrip);
+app.get('/trips/download/:tripId', tripController.downloadTripData);
 
-// GET specific trip data by tripId
-const getTripById = async (req, res) => {
-    const tripId = req.params.tripId;
-    try {
-        const trip = await Trip.findByPk(tripId);
-        if (!trip) {
-            return res.status(404).json({ message: "Trip not found" });
-        }
-        res.json({ data: trip });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Internal Server Error", error: err.message });
-    }
-};
+const sequelize = new Sequelize('sqlite::memory:');
 
-// PUT request to update trip data
-const updateTrip = async (req, res) => {
-    const tripId = req.params.tripId;
-    const { name, startDate, endDate, budget, image } = req.body;
-    try {
-        // find trip by tripId
-        const trip = await Trip.findByPk(tripId);
-        if (!trip) {
-            return res.status(404).json();
-        }
-        // update trip data
-        const updatedTrip = await trip.update({ name, startDate, endDate, budget, image });
-        res.json({ data: updatedTrip });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Internal Server Error", error: err.message });
-    }
-};
+beforeAll(async () => {
+    await sequelize.sync({ force: true }); // Create tables for testing
+});
 
-// DELETE trip data
-const deleteTrip = async (req, res) => {
-    const tripId = req.params.tripId;
-    try {
-        // delete trip by tripId
-        const deletedCount = await Trip.destroy({ where: { trip_id: tripId } });
-        if (deletedCount === 0) {
-            return res.status(404).json({ message: "Trip not found" });
-        }
-        // update sharedtrips table
-        res.status(204).json();
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Internal Server Error", error: err.message });
-    }
-};
+beforeEach(() => {
+    jest.clearAllMocks(); // Clear mocks before each test
+});
 
-// DOWNLOAD trip data as CSV
-const downloadTripData = async (req, res) => {
-    const tripId = req.params.tripId;
-    try {
-        const trip = await Trip.findByPk(tripId);
-        if (!trip) {
-            return res.status(404).json({ message: "Trip not found" });
-        }
+// Test for creating a new trip
+test('POST /trips/:userId should create a new trip', async () => {
+    const mockNewTrip = {
+        trip_id: 1,
+        name: 'Summer Vacation',
+        start_date: '2024-07-01',
+        end_date: '2024-07-10',
+        budget: 1000,
+        image: 'image_url',
+    };
 
-        // Fetch expenses associated with the trip
-        const expenses = await Expense.findAll({ where: { trip_id: tripId } });
+    Trip.create.mockResolvedValue(mockNewTrip);
+    SharedTrip.create.mockResolvedValue({}); // Simulate successful relationship creation
 
-        // Prepare trip data for CSV
-        const tripData = {
-            name: trip.name,
-            start_date: trip.start_date,
-            end_date: trip.end_date,
-            budget: trip.budget,
-            image: trip.image,
-        };
+    const userId = 1;
+    const response = await request(app)
+        .post(`/trips/${userId}`)
+        .send(mockNewTrip);
 
-        // Define fields for trip data
-        const tripFields = ['name', 'start_date', 'end_date', 'budget', 'image'];
-        const csvTrip = parse(tripData, { fields: tripFields });
+    expect(response.status).toBe(201);
+    expect(response.body.data).toEqual(mockNewTrip);
+});
 
-        // Prepare expenses data for CSV
-        const expenseData = expenses.map(expense => ({
-            name: expense.name,
-            amount: expense.amount,
-            category: expense.category,
-            currency: expense.currency,
-            posted: expense.posted,
-            notes: expense.notes
-        }));
+// Test for getting all trips
+test('GET /trips should return all trips', async () => {
+    const mockTrips = [
+        { trip_id: 1, name: 'Trip 1' },
+        { trip_id: 2, name: 'Trip 2' },
+    ];
 
-        // Define fields for expense data
-        const expenseFields = ['name', 'amount', 'category', 'currency', 'posted', 'notes'];
-        const csvExpenses = parse(expenseData, { fields: expenseFields });
+    Trip.findAll.mockResolvedValue(mockTrips);
 
-        // Combine both trip and expense CSV
-        const combinedCSV = `${csvTrip}\n\nExpense Data:\n${csvExpenses}`;
+    const response = await request(app).get('/trips');
 
-        // Send CSV file
-        const safeTripName = trip.name ? trip.name.replace(/[^a-zA-Z0-9]/g, '_') : `trip_${tripId}`;
-        res.setHeader('Content-Disposition', `attachment; filename="${safeTripName}.csv"`);
-        res.setHeader('Content-Type', 'text/csv');
-        res.status(200).send(combinedCSV);
-    } catch (err) {
-        console.error('Error generating CSV:', err);
-    }
-};
+    expect(response.status).toBe(200);
+    expect(response.body.data).toEqual(mockTrips);
+});
 
-module.exports = {
-    createTrip,
-    getTrips,
-    getTripsByUserId,
-    getTripById,
-    updateTrip,
-    deleteTrip,
-    downloadTripData
-};
+// Test for getting trips by user ID
+test('GET /trips/user/:userId should return trips for a specific user', async () => {
+    const userId = 1;
+    const mockSharedTrips = [
+        { trip_id: 1, user_id: userId },
+        { trip_id: 2, user_id: userId },
+    ];
+    const mockTrips = [
+        { trip_id: 1, name: 'Trip 1' },
+        { trip_id: 2, name: 'Trip 2' },
+    ];
+
+    SharedTrip.findAll.mockResolvedValue(mockSharedTrips);
+    Trip.findAll.mockResolvedValue(mockTrips);
+
+    const response = await request(app).get(`/trips/user/${userId}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.data).toEqual(mockTrips);
+});
+
+// Test for getting a specific trip by trip ID
+test('GET /trips/:tripId should return a specific trip', async () => {
+    const tripId = 1;
+    const mockTrip = { trip_id: tripId, name: 'Trip 1' };
+
+    Trip.findByPk.mockResolvedValue(mockTrip);
+
+    const response = await request(app).get(`/trips/${tripId}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.data).toEqual(mockTrip);
+});
+
+// Test for updating a trip
+test('PUT /trips/:tripId should update a trip', async () => {
+    const tripId = 1;
+    const updatedTripData = {
+        name: 'Updated Trip',
+        start_date: '2024-07-01',
+        end_date: '2024-07-10',
+        budget: 1200,
+        image: 'new_image_url',
+    };
+    const mockUpdatedTrip = { trip_id: tripId, ...updatedTripData };
+
+    Trip.findByPk.mockResolvedValue({
+        update: jest.fn().mockResolvedValue(mockUpdatedTrip),
+    });
+
+    const response = await request(app)
+        .put(`/trips/${tripId}`)
+        .send(updatedTripData);
+
+    expect(response.status).toBe(200);
+    expect(response.body.data).toEqual(mockUpdatedTrip);
+});
+
+// Test for deleting a trip
+test('DELETE /trips/:tripId should delete a trip', async () => {
+    const tripId = 1;
+
+    Trip.destroy.mockResolvedValue(1); // Simulate successful deletion
+
+    const response = await request(app).delete(`/trips/${tripId}`);
+
+    expect(response.status).toBe(204);
+});
+
+// Test for downloading trip data as CSV
+test('GET /trips/download/:tripId should download trip data as CSV', async () => {
+    const tripId = 1;
+    const mockTrip = {
+        trip_id: tripId,
+        name: 'Trip 1',
+        start_date: '2024-07-01',
+        end_date: '2024-07-10',
+        budget: 1000,
+        image: 'image_url',
+    };
+    const mockExpenses = [
+        { name: 'Expense 1', amount: 100, category: 'Food', currency: 'USD', posted: new Date(), notes: 'Dinner' },
+        { name: 'Expense 2', amount: 50, category: 'Transport', currency: 'USD', posted: new Date(), notes: 'Taxi' },
+    ];
+
+    Trip.findByPk.mockResolvedValue(mockTrip);
+    Expense.findAll.mockResolvedValue(mockExpenses);
+
+    const response = await request(app).get(`/trips/download/${tripId}`);
+
+    expect(response.status).toBe(200);
+    expect(response.headers['content-disposition']).toContain(`attachment; filename="${mockTrip.name.replace(/[^a-zA-Z0-9]/g, '_')}.csv"`);
+});
 
