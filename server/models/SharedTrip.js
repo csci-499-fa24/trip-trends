@@ -25,6 +25,14 @@ const SharedTrip = sequelize.define('sharedtrips', {
             onDelete: 'CASCADE',
         },
     },
+    role: {
+        type: DataTypes.STRING(10),
+        allowNull: false,
+        defaultValue: 'owner',
+        validate: {
+            isIn: [['owner', 'editor', 'viewer']]
+        }
+    },
 }, {
     tableName: 'sharedtrips',
     timestamps: false,
