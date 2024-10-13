@@ -148,12 +148,12 @@ const downloadTripData = async (req, res) => {
         const combinedCSV = `${csvTrip}\n\nExpense Data:\n${csvExpenses}`;
 
         // Send CSV file
-        const safeTripName = trip.name ? trip.name.replace(/[^a-zA-Z0-9]/g, '_') : `trip_${tripId}`;
-        res.setHeader('Content-Disposition', `attachment; filename="${safeTripName}.csv"`);
+        res.setHeader('Content-Disposition', `attachment; filename=trip_${tripId}.csv`);
         res.setHeader('Content-Type', 'text/csv');
         res.status(200).send(combinedCSV);
     } catch (err) {
         console.error('Error generating CSV:', err);
+        res.status(500).json({ message: 'Server error', error: err.message });
     }
 };
 
@@ -166,4 +166,3 @@ module.exports = {
     deleteTrip,
     downloadTripData
 };
-

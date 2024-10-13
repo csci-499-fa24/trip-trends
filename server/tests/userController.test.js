@@ -2,11 +2,12 @@ require('dotenv').config({ path: 'server/.env' });
 const User = require('../models/User');
 const request = require('supertest');
 const express = require('express');
-const { getUsers, getUserById, updateUser, deleteUser, createGoogleUser } = require('../controllers/userController');
+const { getUsers, getUserById, updateUser, deleteUser, createGoogleUser } = require('../controllers/UserController');
 const jwt = require('jsonwebtoken');
 
 // mock User model
 jest.mock('../models/User');
+console.error = jest.fn(); // suppress error logs
 
 const app = express();
 app.use(express.json());
