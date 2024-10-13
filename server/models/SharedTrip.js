@@ -1,7 +1,7 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
-const User = require('./User');
-const Trip = require('./Trip');
+const User = require('./User'); // Import User model
+const Trip = require('./Trip');   // Import Trip model
 
 //db schema to add a shared trip
 const SharedTrip = sequelize.define('sharedtrips', {

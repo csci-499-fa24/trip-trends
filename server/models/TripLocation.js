@@ -1,6 +1,6 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
-const Trip = require('./Trip');
+const Trip = require('./Trip');   // Import Trip model
 
 // db schema to add a trip location
 const TripLocation = sequelize.define('TripLocation', {
@@ -25,7 +25,11 @@ const TripLocation = sequelize.define('TripLocation', {
     latitude: {
         type: DataTypes.DECIMAL(10,7),
         allowNull: true,
-    }
+    },
+    currency_code: {
+        type: DataTypes.STRING(3),
+        allowNull: true, // This makes the column nullable
+    },
 }, {
     tableName: 'tlocation',
     timestamps: false,
