@@ -378,7 +378,22 @@ function Singletrip() {
                             </Link>
                         </div>
                         <h1 id='tripName'>{tripData.data.name}</h1>
-                        {/* General Trip Info Table */}
+                        <div className="trip-info-cards">
+    <div className="trip-info-card">
+        <h4><b>BUDGET</b></h4>
+        <p>${tripData.data.budget}</p>
+    </div>
+    <div className="trip-info-card">
+        <h4><b>START</b></h4>
+        <p>{tripData.data.start_date}</p>
+    </div>
+    <div className="trip-info-card">
+        <h4><b>END</b></h4>
+        <p>{tripData.data.end_date}</p>
+    </div>
+</div>
+
+                        {/* General Trip Info Table
                         <Table striped bordered hover size="sm" responsive="sm">
                             <thead>
                                 <tr>
@@ -396,7 +411,7 @@ function Singletrip() {
                                     <td>{tripData.data.end_date}</td>
                                 </tr>
                             </tbody>
-                        </Table>
+                        </Table> */}
                         {/* Trip Calendar and Budget Meter */}
                         <div className='container'>
                             <div className='row'>
@@ -454,7 +469,7 @@ function Singletrip() {
                                                     needleTransitionDuration={2500}
                                                     needleTransition={Transition.easeBounceOut}
                                                     segments={4}
-                                                    segmentColors={['#7ada2c', '#d4e725', '#f3a820', '#fe471a']}
+                                                    segmentColors={['#b3e5fc', '#ffe0b2', '#ffccbc', '#d1c4e9']}
                                                 />
                                             </div>
                                         )}
@@ -484,7 +499,7 @@ function Singletrip() {
                         {/* Expense Table */}
                         {expenseData && expenseData.data ? (
                             <div>
-                                <Table striped bordered hover size="sm" responsive="sm">
+                                <Table striped bordered hover size="sm" responsive="sm" className="expense-table">
                                     <thead>
                                         <tr>
                                             <th>Name</th>
@@ -493,7 +508,7 @@ function Singletrip() {
                                             <th>Currency</th>
                                             <th>Date Posted</th>
                                             <th>Notes</th>
-                                            <th>Edit/Delete Expense</th>
+                                            <th>Modify Expense</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -506,7 +521,7 @@ function Singletrip() {
                                                 <td>{expense.posted}</td>
                                                 <td>{expense.notes}</td>
                                                 <td>
-                                                    <button onClick={() => { setEditPopupVisible(true); setSelectedExpense(expense) }} className='edit-expense'>Edit/Delete Expense</button>
+                                                    <button onClick={() => { setEditPopupVisible(true); setSelectedExpense(expense) }} className='edit-expense'>Edit/Delete</button>
                                                     <div className="expense-form">
                                                         {isEditPopupVisible && selectedExpense && (
                                                             <div className="modal">
