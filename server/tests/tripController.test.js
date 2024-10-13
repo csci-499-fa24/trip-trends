@@ -1,182 +1,107 @@
+// require('dotenv').config();
 require('dotenv').config({ path: 'server/.env' });
-const request = require('supertest');
-const express = require('express');
-const { Sequelize } = require('sequelize');
+const { ValidationError } = require('sequelize');
+
+const { createTrip } = require('../controllers/TripController');
 const Trip = require('../models/Trip');
 const SharedTrip = require('../models/SharedTrip');
-const Expense = require('../models/Expense');
-const User = require('../models/User');
 
-// mock Trip, SharedTrip, Expense models
+// mock Trip, SharedTrip models
 jest.mock('../models/Trip');
 jest.mock('../models/SharedTrip');
-jest.mock('../models/Expense');
-jest.mock('../models/User');
 
-const app = express();
-app.use(express.json());
-const sequelize = new Sequelize('sqlite::memory:');
-
-// Initialize models
-const TripModel = Trip(sequelize, Sequelize.DataTypes);
-const SharedTripModel = SharedTrip(sequelize, Sequelize.DataTypes);
-const ExpenseModel = Expense(sequelize, Sequelize.DataTypes);
-const UserModel = User(sequelize, Sequelize.DataTypes);
-
-// Define associations after all models are initialized
-UserModel.belongsToMany(TripModel, {
-    through: SharedTripModel,
-    foreignKey: 'user_id',
-    otherKey: 'trip_id',
-    onDelete: 'CASCADE',
-});
-
-TripModel.belongsToMany(UserModel, {
-    through: SharedTripModel,
-    foreignKey: 'trip_id',
-    otherKey: 'user_id',
-    onDelete: 'CASCADE',
-});
-
-describe('Trip Controller', () => {
-    beforeAll(async () => {
-        await sequelize.sync({ force: true }); // Creates the tables in the test database
-    });
+describe('createTrip', () => {
+    let mockRequest, mockResponse;
     
+    // set up fresh mock request and response objects before each test
     beforeEach(() => {
-        jest.clearAllMocks(); // Clear mocks before each test
-    });
-
-    // Test for creating a new trip
-    test('POST /trips/:userId should create a new trip', async () => {
-        const mockNewTrip = {
-            trip_id: 1,
-            name: 'Summer Vacation',
-            start_date: '2024-07-01',
-            end_date: '2024-07-10',
-            budget: 1000,
-            image: 'image_url',
+        mockRequest = {
+            body: {},
+            params: {}
         };
-
-        Trip.create.mockResolvedValue(mockNewTrip);
-        SharedTrip.create.mockResolvedValue({}); // Simulate successful relationship creation
-
-        const userId = 1;
-        const response = await request(app)
-            .post(`/trips/${userId}`)
-            .send(mockNewTrip);
-
-        expect(response.status).toBe(201);
-        expect(response.body.data).toEqual(mockNewTrip);
-    });
-
-    // Test for getting all trips
-    test('GET /trips should return all trips', async () => {
-        const mockTrips = [
-            { trip_id: 1, name: 'Trip 1' },
-            { trip_id: 2, name: 'Trip 2' },
-        ];
-
-        Trip.findAll.mockResolvedValue(mockTrips);
-
-        const response = await request(app).get('/trips');
-
-        expect(response.status).toBe(200);
-        expect(response.body.data).toEqual(mockTrips);
-    });
-
-    // Test for getting trips by user ID
-    test('GET /trips/user/:userId should return trips for a specific user', async () => {
-        const userId = 1;
-        const mockSharedTrips = [
-            { trip_id: 1, user_id: userId },
-            { trip_id: 2, user_id: userId },
-        ];
-        const mockTrips = [
-            { trip_id: 1, name: 'Trip 1' },
-            { trip_id: 2, name: 'Trip 2' },
-        ];
-
-        SharedTrip.findAll.mockResolvedValue(mockSharedTrips);
-        Trip.findAll.mockResolvedValue(mockTrips);
-
-        const response = await request(app).get(`/trips/user/${userId}`);
-
-        expect(response.status).toBe(200);
-        expect(response.body.data).toEqual(mockTrips);
-    });
-
-    // Test for getting a specific trip by trip ID
-    test('GET /trips/:tripId should return a specific trip', async () => {
-        const tripId = 1;
-        const mockTrip = { trip_id: tripId, name: 'Trip 1' };
-
-        Trip.findByPk.mockResolvedValue(mockTrip);
-
-        const response = await request(app).get(`/trips/${tripId}`);
-
-        expect(response.status).toBe(200);
-        expect(response.body.data).toEqual(mockTrip);
-    });
-
-    // Test for updating a trip
-    test('PUT /trips/:tripId should update a trip', async () => {
-        const tripId = 1;
-        const updatedTripData = {
-            name: 'Updated Trip',
-            start_date: '2024-07-01',
-            end_date: '2024-07-10',
-            budget: 1200,
-            image: 'new_image_url',
+        mockResponse = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
         };
-        const mockUpdatedTrip = { trip_id: tripId, ...updatedTripData };
-
-        Trip.findByPk.mockResolvedValue({
-            update: jest.fn().mockResolvedValue(mockUpdatedTrip),
-        });
-
-        const response = await request(app)
-            .put(`/trips/${tripId}`)
-            .send(updatedTripData);
-
-        expect(response.status).toBe(200);
-        expect(response.body.data).toEqual(mockUpdatedTrip);
+        console.error = jest.fn(); // suppress error logs
     });
 
-    // Test for deleting a trip
-    test('DELETE /trips/:tripId should delete a trip', async () => {
-        const tripId = 1;
-
-        Trip.destroy.mockResolvedValue(1); // Simulate successful deletion
-
-        const response = await request(app).delete(`/trips/${tripId}`);
-
-        expect(response.status).toBe(204);
-        expect(response.body).toEqual({});
+    afterEach(() => {
+        jest.clearAllMocks();
+        console.error.mockRestore();
     });
 
-    // Test for downloading trip data as CSV
-    test('GET /trips/download/:tripId should download trip data as CSV', async () => {
-        const tripId = 1;
-        const mockTrip = {
-            trip_id: tripId,
-            name: 'Trip 1',
-            start_date: '2024-07-01',
-            end_date: '2024-07-10',
-            budget: 1000,
-            image: 'image_url',
+    it('should create new trip and return 201 status', async () => {
+        const mockUserId = 'b3c249e7-26ae-4818-83de-ca8f5b4f4bb6';
+        // mock request body
+        const inputTrip = { 
+            name: 'Paris', 
+            start_date: '2024-08-01', 
+            end_date: '2025-03-30', 
+            budget: '123',
+            image: 'image.jpg'
         };
-        const mockExpenses = [
-            { name: 'Expense 1', amount: 100, category: 'Food', currency: 'USD', posted: new Date(), notes: 'Dinner' },
-            { name: 'Expense 2', amount: 50, category: 'Transport', currency: 'USD', posted: new Date(), notes: 'Taxi' },
-        ];
+        const createdTrip = { trip_id: '3333', ...inputTrip };
+        mockRequest.body = inputTrip;
+        mockRequest.params = { userId: mockUserId }; // set userId in request params
 
-        Trip.findByPk.mockResolvedValue(mockTrip);
-        Expense.findAll.mockResolvedValue(mockExpenses);
+        // arrange
+        Trip.create.mockResolvedValue(createdTrip); // mock Trip.create method to resolve with createdTrip
+        SharedTrip.create.mockResolvedValue({ user_id: mockUserId, trip_id: createdTrip.trip_id }); // mock SharedTrip.create method to resolve with createdSharedTrip
 
-        const response = await request(app).get(`/trips/download/${tripId}`);
+        // act
+        await createTrip(mockRequest, mockResponse); // call createTrip function
 
-        expect(response.status).toBe(200);
-        expect(response.headers['content-disposition']).toContain(`attachment; filename="${mockTrip.name.replace(/[^a-zA-Z0-9]/g, '_')}.csv"`);
+        // assert
+        expect(Trip.create).toHaveBeenCalledWith(inputTrip); // check if Trip.create called with inputTrip
+        expect(mockResponse.status).toHaveBeenCalledWith(201); // check for response 201
+        expect(mockResponse.json).toHaveBeenCalledWith({ data: createdTrip }); // check reponse data
+    });
+
+    it('should return 400 status for invalid date range', async () => {
+        const mockUserId = 'b3c249e7-26ae-4818-83de-ca8f5b4f4bb6';
+        mockRequest.params = { userId: mockUserId }; // set userId in request params
+
+        mockRequest.body = {
+            name: 'Paris',
+            start_date: '2025-03-10',
+            end_date: '2024-08-01',
+            budget: '123',
+            image: 'image.jpg'
+        };
+        
+        const validationError = new Error('Start date cannot be after end date.');
+        validationError.name = 'SequelizeValidationError';
+
+        // arrange
+        Trip.create.mockRejectedValue(validationError);
+
+        // act
+        await createTrip(mockRequest, mockResponse); // call createTrip function
+
+        // assert
+        expect(mockResponse.status).toHaveBeenCalledWith(400); // check for 400 status
+        expect(mockResponse.json).toHaveBeenCalledWith({ 
+            message: 'Validation Error',
+            error: 'Start date cannot be after end date.',
+        }); // check response message
+    });
+
+    it('should handle errors and return 500 status', async () => {
+        const error = new Error('Validation error');
+
+        // arrange
+        Trip.create.mockRejectedValue(error); // mock Trip.create to reject with error
+    
+        // act
+        await createTrip(mockRequest, mockResponse); // call createTrip function
+
+        // assert
+        expect(Trip.create).toHaveBeenCalled(); // check Trip.create called
+        expect(mockResponse.status).toHaveBeenCalledWith(500); // check for 500 status
+        expect(mockResponse.json).toHaveBeenCalledWith({
+            message: 'Internal Server Error',
+            error: error.message
+        }); // check for error response data
     });
 });

@@ -2,7 +2,6 @@ name: 'coverage'
 on:
     pull_request:
         branches:
-            - master
             - main
             - dev
     push:
@@ -11,12 +10,21 @@ on:
 jobs:
     coverage:
         runs-on: ubuntu-latest
+        env:
+          DB_URL: ${{ secrets.DB_URL }}
+        permissions:
+          checks: write
+          actions: write
+          contents: read
+          pull-requests: write
         steps:
             - name: checkout code
               uses: actions/checkout@v3
             
             - name: install dependencies
-              run: npm install
+              run: |
+                cd server
+                npm install
 
             - name: run Jest coverage report
               uses: ArtiomTr/jest-coverage-report-action@v2
