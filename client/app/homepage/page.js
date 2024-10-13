@@ -60,7 +60,6 @@ function homepage() {
     const [suggestions, setSuggestions] = useState([]);
     const [locationsNotProvided, setLocationsNotProvided] = useState(false);
     const [userId, setUserId] = useState(null);
-    const [extendedTripLocation, setExtendedTripLocatiom] = useState({ trip_locations: [] });
 
     const handleLogout = () => {
         googleLogout();
@@ -122,15 +121,10 @@ function homepage() {
         try {
             const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${tripId}`);
 
-            setExtendedTripLocatiom({ trip_locations: response.data.data });
-
         } catch (error) {
             console.error('Error fetching trip locations:', error);
         }
     };
-    useEffect(() => {
-        //console.log('Updated extendedTripLocation:', extendedTripLocation);
-    }, [extendedTripLocation]); // Runs every time extendedTripLocation changes
 
 
 
@@ -253,7 +247,8 @@ function homepage() {
                 // UPDATE the trip location with location coordinates
                 const lat = geocode_response.data.results[0].geometry.lat;
                 const long = geocode_response.data.results[0].geometry.lng;
-                const coordinates = {"latitude": lat, "longitude": long};
+                const currency = geocode_response.data.results[0].annotations.currency.iso_code;
+                const coordinates = {"latitude": lat, "longitude": long, "currency_code": currency};
                 try {
                     await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${trip_id}/${a_trip_location.location}`, coordinates);
                 } catch (error) {
@@ -537,10 +532,7 @@ function homepage() {
                                                 <strong>Dates:</strong> {trip.start_date} - {trip.end_date}
                                             </p>
                                             <p><strong>Budget:</strong> ${trip.budget}</p>
-                                            <Link
-                                                href={`/singletrip?tripId=${trip.trip_id}&coordinates=${encodeURIComponent(extendedTripLocation.trip_locations.map(loc => `${loc.latitude},${loc.longitude}`).join(';'))}`}
-                                                style={{ color: 'white', textDecoration: 'underline' }}
-                                            >
+                                            <Link href={`/singletrip?tripId=${trip.trip_id}`} style={{ color: 'white', textDecoration: 'underline' }}>
                                                 See more
                                             </Link>
                                         </div>

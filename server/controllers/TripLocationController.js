@@ -63,14 +63,13 @@ const getTripLocationByUserId = async (req, res) => {
 const updateTripLocation = async (req, res) => {
     const tripId = req.params.tripId;
     const tripLocationId = req.params.tripLocationId;
-    const { location } = req.body;
-    const { longitude, latitude } = req.body;
+    const { location, longitude, latitude, currency_code } = req.body;
     try {
         const tripLocation = await TripLocation.findOne({ where: { trip_id: tripId, location: tripLocationId} });
         if (!tripLocation) {
             return res.status(404).json({ message: "Trip location not found" });
         }
-        const updatedTripLocation = await tripLocation.update({ location, longitude, latitude });
+        const updatedTripLocation = await tripLocation.update({ location, longitude, latitude, currency_code });
         res.json({ data: updatedTripLocation });
     } catch (err) {
         console.error(err);
