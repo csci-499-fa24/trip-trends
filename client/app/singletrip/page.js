@@ -613,11 +613,6 @@ function Singletrip() {
                                 <button onClick={downloadTripData} className="download-trip-data-btn">
                                     Download Trip
                                 </button>
-
-                                {/* Add the Delete Button */}
-                                <button onClick={deleteTrip} className="delete-trip-button">
-                                    Delete Trip
-                                </button>
                             </div>
                         ) : (
                             <p>No expenses yet...</p>
@@ -628,6 +623,10 @@ function Singletrip() {
                         ) : (
                             <p>[Gallery of photos]</p>
                         )}
+                        {/* Add the Delete Button */}
+                        <button onClick={deleteTrip} className="delete-trip-button">
+                            Delete Trip
+                        </button>
                     </div>
                 ) : (
                     <p>No Trip Data Found.</p>
