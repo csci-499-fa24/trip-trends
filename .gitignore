@@ -7,5 +7,5 @@
 .DS_Store
 .gitignore
 .env
-node_modules
 coverage
+node_modules/
