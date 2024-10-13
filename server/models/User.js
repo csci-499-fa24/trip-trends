@@ -48,4 +48,3 @@ const User = sequelize.define('user', {
 // User.beforeCreate(user => user.id = uuid());
 
 module.exports = User;
-

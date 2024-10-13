@@ -1,6 +1,5 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
-const User = require('./User');
 
 // db schema to add a trip
 const Trip = sequelize.define("all_trips", {
@@ -41,7 +40,5 @@ const Trip = sequelize.define("all_trips", {
     tableName: 'all_trips',
     timestamps: false
 });
-// User.hasMany(Trip, { foreignKey: 'user_id' });
-// Trip.belongsTo(User, { foreignKey: 'user_id' });
 
 module.exports = Trip;

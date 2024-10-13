@@ -1,7 +1,5 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
-const User = require('./User');
-const Trip = require('./Trip');
 
 //db schema to add a shared trip
 const SharedTrip = sequelize.define('sharedtrips', {
@@ -33,19 +31,19 @@ const SharedTrip = sequelize.define('sharedtrips', {
         fields: ['user_id', 'trip_id']
     }]
 });
-User.belongsToMany(Trip, {
-    through: SharedTrip,
-    foreignKey: 'user_id',
-    otherKey: 'trip_id',
-    onDelete: 'CASCADE',
+// User.belongsToMany(Trip, {
+//     through: SharedTrip,
+//     foreignKey: 'user_id',
+//     otherKey: 'trip_id',
+//     onDelete: 'CASCADE',
     
-});
+// });
 
-Trip.belongsToMany(User, {
-    through: SharedTrip,
-    foreignKey: 'trip_id',
-    otherKey: 'user_id',
-    onDelete: 'CASCADE',
-});
+// Trip.belongsToMany(User, {
+//     through: SharedTrip,
+//     foreignKey: 'trip_id',
+//     otherKey: 'user_id',
+//     onDelete: 'CASCADE',
+// });
 
 module.exports = SharedTrip;
