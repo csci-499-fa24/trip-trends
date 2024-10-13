@@ -82,7 +82,6 @@ function Singletrip() {
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get('tripId');
         setTripId(id);
-       
     }, []);
 
 
@@ -123,13 +122,13 @@ function Singletrip() {
 
             axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${tripId}`)
                 .then(response => {
-                      console.log(response.data);
-                      setSelectedCurrency(response.data.data[0].currency_code)
+                    console.log(response.data);
+                    setSelectedCurrency(response.data.data[0].currency_code)
 
-                      const locations = response.data.data;
-                      const currencyCodes = locations.map(location => location.currency_code);
-      
-                      setOtherCurrencies(currencyCodes);
+                    const locations = response.data.data;
+                    const currencyCodes = locations.map(location => location.currency_code);
+
+                    setOtherCurrencies(currencyCodes);
 
                 })
                 .catch(error => {
@@ -238,6 +237,20 @@ function Singletrip() {
         // API CALL
         alert("Editing is still a WIP :)");
         setEditPopupVisible(false);
+    };
+
+    const deleteExpense = async (expenseID) => {
+        if (window.confirm('Please confirm expense deletion. This action cannot be undone.')) {
+            axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/${expenseID}`)
+                .then(response => {
+                    console.log(response)
+                })
+                .catch(error => {
+                    console.error('Error deleting expense:', error);
+                });
+        }
+        setEditPopupVisible(false);
+        window.location.reload();
     };
 
     const downloadTripData = async () => {
@@ -575,7 +588,16 @@ function Singletrip() {
                                                                                 value={selectedExpense.notes}
                                                                             />
                                                                         </label>
-                                                                        <button type="submit" className="submit-edit-expense-button">Edit</button>
+                                                                        <div className='container'>
+                                                                            <div className='row'>
+                                                                                <div className='col'>
+                                                                                    <button type="submit" className="submit-edit-expense-button">Edit</button>
+                                                                                </div>
+                                                                                <div className='col'>
+                                                                                    <button type="button" onClick={() => deleteExpense(expense.expense_id)} className="delete-expense-button">Delete</button>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
                                                                     </form>
                                                                 </div>
                                                             </div>
