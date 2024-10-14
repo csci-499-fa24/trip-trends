@@ -17,6 +17,7 @@ import logo from '../img/Logo.png';
 import Link from 'next/link';
 import { Pie } from 'react-chartjs-2';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
+import DeleteTripComponent from '../components/DeleteTripComponent';
 import ShareTripComponent from '../components/ShareTripComponent';
 
 Chart.register(ArcElement, Tooltip, Legend);
@@ -258,29 +259,29 @@ function Singletrip() {
     }, [tripId]);
 
 
-    const deleteTrip = async () => {
-        if (window.confirm('Please confirm trip deletion. This action cannot be undone.')) {
-            try {
-                // delete trip
-                await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`);
-                window.location.href = '/homepage'; // redirect to homepage
-            } catch (error) {
-                console.error('Error deleting trip:', error);
-            }
-        }
-    };
+    // const deleteTrip = async () => {
+    //     if (window.confirm('Please confirm trip deletion. This action cannot be undone.')) {
+    //         try {
+    //             // delete trip
+    //             await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`);
+    //             window.location.href = '/homepage'; // redirect to homepage
+    //         } catch (error) {
+    //             console.error('Error deleting trip:', error);
+    //         }
+    //     }
+    // };
 
-    const deleteUserFromTrip = async (userId) => {
-        if (window.confirm('Please confirm user removal from trip. This action cannot be undone.')) {
-            try {
-                // delete user from trip
-                await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/sharedtrips/${userId}/${tripId}`);
-                window.location.reload();
-            } catch (error) {
-                console.error('Error deleting user from trip:', error);
-            }
-        }
-    };
+    // const deleteUserFromTrip = async (userId) => {
+    //     if (window.confirm('Please confirm user removal from trip. This action cannot be undone.')) {
+    //         try {
+    //             // delete user from trip
+    //             await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/sharedtrips/${userId}/${tripId}`);
+    //             window.location.reload();
+    //         } catch (error) {
+    //             console.error('Error deleting user from trip:', error);
+    //         }
+    //     }
+    // };
 
     const submitEditExpense = async (e) => {
         e.preventDefault();
@@ -699,9 +700,10 @@ function Singletrip() {
                                 </button>
                                 
                                 {/* Add Delete Button */}
-                                <button onClick={deleteTrip} className="delete-trip-button">
+                                {/* <button onClick={deleteTrip} className="delete-trip-button">
                                     Delete Trip
-                                </button>
+                                </button> */}
+                                <DeleteTripComponent tripId={tripId} userRole={userRole} />
 
                                 {/* Add Share Trip Button */}
                                 <ShareTripComponent tripId={tripId} isOwner={isOwner} />
