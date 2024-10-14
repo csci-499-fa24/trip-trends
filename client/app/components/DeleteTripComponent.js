@@ -42,7 +42,7 @@ const DeleteTripComponent = ({ tripId, userRole }) => {
 
     return (
         <>
-            <div class="icon-div" tooltip={userRole !== 'owner' ? 'Remove Trip' : 'Delete Trip'} tabindex="0">
+            <div class="icon-div delete-icon" tooltip={userRole !== 'owner' ? 'Remove Trip' : 'Delete Trip'} tabindex="0">
                 <div class="icon-SVG">
                     <svg
                     onClick={handleDeleteAction}
