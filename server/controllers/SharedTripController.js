@@ -1,80 +1,71 @@
 const SharedTrip = require('../models/SharedTrip');
 const User = require('../models/User');
 
+// needs to be further implemented
 // POST new trip for user
 const createSharedTrip = async (req, res) => {
     const userId = req.params.userId;
     const tripId = req.params.tripId;
-    const { email, role } = req.body;
+    const { email, role } = req.body; // destructure role and email from req.body
+    console.log("Request Params:", req.params);
+    console.log("Request Body:", req.body);
 
     try {
+        // validate userId and tripId
         if (!userId || !tripId) {
-            return res.status(400).json({ message: "userId, tripId required" });
+            return res.status(400).json({ message: "userId and tripId are required" });
         }
-        if (role == 'owner') {
-            const { email, role } = req.body;
-            if (!userId || !tripId) {
-                return res.status(400).json({ message: "userId, tripId required" });
-            }
-            // check if user is owner of trip
-            const sharedTrip = await SharedTrip.findOne({ where: { user_id: userId, trip_id: tripId } });
+        // if role is provided in the request body
+        if (req.body) {
+            // check if current user is the owner of the trip
+            const sharedTrip = await SharedTrip.findOne({ 
+                where: { 
+                    user_id: userId, 
+                    trip_id: tripId 
+                }
+            });
             if (!sharedTrip || sharedTrip.role !== 'owner') {
                 return res.status(403).json({ message: "You do not have permission to share this trip" });
             }
-            // check if user with email exists
-            const newPartipant = await User.findOne({ where: { email } });
-            if (!newPartipant) {
-                return res.status(404).json({ message: "User with this email not found" });
+            // find user by email
+            const newParticipant = await User.findOne({ where: { email } });
+            if (!newParticipant) {
+                return res.status(404).json({ message: "User with email not found" });
             }
-            // create new model instance 
+            // check if user is already participant in trip
+            const existingSharedTrip = await SharedTrip.findOne({
+                where: {
+                    user_id: newParticipant.user_id,
+                    trip_id: tripId
+                }
+            });
+            if (existingSharedTrip) {
+                // update role if the user is already participant
+                await SharedTrip.update({ role }, {
+                    where: {
+                        user_id: newParticipant.user_id,
+                        trip_id: tripId
+                    }
+                });
+                return res.status(200).json({ message: "User role updated" });
+            }
+            // create new shared trip for new participant
             const newSharedTrip = await SharedTrip.create({
-                user_id: newPartipant.user_id,
+                user_id: newParticipant.user_id,
                 trip_id: tripId,
                 role: role
             });
-            res.status(201).json({ data: newSharedTrip });
-        } else {
-            // create new model instance 
-            const newSharedTrip = await SharedTrip.create({ user_id: userId, trip_id: tripId, role: 'owner' });
-            res.status(201).json({ data: newSharedTrip });
+            return res.status(201).json({ data: newSharedTrip });
         }
+        // if no role provided, create new shared trip with current user as owner
+        const newSharedTrip = await SharedTrip.create({ user_id: userId, trip_id: tripId, role: 'owner' });
+        return res.status(201).json({ data: newSharedTrip });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: "Internal Server Error", error: err.message });
+        return res.status(500).json({ message: "Internal Server Error", error: err.message });
     }
 };
 
-// POST new shared trip for user
-const addSharedTrip = async (req, res) => {
-    const userId = req.params.userId; // owner
-    const tripId = req.params.tripId; 
-    const { email, role } = req.body;
-    try {
-        if (!userId || !tripId) {
-            return res.status(400).json({ message: "userId, tripId required" });
-        }
-        // check if user is owner of trip
-        const sharedTrip = await SharedTrip.findOne({ where: { user_id: userId, trip_id: tripId } });
-        if (!sharedTrip || sharedTrip.role !== 'owner') {
-            return res.status(403).json({ message: "You do not have permission to share this trip" });
-        }
-        // check if user with email exists
-        const newPartipant = await User.findOne({ where: { email } });
-        if (!newPartipant) {
-            return res.status(404).json({ message: "User with this email not found" });
-        }
-        // create new model instance 
-        const newSharedTrip = await SharedTrip.create({
-            user_id: newPartipant.user_id,
-            trip_id: tripId,
-            role: role
-        });
-        res.status(201).json({ data: newSharedTrip });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Internal Server Error", error: err.message });
-    }
-}
 
 // GET all shared trips
 const getSharedTrips = async (req, res) => {
@@ -105,6 +96,7 @@ const getSharedTripsByUserId = async (req, res) => {
 // GET specific shared trip data by tripId
 const getSharedTripsByTripId = async (req, res) => {
     const tripId = req.params.tripId;
+    // const role = req.query.role;
     try {
         const sharedTrips = await SharedTrip.findAll({ where: { trip_id: tripId } });
         if (sharedTrips.length === 0) {
@@ -152,7 +144,7 @@ const deleteSharedTrip = async (req, res) => {
 
 module.exports = {
     createSharedTrip,
-    addSharedTrip,
+    // addSharedTrip,
     getSharedTrips,
     getSharedTripsByUserId,
     getSharedTripsByTripId,

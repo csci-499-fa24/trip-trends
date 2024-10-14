@@ -17,6 +17,7 @@ import logo from '../img/Logo.png';
 import Link from 'next/link';
 import { Pie } from 'react-chartjs-2';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
+import ShareTripComponent from '../components/ShareTripComponent';
 
 Chart.register(ArcElement, Tooltip, Legend);
 
@@ -25,6 +26,7 @@ function Singletrip() {
     const [categoryData, setCategoryData] = useState({ labels: [], datasets: [] });
     const [tripId, setTripId] = useState(null);
     const [tripData, setTripData] = useState(null);
+    const [userRole, setUserRole] = useState(null);
     const [expenseData, setExpenseData] = useState([]);
     const [totalExpenses, setTotalExpenses] = useState(0);
     const [currencyCodes, setCurrencyCodes] = useState([]);
@@ -55,22 +57,14 @@ function Singletrip() {
         "Shopping",
         "Phone/Internet",
         "Health/Safety",
-        "Accommodations",
-        "Food/Drink",
-        "Transport",
-        "Activities",
-        "Shopping",
-        "Phone/Internet",
-        "Health/Safety",
         "Other"
     ]);
-    const [userRole, setUserRole] = useState(null);
 
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get('tripId');
         setTripId(id);
-
+        
     }, []);
 
     useEffect(() => {
@@ -125,24 +119,33 @@ function Singletrip() {
     }, [tripId]);
 
     useEffect(() => {
+        console.log('fetching user role...');
+        console.log('Trip ID:', tripId);
         const fetchUserRole = async () => {
-            const userId = localStorage.getItem("user_id");
-            if (tripData && tripData.data) {
-                try {
-                    const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/sharedtrips/`, {
-                        params: { userId: userId, tripId: tripData.data.trip_id }
-                    });
-                    if (response.data && response.data.role) {
-                        setUserRole(response.data.role);
-                    }
-                } catch (error) {
-                    console.error('Error fetching user role:', error);
-                }
+          const userId = localStorage.getItem("user_id");
+          console.log('User ID:', userId);
+          if (tripId && userId) {
+            try {
+              const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/trips/${tripId}`);
+              const sharedTrips = response.data.data;
+              const userRole = sharedTrips.find(trip => trip.user_id === userId)?.role;
+              if (userRole) {
+                setUserRole(userRole);
+              } else {
+                console.log("User does not have a role for this trip.");
+              }
+            } catch (error) {
+              console.error('Error fetching user role:', error);
+              setError('Error fetching user role. Please try again later.');
             }
+          } else {
+            console.log("tripId or userId is missing.");
+          }
         };
-
         fetchUserRole();
-    }, [tripData]);
+      }, [tripId]);
+    
+    const isOwner = userRole === 'owner';
 
     useEffect(() => {
         const getExchangeRates = async () => {
@@ -416,26 +419,26 @@ function Singletrip() {
         localStorage.removeItem('selectedFilter');
     };
 
-    const shareTrip = async (newUserId, role) => {
-        try {
-            if (!userId) {
-                console.error('User not authenticated. Cannot share trip.');
-                return;
-            }
-            if (!tripId) {
-                console.error('Trip ID not found. Cannot share trip.');
-                return;
-            }
-            const requestBody = {
-                newUserId, 
-                role        
-            };
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/${userId}/trips/${tripId}/`, requestBody);
-            console.log('Trip shared successfully:', response.data);
-        } catch (error) {
-            console.error('Error sharing trip:', error.response?.data || error.message);
-        }
-    };
+    // const shareTrip = async (email, role) => {
+    //     try {
+    //         if (!userId) {
+    //             console.error('User not authenticated. Cannot share trip.');
+    //             return;
+    //         }
+    //         if (!tripId) {
+    //             console.error('Trip ID not found. Cannot share trip.');
+    //             return;
+    //         }
+    //         const requestBody = {
+    //             email, 
+    //             role        
+    //         };
+    //         const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/${userId}/trips/${tripId}/`, requestBody);
+    //         console.log('Trip shared successfully:', response.data);
+    //     } catch (error) {
+    //         console.error('Error sharing trip:', error.response?.data || error.message);
+    //     }
+    // };
 
     return (
         <div className="main-container">
@@ -458,19 +461,19 @@ function Singletrip() {
                         </div>
                         <h1 id='tripName'>{tripData.data.name}</h1>
                         <div className="trip-info-cards">
-    <div className="trip-info-card">
-        <h4><b>BUDGET</b></h4>
-        <p>${tripData.data.budget}</p>
-    </div>
-    <div className="trip-info-card">
-        <h4><b>START</b></h4>
-        <p>{tripData.data.start_date}</p>
-    </div>
-    <div className="trip-info-card">
-        <h4><b>END</b></h4>
-        <p>{tripData.data.end_date}</p>
-    </div>
-</div>
+                        <div className="trip-info-card">
+                            <h4><b>BUDGET</b></h4>
+                            <p>${tripData.data.budget}</p>
+                        </div>
+                        <div className="trip-info-card">
+                            <h4><b>START</b></h4>
+                            <p>{tripData.data.start_date}</p>
+                        </div>
+                        <div className="trip-info-card">
+                            <h4><b>END</b></h4>
+                            <p>{tripData.data.end_date}</p>
+                        </div>
+                    </div>
 
                         {/* General Trip Info Table
                         <Table striped bordered hover size="sm" responsive="sm">
@@ -695,15 +698,13 @@ function Singletrip() {
                                     Download Trip
                                 </button>
                                 
-                                {/* Add the Delete Button */}
+                                {/* Add Delete Button */}
                                 <button onClick={deleteTrip} className="delete-trip-button">
                                     Delete Trip
                                 </button>
 
-                                {/* Add the Delete Button */}
-                                <button onClick={shareTrip} className="delete-trip-button">
-                                    Share Trip
-                                </button>
+                                {/* Add Share Trip Button */}
+                                <ShareTripComponent tripId={tripId} isOwner={isOwner} />
                             </div>
                         ) : (
                             <p>No expenses yet...</p>
