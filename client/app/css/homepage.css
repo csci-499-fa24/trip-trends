@@ -307,3 +307,12 @@ form {
     cursor: pointer;
     border-radius: 50%;
 }
+
+@keyframes pop {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.09); }
+}
+
+.shake {
+    animation: pop 0.4s;
+}
