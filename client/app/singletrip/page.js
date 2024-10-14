@@ -64,7 +64,6 @@ function Singletrip() {
         "Health/Safety",
         "Other"
     ]);
-    const userId = localStorage.getItem("user_id");
     const [userRole, setUserRole] = useState(null);
 
     useEffect(() => {
@@ -73,9 +72,6 @@ function Singletrip() {
         setTripId(id);
 
     }, []);
-
-
-
 
     useEffect(() => {
         if (tripId) {
@@ -130,20 +126,23 @@ function Singletrip() {
 
     useEffect(() => {
         const fetchUserRole = async () => {
-            try {
-                const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/sharedtrips/`, {
-                    params: { userId: userId, tripId: tripData.data.trip_id }
-                });
-                if (response.data && response.data.role) {
-                    setUserRole(response.data.role);
+            const userId = localStorage.getItem("user_id");
+            if (tripData && tripData.data) {
+                try {
+                    const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/sharedtrips/`, {
+                        params: { userId: userId, tripId: tripData.data.trip_id }
+                    });
+                    if (response.data && response.data.role) {
+                        setUserRole(response.data.role);
+                    }
+                } catch (error) {
+                    console.error('Error fetching user role:', error);
                 }
-            } catch (error) {
-                console.error('Error fetching user role:', error);
             }
         };
 
         fetchUserRole();
-    }, [tripData.data.trip_id, userId]);
+    }, [tripData]);
 
     useEffect(() => {
         const getExchangeRates = async () => {
@@ -264,6 +263,18 @@ function Singletrip() {
                 window.location.href = '/homepage'; // redirect to homepage
             } catch (error) {
                 console.error('Error deleting trip:', error);
+            }
+        }
+    };
+
+    const deleteUserFromTrip = async (userId) => {
+        if (window.confirm('Please confirm user removal from trip. This action cannot be undone.')) {
+            try {
+                // delete user from trip
+                await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/sharedtrips/${userId}/${tripId}`);
+                window.location.reload();
+            } catch (error) {
+                console.error('Error deleting user from trip:', error);
             }
         }
     };
@@ -572,8 +583,8 @@ function Singletrip() {
                                         <tr>
                                             <th>Name</th>
                                             <th>Amount</th>
-                                            <th>Category</th>
                                             <th>Currency</th>
+                                            <th>Category</th>
                                             <th>Date Posted</th>
                                             <th>Notes</th>
                                             <th>Modify Expense</th>
@@ -584,8 +595,8 @@ function Singletrip() {
                                             <tr key={expense.expense_id}>
                                                 <td>{expense.name}</td>
                                                 <td>{expense.amount}</td>
-                                                <td>{expense.category}</td>
                                                 <td>{expense.currency}</td>
+                                                <td>{expense.category}</td>
                                                 <td>{expense.posted}</td>
                                                 <td>{expense.notes}</td>
                                                 <td>
@@ -688,6 +699,11 @@ function Singletrip() {
                                 <button onClick={deleteTrip} className="delete-trip-button">
                                     Delete Trip
                                 </button>
+
+                                {/* Add the Delete Button */}
+                                <button onClick={shareTrip} className="delete-trip-button">
+                                    Share Trip
+                                </button>
                             </div>
                         ) : (
                             <p>No expenses yet...</p>
@@ -698,10 +714,7 @@ function Singletrip() {
                         ) : (
                             <p>[Gallery of photos]</p>
                         )}
-                        {/* Add the Delete Button */}
-                        <button onClick={deleteTrip} className="delete-trip-button">
-                            Delete Trip
-                        </button>
+                        
                     </div>
                 ) : (
                     <p>No Trip Data Found.</p>

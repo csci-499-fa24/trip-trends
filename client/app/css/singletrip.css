@@ -473,7 +473,9 @@
 .expense-table td:nth-child(2) {
     text-align: right
 }
+.expense-table td:nth-child(3),
 .expense-table td:nth-child(4),
+.expense-table td:nth-child(5),
 .expense-table td:nth-child(7) {
     text-align: center;
 }
