@@ -630,3 +630,135 @@
     margin: 4px 2px;
     cursor: pointer;
   }
+
+/* Icon bar styling */
+.top-icon-header {
+    width: auto; 
+    display: flex;                    
+    align-items: center;              
+    position: fixed;                  
+    padding: 10px;                    
+    position: absolute;
+    top: 95px;
+    margin-left: -20px;
+    height: 40px;
+    aspect-ratio: 1 / 1;
+    z-index: 1000;
+}
+
+.icon-bar-header {
+    width: 490px;
+    padding: 0 14px;
+    display: flex;
+    align-items: center; 
+    background-color: white; 
+    margin-left: -25px; 
+}
+
+.icon-div {
+    height: 56px; 
+    width: 56px;
+    margin: 0 10px; 
+    padding: 10px; 
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center; 
+    position: relative;
+    transition: background-color 300ms ease; 
+    cursor: pointer;
+}
+
+.icon-div .icon-SVG {
+    height: 26px; 
+    aspect-ratio: 1 / 1;
+    transition: transform 300ms ease; 
+}
+
+.icon-text {
+    position: absolute;
+    bottom: 100%; 
+    left: 50%; 
+    transform: translateX(-50%) translateY(-10px); 
+    background-color: rgb(85, 83, 83);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0; 
+    transition: opacity 200ms ease, transform 200ms ease; 
+}
+
+.icon-div:hover .icon-text,
+.icon-div:focus-visible .icon-text {
+    opacity: 1; 
+    transform: translateX(-50%) translateY(-15px); 
+}
+
+.icon-div:hover .icon-SVG {
+    transform: scale(1.2);
+}
+
+.icon-div:hover,
+.icon-div:focus-visible {
+    background-color: lightgray;
+}
+
+.icon-div:active {
+    opacity: 0.9;
+}
+
+/* .spacer {
+    flex-grow: 1;
+}
+
+.divider {
+    height: 40px;
+    width: 2px;
+    margin: 0 16px; 
+    background-color: rgb(192, 192, 192);
+    display: inline-block; 
+} */
+
+.trip-overview {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 20px 0;
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+  
+.trip-overview-div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+  
+.trip-overview-circle {
+    width: 50px;
+    height: 50px;
+    background-color: rgb(214, 213, 213);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+  
+.trip-overview-content h3 {
+    font-size: 18px;
+    margin: 0;
+    text-align: center;  
+}
+  
+.trip-overview-content p {
+    margin: 5px 0 0;
+    font-size: 15px;
+    
+}
