@@ -130,8 +130,6 @@ function homepage() {
         }
     };
 
-
-
     // Captures new input instantly in each popup field
     const newTripInputChange = (e) => {
         const { name, value } = e.target;
@@ -409,12 +407,20 @@ function homepage() {
         setProfileDropdownVisible(!profileDropdownVisible);
     };
 
+    const handleChangeDisplayName = () => {
+        const newDisplayName = prompt('Enter a new display name:');
+        if (newDisplayName) {
+            setUserName(newDisplayName);
+            // Update backend
+        }
+    };
+
     return (
         <GoogleOAuthProvider clientId={googleID}>
              <div className="dashboard">
                 {/* Header section */}
                 <header className="header">
-                    <div class="left-rectangle"></div> 
+                    <div className="left-rectangle"></div> 
                     <div className="logo-container">
                         <Image src={logo} alt="Logo" width={300} height={300} priority />
                     </div>
@@ -433,6 +439,7 @@ function homepage() {
                         {profileDropdownVisible && (
                             <div className="dropdown">
                                 <button className="dropdown-item" onClick={handleLogout}>Logout</button>
+                                <button className="dropdown-item" onClick={handleChangeDisplayName}>Change Display Name</button>
                             </div>
                         )}
                     </div>
