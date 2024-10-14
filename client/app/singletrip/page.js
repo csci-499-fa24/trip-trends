@@ -17,6 +17,8 @@ import logo from '../img/Logo.png';
 import Link from 'next/link';
 import { Pie } from 'react-chartjs-2';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
+import DeleteTripComponent from '../components/DeleteTripComponent';
+import ShareTripComponent from '../components/ShareTripComponent';
 
 Chart.register(ArcElement, Tooltip, Legend);
 
@@ -25,6 +27,7 @@ function Singletrip() {
     const [categoryData, setCategoryData] = useState({ labels: [], datasets: [] });
     const [tripId, setTripId] = useState(null);
     const [tripData, setTripData] = useState(null);
+    const [userRole, setUserRole] = useState(null);
     const [expenseData, setExpenseData] = useState([]);
     const [totalExpenses, setTotalExpenses] = useState(0);
     const [currencyCodes, setCurrencyCodes] = useState([]);
@@ -48,33 +51,13 @@ function Singletrip() {
     });
     const [expenseCategories] = useState([
         "Flights",
-        "Accommodation",
-        "Car Rentals",
-        "Fuel",
-        "Food",
-        "Groceries",
-        "Restaurants",
-        "Snacks",
-        "Beverages",
-        "Tours",
-        "Tickets",
-        "Entertainment",
-        "Public Transport",
-        "Taxis/Rideshares",
-        "Parking",
-        "Hotels",
-        "Hostels",
-        "Vacation Rentals",
-        "Souvenirs",
-        "Clothing",
-        "Essentials",
-        "Tips",
-        "Travel Insurance",
-        "Phone Roaming",
-        "Internet/Wi-Fi",
-        "Phone Calls",
-        "Medication",
-        "First Aid",
+        "Accommodations",
+        "Food/Drink",
+        "Transport",
+        "Activities",
+        "Shopping",
+        "Phone/Internet",
+        "Health/Safety",
         "Other"
     ]);
 
@@ -82,11 +65,8 @@ function Singletrip() {
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get('tripId');
         setTripId(id);
-
+        
     }, []);
-
-
-
 
     useEffect(() => {
         if (tripId) {
@@ -138,6 +118,35 @@ function Singletrip() {
 
         }
     }, [tripId]);
+
+    useEffect(() => {
+        console.log('fetching user role...');
+        console.log('Trip ID:', tripId);
+        const fetchUserRole = async () => {
+          const userId = localStorage.getItem("user_id");
+          console.log('User ID:', userId);
+          if (tripId && userId) {
+            try {
+              const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/trips/${tripId}`);
+              const sharedTrips = response.data.data;
+              const userRole = sharedTrips.find(trip => trip.user_id === userId)?.role;
+              if (userRole) {
+                setUserRole(userRole);
+              } else {
+                console.log("User does not have a role for this trip.");
+              }
+            } catch (error) {
+              console.error('Error fetching user role:', error);
+              setError('Error fetching user role. Please try again later.');
+            }
+          } else {
+            console.log("tripId or userId is missing.");
+          }
+        };
+        fetchUserRole();
+      }, [tripId]);
+    
+    const isOwner = userRole === 'owner';
 
     useEffect(() => {
         const getExchangeRates = async () => {
@@ -250,17 +259,29 @@ function Singletrip() {
     }, [tripId]);
 
 
-    const deleteTrip = async () => {
-        if (window.confirm('Please confirm trip deletion. This action cannot be undone.')) {
-            try {
-                // delete trip
-                await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`);
-                window.location.href = '/homepage'; // redirect to homepage
-            } catch (error) {
-                console.error('Error deleting trip:', error);
-            }
-        }
-    };
+    // const deleteTrip = async () => {
+    //     if (window.confirm('Please confirm trip deletion. This action cannot be undone.')) {
+    //         try {
+    //             // delete trip
+    //             await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`);
+    //             window.location.href = '/homepage'; // redirect to homepage
+    //         } catch (error) {
+    //             console.error('Error deleting trip:', error);
+    //         }
+    //     }
+    // };
+
+    // const deleteUserFromTrip = async (userId) => {
+    //     if (window.confirm('Please confirm user removal from trip. This action cannot be undone.')) {
+    //         try {
+    //             // delete user from trip
+    //             await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/sharedtrips/${userId}/${tripId}`);
+    //             window.location.reload();
+    //         } catch (error) {
+    //             console.error('Error deleting user from trip:', error);
+    //         }
+    //     }
+    // };
 
     const submitEditExpense = async (e) => {
         e.preventDefault();
@@ -399,7 +420,26 @@ function Singletrip() {
         localStorage.removeItem('selectedFilter');
     };
 
-
+    // const shareTrip = async (email, role) => {
+    //     try {
+    //         if (!userId) {
+    //             console.error('User not authenticated. Cannot share trip.');
+    //             return;
+    //         }
+    //         if (!tripId) {
+    //             console.error('Trip ID not found. Cannot share trip.');
+    //             return;
+    //         }
+    //         const requestBody = {
+    //             email, 
+    //             role        
+    //         };
+    //         const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/${userId}/trips/${tripId}/`, requestBody);
+    //         console.log('Trip shared successfully:', response.data);
+    //     } catch (error) {
+    //         console.error('Error sharing trip:', error.response?.data || error.message);
+    //     }
+    // };
 
     return (
         <div className="main-container">
@@ -421,7 +461,22 @@ function Singletrip() {
                             </Link>
                         </div>
                         <h1 id='tripName'>{tripData.data.name}</h1>
-                        {/* General Trip Info Table */}
+                        <div className="trip-info-cards">
+                        <div className="trip-info-card">
+                            <h4><b>BUDGET</b></h4>
+                            <p>${tripData.data.budget}</p>
+                        </div>
+                        <div className="trip-info-card">
+                            <h4><b>START</b></h4>
+                            <p>{tripData.data.start_date}</p>
+                        </div>
+                        <div className="trip-info-card">
+                            <h4><b>END</b></h4>
+                            <p>{tripData.data.end_date}</p>
+                        </div>
+                    </div>
+
+                        {/* General Trip Info Table
                         <Table striped bordered hover size="sm" responsive="sm">
                             <thead>
                                 <tr>
@@ -439,7 +494,7 @@ function Singletrip() {
                                     <td>{tripData.data.end_date}</td>
                                 </tr>
                             </tbody>
-                        </Table>
+                        </Table> */}
                         {/* Trip Calendar and Budget Meter */}
                         <div className='container'>
                             <div className='row'>
@@ -497,7 +552,7 @@ function Singletrip() {
                                                     needleTransitionDuration={2500}
                                                     needleTransition={Transition.easeBounceOut}
                                                     segments={4}
-                                                    segmentColors={['#7ada2c', '#d4e725', '#f3a820', '#fe471a']}
+                                                    segmentColors={['#b3e5fc', '#ffe0b2', '#ffccbc', '#d1c4e9']}
                                                 />
                                             </div>
                                         )}
@@ -527,16 +582,16 @@ function Singletrip() {
                         {/* Expense Table */}
                         {expenseData && expenseData.data ? (
                             <div>
-                                <Table striped bordered hover size="sm" responsive="sm">
+                                <Table striped bordered hover size="sm" responsive="sm" className="expense-table">
                                     <thead>
                                         <tr>
                                             <th>Name</th>
                                             <th>Amount</th>
-                                            <th>Category</th>
                                             <th>Currency</th>
+                                            <th>Category</th>
                                             <th>Date Posted</th>
                                             <th>Notes</th>
-                                            <th>Edit/Delete Expense</th>
+                                            <th>Modify Expense</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -544,12 +599,12 @@ function Singletrip() {
                                             <tr key={expense.expense_id}>
                                                 <td>{expense.name}</td>
                                                 <td>{expense.amount}</td>
-                                                <td>{expense.category}</td>
                                                 <td>{expense.currency}</td>
+                                                <td>{expense.category}</td>
                                                 <td>{expense.posted}</td>
                                                 <td>{expense.notes}</td>
                                                 <td>
-                                                    <button onClick={() => { setEditPopupVisible(true); setSelectedExpense(expense) }} className='edit-expense'>Edit/Delete Expense</button>
+                                                    <button onClick={() => { setEditPopupVisible(true); setSelectedExpense(expense) }} className='edit-expense'>Edit/Delete</button>
                                                     <div className="expense-form">
                                                         {isEditPopupVisible && selectedExpense && (
                                                             <div className="modal">
@@ -643,6 +698,15 @@ function Singletrip() {
                                 <button onClick={downloadTripData} className="download-trip-data-btn">
                                     Download Trip
                                 </button>
+                                
+                                {/* Add Delete Button */}
+                                {/* <button onClick={deleteTrip} className="delete-trip-button">
+                                    Delete Trip
+                                </button> */}
+                                <DeleteTripComponent tripId={tripId} userRole={userRole} />
+
+                                {/* Add Share Trip Button */}
+                                <ShareTripComponent tripId={tripId} isOwner={isOwner} />
                             </div>
                         ) : (
                             <p>No expenses yet...</p>
@@ -653,10 +717,7 @@ function Singletrip() {
                         ) : (
                             <p>[Gallery of photos]</p>
                         )}
-                        {/* Add the Delete Button */}
-                        <button onClick={deleteTrip} className="delete-trip-button">
-                            Delete Trip
-                        </button>
+                        
                     </div>
                 ) : (
                     <p>No Trip Data Found.</p>

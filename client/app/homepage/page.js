@@ -442,7 +442,7 @@ function homepage() {
                 <div className="welcome-section">
                     <h1>Welcome Back, {userName}!</h1>
                     <br></br>
-                    <button onClick={() => setPopUpVisible(true)} className='create-trip'>Create a Trip</button>
+                    <button onClick={() => setPopUpVisible(true)} className='create-trip'>New Trip</button>
                     <br></br>
                     <br></br>
                     <p>See everywhere you've gone:</p>
