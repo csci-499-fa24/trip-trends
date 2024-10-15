@@ -62,7 +62,6 @@ function Singletrip() {
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get('tripId');
         setTripId(id);
-        
     }, []);
 
     useEffect(() => {
@@ -120,29 +119,29 @@ function Singletrip() {
         console.log('fetching user role...');
         console.log('Trip ID:', tripId);
         const fetchUserRole = async () => {
-          const userId = localStorage.getItem("user_id");
-          console.log('User ID:', userId);
-          if (tripId && userId) {
-            try {
-              const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/trips/${tripId}`);
-              const sharedTrips = response.data.data;
-              const userRole = sharedTrips.find(trip => trip.user_id === userId)?.role;
-              if (userRole) {
-                setUserRole(userRole);
-              } else {
-                console.log("User does not have a role for this trip.");
-              }
-            } catch (error) {
-              console.error('Error fetching user role:', error);
-              setError('Error fetching user role. Please try again later.');
+            const userId = localStorage.getItem("user_id");
+            console.log('User ID:', userId);
+            if (tripId && userId) {
+                try {
+                    const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/trips/${tripId}`);
+                    const sharedTrips = response.data.data;
+                    const userRole = sharedTrips.find(trip => trip.user_id === userId)?.role;
+                    if (userRole) {
+                        setUserRole(userRole);
+                    } else {
+                        console.log("User does not have a role for this trip.");
+                    }
+                } catch (error) {
+                    console.error('Error fetching user role:', error);
+                    setError('Error fetching user role. Please try again later.');
+                }
+            } else {
+                console.log("tripId or userId is missing.");
             }
-          } else {
-            console.log("tripId or userId is missing.");
-          }
         };
         fetchUserRole();
-      }, [tripId]);
-    
+    }, [tripId]);
+
     const isOwner = userRole === 'owner';
 
     useEffect(() => {
@@ -462,35 +461,35 @@ function Singletrip() {
                             </Link>
                         </div> */}
                         <h1 id='tripName'>{tripData.data.name}</h1>
-                        <header class = "top-icon-header">
+                        <header class="top-icon-header">
                             {/* Share Trip Button */}
                             <ShareTripComponent tripId={tripId} isOwner={isOwner} />
                             {/* Delete Trip Button */}
-                            <DeleteTripComponent tripId={tripId} userRole={userRole}/>
+                            <DeleteTripComponent tripId={tripId} userRole={userRole} />
                         </header>
                         {/* General Trip Info*/}
                         <div className="trip-overview">
                             <div className="trip-overview-div">
                                 <div className="trip-overview-circle">🗓️</div>
-                                    <div className="trip-overview-content">
-                                        <h3>START</h3>
-                                        <p>{tripData.data.start_date}</p>
+                                <div className="trip-overview-content">
+                                    <h3>START</h3>
+                                    <p>{tripData.data.start_date}</p>
                                 </div>
                             </div>
 
                             <div className="trip-overview-div">
                                 <div className="trip-overview-circle">🗓️</div>
-                                    <div className="trip-overview-content">
-                                        <h3>END</h3>
-                                        <p>{tripData.data.end_date}</p>
+                                <div className="trip-overview-content">
+                                    <h3>END</h3>
+                                    <p>{tripData.data.end_date}</p>
                                 </div>
                             </div>
 
                             <div className="trip-overview-div">
                                 <div className="trip-overview-circle">💰</div>
-                                    <div className="trip-overview-content">
-                                        <h3>BUDGET</h3>
-                                        <p>${tripData.data.budget}</p>
+                                <div className="trip-overview-content">
+                                    <h3>BUDGET</h3>
+                                    <p>${tripData.data.budget}</p>
                                 </div>
                             </div>
                         </div>
@@ -563,37 +562,37 @@ function Singletrip() {
                         <br></br>
                         {/* Icon Bar Above Expenses */}
                         <div className="filter-section">
-                            <header class = "icon-bar-header">
+                            <header class="icon-bar-header">
                                 {/* Add Expense Button */}
                                 <div class="icon-div" tooltip="Add Expense" tabindex="0">
                                     <div class="icon-SVG">
-                                    <svg 
-                                    onClick={() => setPopUpVisible(true)}
-                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.3" stroke="currentColor" class="size-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                                    </svg>
-                                    <span class="icon-text">Add Expense</span>
+                                        <svg
+                                            onClick={() => setPopUpVisible(true)}
+                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.3" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                        </svg>
+                                        <span class="icon-text">Add Expense</span>
                                     </div>
                                 </div>
                                 {/* Filter Expenses Button */}
                                 <div class="icon-div" tooltip="Filter" tabindex="0">
                                     <div class="icon-SVG">
-                                    <svg 
-                                    onClick={() => setFilterPopupVisible(true)}
-                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.3" stroke="currentColor" class="size-6" >
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
-                                    </svg>
-                                    <span class="icon-text">Filter</span>
-                                    {selectedFilter && (
-                                    <div className="applied-filter">
-                                        <span>{`Filter: ${selectedFilter}`}</span>
-                                        <button className="clear-filter-btn" onClick={clearFilter}>
-                                            &times;
-                                        </button>
-                                    </div>
-                                    )}
+                                        <svg
+                                            onClick={() => setFilterPopupVisible(true)}
+                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.3" stroke="currentColor" class="size-6" >
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+                                        </svg>
+                                        <span class="icon-text">Filter</span>
+                                        {selectedFilter && (
+                                            <div className="applied-filter">
+                                                <span>{`Filter: ${selectedFilter}`}</span>
+                                                <button className="clear-filter-btn" onClick={clearFilter}>
+                                                    &times;
+                                                </button>
+                                            </div>
+                                        )}
 
-                                    </div>  
+                                    </div>
                                 </div>
                                 {/* <div class="spacer"></div>
                                 <div class="divider"></div> */}
@@ -601,9 +600,9 @@ function Singletrip() {
                                 {/* Download Trip Button */}
                                 <div class="icon-div" tooltip="Download Trip" tabindex="0">
                                     <div class="icon-SVG">
-                                        <svg 
-                                        onClick={downloadTripData}
-                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.3" stroke="currentColor" class="size-6">
+                                        <svg
+                                            onClick={downloadTripData}
+                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.3" stroke="currentColor" class="size-6">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                                         </svg>
                                         <span class="icon-text">Download Trip</span>
@@ -612,10 +611,10 @@ function Singletrip() {
                                 {/* Add Image Button */}
                                 <div class="icon-div" tooltip="Add Image" tabindex="0">
                                     <div class="icon-SVG">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.3" stroke="currentColor" class="size-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-                                    </svg>
-                                    <span class="icon-text">Add Image</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.3" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                                        </svg>
+                                        <span class="icon-text">Add Image</span>
                                     </div>
                                 </div>
                             </header>
@@ -721,7 +720,7 @@ function Singletrip() {
                                                                                     <button type="submit" className="submit-edit-expense-button">Edit</button>
                                                                                 </div>
                                                                                 <div className='col'>
-                                                                                    <button type="button" onClick={() => deleteExpense(expense.expense_id)} className="delete-expense-button">Delete</button>
+                                                                                    <button type="button" onClick={() => deleteExpense(selectedExpense.expense_id)} className="delete-expense-button">Delete</button>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -745,7 +744,6 @@ function Singletrip() {
                         ) : (
                             <p>[Gallery of photos]</p>
                         )}
-                        
                     </div>
                 ) : (
                     <p>No Trip Data Found.</p>
