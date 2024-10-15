@@ -11,8 +11,6 @@ import 'react-calendar/dist/Calendar.css';
 import { parseISO, startOfDay, endOfDay } from 'date-fns';
 import ReactSpeedometer, { Transition } from 'react-d3-speedometer';
 import Image from 'next/image';
-import homeIcon from '../img/homeIcon.png';
-import Filter from '../img/Filter.png';
 import logo from '../img/Logo.png';
 import Link from 'next/link';
 import { Pie } from 'react-chartjs-2';
@@ -21,7 +19,6 @@ import DeleteTripComponent from '../components/DeleteTripComponent';
 import ShareTripComponent from '../components/ShareTripComponent';
 
 Chart.register(ArcElement, Tooltip, Legend);
-
 
 function Singletrip() {
     const [categoryData, setCategoryData] = useState({ labels: [], datasets: [] });
@@ -474,28 +471,28 @@ function Singletrip() {
                         {/* General Trip Info*/}
                         <div className="trip-overview">
                             <div className="trip-overview-div">
-                            <div className="trip-overview-circle">💰</div>
-                            <div className="trip-overview-content">
-                            <h3>BUDGET</h3>
-                            <p>${tripData.data.budget}</p>
+                                <div className="trip-overview-circle">🗓️</div>
+                                    <div className="trip-overview-content">
+                                        <h3>START</h3>
+                                        <p>{tripData.data.start_date}</p>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="trip-overview-div">
-                            <div className="trip-overview-circle">🗓️</div>
-                            <div className="trip-overview-content">
-                            <h3>START</h3>
-                            <p>{tripData.data.start_date}</p>
+                            <div className="trip-overview-div">
+                                <div className="trip-overview-circle">🗓️</div>
+                                    <div className="trip-overview-content">
+                                        <h3>END</h3>
+                                        <p>{tripData.data.end_date}</p>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="trip-overview-div">
-                            <div className="trip-overview-circle">🗓️</div>
-                            <div className="trip-overview-content">
-                            <h3>END</h3>
-                            <p>{tripData.data.end_date}</p>
+                            <div className="trip-overview-div">
+                                <div className="trip-overview-circle">💰</div>
+                                    <div className="trip-overview-content">
+                                        <h3>BUDGET</h3>
+                                        <p>${tripData.data.budget}</p>
+                                </div>
                             </div>
-                        </div>
                         </div>
                         {/* Trip Calendar and Budget Meter */}
                         <div className='container'>
@@ -911,7 +908,6 @@ function Singletrip() {
                         </div>
                     )}
                 </div>
-
 
                 {/* Pie Chart */}
                 <div>
