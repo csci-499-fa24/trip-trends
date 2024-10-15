@@ -279,13 +279,18 @@ form {
 .dropdown {
     position: absolute; 
     right: 0; 
-    background-color: white; 
-    border: 1px solid #ccc;
+    background-color: transparent; 
+    border: none;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); 
     z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
 }
 
 .dropdown-item {
+    text-align: center;
     padding: 10px;
     cursor: pointer;
     background-color: #134a09;

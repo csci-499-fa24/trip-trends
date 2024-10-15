@@ -71,14 +71,26 @@ function homepage() {
         window.location.href = '/signup';
     };
 
-    // Used to display user's name if token exists
-    const handleToken = () => {
+    // Used to display user's name
+    const fetchUserName = async () => {
+        const userId = localStorage.getItem("user_id");
+        try {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/${userId}`);
+            const userData = response.data.data;
+            if (userData) {
+                setUserName(userData.fname); // Set the username from the database
+            }
+        } catch (error) {
+            console.error("Error fetching user details:", error);
+        }
+    };
+
+    // Used to display user's image if token exists
+    const handleToken = async() => {
         const token = localStorage.getItem("token");
         if (token) {
             const userCredential = jwtDecode(token);
-            const userName = userCredential.given_name;
             const userProfileImage = userCredential.picture;
-            setUserName(userName);
             setProfileImageUrl(userProfileImage);
         } else {
             console.log("Token not found. Redirecting to sign in page.");
@@ -98,6 +110,7 @@ function homepage() {
     }
 
     useEffect(() => {
+        fetchUserName();
         handleToken();
         getUserId();
     }, []);
@@ -133,8 +146,6 @@ function homepage() {
             console.error('Error fetching trip locations:', error);
         }
     };
-
-
 
     // Captures new input instantly in each popup field
     const newTripInputChange = (e) => {
@@ -415,12 +426,34 @@ function homepage() {
         setProfileDropdownVisible(!profileDropdownVisible);
     };
 
+    const handleChangeDisplayName = async () => {
+        const newDisplayName = prompt('Enter a new display name:');
+        if (newDisplayName) {
+            setUserName(newDisplayName);
+            try {
+                const newUserData = {
+                    fname: newDisplayName, // Assuming the new display name is the first name
+                };
+    
+                // Send the PUT request to update user details
+                const response = await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/${userId}`, newUserData);
+    
+                // Update the frontend state after successful update
+                setUserName(newDisplayName);
+    
+                console.log('Display name updated successfully:', response.data);
+            } catch (error) {
+                console.error('Error updating display name:', error);
+            }
+        }
+    };
+
     return (
         <GoogleOAuthProvider clientId={googleID}>
              <div className="dashboard">
                 {/* Header section */}
                 <header className="header">
-                    <div class="left-rectangle"></div> 
+                    <div className="left-rectangle"></div> 
                     <div className="logo-container">
                         <Image src={logo} alt="Logo" width={300} height={300} priority />
                     </div>
@@ -439,6 +472,7 @@ function homepage() {
                         {profileDropdownVisible && (
                             <div className="dropdown">
                                 <button className="dropdown-item" onClick={handleLogout}>Logout</button>
+                                <button className="dropdown-item" onClick={handleChangeDisplayName}>Change Display Name</button>
                             </div>
                         )}
                     </div>
