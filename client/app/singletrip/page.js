@@ -279,10 +279,31 @@ function Singletrip() {
     //     }
     // };
 
-    const submitEditExpense = async (e) => {
-        e.preventDefault();
-        // API CALL
-        alert("Editing is still a WIP :)");
+    // const handleEditChange = (e) => {
+    //     const { name, value } = e.target;
+    //     setSelectedExpense((prev) => ({
+    //         ...prev,
+    //         [name]: name === 'amount' ? Number(value) : value
+    //     }));
+    // };
+
+    const handleEditChange = (e) => {
+        const { name, value } = e.target;
+        setSelectedExpense((prev) => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const submitEditExpense = async (expenseID) => {
+        axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/${expenseID}`, selectedExpense)
+            .then(response => {
+                console.log(response)
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error editing expense:', error);
+            });
         setEditPopupVisible(false);
     };
 
@@ -290,14 +311,14 @@ function Singletrip() {
         if (window.confirm('Please confirm expense deletion. This action cannot be undone.')) {
             axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/${expenseID}`)
                 .then(response => {
-                    console.log(response)
+                    console.log(response);
+                    window.location.reload();
                 })
                 .catch(error => {
                     console.error('Error deleting expense:', error);
                 });
         }
         setEditPopupVisible(false);
-        window.location.reload();
     };
 
     const downloadTripData = async () => {
@@ -652,13 +673,17 @@ function Singletrip() {
                                                                 <div className="modal-content">
                                                                     <span className="close" onClick={() => setEditPopupVisible(false)}>&times;</span>
                                                                     <h2 className="edit-expense-title">Edit or Delete this Expense</h2>
-                                                                    <form onSubmit={submitEditExpense}>
+                                                                    <form onSubmit={(e) => {
+                                                                        e.preventDefault();
+                                                                        submitEditExpense(selectedExpense.expense_id);
+                                                                    }}>
                                                                         <label className="edit-expense-field-label">
                                                                             Expense Name:
                                                                             <input
                                                                                 type="text"
                                                                                 name="name"
                                                                                 value={selectedExpense.name}
+                                                                                onChange={handleEditChange}
                                                                                 required
                                                                             />
                                                                         </label>
@@ -668,6 +693,7 @@ function Singletrip() {
                                                                                 type="number"
                                                                                 name="amount"
                                                                                 value={selectedExpense.amount}
+                                                                                onChange={handleEditChange}
                                                                                 required
                                                                             />
                                                                         </label>
@@ -676,6 +702,7 @@ function Singletrip() {
                                                                             <select
                                                                                 name="currency"
                                                                                 value={selectedExpense.currency}
+                                                                                onChange={handleEditChange}
                                                                                 required
                                                                             >
                                                                                 <option value="">Select Currency</option>
@@ -689,6 +716,7 @@ function Singletrip() {
                                                                             <select
                                                                                 name="category"
                                                                                 value={selectedExpense.category}
+                                                                                onChange={handleEditChange}
                                                                                 required
                                                                             >
                                                                                 <option value="">Select Category</option>
@@ -703,6 +731,7 @@ function Singletrip() {
                                                                                 type="date"
                                                                                 name="posted"
                                                                                 value={selectedExpense.posted}
+                                                                                onChange={handleEditChange}
                                                                                 required
                                                                             />
                                                                         </label>
@@ -712,6 +741,7 @@ function Singletrip() {
                                                                                 type="text"
                                                                                 name="notes"
                                                                                 value={selectedExpense.notes}
+                                                                                onChange={handleEditChange}
                                                                             />
                                                                         </label>
                                                                         <div className='container'>
