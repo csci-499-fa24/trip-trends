@@ -317,8 +317,8 @@ function Singletrip() {
                 .catch(error => {
                     console.error('Error deleting expense:', error);
                 });
+            setEditPopupVisible(false);
         }
-        setEditPopupVisible(false);
     };
 
     const downloadTripData = async () => {
@@ -672,7 +672,7 @@ function Singletrip() {
                                                             <div className="modal">
                                                                 <div className="modal-content">
                                                                     <span className="close" onClick={() => setEditPopupVisible(false)}>&times;</span>
-                                                                    <h2 className="edit-expense-title">Edit or Delete this Expense</h2>
+                                                                    <h2 className="edit-expense-title">Edit or Delete Expense</h2>
                                                                     <form onSubmit={(e) => {
                                                                         e.preventDefault();
                                                                         submitEditExpense(selectedExpense.expense_id);
@@ -687,54 +687,58 @@ function Singletrip() {
                                                                                 required
                                                                             />
                                                                         </label>
-                                                                        <label className="edit-expense-field-label">
-                                                                            Amount:
-                                                                            <input
-                                                                                type="number"
-                                                                                name="amount"
-                                                                                value={selectedExpense.amount}
-                                                                                onChange={handleEditChange}
-                                                                                required
-                                                                            />
-                                                                        </label>
-                                                                        <label className="edit-expense-field-label">
-                                                                            Currency:
-                                                                            <select
-                                                                                name="currency"
-                                                                                value={selectedExpense.currency}
-                                                                                onChange={handleEditChange}
-                                                                                required
-                                                                            >
-                                                                                <option value="">Select Currency</option>
-                                                                                {currencyCodes.map((code) => (
-                                                                                    <option key={code} value={code}>{code}</option>
-                                                                                ))}
-                                                                            </select>
-                                                                        </label>
-                                                                        <label className="edit-expense-field-label">
-                                                                            Category:
-                                                                            <select
-                                                                                name="category"
-                                                                                value={selectedExpense.category}
-                                                                                onChange={handleEditChange}
-                                                                                required
-                                                                            >
-                                                                                <option value="">Select Category</option>
-                                                                                {expenseCategories.map((category) => (
-                                                                                    <option key={category} value={category}>{category}</option>
-                                                                                ))}
-                                                                            </select>
-                                                                        </label>
-                                                                        <label className="edit-expense-field-label">
-                                                                            Date:
-                                                                            <input
-                                                                                type="date"
-                                                                                name="posted"
-                                                                                value={selectedExpense.posted}
-                                                                                onChange={handleEditChange}
-                                                                                required
-                                                                            />
-                                                                        </label>
+                                                                        <div className="field-pair">
+                                                                            <label className="edit-expense-field-label">
+                                                                                Amount:
+                                                                                <input
+                                                                                    type="number"
+                                                                                    name="amount"
+                                                                                    value={selectedExpense.amount}
+                                                                                    onChange={handleEditChange}
+                                                                                    required
+                                                                                />
+                                                                            </label>
+                                                                            <label className="edit-expense-field-label">
+                                                                                Currency:
+                                                                                <select
+                                                                                    name="currency"
+                                                                                    value={selectedExpense.currency}
+                                                                                    onChange={handleEditChange}
+                                                                                    required
+                                                                                >
+                                                                                    <option value="">Select Currency</option>
+                                                                                    {currencyCodes.map((code) => (
+                                                                                        <option key={code} value={code}>{code}</option>
+                                                                                    ))}
+                                                                                </select>
+                                                                            </label>
+                                                                        </div>
+                                                                        <div className="field-pair">
+                                                                            <label className="edit-expense-field-label">
+                                                                                Category:
+                                                                                <select
+                                                                                    name="category"
+                                                                                    value={selectedExpense.category}
+                                                                                    onChange={handleEditChange}
+                                                                                    required
+                                                                                >
+                                                                                    <option value="">Select Category</option>
+                                                                                    {expenseCategories.map((category) => (
+                                                                                        <option key={category} value={category}>{category}</option>
+                                                                                    ))}
+                                                                                </select>
+                                                                            </label>
+                                                                            <label className="edit-expense-field-label">
+                                                                                Date:
+                                                                                <input
+                                                                                    type="date"
+                                                                                    name="posted"
+                                                                                    value={selectedExpense.posted}
+                                                                                    onChange={handleEditChange}
+                                                                                    required
+                                                                                />
+                                                                            </label>
+                                                                        </div>
                                                                         <label className="edit-expense-field-label">
                                                                             Notes:
                                                                             <input
