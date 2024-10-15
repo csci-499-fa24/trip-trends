@@ -1,12 +1,17 @@
 {
   "devDependencies": {
+    "concurrently": "^9.0.1",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "react-router-dom": "^6.26.2",
     "supertest": "^7.0.0"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "kill-ports": "lsof -t -i :8080 | xargs kill -9; lsof -t -i :3003 | xargs kill -9; sleep 1",
+    "dev": "npm run kill-ports && concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev"
   },
   "dependencies": {
     "dotenv": "^16.4.5",

@@ -62,6 +62,8 @@ function homepage() {
     const [userId, setUserId] = useState(null);
     const [profileDropdownVisible, setProfileDropdownVisible] = useState(false);
     const [profileImageUrl, setProfileImageUrl] = useState('');
+    const [animatedTripId, setAnimationForTripId] = useState(null);
+
 
     const handleLogout = () => {
         googleLogout();
@@ -122,6 +124,8 @@ function homepage() {
     // Toggle the expanded state of a trip
     const toggleTripDetails = async (tripId) => {
         setExpandedTripId(prevId => (prevId === tripId ? null : tripId));
+        setAnimationForTripId(tripId); // enable animation
+        setTimeout(() => setAnimationForTripId(null), 300); // for trip divider when toggled
         try {
             const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${tripId}`);
 
@@ -359,8 +363,10 @@ function homepage() {
                     if (tripElement) {
                         tripElement.scrollIntoView({ behavior: 'smooth' });
                     }
-
-                    toggleTripDetails(tripId);
+                    // Delay the toggleTripDetails call
+                    setTimeout(() => {
+                        toggleTripDetails(tripId);
+                    }, 1000); // Delay before toggling
                 } else {
                     console.log('No marker found.');
                 }
@@ -449,7 +455,7 @@ function homepage() {
                 <div className="welcome-section">
                     <h1>Welcome Back, {userName}!</h1>
                     <br></br>
-                    <button onClick={() => setPopUpVisible(true)} className='create-trip'>Create a Trip</button>
+                    <button onClick={() => setPopUpVisible(true)} className='create-trip'>New Trip</button>
                     <br></br>
                     <br></br>
                     <p>See everywhere you've gone:</p>
@@ -551,12 +557,14 @@ function homepage() {
                                 {trips.map(trip => (
                                     <li key={trip.trip_id}>
                                         <div
-                                            id={`trip-${trip.trip_id}`} // unique ID for each trip 
-                                            onClick={() => toggleTripDetails(trip.trip_id)} style={{ cursor: 'pointer', padding: '10px', border: '1px solid #ccc', marginBottom: '5px', backgroundColor: '#134a09' }}>
+                                            id={`trip-${trip.trip_id}`} // Unique ID for each trip 
+                                            onClick={() => toggleTripDetails(trip.trip_id)} 
+                                            className={animatedTripId === trip.trip_id ? "shake" : '' } // Apply animation
+                                            style={{ cursor: 'pointer', padding: '10px', border: '1px solid #ccc', marginBottom: '5px', backgroundColor: expandedTripId === trip.trip_id ? '#2e7d32' : '#134a09'}}>
                                             {trip.name}
                                         </div>
                                         {expandedTripId === trip.trip_id && (
-                                            <div style={{ padding: '10px', backgroundColor: '#134a09', border: '1px solid #ccc' }}>
+                                            <div style={{ padding: '10px', backgroundColor: expandedTripId === trip.trip_id ? '#2e7d32' : '#134a09', border: '1px solid #ccc' }}>
                                                 <p>
                                                     <strong>Dates:</strong> {trip.start_date} - {trip.end_date}
                                                 </p>
