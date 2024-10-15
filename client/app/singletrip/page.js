@@ -279,14 +279,6 @@ function Singletrip() {
     //     }
     // };
 
-    // const handleEditChange = (e) => {
-    //     const { name, value } = e.target;
-    //     setSelectedExpense((prev) => ({
-    //         ...prev,
-    //         [name]: name === 'amount' ? Number(value) : value
-    //     }));
-    // };
-
     const handleEditChange = (e) => {
         const { name, value } = e.target;
         setSelectedExpense((prev) => ({
@@ -300,11 +292,11 @@ function Singletrip() {
             .then(response => {
                 console.log(response)
                 window.location.reload();
+                setEditPopupVisible(false);
             })
             .catch(error => {
                 console.error('Error editing expense:', error);
             });
-        setEditPopupVisible(false);
     };
 
     const deleteExpense = async (expenseID) => {
