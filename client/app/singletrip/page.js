@@ -11,8 +11,6 @@ import 'react-calendar/dist/Calendar.css';
 import { parseISO, startOfDay, endOfDay } from 'date-fns';
 import ReactSpeedometer, { Transition } from 'react-d3-speedometer';
 import Image from 'next/image';
-import homeIcon from '../img/homeIcon.png';
-import Filter from '../img/Filter.png';
 import logo from '../img/Logo.png';
 import Link from 'next/link';
 import { Pie } from 'react-chartjs-2';
@@ -21,7 +19,6 @@ import DeleteTripComponent from '../components/DeleteTripComponent';
 import ShareTripComponent from '../components/ShareTripComponent';
 
 Chart.register(ArcElement, Tooltip, Legend);
-
 
 function Singletrip() {
     const [categoryData, setCategoryData] = useState({ labels: [], datasets: [] });
@@ -447,7 +444,9 @@ function Singletrip() {
                 {/* Header section */}
                 <header className="header">
                     <div className="logo-container">
-                        <Image src={logo} alt="Logo" width={300} height={300} />
+                        <Link href={`/homepage`}>
+                            <Image src={logo} alt="Logo" width={300} height={300} />
+                        </Link>
                     </div>
                     <div className="left-rectangle"></div>
                     <div className="right-rectangle"></div>
@@ -455,46 +454,46 @@ function Singletrip() {
 
                 {tripData ? (
                     <div>
-                        <div className='homeCorner'>
+                        {/* <div className="homeCorner">
                             <Link href={`/homepage`}>
-                                <Image src={homeIcon} alt="homepage" width={"50"} height={"50"} />
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="black" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                            </svg>
                             </Link>
-                        </div>
+                        </div> */}
                         <h1 id='tripName'>{tripData.data.name}</h1>
-                        <div className="trip-info-cards">
-                        <div className="trip-info-card">
-                            <h4><b>BUDGET</b></h4>
-                            <p>${tripData.data.budget}</p>
-                        </div>
-                        <div className="trip-info-card">
-                            <h4><b>START</b></h4>
-                            <p>{tripData.data.start_date}</p>
-                        </div>
-                        <div className="trip-info-card">
-                            <h4><b>END</b></h4>
-                            <p>{tripData.data.end_date}</p>
-                        </div>
-                    </div>
+                        <header class = "top-icon-header">
+                            {/* Share Trip Button */}
+                            <ShareTripComponent tripId={tripId} isOwner={isOwner} />
+                            {/* Delete Trip Button */}
+                            <DeleteTripComponent tripId={tripId} userRole={userRole}/>
+                        </header>
+                        {/* General Trip Info*/}
+                        <div className="trip-overview">
+                            <div className="trip-overview-div">
+                                <div className="trip-overview-circle">🗓️</div>
+                                    <div className="trip-overview-content">
+                                        <h3>START</h3>
+                                        <p>{tripData.data.start_date}</p>
+                                </div>
+                            </div>
 
-                        {/* General Trip Info Table
-                        <Table striped bordered hover size="sm" responsive="sm">
-                            <thead>
-                                <tr>
-                                    <th>Trip Name</th>
-                                    <th>Trip Budget</th>
-                                    <th>Trip Start Date</th>
-                                    <th>Trip End Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>{tripData.data.name}</td>
-                                    <td>{tripData.data.budget}</td>
-                                    <td>{tripData.data.start_date}</td>
-                                    <td>{tripData.data.end_date}</td>
-                                </tr>
-                            </tbody>
-                        </Table> */}
+                            <div className="trip-overview-div">
+                                <div className="trip-overview-circle">🗓️</div>
+                                    <div className="trip-overview-content">
+                                        <h3>END</h3>
+                                        <p>{tripData.data.end_date}</p>
+                                </div>
+                            </div>
+
+                            <div className="trip-overview-div">
+                                <div className="trip-overview-circle">💰</div>
+                                    <div className="trip-overview-content">
+                                        <h3>BUDGET</h3>
+                                        <p>${tripData.data.budget}</p>
+                                </div>
+                            </div>
+                        </div>
                         {/* Trip Calendar and Budget Meter */}
                         <div className='container'>
                             <div className='row'>
@@ -562,22 +561,65 @@ function Singletrip() {
                         </div>
 
                         <br></br>
+                        {/* Icon Bar Above Expenses */}
                         <div className="filter-section">
-                            <button onClick={() => setPopUpVisible(true)} className='create-expense'>Create Expense</button>
-                            <button className="filter-button" onClick={() => setFilterPopupVisible(true)}>
-                                <Image src={Filter} alt="Filter" className="filter-icon" />
-                            </button>
-                            {selectedFilter && (
-                                <div className="applied-filter">
-                                    <span>{`Filter: ${selectedFilter}`}</span>
-                                    <button className="clear-filter-btn" onClick={clearFilter}>
-                                        &times;
-                                    </button>
+                            <header class = "icon-bar-header">
+                                {/* Add Expense Button */}
+                                <div class="icon-div" tooltip="Add Expense" tabindex="0">
+                                    <div class="icon-SVG">
+                                    <svg 
+                                    onClick={() => setPopUpVisible(true)}
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.3" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                                    </svg>
+                                    <span class="icon-text">Add Expense</span>
+                                    </div>
                                 </div>
-                            )}
+                                {/* Filter Expenses Button */}
+                                <div class="icon-div" tooltip="Filter" tabindex="0">
+                                    <div class="icon-SVG">
+                                    <svg 
+                                    onClick={() => setFilterPopupVisible(true)}
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.3" stroke="currentColor" class="size-6" >
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+                                    </svg>
+                                    <span class="icon-text">Filter</span>
+                                    {selectedFilter && (
+                                    <div className="applied-filter">
+                                        <span>{`Filter: ${selectedFilter}`}</span>
+                                        <button className="clear-filter-btn" onClick={clearFilter}>
+                                            &times;
+                                        </button>
+                                    </div>
+                                    )}
+
+                                    </div>  
+                                </div>
+                                {/* <div class="spacer"></div>
+                                <div class="divider"></div> */}
+
+                                {/* Download Trip Button */}
+                                <div class="icon-div" tooltip="Download Trip" tabindex="0">
+                                    <div class="icon-SVG">
+                                        <svg 
+                                        onClick={downloadTripData}
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.3" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                        </svg>
+                                        <span class="icon-text">Download Trip</span>
+                                    </div>
+                                </div>
+                                {/* Add Image Button */}
+                                <div class="icon-div" tooltip="Add Image" tabindex="0">
+                                    <div class="icon-SVG">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.3" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                                    </svg>
+                                    <span class="icon-text">Add Image</span>
+                                    </div>
+                                </div>
+                            </header>
                         </div>
-                        <br></br>
-                        <br></br>
 
                         {/* Expense Table */}
                         {expenseData && expenseData.data ? (
@@ -693,20 +735,6 @@ function Singletrip() {
                                         ))}
                                     </tbody>
                                 </Table>
-
-                                {/* Add the Download Button */}
-                                <button onClick={downloadTripData} className="download-trip-data-btn">
-                                    Download Trip
-                                </button>
-                                
-                                {/* Add Delete Button */}
-                                {/* <button onClick={deleteTrip} className="delete-trip-button">
-                                    Delete Trip
-                                </button> */}
-                                <DeleteTripComponent tripId={tripId} userRole={userRole} />
-
-                                {/* Add Share Trip Button */}
-                                <ShareTripComponent tripId={tripId} isOwner={isOwner} />
                             </div>
                         ) : (
                             <p>No expenses yet...</p>
@@ -880,7 +908,6 @@ function Singletrip() {
                         </div>
                     )}
                 </div>
-
 
                 {/* Pie Chart */}
                 <div>

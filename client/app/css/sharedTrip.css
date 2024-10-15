@@ -38,19 +38,3 @@
     display: block;
     margin-bottom: 10px;
 }
-
-.share-trip-button {
-    padding: 10px 20px;
-    margin: auto auto;
-    background-color: #134a09;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    overflow: hidden;
-}
-
-.share-trip-button:hover {
-    background-color: #45a049;
-}
-
