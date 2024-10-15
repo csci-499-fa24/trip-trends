@@ -1,8 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
-      domains: ['lh3.googleusercontent.com'], // Allow images from this domain
+        domains: ['lh3.googleusercontent.com'], // Allow images from this domain
     },
-  };
-  
-  export default nextConfig;  
+    async redirects() {
+        return [
+            {
+                source: '/',
+                destination: '/signup',
+                permanent: true,
+            },
+        ];
+    },
+};
+export default nextConfig;

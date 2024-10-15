@@ -1,0 +1,40 @@
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    max-width: 300px;
+    width: 100%;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.close {
+    cursor: pointer;
+    font-size: 24px;
+    color: black;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+.share-trip-title {
+    font-size: 24px;
+    text-align: center;
+}
+
+.share-trip-field-label {
+    display: block;
+    margin-bottom: 10px;
+}
