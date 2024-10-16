@@ -16,6 +16,54 @@ body {
   overflow-x: hidden;
 }
 
+
+.header {
+  display: flex;
+  justify-content: space-between; 
+  align-items: center; 
+  padding: 0; 
+  height: 150px; 
+  background-color: white;
+  position: relative;
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1; 
+  text-align: center;
+}
+
+.welcome-section {
+  text-align: left;
+  padding: 10px;
+  background-color: #FFFFFF;
+  color: black;
+  font-size: 21px;
+  font-weight: bold;
+}
+
+
+.modal {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  position: fixed;
+  z-index: 1000; 
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(2px);
+}
+
+
+button{
+  box-shadow: 0 10px 20px -8px rgba(0, 0, 0, .7);
+}
+
 body {
   color: var(--foreground);
   background: var(--background);

@@ -85,9 +85,6 @@ function Singletrip() {
 
     }, []);
 
-
-
-
     useEffect(() => {
         if (tripId) {
             axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`)

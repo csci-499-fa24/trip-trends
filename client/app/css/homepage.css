@@ -32,13 +32,13 @@
     right: 0;
 }
 
-.welcome-section {
+/* .welcome-section {
     text-align: left;
     padding: 10px;
     background-color: #FFFFFF;
     color: black;
     font-size: 21px;
-}
+} */
 
 .recent-trips {
     padding: 10px;
@@ -79,9 +79,6 @@
     transition: 0.2s;
 }
 
-button{
-    box-shadow: 0 10px 20px -8px rgba(0, 0, 0, .7);
-}
 
 .create-trip {
     background-color: #134a09;
@@ -120,20 +117,6 @@ button{
     transform: translate(50%, -50%);
 }
 
-.modal {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-    position: fixed;
-    z-index: 1000; /* equivalent to bring to front*/
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    backdrop-filter: blur(2px);
-}
-
 .modal-content {
     max-height: 80vh;
     overflow-y: auto; 
@@ -143,6 +126,8 @@ button{
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
     width: 500px; /*fixed width so the suggestions don't cause the form to change size*/
 }
+
+
 
 form {
     display: flex;

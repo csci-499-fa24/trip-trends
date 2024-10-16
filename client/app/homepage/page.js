@@ -414,7 +414,7 @@ function homepage() {
              <div className="dashboard">
                 {/* Header section */}
                 <header className="header">
-                    <div class="left-rectangle"></div> 
+                    <div className="left-rectangle"></div> 
                     <div className="logo-container">
                         <Image src={logo} alt="Logo" width={300} height={300} priority />
                     </div>
