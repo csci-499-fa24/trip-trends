@@ -8,7 +8,8 @@ const createSharedTrip = async (req, res) => {
     const tripId = req.params.tripId;
     const { email, role } = req.body; // destructure role and email from req.body
     console.log("Request Params:", req.params);
-    console.log("Request Body:", req.body);
+    console.log("Request Headers:", req.headers || "No headers available");
+    console.log("Request Body:", req.body || "No body provided");
 
     try {
         // validate userId and tripId

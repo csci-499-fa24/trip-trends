@@ -5,9 +5,11 @@ const { createSharedTrip,
         getSharedTripsByTripId, 
         deleteSharedTrip } = require('../controllers/SharedTripController');
 const SharedTrip = require('../models/SharedTrip');
+const User = require('../models/User');
 
 // Mock SharedTrip model
 jest.mock('../models/SharedTrip');
+jest.mock('../models/User');
 
 describe('SharedTrip Controller', () => {
     let mockRequest, mockResponse;
@@ -30,26 +32,25 @@ describe('SharedTrip Controller', () => {
     });
 
     it('should create a new shared trip and return 201 status', async () => {
-        const userId = '1';
-        const tripId = '2';
-        const newSharedTrip = { user_id: userId, trip_id: tripId };
-        mockRequest.params.userId = userId;
-        mockRequest.params.tripId = tripId;
+        mockRequest.params = { userId: '1', tripId: '3' };
+        mockRequest.body = { email: 'user@example.com', role: 'editor' };
 
-        SharedTrip.create.mockResolvedValue(newSharedTrip);
+        SharedTrip.findOne.mockResolvedValueOnce({ user_id: '1', trip_id: '3', role: 'owner' });
+        User.findOne.mockResolvedValue({ user_id: '2', email: 'user@example.com' });
+        SharedTrip.findOne.mockResolvedValueOnce(null);
+        SharedTrip.create.mockResolvedValue({ user_id: '2', trip_id: '3', role: 'editor' });
 
         await createSharedTrip(mockRequest, mockResponse);
 
-        expect(SharedTrip.create).toHaveBeenCalledWith(newSharedTrip);
         expect(mockResponse.status).toHaveBeenCalledWith(201);
-        expect(mockResponse.json).toHaveBeenCalledWith({ data: newSharedTrip });
+        expect(mockResponse.json).toHaveBeenCalledWith({ data: { user_id: '2', trip_id: '3', role: 'editor' } });
     });
 
     it('should return 400 if userId or tripId is missing', async () => {
         await createSharedTrip(mockRequest, mockResponse);
         
         expect(mockResponse.status).toHaveBeenCalledWith(400);
-        expect(mockResponse.json).toHaveBeenCalledWith({ message: "userId, tripId required" });
+        expect(mockResponse.json).toHaveBeenCalledWith({ message: "userId and tripId are required" });
     });
 
     it('should get all shared trips', async () => {
