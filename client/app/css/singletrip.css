@@ -1,9 +1,27 @@
 /* singletrip.css */
-/* .main-container {
+.main-container {
     display: flex;
     flex-direction: column;
-    align-items: center;
-} */
+    /* align-items: center;  */
+    margin: 5px;
+}
+
+.center-container {
+    text-align: center;
+}
+
+
+.banner2 {
+    background-color: #344E41;
+    color: white;
+    font-size: 40px;
+    font-weight: 400;
+    text-align: center;
+    width: 100%;
+    border-radius: 30px;
+    letter-spacing: 2px;
+    font-family: 'Inknut Antiqua';
+}
 
 .button {
     box-shadow: 0 10px 20px -8px rgba(0, 0, 0, .7);
@@ -151,7 +169,7 @@
 
 .submit-new-expense-button {
     padding: 8px;
-    background-color: #134a09;
+    background-color:#588157;
     color: white;
     border: none;
     width: 40%;
@@ -201,7 +219,7 @@
 
 .submit-edit-expense-button {
     padding: 8px;
-    background-color: #134a09;
+    background-color: #588157;
     color: white;
     border: none;
     width: 90%;
@@ -238,7 +256,7 @@
 }
 
 .highlighted-date {
-    background-color: #77DD77 !important;
+    background-color:#588157 !important;
     color: white !important;
 }
 
@@ -319,30 +337,6 @@
     margin-bottom: 0;
 }
 
-.logo-container {
-    z-index: 1;
-    position: relative;
-}
-
-.left-rectangle,
-.right-rectangle {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: black;
-    height: 25px;
-}
-
-.left-rectangle {
-    left: 0;
-    width: 690px;
-}
-
-.right-rectangle {
-    right: 0;
-    width: 690px;
-}
-
 #budget-text {
     margin-top: 0;
 }
@@ -402,7 +396,7 @@
 }
 
 .filter-option-button:hover {
-    background-color: #134a09;
+    background-color: #588157;
     color: white;
 }
 
@@ -452,7 +446,7 @@
 }
 
 .edit-expense {
-    background-color: #134a09;
+    background-color:#588157;
     position: relative;
     padding: 5px 10px;
     font-size: 14px;

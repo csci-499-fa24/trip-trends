@@ -3,7 +3,7 @@
 import React from 'react';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import Image from 'next/image';
-import logo from '../img/Logo.png'
+import logo from '../img/newlogo.png'
 import '../css/signup.css'
 import axios from 'axios';
 import { Inria_Sans } from 'next/font/google';
