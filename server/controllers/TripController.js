@@ -96,7 +96,7 @@ const deleteTrip = async (req, res) => {
         if (deletedCount === 0) {
             return res.status(404).json({ message: "Trip not found" });
         }
-        res.status(204).send();
+        res.status(204).json("Trip deleted successfully");
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error"});

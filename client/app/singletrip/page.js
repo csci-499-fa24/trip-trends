@@ -11,20 +11,20 @@ import 'react-calendar/dist/Calendar.css';
 import { parseISO, startOfDay, endOfDay } from 'date-fns';
 import ReactSpeedometer, { Transition } from 'react-d3-speedometer';
 import Image from 'next/image';
-import homeIcon from '../img/homeIcon.png';
-import Filter from '../img/Filter.png';
 import logo from '../img/Logo.png';
 import Link from 'next/link';
 import { Pie } from 'react-chartjs-2';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
+import DeleteTripComponent from '../components/DeleteTripComponent';
+import ShareTripComponent from '../components/ShareTripComponent';
 
 Chart.register(ArcElement, Tooltip, Legend);
-
 
 function Singletrip() {
     const [categoryData, setCategoryData] = useState({ labels: [], datasets: [] });
     const [tripId, setTripId] = useState(null);
     const [tripData, setTripData] = useState(null);
+    const [userRole, setUserRole] = useState(null);
     const [expenseData, setExpenseData] = useState([]);
     const [totalExpenses, setTotalExpenses] = useState(0);
     const [currencyCodes, setCurrencyCodes] = useState([]);
@@ -48,33 +48,13 @@ function Singletrip() {
     });
     const [expenseCategories] = useState([
         "Flights",
-        "Accommodation",
-        "Car Rentals",
-        "Fuel",
-        "Food",
-        "Groceries",
-        "Restaurants",
-        "Snacks",
-        "Beverages",
-        "Tours",
-        "Tickets",
-        "Entertainment",
-        "Public Transport",
-        "Taxis/Rideshares",
-        "Parking",
-        "Hotels",
-        "Hostels",
-        "Vacation Rentals",
-        "Souvenirs",
-        "Clothing",
-        "Essentials",
-        "Tips",
-        "Travel Insurance",
-        "Phone Roaming",
-        "Internet/Wi-Fi",
-        "Phone Calls",
-        "Medication",
-        "First Aid",
+        "Accommodations",
+        "Food/Drink",
+        "Transport",
+        "Activities",
+        "Shopping",
+        "Phone/Internet",
+        "Health/Safety",
         "Other"
     ]);
 
@@ -82,7 +62,6 @@ function Singletrip() {
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get('tripId');
         setTripId(id);
-
     }, []);
 
     useEffect(() => {
@@ -135,6 +114,35 @@ function Singletrip() {
 
         }
     }, [tripId]);
+
+    useEffect(() => {
+        console.log('fetching user role...');
+        console.log('Trip ID:', tripId);
+        const fetchUserRole = async () => {
+            const userId = localStorage.getItem("user_id");
+            console.log('User ID:', userId);
+            if (tripId && userId) {
+                try {
+                    const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/trips/${tripId}`);
+                    const sharedTrips = response.data.data;
+                    const userRole = sharedTrips.find(trip => trip.user_id === userId)?.role;
+                    if (userRole) {
+                        setUserRole(userRole);
+                    } else {
+                        console.log("User does not have a role for this trip.");
+                    }
+                } catch (error) {
+                    console.error('Error fetching user role:', error);
+                    setError('Error fetching user role. Please try again later.');
+                }
+            } else {
+                console.log("tripId or userId is missing.");
+            }
+        };
+        fetchUserRole();
+    }, [tripId]);
+
+    const isOwner = userRole === 'owner';
 
     useEffect(() => {
         const getExchangeRates = async () => {
@@ -247,37 +255,62 @@ function Singletrip() {
     }, [tripId]);
 
 
-    const deleteTrip = async () => {
-        if (window.confirm('Please confirm trip deletion. This action cannot be undone.')) {
-            try {
-                // delete trip
-                await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`);
-                window.location.href = '/homepage'; // redirect to homepage
-            } catch (error) {
-                console.error('Error deleting trip:', error);
-            }
-        }
+    // const deleteTrip = async () => {
+    //     if (window.confirm('Please confirm trip deletion. This action cannot be undone.')) {
+    //         try {
+    //             // delete trip
+    //             await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`);
+    //             window.location.href = '/homepage'; // redirect to homepage
+    //         } catch (error) {
+    //             console.error('Error deleting trip:', error);
+    //         }
+    //     }
+    // };
+
+    // const deleteUserFromTrip = async (userId) => {
+    //     if (window.confirm('Please confirm user removal from trip. This action cannot be undone.')) {
+    //         try {
+    //             // delete user from trip
+    //             await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/sharedtrips/${userId}/${tripId}`);
+    //             window.location.reload();
+    //         } catch (error) {
+    //             console.error('Error deleting user from trip:', error);
+    //         }
+    //     }
+    // };
+
+    const handleEditChange = (e) => {
+        const { name, value } = e.target;
+        setSelectedExpense((prev) => ({
+            ...prev,
+            [name]: value
+        }));
     };
 
-    const submitEditExpense = async (e) => {
-        e.preventDefault();
-        // API CALL
-        alert("Editing is still a WIP :)");
-        setEditPopupVisible(false);
+    const submitEditExpense = async (expenseID) => {
+        axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/${expenseID}`, selectedExpense)
+            .then(response => {
+                console.log(response)
+                window.location.reload();
+                setEditPopupVisible(false);
+            })
+            .catch(error => {
+                console.error('Error editing expense:', error);
+            });
     };
 
     const deleteExpense = async (expenseID) => {
         if (window.confirm('Please confirm expense deletion. This action cannot be undone.')) {
             axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/${expenseID}`)
                 .then(response => {
-                    console.log(response)
+                    console.log(response);
+                    window.location.reload();
                 })
                 .catch(error => {
                     console.error('Error deleting expense:', error);
                 });
+            setEditPopupVisible(false);
         }
-        setEditPopupVisible(false);
-        window.location.reload();
     };
 
     const downloadTripData = async () => {
@@ -396,7 +429,26 @@ function Singletrip() {
         localStorage.removeItem('selectedFilter');
     };
 
-
+    // const shareTrip = async (email, role) => {
+    //     try {
+    //         if (!userId) {
+    //             console.error('User not authenticated. Cannot share trip.');
+    //             return;
+    //         }
+    //         if (!tripId) {
+    //             console.error('Trip ID not found. Cannot share trip.');
+    //             return;
+    //         }
+    //         const requestBody = {
+    //             email, 
+    //             role        
+    //         };
+    //         const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/${userId}/trips/${tripId}/`, requestBody);
+    //         console.log('Trip shared successfully:', response.data);
+    //     } catch (error) {
+    //         console.error('Error sharing trip:', error.response?.data || error.message);
+    //     }
+    // };
 
     return (
         <div className="main-container">
@@ -404,7 +456,9 @@ function Singletrip() {
                 {/* Header section */}
                 <header className="header">
                     <div className="logo-container">
-                        <Image src={logo} alt="Logo" width={300} height={300} />
+                        <Link href={`/homepage`}>
+                            <Image src={logo} alt="Logo" width={300} height={300} />
+                        </Link>
                     </div>
                     <div className="left-rectangle"></div>
                     <div className="right-rectangle"></div>
@@ -412,31 +466,46 @@ function Singletrip() {
 
                 {tripData ? (
                     <div>
-                        <div className='homeCorner'>
+                        {/* <div className="homeCorner">
                             <Link href={`/homepage`}>
-                                <Image src={homeIcon} alt="homepage" width={"50"} height={"50"} />
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="black" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                            </svg>
                             </Link>
-                        </div>
+                        </div> */}
                         <h1 id='tripName'>{tripData.data.name}</h1>
-                        {/* General Trip Info Table */}
-                        <Table striped bordered hover size="sm" responsive="sm">
-                            <thead>
-                                <tr>
-                                    <th>Trip Name</th>
-                                    <th>Trip Budget</th>
-                                    <th>Trip Start Date</th>
-                                    <th>Trip End Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>{tripData.data.name}</td>
-                                    <td>{tripData.data.budget}</td>
-                                    <td>{tripData.data.start_date}</td>
-                                    <td>{tripData.data.end_date}</td>
-                                </tr>
-                            </tbody>
-                        </Table>
+                        <header class="top-icon-header">
+                            {/* Share Trip Button */}
+                            <ShareTripComponent tripId={tripId} isOwner={isOwner} />
+                            {/* Delete Trip Button */}
+                            <DeleteTripComponent tripId={tripId} userRole={userRole} />
+                        </header>
+                        {/* General Trip Info*/}
+                        <div className="trip-overview">
+                            <div className="trip-overview-div">
+                                <div className="trip-overview-circle">🗓️</div>
+                                <div className="trip-overview-content">
+                                    <h3>START</h3>
+                                    <p>{tripData.data.start_date}</p>
+                                </div>
+                            </div>
+
+                            <div className="trip-overview-div">
+                                <div className="trip-overview-circle">🗓️</div>
+                                <div className="trip-overview-content">
+                                    <h3>END</h3>
+                                    <p>{tripData.data.end_date}</p>
+                                </div>
+                            </div>
+
+                            <div className="trip-overview-div">
+                                <div className="trip-overview-circle">💰</div>
+                                <div className="trip-overview-content">
+                                    <h3>BUDGET</h3>
+                                    <p>${tripData.data.budget}</p>
+                                </div>
+                            </div>
+                        </div>
                         {/* Trip Calendar and Budget Meter */}
                         <div className='container'>
                             <div className='row'>
@@ -494,7 +563,7 @@ function Singletrip() {
                                                     needleTransitionDuration={2500}
                                                     needleTransition={Transition.easeBounceOut}
                                                     segments={4}
-                                                    segmentColors={['#7ada2c', '#d4e725', '#f3a820', '#fe471a']}
+                                                    segmentColors={['#b3e5fc', '#ffe0b2', '#ffccbc', '#d1c4e9']}
                                                 />
                                             </div>
                                         )}
@@ -504,36 +573,79 @@ function Singletrip() {
                         </div>
 
                         <br></br>
+                        {/* Icon Bar Above Expenses */}
                         <div className="filter-section">
-                            <button onClick={() => setPopUpVisible(true)} className='create-expense'>Create Expense</button>
-                            <button className="filter-button" onClick={() => setFilterPopupVisible(true)}>
-                                <Image src={Filter} alt="Filter" className="filter-icon" />
-                            </button>
-                            {selectedFilter && (
-                                <div className="applied-filter">
-                                    <span>{`Filter: ${selectedFilter}`}</span>
-                                    <button className="clear-filter-btn" onClick={clearFilter}>
-                                        &times;
-                                    </button>
+                            <header class="icon-bar-header">
+                                {/* Add Expense Button */}
+                                <div class="icon-div" tooltip="Add Expense" tabindex="0">
+                                    <div class="icon-SVG">
+                                        <svg
+                                            onClick={() => setPopUpVisible(true)}
+                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.3" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                        </svg>
+                                        <span class="icon-text">Add Expense</span>
+                                    </div>
                                 </div>
-                            )}
+                                {/* Filter Expenses Button */}
+                                <div class="icon-div" tooltip="Filter" tabindex="0">
+                                    <div class="icon-SVG">
+                                        <svg
+                                            onClick={() => setFilterPopupVisible(true)}
+                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.3" stroke="currentColor" class="size-6" >
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+                                        </svg>
+                                        <span class="icon-text">Filter</span>
+                                        {selectedFilter && (
+                                            <div className="applied-filter">
+                                                <span>{`Filter: ${selectedFilter}`}</span>
+                                                <button className="clear-filter-btn" onClick={clearFilter}>
+                                                    &times;
+                                                </button>
+                                            </div>
+                                        )}
+
+                                    </div>
+                                </div>
+                                {/* <div class="spacer"></div>
+                                <div class="divider"></div> */}
+
+                                {/* Download Trip Button */}
+                                <div class="icon-div" tooltip="Download Trip" tabindex="0">
+                                    <div class="icon-SVG">
+                                        <svg
+                                            onClick={downloadTripData}
+                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.3" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                        </svg>
+                                        <span class="icon-text">Download Trip</span>
+                                    </div>
+                                </div>
+                                {/* Add Image Button */}
+                                <div class="icon-div" tooltip="Add Image" tabindex="0">
+                                    <div class="icon-SVG">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.3" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                                        </svg>
+                                        <span class="icon-text">Add Image</span>
+                                    </div>
+                                </div>
+                            </header>
                         </div>
-                        <br></br>
-                        <br></br>
 
                         {/* Expense Table */}
                         {expenseData && expenseData.data ? (
                             <div>
-                                <Table striped bordered hover size="sm" responsive="sm">
+                                <Table striped bordered hover size="sm" responsive="sm" className="expense-table">
                                     <thead>
                                         <tr>
                                             <th>Name</th>
                                             <th>Amount</th>
-                                            <th>Category</th>
                                             <th>Currency</th>
+                                            <th>Category</th>
                                             <th>Date Posted</th>
                                             <th>Notes</th>
-                                            <th>Edit/Delete Expense</th>
+                                            <th>Modify Expense</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -541,78 +653,91 @@ function Singletrip() {
                                             <tr key={expense.expense_id}>
                                                 <td>{expense.name}</td>
                                                 <td>{expense.amount}</td>
-                                                <td>{expense.category}</td>
                                                 <td>{expense.currency}</td>
+                                                <td>{expense.category}</td>
                                                 <td>{expense.posted}</td>
                                                 <td>{expense.notes}</td>
                                                 <td>
-                                                    <button onClick={() => { setEditPopupVisible(true); setSelectedExpense(expense) }} className='edit-expense'>Edit/Delete Expense</button>
+                                                    <button onClick={() => { setEditPopupVisible(true); setSelectedExpense(expense) }} className='edit-expense'>Edit/Delete</button>
                                                     <div className="expense-form">
                                                         {isEditPopupVisible && selectedExpense && (
                                                             <div className="modal">
                                                                 <div className="modal-content">
                                                                     <span className="close" onClick={() => setEditPopupVisible(false)}>&times;</span>
-                                                                    <h2 className="edit-expense-title">Edit or Delete this Expense</h2>
-                                                                    <form onSubmit={submitEditExpense}>
+                                                                    <h2 className="edit-expense-title">Edit or Delete Expense</h2>
+                                                                    <form onSubmit={(e) => {
+                                                                        e.preventDefault();
+                                                                        submitEditExpense(selectedExpense.expense_id);
+                                                                    }}>
                                                                         <label className="edit-expense-field-label">
                                                                             Expense Name:
                                                                             <input
                                                                                 type="text"
                                                                                 name="name"
                                                                                 value={selectedExpense.name}
+                                                                                onChange={handleEditChange}
                                                                                 required
                                                                             />
                                                                         </label>
-                                                                        <label className="edit-expense-field-label">
-                                                                            Amount:
-                                                                            <input
-                                                                                type="number"
-                                                                                name="amount"
-                                                                                value={selectedExpense.amount}
-                                                                                required
-                                                                            />
-                                                                        </label>
-                                                                        <label className="edit-expense-field-label">
-                                                                            Currency:
-                                                                            <select
-                                                                                name="currency"
-                                                                                value={selectedExpense.currency}
-                                                                                required
-                                                                            >
-                                                                                <option value="">Select Currency</option>
-                                                                                {currencyCodes.map((code) => (
-                                                                                    <option key={code} value={code}>{code}</option>
-                                                                                ))}
-                                                                            </select>
-                                                                        </label>
-                                                                        <label className="edit-expense-field-label">
-                                                                            Category:
-                                                                            <select
-                                                                                name="category"
-                                                                                value={selectedExpense.category}
-                                                                                required
-                                                                            >
-                                                                                <option value="">Select Category</option>
-                                                                                {expenseCategories.map((category) => (
-                                                                                    <option key={category} value={category}>{category}</option>
-                                                                                ))}
-                                                                            </select>
-                                                                        </label>
-                                                                        <label className="edit-expense-field-label">
-                                                                            Date:
-                                                                            <input
-                                                                                type="date"
-                                                                                name="posted"
-                                                                                value={selectedExpense.posted}
-                                                                                required
-                                                                            />
-                                                                        </label>
+                                                                        <div className="field-pair">
+                                                                            <label className="edit-expense-field-label">
+                                                                                Amount:
+                                                                                <input
+                                                                                    type="number"
+                                                                                    name="amount"
+                                                                                    value={selectedExpense.amount}
+                                                                                    onChange={handleEditChange}
+                                                                                    required
+                                                                                />
+                                                                            </label>
+                                                                            <label className="edit-expense-field-label">
+                                                                                Currency:
+                                                                                <select
+                                                                                    name="currency"
+                                                                                    value={selectedExpense.currency}
+                                                                                    onChange={handleEditChange}
+                                                                                    required
+                                                                                >
+                                                                                    <option value="">Select Currency</option>
+                                                                                    {currencyCodes.map((code) => (
+                                                                                        <option key={code} value={code}>{code}</option>
+                                                                                    ))}
+                                                                                </select>
+                                                                            </label>
+                                                                        </div>
+                                                                        <div className="field-pair">
+                                                                            <label className="edit-expense-field-label">
+                                                                                Category:
+                                                                                <select
+                                                                                    name="category"
+                                                                                    value={selectedExpense.category}
+                                                                                    onChange={handleEditChange}
+                                                                                    required
+                                                                                >
+                                                                                    <option value="">Select Category</option>
+                                                                                    {expenseCategories.map((category) => (
+                                                                                        <option key={category} value={category}>{category}</option>
+                                                                                    ))}
+                                                                                </select>
+                                                                            </label>
+                                                                            <label className="edit-expense-field-label">
+                                                                                Date:
+                                                                                <input
+                                                                                    type="date"
+                                                                                    name="posted"
+                                                                                    value={selectedExpense.posted}
+                                                                                    onChange={handleEditChange}
+                                                                                    required
+                                                                                />
+                                                                            </label>
+                                                                        </div>
                                                                         <label className="edit-expense-field-label">
                                                                             Notes:
                                                                             <input
                                                                                 type="text"
                                                                                 name="notes"
                                                                                 value={selectedExpense.notes}
+                                                                                onChange={handleEditChange}
                                                                             />
                                                                         </label>
                                                                         <div className='container'>
@@ -621,7 +746,7 @@ function Singletrip() {
                                                                                     <button type="submit" className="submit-edit-expense-button">Edit</button>
                                                                                 </div>
                                                                                 <div className='col'>
-                                                                                    <button type="button" onClick={() => deleteExpense(expense.expense_id)} className="delete-expense-button">Delete</button>
+                                                                                    <button type="button" onClick={() => deleteExpense(selectedExpense.expense_id)} className="delete-expense-button">Delete</button>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -635,11 +760,6 @@ function Singletrip() {
                                         ))}
                                     </tbody>
                                 </Table>
-
-                                {/* Add the Download Button */}
-                                <button onClick={downloadTripData} className="download-trip-data-btn">
-                                    Download Trip
-                                </button>
                             </div>
                         ) : (
                             <p>No expenses yet...</p>
@@ -650,10 +770,6 @@ function Singletrip() {
                         ) : (
                             <p>[Gallery of photos]</p>
                         )}
-                        {/* Add the Delete Button */}
-                        <button onClick={deleteTrip} className="delete-trip-button">
-                            Delete Trip
-                        </button>
                     </div>
                 ) : (
                     <p>No Trip Data Found.</p>
@@ -816,7 +932,6 @@ function Singletrip() {
                         </div>
                     )}
                 </div>
-
 
                 {/* Pie Chart */}
                 <div>

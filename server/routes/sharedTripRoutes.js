@@ -3,6 +3,7 @@ const router = express.Router();
 const SharedTripController = require('../controllers/SharedTripController');
 
 router.post('/users/:userId/trips/:tripId', SharedTripController.createSharedTrip);
+// router.post('/users/:userId/trips/:tripId', SharedTripController.addSharedTrip);
 router.get('/', SharedTripController.getSharedTrips);
 router.get('/users/:userId', SharedTripController.getSharedTripsByUserId);
 router.get('/trips/:tripId', SharedTripController.getSharedTripsByTripId);
