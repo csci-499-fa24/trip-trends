@@ -668,3 +668,18 @@
 .delete-icon .icon-text {
     background-color: rgb(235, 5, 5);
 }
+
+.exchange-table-dropdown input,
+.exchange-table-dropdown select {
+    width: 50%;
+    padding: 8px;
+    margin-top: 5px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    background-color: black;
+    color: white;
+    font-size: 15px;
+    transition: border-color 0.3s ease;
+    filter: invert(1);
+    text-align: center;
+}
