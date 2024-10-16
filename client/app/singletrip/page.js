@@ -26,7 +26,7 @@ function Singletrip() {
     const [tripData, setTripData] = useState(null);
     const [userRole, setUserRole] = useState(null);
     const [expenseData, setExpenseData] = useState([]);
-    const [totalExpenses, setTotalExpenses] = useState(0);
+    const [totalUSDExpenses, setTotalUSDExpenses] = useState(0);
     const [currencyCodes, setCurrencyCodes] = useState([]);
     const [selectedCurrency, setSelectedCurrency] = useState('');
     const [otherCurrencies, setOtherCurrencies] = useState([]);
@@ -85,12 +85,6 @@ function Singletrip() {
                         applyFilter(savedFilter, response.data);
                     }
 
-                    const total = response.data.data.reduce((sum, expense) => {
-                        const amount = parseFloat(expense.amount);
-                        return sum + amount;
-                    }, 0);
-
-                    setTotalExpenses(total);
                     fetchCurrencyRates(fetchedExpenses);
                 })
                 .catch(error => {
@@ -200,6 +194,8 @@ function Singletrip() {
                         categoryTotals[expense.category] = 0;
                     }
                     categoryTotals[expense.category] += parseFloat(amountInUSD);
+
+                    setTotalUSDExpenses(prevTotal => prevTotal + parseFloat(amountInUSD));
 
                     return {
                         ...expense,
@@ -526,15 +522,15 @@ function Singletrip() {
                                 <div className='col'>
                                     <div className="meter-container">
                                         <p id='budgetTitle'>Your Budget Meter:</p>
-
-                                        {totalExpenses > tripData.data.budget ? (
+                                        {expenseData && expenseData.data && totalUSDExpenses === 0 ? (
+                                            <p>Loading your budget data...</p>
+                                        ) : totalUSDExpenses > tripData.data.budget ? (
                                             <div style={{
                                                 marginTop: "10px",
                                                 width: "350px",
-                                                height: "230px",
+                                                height: "200px",
                                                 marginLeft: "50px"
                                             }}>
-                                                <p id='budget-text'>You are {totalExpenses - tripData.data.budget} dollars over your budget.</p>
                                                 <ReactSpeedometer
                                                     width={300}
                                                     minValue={0}
@@ -544,7 +540,7 @@ function Singletrip() {
                                                     needleTransitionDuration={2500}
                                                     needleTransition={Transition.easeBounceOut}
                                                     segments={4}
-                                                    segmentColors={['#7ada2c', '#d4e725', '#f3a820', '#fe471a']}
+                                                    segmentColors={['#b3e5fc', '#ffe0b2', '#ffccbc', '#d1c4e9']}
                                                 />
                                             </div>
                                         ) : (
@@ -558,7 +554,7 @@ function Singletrip() {
                                                     width={300}
                                                     minValue={0}
                                                     maxValue={tripData.data.budget}
-                                                    value={totalExpenses}
+                                                    value={totalUSDExpenses.toFixed(2)}
                                                     needleColor="steelblue"
                                                     needleTransitionDuration={2500}
                                                     needleTransition={Transition.easeBounceOut}
@@ -569,6 +565,25 @@ function Singletrip() {
                                         )}
                                     </div>
                                 </div>
+                                <div className='col'>
+                                    <div className="meter-container">
+                                        <p id='budgetTitle'>Your Budget Data:</p>
+                                        {expenseData && expenseData.data && totalUSDExpenses === 0 ? (
+                                            <p>Loading your budget data...</p>
+                                        ) : (
+                                            <div style={{ textAlign: 'center', margin: '20px' }}>
+                                                <p style={{ textDecoration: "underline" }}>Total Expenses in USD:</p>
+                                                <p>${totalUSDExpenses.toFixed(2)}</p>
+                                                {totalUSDExpenses > tripData.data.budget ? (
+                                                    <p id='budget-text'>You are <strong>${(totalUSDExpenses - tripData.data.budget).toFixed(2)}</strong> over your budget.</p>
+                                                ) : (
+                                                    <p>You are within your budget.</p>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
 
