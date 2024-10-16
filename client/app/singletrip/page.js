@@ -22,6 +22,8 @@ Chart.register(ArcElement, Tooltip, Legend);
 
 function Singletrip() {
     const [categoryData, setCategoryData] = useState({ labels: [], datasets: [] });
+    const [customCurrency, setCustomCurrency] = useState('');
+    const [exchangeRate, setExchangeRate] = useState(null);
     const [tripId, setTripId] = useState(null);
     const [tripData, setTripData] = useState(null);
     const [userRole, setUserRole] = useState(null);
@@ -212,7 +214,10 @@ function Singletrip() {
                     datasets: [{
                         label: 'Expenses by Category',
                         data,
-                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'], // Add more colors as needed
+                        backgroundColor: [
+                            '#2A9D8F', '#e76f51', '#E9C46A', '#F4A261', '#E76F51', '#264653', '#e5989b', '#9d0208', '#e4c1f9', 
+                            '#bc6c25', '#fca311', '#d62828', '#003049', '#00a896', '#f77f00', '#8338ec', '#fb5607'
+                        ],
                         hoverOffset: 4
                     }]
                 });
@@ -445,6 +450,24 @@ function Singletrip() {
     //         console.error('Error sharing trip:', error.response?.data || error.message);
     //     }
     // };
+
+    const handleCurrencyChange = async (e) => {
+        const currency = e.target.value;
+        setCustomCurrency(currency);
+
+        // Fetch the exchange rate relative to USD
+        try {
+            const response = await axios.get(`https://hexarate.paikama.co/api/rates/latest/USD?target=${currency}`);
+            //if (response.data && response.data.rate) {
+            console.log(response.data.data.mid);
+            setExchangeRate(response.data.data.mid);
+            // } else {
+            //  console.error("Invalid response from the API");
+            // }
+        } catch (error) {
+            console.error("Error fetching exchange rate:", error);
+        }
+    };
 
     return (
         <div className="main-container">
@@ -955,25 +978,50 @@ function Singletrip() {
                     </div>
                 </div>
 
-                {/* Exchange Rate Table */}
-                <div className="exchange-rates-container">
-                    <table className="exchange-rates-table">
-                        <thead>
-                            <tr>
-                                <th>Currency</th>
-                                <th>Rate (Relative to USD)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {Object.keys(exchangeRates).map((currency) => (
-                                <tr key={currency}>
-                                    <td>{currency}</td>
-                                    <td>{exchangeRates[currency]}</td>
+                <div>
+                    {/* Exchange Rate Table */}
+                    <div className="exchange-rates-container">
+                        <table className="exchange-rates-table">
+                            <thead>
+                                <tr>
+                                    <th>Currency</th>
+                                    <th>Rate (Relative to USD)</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {Object.keys(exchangeRates).map((currency) => (
+                                    <tr key={currency}>
+                                        <td>{currency}</td>
+                                        <td>{exchangeRates[currency]}</td>
+                                    </tr>
+                                ))}
+                                {/* Last row for dropdown selection and its rate */}
+                                {/* {customCurrency && ( */}
+                                <tr>
+                                    <td className="exchange-table-dropdown">
+                                        {/* Dropdown for currency codes */}
+                                        <label htmlFor="currency-select"></label>
+                                        <select
+                                            id="currency-select"
+                                            value={customCurrency}
+                                            onChange={handleCurrencyChange}
+                                        >
+                                            <option value="">Currency</option>
+                                            {currencyCodes.map((code) => (
+                                                <option key={code} value={code}>
+                                                    {code}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </td>
+                                    <td>{exchangeRate !== null ? exchangeRate : 'N/A'}</td>
+                                </tr>
+                                {/* )} */}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+
 
 
 
