@@ -215,7 +215,7 @@ function Singletrip() {
                         label: 'Expenses by Category',
                         data,
                         backgroundColor: [
-                            '#2A9D8F', '#e76f51', '#E9C46A', '#F4A261', '#E76F51', '#264653', '#e5989b', '#9d0208', '#e4c1f9', 
+                            '#2A9D8F', '#e76f51', '#E9C46A', '#F4A261', '#c476bf', '#264653', '#e5989b', '#9d0208', '#e4c1f9', 
                             '#bc6c25', '#fca311', '#d62828', '#003049', '#00a896', '#f77f00', '#8338ec', '#fb5607'
                         ],
                         hoverOffset: 4

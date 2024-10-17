@@ -49,21 +49,22 @@
     z-index: 1000;
     left: 0;
     top: 0;
-    width: 100%;
+    width: 100% !important;
     height: 100%;
     backdrop-filter: blur(2px);
 }
 
 .modal-content {
-    max-width: 100vw;
+    max-width: 30% !important;
     max-height: 300vh;
+    overflow-x: auto;
     overflow-y: auto;
     padding: 20px;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     margin: 10px;
-    width: 100vw;
+    width: 100%;
 }
 
 .form {
