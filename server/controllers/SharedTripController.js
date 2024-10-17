@@ -7,15 +7,13 @@ const createSharedTrip = async (req, res) => {
     const userId = req.params.userId;
     const tripId = req.params.tripId;
     const { email, role } = req.body; // destructure role and email from req.body
-    console.log("Request Params:", req.params);
-    console.log("Request Headers:", req.headers || "No headers available");
-    console.log("Request Body:", req.body || "No body provided");
 
     try {
         // validate userId and tripId
         if (!userId || !tripId) {
             return res.status(400).json({ message: "userId and tripId are required" });
         }
+
         // if role is provided in the request body
         if (req.body) {
             // check if current user is the owner of the trip
