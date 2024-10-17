@@ -89,21 +89,22 @@
     z-index: 1000;
     left: 0;
     top: 0;
-    width: 100%;
+    width: 100% !important;
     height: 100%;
     backdrop-filter: blur(2px);
 }
 
 .modal-content {
-    max-width: 100vw;
+    max-width: 30% !important;
     max-height: 300vh;
+    overflow-x: auto;
     overflow-y: auto;
     padding: 20px;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     margin: 10px;
-    width: 100vw;
+    width: 100%;
 }
 
 .form {
@@ -707,4 +708,19 @@
 
 .delete-icon .icon-text {
     background-color: rgb(235, 5, 5);
+}
+
+.exchange-table-dropdown input,
+.exchange-table-dropdown select {
+    width: 50%;
+    padding: 8px;
+    margin-top: 5px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    background-color: black;
+    color: white;
+    font-size: 15px;
+    transition: border-color 0.3s ease;
+    filter: invert(1);
+    text-align: center;
 }
