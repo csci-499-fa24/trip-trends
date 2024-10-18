@@ -6,45 +6,42 @@
 
 .header {
     display: flex;
-    justify-content: space-between; 
+    justify-content: center; 
     align-items: center; 
-    padding: 0; 
-    height: 150px; 
+    height: 80px; 
     background-color: white;
     position: relative;
 }
 
-.left-rectangle,
-.right-rectangle {
-    position: absolute;
-    top: 50%;
-    height: 20px; 
-    width: 40%; 
-    background-color: black;
-    transform: translateY(-50%);
-}
-
-.left-rectangle {
-    left: 0;
-}
-
-.right-rectangle {
-    right: 0;
+.banner {
+    background-color: #344E41;
+    color: white;
+    font-size: 40px;
+    font-weight: 400;
+    text-align: center;
+    padding: 10px;
+    width: 99%;
+    border-radius: 30px;
+    letter-spacing: 2px;
+    font-family: 'Inknut Antiqua';
 }
 
 .welcome-section {
     text-align: left;
-    padding: 10px;
+    padding: 20px;
     background-color: #FFFFFF;
     color: black;
     font-size: 21px;
+    font-weight: bold;
 }
 
 .recent-trips {
     padding: 10px;
-    background-color: black;
+    background-color:#344E41;
     color: white;
     height: auto; 
+    width: 100%;
+    text-align: center;
 }
 
 .trip {
@@ -54,16 +51,8 @@
     background-color: rgba(255, 255, 255, 0.1); 
 }
 
-.logo-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-grow: 1; 
-    text-align: center;
-}
-
 .logout {
-    background-color: #134a09;
+    background-color:#588157;
     color: white;
     border: none; 
     padding: 10px 20px;
@@ -75,16 +64,16 @@
 }
 
 .logout:hover{
-    background-color: green;
+    background-color: #588157;
     transition: 0.2s;
 }
 
 button{
     box-shadow: 0 10px 20px -8px rgba(0, 0, 0, .7);
-}
+  }
 
 .create-trip {
-    background-color: #134a09;
+    background-color:#588157;
     position: relative;
     padding: 10px 20px;
     font-size: 16px;
@@ -120,19 +109,21 @@ button{
     transform: translate(50%, -50%);
 }
 
+
 .modal {
     display: flex;
     justify-content: center;
     flex-direction: column;
     align-items: center;
     position: fixed;
-    z-index: 1000; /* equivalent to bring to front*/
+    z-index: 1000; 
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
     backdrop-filter: blur(2px);
-}
+  }
+  
 
 .modal-content {
     max-height: 80vh;
@@ -205,7 +196,7 @@ form {
 
 .submit-new-trip-button { 
     padding: 8px; 
-    background-color: #134a09;
+    background-color:#588157;;
     color: white;
     border: none;
     width: 40%; /* Width of the button */
@@ -293,16 +284,17 @@ form {
     text-align: center;
     padding: 10px;
     cursor: pointer;
-    background-color: #134a09;
+    background-color: #588157;
+    ;
 }
 
 .dropdown-item:hover {
-    background-color: rgb(8, 148, 8);
+    background-color: #13874d95; 
 }
 
 .profile-container {
     position: absolute;
-    top: 10px;
+    top: 95px;
     right: 15px;
 }
 

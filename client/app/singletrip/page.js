@@ -11,7 +11,7 @@ import 'react-calendar/dist/Calendar.css';
 import { parseISO, startOfDay, endOfDay } from 'date-fns';
 import ReactSpeedometer, { Transition } from 'react-d3-speedometer';
 import Image from 'next/image';
-import logo from '../img/Logo.png';
+import homeIcon from '../img/homeIcon.png';
 import Link from 'next/link';
 import { Pie } from 'react-chartjs-2';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
@@ -473,32 +473,26 @@ function Singletrip() {
         <div className="main-container">
             <div>
                 {/* Header section */}
-                <header className="header">
-                    <div className="logo-container">
-                        <Link href={`/homepage`}>
-                            <Image src={logo} alt="Logo" width={300} height={300} />
-                        </Link>
-                    </div>
-                    <div className="left-rectangle"></div>
-                    <div className="right-rectangle"></div>
-                </header>
-
+                <div className="banner2">
+                    TRIP TRENDS
+                </div>
+                
                 {tripData ? (
                     <div>
-                        {/* <div className="homeCorner">
-                            <Link href={`/homepage`}>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="black" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                            </svg>
-                            </Link>
-                        </div> */}
                         <h1 id='tripName'>{tripData.data.name}</h1>
                         <header class="top-icon-header">
+                            <div class="icon-div" tooltip="Home" tabindex="0">
+                                    <Link href={'/homepage'}>
+                                        <Image src={homeIcon} alt="homepage" width={"55"} height={"55"} />
+                                    </Link>
+                                    <span class="icon-text">Home</span>
+                            </div>
                             {/* Share Trip Button */}
                             <ShareTripComponent tripId={tripId} isOwner={isOwner} />
                             {/* Delete Trip Button */}
                             <DeleteTripComponent tripId={tripId} userRole={userRole} />
                         </header>
+                        
                         {/* General Trip Info*/}
                         <div className="trip-overview">
                             <div className="trip-overview-div">
@@ -525,10 +519,11 @@ function Singletrip() {
                                 </div>
                             </div>
                         </div>
+
                         {/* Trip Calendar and Budget Meter */}
                         <div className='container'>
                             <div className='row'>
-                                <div className='col'>
+                                    <div className='col'> 
                                     <Calendar
                                         tileClassName={({ date }) => {
                                             if (isDateInRange(date)) {
@@ -543,7 +538,7 @@ function Singletrip() {
                                     />
                                 </div>
                                 <div className='col'>
-                                    <div className="meter-container">
+                                  <div className="meter-container">
                                         <p id='budgetTitle'>Your Budget Meter:</p>
                                         {expenseData && expenseData.data && totalUSDExpenses === 0 ? (
                                             <p>Loading your budget data...</p>
@@ -571,7 +566,7 @@ function Singletrip() {
                                                 marginTop: "10px",
                                                 width: "350px",
                                                 height: "200px",
-                                                marginLeft: "50px"
+                                                marginLeft: "50px",
                                             }}>
                                                 <ReactSpeedometer
                                                     width={300}
@@ -588,8 +583,14 @@ function Singletrip() {
                                         )}
                                     </div>
                                 </div>
+                                {/* Pie Chart */}
                                 <div className='col'>
                                     <div className="meter-container">
+                                        <div>
+                                            <div className="pie-chart-container">
+                                                <Pie data={categoryData} />
+                                            </div>
+                                        </div>
                                         <p id='budgetTitle'>Your Budget Data:</p>
                                         {expenseData && expenseData.data && totalUSDExpenses === 0 ? (
                                             <p>Loading your budget data...</p>
@@ -605,8 +606,8 @@ function Singletrip() {
                                             </div>
                                         )}
                                     </div>
+                                
                                 </div>
-
                             </div>
                         </div>
 
@@ -674,6 +675,7 @@ function Singletrip() {
                         {/* Expense Table */}
                         {expenseData && expenseData.data ? (
                             <div>
+                                <div className="expense-table-container">
                                 <Table striped bordered hover size="sm" responsive="sm" className="expense-table">
                                     <thead>
                                         <tr>
@@ -799,18 +801,22 @@ function Singletrip() {
                                     </tbody>
                                 </Table>
                             </div>
+                        </div>
                         ) : (
                             <p>No expenses yet...</p>
                         )}
-                        {/* Gallery of Photos like Google Photos or Photos on iPhone*/}
+                        {/* Gallery of Photos like Google Photos or Photos on iPhone
                         {tripData.data.image ? (
                             <p>{tripData.data.image}</p>
                         ) : (
                             <p>[Gallery of photos]</p>
-                        )}
+                        )} */}
+                        
                     </div>
                 ) : (
-                    <p>No Trip Data Found.</p>
+                    <div className="center-container">
+                        <p>No Trip Data Found.</p>
+                    </div>
                 )}
 
                 {/* Create a expense popup form */}
@@ -971,13 +977,6 @@ function Singletrip() {
                     )}
                 </div>
 
-                {/* Pie Chart */}
-                <div>
-                    <div className="pie-chart-container">
-                        <Pie data={categoryData} />
-                    </div>
-                </div>
-
                 <div>
                     {/* Exchange Rate Table */}
                     <div className="exchange-rates-container">
@@ -1021,11 +1020,6 @@ function Singletrip() {
                         </table>
                     </div>
                 </div>
-
-
-
-
-
             </div >
         </div >
     );

@@ -453,12 +453,10 @@ function homepage() {
              <div className="dashboard">
                 {/* Header section */}
                 <header className="header">
-                    <div className="left-rectangle"></div> 
-                    <div className="logo-container">
-                        <Image src={logo} alt="Logo" width={300} height={300} priority />
+                    <div className="banner">
+                            TRIP TRENDS
                     </div>
-                    <div className="right-rectangle"></div>
-                    
+
                     {/* Profile Container on the right */}
                     <div className="profile-container">
                         <Image
@@ -575,7 +573,6 @@ function homepage() {
                     <br></br>
                     <h2>Recent Trips</h2>
                     <br></br>
-                    <br></br>
                     {trips.length === 0 ? (
                         <p>No trips created.</p>
                     ) : (
@@ -587,11 +584,11 @@ function homepage() {
                                             id={`trip-${trip.trip_id}`} // Unique ID for each trip 
                                             onClick={() => toggleTripDetails(trip.trip_id)} 
                                             className={animatedTripId === trip.trip_id ? "shake" : '' } // Apply animation
-                                            style={{ cursor: 'pointer', padding: '10px', border: '1px solid #ccc', marginBottom: '5px', backgroundColor: expandedTripId === trip.trip_id ? '#2e7d32' : '#134a09'}}>
+                                            style={{ cursor: 'pointer', padding: '10px', border: '1px solid #ccc', marginBottom: '5px', backgroundColor: expandedTripId === trip.trip_id ? '#2e7d32' : '#588157'}}>
                                             {trip.name}
                                         </div>
                                         {expandedTripId === trip.trip_id && (
-                                            <div style={{ padding: '10px', backgroundColor: expandedTripId === trip.trip_id ? '#2e7d32' : '#134a09', border: '1px solid #ccc' }}>
+                                            <div style={{ padding: '10px', backgroundColor: expandedTripId === trip.trip_id ? '#2e7d32' : '#588157', border: '1px solid #ccc' }}>
                                                 <p>
                                                     <strong>Dates:</strong> {trip.start_date} - {trip.end_date}
                                                 </p>
