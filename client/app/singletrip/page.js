@@ -519,10 +519,11 @@ function Singletrip() {
                                 </div>
                             </div>
                         </div>
+
                         {/* Trip Calendar and Budget Meter */}
                         <div className='container'>
                             <div className='row'>
-                                <div className='col'>
+                                    <div className='col'> 
                                     <Calendar
                                         tileClassName={({ date }) => {
                                             if (isDateInRange(date)) {
@@ -537,7 +538,7 @@ function Singletrip() {
                                     />
                                 </div>
                                 <div className='col'>
-                                    <div className="meter-container">
+                                  <div className="meter-container">
                                         <p id='budgetTitle'>Your Budget Meter:</p>
                                         {expenseData && expenseData.data && totalUSDExpenses === 0 ? (
                                             <p>Loading your budget data...</p>
@@ -565,7 +566,7 @@ function Singletrip() {
                                                 marginTop: "10px",
                                                 width: "350px",
                                                 height: "200px",
-                                                marginLeft: "50px"
+                                                marginLeft: "50px",
                                             }}>
                                                 <ReactSpeedometer
                                                     width={300}
@@ -582,8 +583,14 @@ function Singletrip() {
                                         )}
                                     </div>
                                 </div>
+                                {/* Pie Chart */}
                                 <div className='col'>
                                     <div className="meter-container">
+                                        <div>
+                                            <div className="pie-chart-container">
+                                                <Pie data={categoryData} />
+                                            </div>
+                                        </div>
                                         <p id='budgetTitle'>Your Budget Data:</p>
                                         {expenseData && expenseData.data && totalUSDExpenses === 0 ? (
                                             <p>Loading your budget data...</p>
@@ -599,8 +606,8 @@ function Singletrip() {
                                             </div>
                                         )}
                                     </div>
+                                
                                 </div>
-
                             </div>
                         </div>
 
@@ -668,6 +675,7 @@ function Singletrip() {
                         {/* Expense Table */}
                         {expenseData && expenseData.data ? (
                             <div>
+                                <div className="expense-table-container">
                                 <Table striped bordered hover size="sm" responsive="sm" className="expense-table">
                                     <thead>
                                         <tr>
@@ -793,15 +801,17 @@ function Singletrip() {
                                     </tbody>
                                 </Table>
                             </div>
+                        </div>
                         ) : (
                             <p>No expenses yet...</p>
                         )}
-                        {/* Gallery of Photos like Google Photos or Photos on iPhone*/}
+                        {/* Gallery of Photos like Google Photos or Photos on iPhone
                         {tripData.data.image ? (
                             <p>{tripData.data.image}</p>
                         ) : (
                             <p>[Gallery of photos]</p>
-                        )}
+                        )} */}
+                        
                     </div>
                 ) : (
                     <div className="center-container">
@@ -967,13 +977,6 @@ function Singletrip() {
                     )}
                 </div>
 
-                {/* Pie Chart */}
-                <div>
-                    <div className="pie-chart-container">
-                        <Pie data={categoryData} />
-                    </div>
-                </div>
-
                 <div>
                     {/* Exchange Rate Table */}
                     <div className="exchange-rates-container">
@@ -1017,11 +1020,6 @@ function Singletrip() {
                         </table>
                     </div>
                 </div>
-
-
-
-
-
             </div >
         </div >
     );

@@ -40,7 +40,8 @@
     background-color:#344E41;
     color: white;
     height: auto; 
-    width: 50%;
+    width: 100%;
+    text-align: center;
 }
 
 .trip {
@@ -288,7 +289,7 @@ form {
 }
 
 .dropdown-item:hover {
-    background-color: rgb(0, 249, 0);
+    background-color: #13874d95; 
 }
 
 .profile-container {
