@@ -17,6 +17,7 @@ import { Pie } from 'react-chartjs-2';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 import DeleteTripComponent from '../components/DeleteTripComponent';
 import ShareTripComponent from '../components/ShareTripComponent';
+import { createApi } from 'unsplash-js';
 
 Chart.register(ArcElement, Tooltip, Legend);
 
@@ -469,6 +470,33 @@ function Singletrip() {
         }
     };
 
+    const unsplash = createApi({
+        accessKey: process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY
+      });
+
+    const getImageURL = async (trip_location) => {
+        try {
+            const response = await unsplash.search.getPhotos({
+            query: trip_location,
+            page: 1,
+            perPage: 10,
+        });
+
+        if (response.response.results.length > 0) {
+            const images = response.response.results.map(image => image.urls.raw); // array of 10 images
+
+            const random_index = Math.floor(Math.random() * response.response.results.length);
+            const imageURL = images[random_index]
+            console.log(`Image URL for ${trip_location}:`, imageURL); // Display the random image URL
+            // console.log(images); // Array of image URLs
+          } else {
+            console.log('No images found.');
+          }
+        } catch (error) {
+          console.error('Error fetching images:', error);
+        }
+    };
+
     return (
         <div className="main-container">
             <div>
@@ -493,6 +521,13 @@ function Singletrip() {
                             <DeleteTripComponent tripId={tripId} userRole={userRole} />
                         </header>
 
+                        <Slider {...settings}>
+                        {tripData.data.tr.map((location) => (
+                            <div key={location.name}>
+                            <img src={location.imageUrl} alt={location.name} style={{ width: '100%', height: 'auto' }} />
+                            </div>
+                        ))}
+                        </Slider>
                         {/* General Trip Info*/}
                         <div className="trip-overview">
                             <div className="trip-overview-div">
