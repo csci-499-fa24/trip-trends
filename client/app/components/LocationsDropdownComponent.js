@@ -20,7 +20,7 @@ const LocationsDropdownComponent = ({ tripLocations }) => {
                         </button>
                         <div className="dropdown-menu">
                             {tripLocations.map((location, index) => (
-                                <div key={index} className="dropdown-item" href="#">
+                                <div key={index} className="dropdown-item">
                                     {location}
                                 </div>
                             ))}
