@@ -22,6 +22,8 @@ import { boundingExtent } from 'ol/extent';
 import { fromLonLat } from 'ol/proj';
 import Link from 'next/link';
 import { debounce } from 'lodash';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Custom marker icon style
 const customDefaultMarker = new Style({
@@ -56,7 +58,7 @@ function homepage() {
     });
     const [newTripLocation, setNewTripLocation] = useState({ trip_locations: [] });
     const [tempLocation, setTempLocation] = useState('');
-    const mapRef = useRef(null); 
+    const mapRef = useRef(null);
     const [suggestions, setSuggestions] = useState([]);
     const [locationsNotProvided, setLocationsNotProvided] = useState(false);
     const [userId, setUserId] = useState(null);
@@ -86,7 +88,7 @@ function homepage() {
     };
 
     // Used to display user's image if token exists
-    const handleToken = async() => {
+    const handleToken = async () => {
         const token = localStorage.getItem("token");
         if (token) {
             const userCredential = jwtDecode(token);
@@ -207,7 +209,7 @@ function homepage() {
             console.error("Error getting all trip locations from user:", error);
         }
         const loc_data = locations_response.data.data;
-        const locations = loc_data.map(location => {return {"trip_id": location.trip_id, "location": location.location, "latitude": location.latitude, "longitude": location.longitude}; });
+        const locations = loc_data.map(location => { return { "trip_id": location.trip_id, "location": location.location, "latitude": location.latitude, "longitude": location.longitude }; });
         setAllTripLocations(locations);
     };
 
@@ -223,16 +225,18 @@ function homepage() {
             let trip_submission_response = null;
             try {
                 trip_submission_response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/users/${userId}`, newTripData); // locations not needed for a trip submission
+                toast.success("Trip successfully created!");
             } catch (error) {
                 console.error("Error submitting trip data:", error);
+                toast.error("Trip creation failed. Please try again later.");
             }
 
             const trip_id = trip_submission_response.data.data.trip_id;
             const num_trip_locs = newTripLocation.trip_locations.length;
 
             // For every location, create a trip location entry
-            for (let i = 0; i < num_trip_locs; i++){
-                let a_trip_location = {trip_id: trip_id, location: newTripLocation.trip_locations[i]};
+            for (let i = 0; i < num_trip_locs; i++) {
+                let a_trip_location = { trip_id: trip_id, location: newTripLocation.trip_locations[i] };
                 let geocode_response = null;
                 try {
                     geocode_response = await axios.get(`https://api.opencagedata.com/geocode/v1/json`, {
@@ -254,7 +258,7 @@ function homepage() {
                 catch {
                     trimmed_location = a_trip_location.location; // original location
                 }
-                
+
                 // POST trip location
                 try {
                     await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${trip_id}`, a_trip_location);
@@ -267,7 +271,7 @@ function homepage() {
                 const lat = geocode_response.data.results[0].geometry.lat;
                 const long = geocode_response.data.results[0].geometry.lng;
                 const currency = geocode_response.data.results[0].annotations.currency.iso_code;
-                const coordinates = {"latitude": lat, "longitude": long, "currency_code": currency};
+                const coordinates = { "latitude": lat, "longitude": long, "currency_code": currency };
                 try {
                     await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${trip_id}/${a_trip_location.location}`, coordinates);
                 } catch (error) {
@@ -277,8 +281,8 @@ function homepage() {
             }
 
             // A shared trip will be under the user who created the trip to support future shared trips
-            const shared_trip = {user_id: userId, trip_id: trip_id};
-            
+            const shared_trip = { user_id: userId, trip_id: trip_id };
+
             setPopUpVisible(false); // Close the popup
             setNewTripData({ name: '', start_date: '', end_date: '', budget: '' }); // Reset form fields
             setNewTripLocation({ trip_locations: [] }); // Reset locations
@@ -368,9 +372,9 @@ function homepage() {
             map.on('singleclick', (event) => {
                 const feature = map.forEachFeatureAtPixel(event.pixel, (feat) => feat);
                 if (feature) {
-                    const tripId = feature.get('trip_id'); 
-                    console.log('Clicked marker:', tripId); 
-                    
+                    const tripId = feature.get('trip_id');
+                    console.log('Clicked marker:', tripId);
+
                     // Scroll to the Recent Trips section and expand the clicked trip
                     const tripElement = document.getElementById(`trip-${tripId}`); // Use a unique ID to target the trip divider
                     if (tripElement) {
@@ -434,31 +438,31 @@ function homepage() {
                 const newUserData = {
                     fname: newDisplayName, // Assuming the new display name is the first name
                 };
-    
+
                 // Send the PUT request to update user details
                 const response = await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/${userId}`, newUserData);
-    
+
                 // Update the frontend state after successful update
                 setUserName(newDisplayName);
-    
-                console.log('Display name updated successfully:', response.data);
+                toast.success("Display name successfully updated!")
+                // console.log('Display name updated successfully:', response.data);
             } catch (error) {
                 console.error('Error updating display name:', error);
+                toast.error("Display name failed to updated.")
             }
         }
     };
 
     return (
         <GoogleOAuthProvider clientId={googleID}>
-             <div className="dashboard">
+            <ToastContainer />
+            <div className="dashboard">
                 {/* Header section */}
                 <header className="header">
-                    <div className="left-rectangle"></div> 
-                    <div className="logo-container">
-                        <Image src={logo} alt="Logo" width={300} height={300} priority />
+                    <div className="banner">
+                        TRIP TRENDS
                     </div>
-                    <div className="right-rectangle"></div>
-                    
+
                     {/* Profile Container on the right */}
                     <div className="profile-container">
                         <Image
@@ -575,7 +579,6 @@ function homepage() {
                     <br></br>
                     <h2>Recent Trips</h2>
                     <br></br>
-                    <br></br>
                     {trips.length === 0 ? (
                         <p>No trips created.</p>
                     ) : (
@@ -585,13 +588,13 @@ function homepage() {
                                     <li key={trip.trip_id}>
                                         <div
                                             id={`trip-${trip.trip_id}`} // Unique ID for each trip 
-                                            onClick={() => toggleTripDetails(trip.trip_id)} 
-                                            className={animatedTripId === trip.trip_id ? "shake" : '' } // Apply animation
-                                            style={{ cursor: 'pointer', padding: '10px', border: '1px solid #ccc', marginBottom: '5px', backgroundColor: expandedTripId === trip.trip_id ? '#2e7d32' : '#134a09'}}>
+                                            onClick={() => toggleTripDetails(trip.trip_id)}
+                                            className={animatedTripId === trip.trip_id ? "shake" : ''} // Apply animation
+                                            style={{ cursor: 'pointer', padding: '10px', border: '1px solid #ccc', marginBottom: '5px', backgroundColor: expandedTripId === trip.trip_id ? '#2e7d32' : '#588157' }}>
                                             {trip.name}
                                         </div>
                                         {expandedTripId === trip.trip_id && (
-                                            <div style={{ padding: '10px', backgroundColor: expandedTripId === trip.trip_id ? '#2e7d32' : '#134a09', border: '1px solid #ccc' }}>
+                                            <div style={{ padding: '10px', backgroundColor: expandedTripId === trip.trip_id ? '#2e7d32' : '#588157', border: '1px solid #ccc' }}>
                                                 <p>
                                                     <strong>Dates:</strong> {trip.start_date} - {trip.end_date}
                                                 </p>
