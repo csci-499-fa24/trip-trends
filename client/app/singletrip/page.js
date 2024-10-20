@@ -524,14 +524,6 @@ function Singletrip() {
                             {/* Delete Trip Button */}
                             <DeleteTripComponent tripId={tripId} userRole={userRole} />
                         </header>
-
-                        <Slider {...settings}>
-                        {tripData.data.tr.map((location) => (
-                            <div key={location.name}>
-                            <img src={location.imageUrl} alt={location.name} style={{ width: '100%', height: 'auto' }} />
-                            </div>
-                        ))}
-                        </Slider>
                         {/* General Trip Info*/}
                         <div className="trip-overview">
                             <div className="trip-overview-div">
@@ -659,7 +651,7 @@ function Singletrip() {
 
                         <br></br>
                         {/* Icon Bar Above Expenses */}
-                        <div className="filter-section">
+                        <div>
                             <header class="icon-bar-header">
                                 {/* Add Expense Button */}
                                 <div class="icon-div" tooltip="Add Expense" tabindex="0">
@@ -681,14 +673,6 @@ function Singletrip() {
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
                                         </svg>
                                         <span class="icon-text">Filter</span>
-                                        {selectedFilter && (
-                                            <div className="applied-filter">
-                                                <span>{`Filter: ${selectedFilter}`}</span>
-                                                <button className="clear-filter-btn" onClick={clearFilter}>
-                                                    &times;
-                                                </button>
-                                            </div>
-                                        )}
 
                                     </div>
                                 </div>
@@ -718,6 +702,16 @@ function Singletrip() {
                                 <div className='dropdown-container'>
                                     <LocationsDropdownComponent tripLocations={tripLocations} />
                                 </div>
+                                
+                                {/* Applied filter popup */}
+                                {selectedFilter && (
+                                            <div className="applied-filter">
+                                                <span>{`Filter: ${selectedFilter}`}</span>
+                                                <button className="clear-filter-btn" onClick={clearFilter}>
+                                                    &times;
+                                                </button>
+                                            </div>
+                                        )}
                             </header>
                         </div>
 
