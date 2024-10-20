@@ -5,6 +5,7 @@ import '../css/singletrip.css';
 import axios from 'axios';
 import Table from 'react-bootstrap/Table';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '../css/homepage.css';
 import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css';
@@ -18,6 +19,7 @@ import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 import DeleteTripComponent from '../components/DeleteTripComponent';
 import ShareTripComponent from '../components/ShareTripComponent';
 import { createApi } from 'unsplash-js';
+import LocationsDropdownComponent from '../components/LocationsDropdownComponent';
 
 Chart.register(ArcElement, Tooltip, Legend);
 
@@ -40,6 +42,7 @@ function Singletrip() {
     const [selectedExpense, setSelectedExpense] = useState(null);
     const [originalData, setOriginalData] = useState([]);
     const [selectedFilter, setSelectedFilter] = useState('');
+    const [tripLocations, setTripLocations] = useState([]);
     const [newExpenseData, setNewExpenseData] = useState({
         trip_id: '',
         name: '',
@@ -96,12 +99,13 @@ function Singletrip() {
 
             axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${tripId}`)
                 .then(response => {
+                    // console.log("TRIP LOCATIONS");
                     // console.log(response.data);
                     setSelectedCurrency(response.data.data[0].currency_code)
-
                     const locations = response.data.data;
-                    const currencyCodes = locations.map(location => location.currency_code);
+                    setTripLocations(locations.map(location => location.location));
 
+                    const currencyCodes = locations.map(location => location.currency_code);
                     setOtherCurrencies(currencyCodes);
 
                 })
@@ -558,19 +562,23 @@ function Singletrip() {
                         {/* Trip Calendar and Budget Meter */}
                         <div className='container'>
                             <div className='row'>
-                                <div className='col'>
-                                    <Calendar
-                                        tileClassName={({ date }) => {
-                                            if (isDateInRange(date)) {
-                                                return 'highlighted-date';
-                                            }
-                                            if (date.toDateString() === endDate.toDateString()) {
+                                <div className='col' style={{ flexDirection: "column" }}>
+                                    <div className="meter-container">
+                                        <p id='budgetTitle'>Your Trip Calendar:</p>
+                                        <br></br>
+                                        <Calendar
+                                            tileClassName={({ date }) => {
+                                                if (isDateInRange(date)) {
+                                                    return 'highlighted-date';
+                                                }
+                                                if (date.toDateString() === endDate.toDateString()) {
 
-                                                return 'highlighted-date';
-                                            }
-                                            return null;
-                                        }}
-                                    />
+                                                    return 'highlighted-date';
+                                                }
+                                                return null;
+                                            }}
+                                        />
+                                    </div>
                                 </div>
                                 <div className='col'>
                                     <div className="meter-container">
@@ -620,9 +628,9 @@ function Singletrip() {
                                         {expenseData && expenseData.data && totalUSDExpenses === 0 ? (
                                             <p>Loading your budget data...</p>
                                         ) : (
-                                            <div style={{ textAlign: 'center', margin: '20px' }}>
-                                                <p style={{ textDecoration: "underline" }}>Total Expenses in USD:</p>
-                                                <p>${totalUSDExpenses.toFixed(2)}</p>
+                                            <div style={{ textAlign: 'center' }}>
+                                                <p style={{ textDecoration: "underline", display: "inline" }}>Total Expenses in USD:</p>
+                                                <span>  ${totalUSDExpenses.toFixed(2)}</span>
                                                 {totalUSDExpenses > tripData.data.budget ? (
                                                     <p id='budget-text'>You are <strong>${(totalUSDExpenses - tripData.data.budget).toFixed(2)}</strong> over your budget.</p>
                                                 ) : (
@@ -632,9 +640,6 @@ function Singletrip() {
                                         )}
                                     </div>
                                 </div>
-
-
-
                                 {/* Pie Chart */}
                                 <div className='col'>
                                     <div className="meter-container">
@@ -709,6 +714,9 @@ function Singletrip() {
                                         </svg>
                                         <span class="icon-text">Add Image</span>
                                     </div>
+                                </div>
+                                <div className='dropdown-container'>
+                                    <LocationsDropdownComponent tripLocations={tripLocations} />
                                 </div>
                             </header>
                         </div>
