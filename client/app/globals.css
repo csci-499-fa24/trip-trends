@@ -16,7 +16,6 @@ body {
   overflow-x: hidden;
 }
 
-
 .header {
   display: flex;
   justify-content: space-between; 
@@ -43,7 +42,6 @@ body {
   font-size: 21px;
   font-weight: bold;
 }
-
 
 .modal {
   display: flex;
