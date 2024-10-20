@@ -601,7 +601,7 @@ function Singletrip() {
                                                     needleTransitionDuration={2500}
                                                     needleTransition={Transition.easeBounceOut}
                                                     segments={4}
-                                                    segmentColors={['#b3e5fc', '#ffe0b2', '#ffccbc', '#d1c4e9']}
+                                                    segmentColors={[ "#a3be8c","#ebcb8b","#d08770","#bf616a"]}
                                                 />
                                             </div>
                                         ) : (
@@ -620,7 +620,7 @@ function Singletrip() {
                                                     needleTransitionDuration={2500}
                                                     needleTransition={Transition.easeBounceOut}
                                                     segments={4}
-                                                    segmentColors={['#b3e5fc', '#ffe0b2', '#ffccbc', '#d1c4e9']}
+                                                    segmentColors={["#a3be8c","#ebcb8b","#d08770","#bf616a"]}
                                                 />
                                             </div>
                                         )}
