@@ -1,8 +1,11 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --green: #3A5A40;
   --darkgreen: #344E41;
+  --lightergreen: #A3B18A;
   --lightgreen: #588157;
+  --offwhite: #DAD7CD;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -105,4 +108,11 @@ form {
   html {
     color-scheme: dark;
   }
+}
+
+.main-container {
+  width: 90%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
 }
