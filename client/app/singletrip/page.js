@@ -10,12 +10,11 @@ import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css';
 import { parseISO, startOfDay, endOfDay } from 'date-fns';
 import ReactSpeedometer, { Transition } from 'react-d3-speedometer';
-import Image from 'next/image';
-import homeIcon from '../img/homeIcon.png';
 import { Pie } from 'react-chartjs-2';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 import DeleteTripComponent from '../components/DeleteTripComponent';
 import ShareTripComponent from '../components/ShareTripComponent';
+import EditTripComponent from '../components/EditTripComponent';
 import { createApi } from 'unsplash-js';
 import LocationsDropdownComponent from '../components/LocationsDropdownComponent';
 
@@ -70,6 +69,14 @@ function Singletrip() {
 
     useEffect(() => {
         if (tripId) {
+            fetchTripData();
+            fetchExpenseData();
+            fetchTripLocations();
+        }
+    }, [tripId]);
+
+    const fetchTripData = () => {
+        if (tripId) {
             axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`)
                 .then(response => {
                     setTripData(response.data);
@@ -77,42 +84,46 @@ function Singletrip() {
                 .catch(error => {
                     console.error('Error fetching trip data:', error);
                 });
-
-            axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/trips/${tripId}`)
-                .then(response => {
-                    setExpenseData(response.data);
-                    setOriginalData(response.data);
-                    const fetchedExpenses = response.data.data;
-
-                    const savedFilter = localStorage.getItem('selectedFilter');
-                    if (savedFilter) {
-                        applyFilter(savedFilter, response.data);
-                    }
-
-                    fetchCurrencyRates(fetchedExpenses);
-                })
-                .catch(error => {
-                    console.error('Error fetching trip data:', error);
-                });
-
-            axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${tripId}`)
-                .then(response => {
-                    // console.log("TRIP LOCATIONS");
-                    // console.log(response.data);
-                    setSelectedCurrency(response.data.data[0].currency_code)
-                    const locations = response.data.data;
-                    setTripLocations(locations.map(location => location.location));
-
-                    const currencyCodes = locations.map(location => location.currency_code);
-                    setOtherCurrencies(currencyCodes);
-
-                })
-                .catch(error => {
-                    console.error('Error fetching trip data:', error);
-                });
-
         }
-    }, [tripId]);
+    };
+
+    const fetchExpenseData = () => {
+        axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/trips/${tripId}`)
+            .then(response => {
+                setExpenseData(response.data);
+                setOriginalData(response.data);
+                const fetchedExpenses = response.data.data;
+
+                const savedFilter = localStorage.getItem('selectedFilter');
+                if (savedFilter) {
+                    applyFilter(savedFilter, response.data);
+                }
+
+                fetchCurrencyRates(fetchedExpenses);
+            })
+            .catch(error => {
+                console.error('Error fetching trip data:', error);
+            });
+    };
+
+    const fetchTripLocations = () => {
+        axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${tripId}`)
+            .then(response => {
+                // console.log("TRIP LOCATIONS");
+                // console.log(response.data);
+                setSelectedCurrency(response.data.data[0].currency_code)
+                const locations = response.data.data;
+                setTripLocations(locations.map(location => location.location));
+
+                const currencyCodes = locations.map(location => location.currency_code);
+                setOtherCurrencies(currencyCodes);
+
+            })
+            .catch(error => {
+                console.error('Error fetching trip data:', error);
+            });
+    };
+
 
     useEffect(() => {
         console.log('fetching user role...');
@@ -257,31 +268,6 @@ function Singletrip() {
             });
 
     }, [tripId]);
-
-
-    // const deleteTrip = async () => {
-    //     if (window.confirm('Please confirm trip deletion. This action cannot be undone.')) {
-    //         try {
-    //             // delete trip
-    //             await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`);
-    //             window.location.href = '/homepage'; // redirect to homepage
-    //         } catch (error) {
-    //             console.error('Error deleting trip:', error);
-    //         }
-    //     }
-    // };
-
-    // const deleteUserFromTrip = async (userId) => {
-    //     if (window.confirm('Please confirm user removal from trip. This action cannot be undone.')) {
-    //         try {
-    //             // delete user from trip
-    //             await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/sharedtrips/${userId}/${tripId}`);
-    //             window.location.reload();
-    //         } catch (error) {
-    //             console.error('Error deleting user from trip:', error);
-    //         }
-    //     }
-    // };
 
     const handleEditChange = (e) => {
         const { name, value } = e.target;
@@ -433,27 +419,6 @@ function Singletrip() {
         localStorage.removeItem('selectedFilter');
     };
 
-    // const shareTrip = async (email, role) => {
-    //     try {
-    //         if (!userId) {
-    //             console.error('User not authenticated. Cannot share trip.');
-    //             return;
-    //         }
-    //         if (!tripId) {
-    //             console.error('Trip ID not found. Cannot share trip.');
-    //             return;
-    //         }
-    //         const requestBody = {
-    //             email, 
-    //             role        
-    //         };
-    //         const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/${userId}/trips/${tripId}/`, requestBody);
-    //         console.log('Trip shared successfully:', response.data);
-    //     } catch (error) {
-    //         console.error('Error sharing trip:', error.response?.data || error.message);
-    //     }
-    // };
-
     const handleCurrencyChange = async (e) => {
         const currency = e.target.value;
         setCustomCurrency(currency);
@@ -511,14 +476,20 @@ function Singletrip() {
                     <div>
                         <h1 id='tripName'>{tripData.data.name}</h1>
                         <header class="top-icon-header">
-                            <div class="icon-div" tooltip="Home" tabindex="0">
-                                <div onClick={() => window.location.href = '/homepage'}>
-                                    <Image src={homeIcon} alt="homepage" width={55} height={55} />
-                                </div>
-                                <span class="icon-text">Home</span>
+                        <div class="icon-div" tooltip="Trips Home" tabindex="0">
+                            <div class="icon-SVG">
+                                <svg
+                                    onClick={() => window.location.href = '/homepage'}
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                                </svg>
+                            <span class="icon-text">Trips Home</span>
                             </div>
+                        </div>
                             {/* Share Trip Button */}
                             <ShareTripComponent tripId={tripId} isOwner={isOwner} />
+                            {/* Edit Trip Button */}
+                            <EditTripComponent tripId={tripId} tripData={tripData} tripLocations={tripLocations} userRole={userRole} onUpdate={fetchTripData}/>
                             {/* Delete Trip Button */}
                             <DeleteTripComponent tripId={tripId} userRole={userRole} />
                         </header>
@@ -726,7 +697,7 @@ function Singletrip() {
                                                 <th>Category</th>
                                                 <th>Date Posted</th>
                                                 <th>Notes</th>
-                                                <th>Modify Expense</th>
+                                                <th>Modify</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -739,7 +710,20 @@ function Singletrip() {
                                                     <td>{expense.posted}</td>
                                                     <td>{expense.notes}</td>
                                                     <td>
-                                                        <button onClick={() => { setEditPopupVisible(true); setSelectedExpense(expense) }} className='edit-expense'>Edit/Delete</button>
+                                                        {/* <div onClick={() => { setEditPopupVisible(true); setSelectedExpense(expense) }} className='edit-expense'>Edit Expense</div> */}
+                                                        <div class="icon-div" tooltip="Edit Trip" tabindex="0">
+                                                            <div class="icon-SVG">
+                                                                <svg
+                                                                    onClick={() => { 
+                                                                        setEditPopupVisible(true); 
+                                                                        setSelectedExpense(expense); 
+                                                                    }}
+                                                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                                                </svg>
+                                                            <span class="icon-text">Edit Expense</span>
+                                                            </div>
+                                                        </div>
                                                         <div className="expense-form">
                                                             {isEditPopupVisible && selectedExpense && (
                                                                 <div className="modal">
