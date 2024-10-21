@@ -1,11 +1,10 @@
 'use client';
 
-import React, { useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import '../css/singletrip.css';
 import axios from 'axios';
 import Table from 'react-bootstrap/Table';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css';
 import { parseISO, startOfDay, endOfDay } from 'date-fns';
@@ -60,6 +59,13 @@ function Singletrip() {
         "Health/Safety",
         "Other"
     ]);
+
+    useEffect(() => {
+        const loadBootstrap = async () => {
+            await import('bootstrap/dist/js/bootstrap.bundle.min.js');
+        };
+        loadBootstrap();
+    }, []);
 
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
@@ -439,28 +445,28 @@ function Singletrip() {
 
     const unsplash = createApi({
         accessKey: process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY
-      });
+    });
 
     const getImageURL = async (trip_location) => {
         try {
             const response = await unsplash.search.getPhotos({
-            query: trip_location,
-            page: 1,
-            perPage: 10,
-        });
+                query: trip_location,
+                page: 1,
+                perPage: 10,
+            });
 
-        if (response.response.results.length > 0) {
-            const images = response.response.results.map(image => image.urls.raw); // array of 10 images
+            if (response.response.results.length > 0) {
+                const images = response.response.results.map(image => image.urls.raw); // array of 10 images
 
-            const random_index = Math.floor(Math.random() * response.response.results.length);
-            const imageURL = images[random_index]
-            console.log(`Image URL for ${trip_location}:`, imageURL); // Display the random image URL
-            // console.log(images); // Array of image URLs
-          } else {
-            console.log('No images found.');
-          }
+                const random_index = Math.floor(Math.random() * response.response.results.length);
+                const imageURL = images[random_index]
+                console.log(`Image URL for ${trip_location}:`, imageURL); // Display the random image URL
+                // console.log(images); // Array of image URLs
+            } else {
+                console.log('No images found.');
+            }
         } catch (error) {
-          console.error('Error fetching images:', error);
+            console.error('Error fetching images:', error);
         }
     };
 
@@ -476,20 +482,20 @@ function Singletrip() {
                     <div>
                         <h1 id='tripName'>{tripData.data.name}</h1>
                         <header class="top-icon-header">
-                        <div class="icon-div" tooltip="Trips Home" tabindex="0">
-                            <div class="icon-SVG">
-                                <svg
-                                    onClick={() => window.location.href = '/homepage'}
-                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                                </svg>
-                            <span class="icon-text">Trips Home</span>
+                            <div class="icon-div" tooltip="Trips Home" tabindex="0">
+                                <div class="icon-SVG">
+                                    <svg
+                                        onClick={() => window.location.href = '/homepage'}
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                                    </svg>
+                                    <span class="icon-text">Trips Home</span>
+                                </div>
                             </div>
-                        </div>
                             {/* Share Trip Button */}
                             <ShareTripComponent tripId={tripId} isOwner={isOwner} />
                             {/* Edit Trip Button */}
-                            <EditTripComponent tripId={tripId} tripData={tripData} tripLocations={tripLocations} userRole={userRole} onUpdate={fetchTripData}/>
+                            <EditTripComponent tripId={tripId} tripData={tripData} tripLocations={tripLocations} userRole={userRole} onUpdate={fetchTripData} />
                             {/* Delete Trip Button */}
                             <DeleteTripComponent tripId={tripId} userRole={userRole} />
                         </header>
@@ -562,7 +568,7 @@ function Singletrip() {
                                                     needleTransitionDuration={2500}
                                                     needleTransition={Transition.easeBounceOut}
                                                     segments={4}
-                                                    segmentColors={[ "#a3be8c","#ebcb8b","#d08770","#bf616a"]}
+                                                    segmentColors={["#a3be8c", "#ebcb8b", "#d08770", "#bf616a"]}
                                                 />
                                             </div>
                                         ) : (
@@ -581,7 +587,7 @@ function Singletrip() {
                                                     needleTransitionDuration={2500}
                                                     needleTransition={Transition.easeBounceOut}
                                                     segments={4}
-                                                    segmentColors={["#a3be8c","#ebcb8b","#d08770","#bf616a"]}
+                                                    segmentColors={["#a3be8c", "#ebcb8b", "#d08770", "#bf616a"]}
                                                 />
                                             </div>
                                         )}
@@ -671,16 +677,16 @@ function Singletrip() {
                                 <div className='dropdown-container'>
                                     <LocationsDropdownComponent tripLocations={tripLocations} />
                                 </div>
-                                
+
                                 {/* Applied filter popup */}
                                 {selectedFilter && (
-                                            <div className="applied-filter">
-                                                <span>{`Filter: ${selectedFilter}`}</span>
-                                                <button className="clear-filter-btn" onClick={clearFilter}>
-                                                    &times;
-                                                </button>
-                                            </div>
-                                        )}
+                                    <div className="applied-filter">
+                                        <span>{`Filter: ${selectedFilter}`}</span>
+                                        <button className="clear-filter-btn" onClick={clearFilter}>
+                                            &times;
+                                        </button>
+                                    </div>
+                                )}
                             </header>
                         </div>
 
@@ -714,14 +720,14 @@ function Singletrip() {
                                                         <div class="icon-div" tooltip="Edit Trip" tabindex="0">
                                                             <div class="icon-SVG">
                                                                 <svg
-                                                                    onClick={() => { 
-                                                                        setEditPopupVisible(true); 
-                                                                        setSelectedExpense(expense); 
+                                                                    onClick={() => {
+                                                                        setEditPopupVisible(true);
+                                                                        setSelectedExpense(expense);
                                                                     }}
                                                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                                                     <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                                                                 </svg>
-                                                            <span class="icon-text">Edit Expense</span>
+                                                                <span class="icon-text">Edit Expense</span>
                                                             </div>
                                                         </div>
                                                         <div className="expense-form">
