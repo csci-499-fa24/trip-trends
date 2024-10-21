@@ -1,19 +1,17 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState} from 'react';
 import '../css/singletrip.css';
 import axios from 'axios';
 import Table from 'react-bootstrap/Table';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import '../css/homepage.css';
 import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css';
 import { parseISO, startOfDay, endOfDay } from 'date-fns';
 import ReactSpeedometer, { Transition } from 'react-d3-speedometer';
 import Image from 'next/image';
 import homeIcon from '../img/homeIcon.png';
-import Link from 'next/link';
 import { Pie } from 'react-chartjs-2';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 import DeleteTripComponent from '../components/DeleteTripComponent';
@@ -505,7 +503,7 @@ function Singletrip() {
         <div className="main-container">
             <div>
                 {/* Header section */}
-                <div className="banner2">
+                <div className="header">
                     TRIP TRENDS
                 </div>
 
@@ -514,9 +512,9 @@ function Singletrip() {
                         <h1 id='tripName'>{tripData.data.name}</h1>
                         <header class="top-icon-header">
                             <div class="icon-div" tooltip="Home" tabindex="0">
-                                <Link href={'/homepage'}>
-                                    <Image src={homeIcon} alt="homepage" width={"55"} height={"55"} />
-                                </Link>
+                                <div onClick={() => window.location.href = '/homepage'}>
+                                    <Image src={homeIcon} alt="homepage" width={55} height={55} />
+                                </div>
                                 <span class="icon-text">Home</span>
                             </div>
                             {/* Share Trip Button */}
