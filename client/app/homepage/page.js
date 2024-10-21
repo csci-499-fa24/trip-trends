@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
-import logo from '../img/Logo.png';
 import '../css/homepage.css';
 import axios from 'axios';
 import { GoogleOAuthProvider, googleLogout } from '@react-oauth/google';
