@@ -458,9 +458,7 @@ function homepage() {
             <div className="dashboard">
                 {/* Header section */}
                 <header className="header">
-                    <div className="banner">
                         TRIP TRENDS
-                    </div>
 
                     {/* Profile Container on the right */}
                     <div className="profile-container">
