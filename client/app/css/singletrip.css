@@ -420,7 +420,9 @@
     padding: 5px 10px;
     border-radius: 5px;
     white-space: nowrap;
+    margin-left: 10px; 
 }
+
 
 .clear-filter-btn {
     background: none;
@@ -594,7 +596,7 @@
     width: auto;
     display: flex;
     align-items: center;
-    position: fixed;
+    position: relative;
     padding: 10px;
     position: absolute;
     top: 95px;
@@ -623,8 +625,8 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    transition: background-color 300ms ease;
     cursor: pointer;
+    transition: none;
 }
 
 .icon-div .icon-SVG {

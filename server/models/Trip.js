@@ -31,10 +31,6 @@ const Trip = sequelize.define("all_trips", {
     budget: {
         type: DataTypes.DOUBLE,
         allowNull: false
-    },
-    image: {
-        type: DataTypes.STRING,
-        allowNull: true,
     }
 }, {
     tableName: 'all_trips',
