@@ -224,6 +224,7 @@
     border: none;
     border-radius: 10px;
     overflow: hidden;
+    size-adjust: auto;
 }
 
 .react-calendar__tile {
@@ -386,7 +387,7 @@
 .expense-table-container {
     width: 64.5%;
     float: left;
-    padding: 3px;
+    padding: 10px;
     background-color: #f5f5f5;
     border-radius: 10px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);

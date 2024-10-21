@@ -3,6 +3,7 @@ import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../css/singletrip.css';
+import '../css/modifyTrip.css';
 
 const DeleteTripComponent = ({ tripId, userRole }) => {
     const handleDelete = async () => {
@@ -25,7 +26,7 @@ const DeleteTripComponent = ({ tripId, userRole }) => {
         if (window.confirm('Please confirm removal of this trip. This action cannot be undone.')) {
             try {
                 // delete user from trip
-                await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/sharedtrips/users/${userId}/trips/${tripId}`);
+                await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/users/${userId}/trips/${tripId}`);
                 window.location.href = '/homepage'; // redirect to homepage
             } catch (error) {
                 console.error('Error removing trip:', error);
@@ -45,7 +46,7 @@ const DeleteTripComponent = ({ tripId, userRole }) => {
 
     return (
         <>
-            <div className="icon-div delete-icon" tooltip={userRole !== 'owner' ? 'Remove Trip' : 'Delete Trip'} tabindex="0">
+            <div className="icon-div delete-icon" tooltip={userRole !== 'owner' ? 'Remove Trip' : 'Delete Trip'} tabIndex="0">
                 <div className="icon-SVG">
                     <svg
                         onClick={handleDeleteAction}

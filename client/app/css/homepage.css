@@ -18,7 +18,6 @@
     background-color:var(--darkgreen);;
     color: white;
     height: auto; 
-    width: 100%;
     text-align: center;
 }
 
@@ -27,6 +26,8 @@
     border: 1px solid white;
     padding: 10px;
     background-color: rgba(255, 255, 255, 0.1); 
+    width: 80%;
+    margin: 0 auto;
 }
 
 .logout {
@@ -183,6 +184,7 @@
     border-radius: 8px; 
     pointer-events: none;
     opacity: 0;
+
     transition: opacity 0.3s, transform 0.3s ease-out;
     z-index: 1000;
     font-size: 14px; 
@@ -193,7 +195,6 @@
 
 .map-container {
     height: 400px;
-    width: 100%;
     position: relative;
     z-index: 0;
     overflow: hidden;

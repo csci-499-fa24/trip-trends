@@ -2,14 +2,12 @@ import React, { useState } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import '../css/sharedTrip.css';
+import '../css/modifyTrip.css';
 
 const ShareTripComponent = ({ tripId, isOwner }) => {
     // hide button if user is not trip owner
     if (!isOwner) return null;
-    // console.log("isOwner: ", isOwner);
-    // console.log("tripId: ", tripId);
-
+    
     const [isOpen, setIsOpen] = useState(false);
     const [email, setEmail] = useState("");
     const [role, setRole] = useState("editor");
@@ -85,7 +83,7 @@ const ShareTripComponent = ({ tripId, isOwner }) => {
                                 </select>
                             </label>
 
-                            <button type="submit" className="share-trip-button">Share</button>
+                            <button type="submit" className="share-trip-button">Confirm Share</button>
                         </form>
                     </div>
                 </div>

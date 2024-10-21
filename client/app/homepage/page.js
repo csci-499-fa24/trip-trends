@@ -453,6 +453,7 @@ function homepage() {
     };
 
     return (
+        <div className='main-container'>
         <GoogleOAuthProvider clientId={googleID}>
             <ToastContainer />
             <div className="dashboard">
@@ -580,9 +581,9 @@ function homepage() {
                         <p>No trips created.</p>
                     ) : (
                         Array.isArray(trips) && trips.length > 0 ? (
-                            <ul>
+                            <div>
                                 {trips.map(trip => (
-                                    <li key={trip.trip_id}>
+                                    <div key={trip.trip_id}>
                                         <div
                                             id={`trip-${trip.trip_id}`} // Unique ID for each trip 
                                             onClick={() => toggleTripDetails(trip.trip_id)}
@@ -601,9 +602,9 @@ function homepage() {
                                                 </Link>
                                             </div>
                                         )}
-                                    </li>
+                                    </div>
                                 ))}
-                            </ul>
+                            </div>
                         ) : (
                             <p>No trips available.</p>
                         )
@@ -611,6 +612,7 @@ function homepage() {
                 </div>
             </div>
         </GoogleOAuthProvider>
+        </div>
     );
 }
 
