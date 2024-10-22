@@ -37,8 +37,6 @@ function Singletrip() {
     const [exchangeRates, setExchangeRates] = useState({});
     const [isPopUpVisible, setPopUpVisible] = useState(false);
     const [isFilterPopupVisible, setFilterPopupVisible] = useState(false);
-    const [isEditPopupVisible, setEditPopupVisible] = useState(false);
-    const [selectedExpense, setSelectedExpense] = useState(null);
     const [originalData, setOriginalData] = useState([]);
     const [selectedFilter, setSelectedFilter] = useState('');
     const [tripLocations, setTripLocations] = useState([]);
@@ -271,40 +269,6 @@ function Singletrip() {
             });
 
     }, [tripId]);
-
-    const handleEditChange = (e) => {
-        const { name, value } = e.target;
-        setSelectedExpense((prev) => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
-    const submitEditExpense = async (expenseID) => {
-        axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/${expenseID}`, selectedExpense)
-            .then(response => {
-                console.log(response)
-                window.location.reload();
-                setEditPopupVisible(false);
-            })
-            .catch(error => {
-                console.error('Error editing expense:', error);
-            });
-    };
-
-    const deleteExpense = async (expenseID) => {
-        if (window.confirm('Please confirm expense deletion. This action cannot be undone.')) {
-            axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/${expenseID}`)
-                .then(response => {
-                    console.log(response);
-                    window.location.reload();
-                })
-                .catch(error => {
-                    console.error('Error deleting expense:', error);
-                });
-            setEditPopupVisible(false);
-        }
-    };
 
     const submitNewExpense = async (e) => {
         e.preventDefault();
@@ -542,7 +506,8 @@ function Singletrip() {
                         </div>
 
                         {/* Expense Table */}
-                        <ExpenseTableComponent tripData={tripData} tripId = {tripId} tripLocations = {tripLocations} expenseData={expenseData} isEditPopupVisible={isEditPopupVisible} />
+                        <ExpenseTableComponent tripData={tripData} tripId = {tripId} tripLocations = {tripLocations} expenseData={expenseData} 
+                        currencyCodes={currencyCodes} expenseCategories={expenseCategories} />
 
                     </div>
                 ) : (
