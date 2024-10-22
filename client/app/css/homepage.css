@@ -5,7 +5,7 @@
 }
 
 .welcome-section {
-    text-align: left;
+    text-align: center;
     padding: 20px;
     background-color: #FFFFFF;
     color: black;
@@ -26,7 +26,6 @@
     border: 1px solid white;
     padding: 10px;
     background-color: rgba(255, 255, 255, 0.1); 
-    width: 80%;
     margin: 0 auto;
 }
 

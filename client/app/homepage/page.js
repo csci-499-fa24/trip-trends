@@ -579,10 +579,10 @@ function homepage() {
                         </div>
                     )}
                 </div>
-
+                {/* <div style={{ width: '100%', backgroundColor: 'white'}}> */}
                 {/* Map section */}
-                <div ref={mapRef} style={{ height: '400px', width: '100%' }}></div>
-
+                <div ref={mapRef} style={{ height: '400px', width: '100%',  }}></div>
+                {/* </div> */}
                 {/* Recent trips section */}
                 <div className="recent-trips">
                     <br></br>
