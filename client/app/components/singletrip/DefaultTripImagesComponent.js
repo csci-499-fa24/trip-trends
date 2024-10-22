@@ -10,7 +10,7 @@ const DefaultTripImagesComponent = ({ tripId, tripLocations }) => {
   const hasFetchedImages = useRef(false); 
 
   const unsplash = createApi({
-    accessKey: "ygg7PbwskWNEmfeldaC3jkUe--xi1-dbIh43H0wLztI"
+    accessKey: process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY
   });
 
   // Uses the Unsplash API to fetch one pgoto based on a single trip location
