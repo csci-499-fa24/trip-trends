@@ -38,7 +38,7 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations }) => {
     const { startDate, endDate } = getTripDates();
 
     return (
-        <div> {/* Single parent element */}
+        <div>
             <div className="trip-overview">
                 <div className="trip-overview-div">
                     <div className="trip-overview-circle">🗓️</div>
