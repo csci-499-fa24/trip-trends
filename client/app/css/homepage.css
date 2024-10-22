@@ -209,25 +209,42 @@
     position: absolute; 
     right: 0; 
     background-color: transparent; 
-    border: none;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); 
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); 
     z-index: 1000;
-    align-items: center;
-    justify-content: center;
     display: flex;
-    flex-direction: column;
+    flex-direction: column; 
+    border-radius: 12px;
+    overflow: hidden; 
+    min-width: 150px;
 }
 
 .dropdown-item {
-    text-align: center;
-    padding: 10px;
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
     cursor: pointer;
     background-color: var(--lightgreen);
-    ;
+    transition: background-color 0.3s ease; 
+    border-radius: 0px;
+    white-space: nowrap;
+    font-size: 13px;
+    line-height: 1.2;
 }
 
 .dropdown-item:hover {
     background-color: #13874d95; 
+    color: white;
+}
+
+.dropdown-item:active {
+    background-color: #0c6a3e; 
+}
+
+.dropdown-item svg {
+    margin-right: 8px;
+    width: 20px;
+    height: 20px;
 }
 
 .profile-container {
