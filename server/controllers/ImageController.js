@@ -32,7 +32,7 @@ const getImageById = async (req, res) => {
     try {
         const image = await Image.findByPk(imageId);
         if (!image) {
-            return res.status(404).json({ message: "Image not found" });
+            return res.status(404).json({ data: image, message: "Image not found" });
         }
         res.status(200).json({ data: image });
     } catch (err) {
@@ -50,7 +50,7 @@ const getImagesByTripId = async (req, res) => {
         }
         const images = await Image.findAll({ where: { trip_id: tripId } });
         if (!images || images.length === 0) {
-            return res.status(404).json({ message: "Images not found" });
+            return res.status(200).json({ data: images, message: "Images not found" });
         }
         res.status(200).json({ data: images });
     } catch (err) {

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import '../css/modifyTrip.css';
+import '../../css/modifyTrip.css';
 
 const ShareTripComponent = ({ tripId, isOwner }) => {
     // hide button if user is not trip owner
