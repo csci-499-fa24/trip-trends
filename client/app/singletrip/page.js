@@ -7,7 +7,6 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Link from 'next/link';
 import 'react-calendar/dist/Calendar.css';
-import ReactSpeedometer, { Transition } from 'react-d3-speedometer';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 
 // Import components
@@ -19,13 +18,13 @@ import CategoryDataComponent from '../components/singletrip/CategoryDataComponen
 import ExpenseFormComponent from '../components/singletrip/ExpenseFormComponent';
 import GeneralTripInfoComponent from '../components/singletrip/GeneralTripInfoComponent';
 import ExpenseTableComponent from '../components/singletrip/ExpenseTableComponent';
+import BudgetMeterComponent from '../components/singletrip/BudgetMeterComponent';
+import ExchangeRateTableComponent from '../components/singletrip/ExchangeRateTableComponent'
 
 Chart.register(ArcElement, Tooltip, Legend);
 
 function Singletrip() {
     const [categoryData, setCategoryData] = useState({ labels: [], datasets: [] });
-    const [customCurrency, setCustomCurrency] = useState('');
-    const [exchangeRate, setExchangeRate] = useState(null);
     const [tripId, setTripId] = useState(null);
     const [tripData, setTripData] = useState(null);
     const [userRole, setUserRole] = useState(null);
@@ -60,23 +59,7 @@ function Singletrip() {
         "Health/Safety",
         "Other"
     ]);
-
-    useEffect(() => {
-        const loadBootstrap = async () => {
-            await import('bootstrap/dist/js/bootstrap.bundle.min.js');
-        };
-        loadBootstrap();
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const id = urlParams.get('tripId');
-        setTripId(id);
-
-        if (tripId) {
-            fetchTripData();
-            fetchExpenseData();
-            fetchTripLocations();
-        }
-    }, [tripId]);
+    const isOwner = userRole === 'owner';
 
     const fetchTripData = () => {
         if (tripId) {
@@ -126,62 +109,6 @@ function Singletrip() {
                 console.error('Error fetching trip data:', error);
             });
     };
-
-
-    useEffect(() => {
-        const fetchUserRole = async () => {
-            const userId = localStorage.getItem("user_id");
-            console.log('User ID:', userId);
-            if (tripId && userId) {
-                try {
-                    const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/trips/${tripId}`);
-                    const sharedTrips = response.data.data;
-                    const userRole = sharedTrips.find(trip => trip.user_id === userId)?.role;
-                    if (userRole) {
-                        setUserRole(userRole);
-                    } else {
-                        console.log("User does not have a role for this trip.");
-                    }
-                } catch (error) {
-                    console.error('Error fetching user role:', error);
-                    setError('Error fetching user role. Please try again later.');
-                }
-            } else {
-                console.log("tripId or userId is missing.");
-            }
-        };
-        fetchUserRole();
-    }, [tripId]);
-    
-    const isOwner = userRole === 'owner';
-
-    useEffect(() => {
-        const getExchangeRates = async () => {
-            const rates = {};
-
-            try {
-                for (let currency of otherCurrencies) {
-                    const response = await axios.get(`https://hexarate.paikama.co/api/rates/latest/USD`, {
-                        params: {
-                            target: currency
-                        }
-                    });
-                    //console.log('API Response:', response.data);
-
-                    if (response.data && response.data.data && response.data.data.mid) {
-                        rates[currency] = response.data.data.mid;
-                    } else {
-                        console.error('Invalid response structure:', response.data);
-                    }
-                }
-                setExchangeRates(rates);
-            } catch (error) {
-                console.error('Error fetching exchange rates:', error);
-            }
-        };
-
-        getExchangeRates();
-    }, [selectedCurrency]);
 
     const fetchCurrencyRates = async (expenses) => {
         try {
@@ -247,29 +174,6 @@ function Singletrip() {
         }
     };
 
-    useEffect(() => {
-        const config = {
-            method: 'get',
-            maxBodyLength: Infinity,
-            url: 'https://data.fixer.io/api/symbols?access_key=' + `${process.env.NEXT_PUBLIC_FIXER_KEY}`,
-            headers: {}
-        };
-
-        axios.request(config)
-            .then(response => {
-                if (response.data.success && response.data.symbols) {
-                    const codes = Object.keys(response.data.symbols);
-                    setCurrencyCodes(codes);
-                } else {
-                    console.error("Failed to fetch currency symbols or symbols is undefined:", response);
-                }
-            })
-            .catch(error => {
-                console.error("Error fetching currency symbols:", error);
-            });
-
-    }, [tripId]);
-
     const submitNewExpense = async (e) => {
         e.preventDefault();
 
@@ -328,23 +232,94 @@ function Singletrip() {
         localStorage.removeItem('selectedFilter');
     };
 
-    const handleCurrencyChange = async (e) => {
-        const currency = e.target.value;
-        setCustomCurrency(currency);
+    useEffect(() => {
+        const loadBootstrap = async () => {
+            await import('bootstrap/dist/js/bootstrap.bundle.min.js');
+        };
+        loadBootstrap();
 
-        // Fetch the exchange rate relative to USD
-        try {
-            const response = await axios.get(`https://hexarate.paikama.co/api/rates/latest/USD?target=${currency}`);
-            //if (response.data && response.data.rate) {
-            console.log(response.data.data.mid);
-            setExchangeRate(response.data.data.mid);
-            // } else {
-            //  console.error("Invalid response from the API");
-            // }
-        } catch (error) {
-            console.error("Error fetching exchange rate:", error);
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('tripId');
+        setTripId(id);
+
+        if (tripId) {
+            fetchTripData();
+            fetchExpenseData();
+            fetchTripLocations();
         }
-    };
+
+        const fetchUserRole = async () => {
+            const userId = localStorage.getItem("user_id");
+            console.log('User ID:', userId);
+            if (tripId && userId) {
+                try {
+                    const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/trips/${tripId}`);
+                    const sharedTrips = response.data.data;
+                    const userRole = sharedTrips.find(trip => trip.user_id === userId)?.role;
+                    if (userRole) {
+                        setUserRole(userRole);
+                    } else {
+                        console.log("User does not have a role for this trip.");
+                    }
+                } catch (error) {
+                    console.error('Error fetching user role:', error);
+                    setError('Error fetching user role. Please try again later.');
+                }
+            } else {
+                console.log("tripId or userId is missing.");
+            }
+        };
+        fetchUserRole();
+
+        const config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: 'https://data.fixer.io/api/symbols?access_key=' + `${process.env.NEXT_PUBLIC_FIXER_KEY}`,
+            headers: {}
+        };
+
+        axios.request(config)
+            .then(response => {
+                if (response.data.success && response.data.symbols) {
+                    const codes = Object.keys(response.data.symbols);
+                    setCurrencyCodes(codes);
+                } else {
+                    console.error("Failed to fetch currency symbols or symbols is undefined:", response);
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching currency symbols:", error);
+            });
+
+    }, [tripId]);
+
+    useEffect(() => {
+        const getExchangeRates = async () => {
+            const rates = {};
+
+            try {
+                for (let currency of otherCurrencies) {
+                    const response = await axios.get(`https://hexarate.paikama.co/api/rates/latest/USD`, {
+                        params: {
+                            target: currency
+                        }
+                    });
+                    //console.log('API Response:', response.data);
+
+                    if (response.data && response.data.data && response.data.data.mid) {
+                        rates[currency] = response.data.data.mid;
+                    } else {
+                        console.error('Invalid response structure:', response.data);
+                    }
+                }
+                setExchangeRates(rates);
+            } catch (error) {
+                console.error('Error fetching exchange rates:', error);
+            }
+        };
+
+        getExchangeRates();
+    }, [selectedCurrency]);
 
     return (
         <div className="main-container">
@@ -379,66 +354,10 @@ function Singletrip() {
                         <GeneralTripInfoComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} />
                         {/* Trip Calendar and Budget Meter */}
                         <div className='container'>
-                            <div className='row'>
-                               
+                            <div className='row'>  
                                 <div className='col'>
-                                    <div className="meter-container">
-                                        <p id='budgetTitle'>Your Budget Meter:</p>
-                                        {expenseData && expenseData.data && totalUSDExpenses === 0 ? (
-                                            <p>Loading your budget data...</p>
-                                        ) : totalUSDExpenses > tripData.data.budget ? (
-                                            <div style={{
-                                                marginTop: "10px",
-                                                width: "350px",
-                                                height: "200px",
-                                                marginLeft: "50px"
-                                            }}>
-                                                <ReactSpeedometer
-                                                    width={300}
-                                                    minValue={0}
-                                                    maxValue={tripData.data.budget}
-                                                    value={tripData.data.budget}
-                                                    needleColor="steelblue"
-                                                    needleTransitionDuration={2500}
-                                                    needleTransition={Transition.easeBounceOut}
-                                                    segments={4}
-                                                    segmentColors={["#a3be8c", "#ebcb8b", "#d08770", "#bf616a"]}
-                                                />
-                                            </div>
-                                        ) : (
-                                            <div style={{
-                                                marginTop: "10px",
-                                                width: "350px",
-                                                height: "200px",
-                                                marginLeft: "50px",
-                                            }}>
-                                                <ReactSpeedometer
-                                                    width={300}
-                                                    minValue={0}
-                                                    maxValue={tripData.data.budget}
-                                                    value={totalUSDExpenses.toFixed(2)}
-                                                    needleColor="steelblue"
-                                                    needleTransitionDuration={2500}
-                                                    needleTransition={Transition.easeBounceOut}
-                                                    segments={4}
-                                                    segmentColors={["#a3be8c", "#ebcb8b", "#d08770", "#bf616a"]}
-                                                />
-                                            </div>
-                                        )}
-                                        <p id='budgetTitle'>Your Budget Data:</p>
-                                        {expenseData && expenseData.data && totalUSDExpenses === 0 ? (
-                                            <p>Loading your budget data...</p>
-                                        ) : (
-                                            <div style={{ textAlign: 'center' }}>
-                                                <p style={{ textDecoration: "underline", display: "inline" }}>Total Expenses in USD:</p>
-                                                <span>  ${totalUSDExpenses.toFixed(2)}</span>
-                                                {totalUSDExpenses > tripData.data.budget ? (
-                                                    <p id='budget-text'>You are <strong>${(totalUSDExpenses - tripData.data.budget).toFixed(2)}</strong> over your budget.</p>
-                                                ) : (
-                                                    <p>You are within your budget.</p>
-                                                )}
-                                            </div>
-                                        )}
+                                    <div className="meter-container"> 
+                                        <BudgetMeterComponent tripData={tripData} expenseData={expenseData} totalUSDExpenses={totalUSDExpenses} />
                                     </div>
                                 </div>
                                 {/* Pie Chart */}
@@ -571,46 +490,7 @@ function Singletrip() {
 
                 <div>
                     {/* Exchange Rate Table */}
-                    <div className="exchange-rates-container">
-                        <table className="exchange-rates-table">
-                            <thead>
-                                <tr>
-                                    <th>Currency</th>
-                                    <th>Rate (Relative to USD)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {Object.keys(exchangeRates).map((currency) => (
-                                    <tr key={currency}>
-                                        <td>{currency}</td>
-                                        <td>{exchangeRates[currency]}</td>
-                                    </tr>
-                                ))}
-                                {/* Last row for dropdown selection and its rate */}
-                                {/* {customCurrency && ( */}
-                                <tr>
-                                    <td className="exchange-table-dropdown">
-                                        {/* Dropdown for currency codes */}
-                                        <label htmlFor="currency-select"></label>
-                                        <select
-                                            id="currency-select"
-                                            value={customCurrency}
-                                            onChange={handleCurrencyChange}
-                                        >
-                                            <option value="">Currency</option>
-                                            {currencyCodes.map((code) => (
-                                                <option key={code} value={code}>
-                                                    {code}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </td>
-                                    <td>{exchangeRate !== null ? exchangeRate : 'N/A'}</td>
-                                </tr>
-                                {/* )} */}
-                            </tbody>
-                        </table>
-                    </div>
+                    <ExchangeRateTableComponent exchangeRates={exchangeRates} currencyCodes={currencyCodes}/>
                 </div>
             </div >
         </div >
