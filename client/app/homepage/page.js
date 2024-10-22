@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
-import logo from '../img/Logo.png';
 import '../css/homepage.css';
 import axios from 'axios';
 import { GoogleOAuthProvider, googleLogout } from '@react-oauth/google';
@@ -454,14 +453,13 @@ function homepage() {
     };
 
     return (
+        <div className='main-container'>
         <GoogleOAuthProvider clientId={googleID}>
             <ToastContainer />
             <div className="dashboard">
                 {/* Header section */}
                 <header className="header">
-                    <div className="banner">
                         TRIP TRENDS
-                    </div>
 
                     {/* Profile Container on the right */}
                     <div className="profile-container">
@@ -583,9 +581,9 @@ function homepage() {
                         <p>No trips created.</p>
                     ) : (
                         Array.isArray(trips) && trips.length > 0 ? (
-                            <ul>
+                            <div>
                                 {trips.map(trip => (
-                                    <li key={trip.trip_id}>
+                                    <div key={trip.trip_id}>
                                         <div
                                             id={`trip-${trip.trip_id}`} // Unique ID for each trip 
                                             onClick={() => toggleTripDetails(trip.trip_id)}
@@ -604,9 +602,9 @@ function homepage() {
                                                 </Link>
                                             </div>
                                         )}
-                                    </li>
+                                    </div>
                                 ))}
-                            </ul>
+                            </div>
                         ) : (
                             <p>No trips available.</p>
                         )
@@ -614,6 +612,7 @@ function homepage() {
                 </div>
             </div>
         </GoogleOAuthProvider>
+        </div>
     );
 }
 

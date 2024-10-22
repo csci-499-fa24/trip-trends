@@ -136,7 +136,6 @@ const deleteSharedTrip = async (req, res) => {
 
 module.exports = {
     createSharedTrip,
-    // addSharedTrip,
     getSharedTrips,
     getSharedTripsByUserId,
     getSharedTripsByTripId,
