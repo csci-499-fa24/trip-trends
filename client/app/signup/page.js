@@ -3,7 +3,7 @@
 import React from 'react';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import Image from 'next/image';
-import logo from '../img/Logo.png'
+import logo from '../img/newlogo.png'
 import '../css/signup.css'
 import axios from 'axios';
 import { Inria_Sans } from 'next/font/google';
@@ -21,12 +21,10 @@ function Signup() {
 
     const handleLoginSuccess = async (response) => {
         const token = response.credential
-        console.log(token)
         const tokenBody = { token: response.credential }
 
         axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/auth/google`, tokenBody)
             .then(response => {
-                console.log(response)
                 toast.success("Sign in successful!");
                 localStorage.setItem("user_id", response.data.user.user_id);
                 localStorage.setItem("token", token);

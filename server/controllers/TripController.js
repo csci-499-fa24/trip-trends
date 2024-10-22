@@ -6,10 +6,10 @@ const { parse } = require('json2csv');
 // POST new trip data
 const createTrip = async (req, res) => {
     const userId = req.params['userId']; 
-    const { name, start_date, end_date, budget, image } = req.body;
+    const { name, start_date, end_date, budget } = req.body;
     try {
         // create new model isntance
-        const newTrip = await Trip.create({ name, start_date, end_date, budget, image });
+        const newTrip = await Trip.create({ name, start_date, end_date, budget });
         // create relationship b/w user and trip
         await SharedTrip.create({ user_id: userId, trip_id: newTrip.trip_id });
         res.status(201).json({ data: newTrip });
@@ -27,7 +27,7 @@ const createTrip = async (req, res) => {
 const getTrips = async (req, res) => {
     try {
         const allTrips = await Trip.findAll();
-        res.json({ data: allTrips });
+        res.status(200).json({ data: allTrips });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });
@@ -47,7 +47,7 @@ const getTripsByUserId = async (req, res) => {
         }
         const tripIds = sharedTrips.map(trip => trip.trip_id);
         const trips = await Trip.findAll({ where: { trip_id: tripIds } });
-        res.json({ data: trips });
+        res.status(200).json({ data: trips });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });
@@ -62,7 +62,7 @@ const getTripById = async (req, res) => {
         if (!trip) {
             return res.status(404).json({ message: "Trip not found" });
         }
-        res.json({ data: trip });
+        res.status(200).json({ data: trip });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });
@@ -72,7 +72,7 @@ const getTripById = async (req, res) => {
 // PUT request to update trip data
 const updateTrip = async (req, res) => {
     const tripId = req.params.tripId;
-    const { name, startDate, endDate, budget, image } = req.body;
+    const { name, startDate, endDate, budget } = req.body;
     try {
         // find trip by tripId
         const trip = await Trip.findByPk(tripId);
@@ -80,8 +80,8 @@ const updateTrip = async (req, res) => {
             return res.status(404).json();
         }
         // update trip data
-        const updatedTrip = await trip.update({ name, startDate, endDate, budget, image });
-        res.json({ data: updatedTrip });
+        const updatedTrip = await trip.update({ name, startDate, endDate, budget });
+        res.status(200).json({ data: updatedTrip });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });
@@ -90,18 +90,16 @@ const updateTrip = async (req, res) => {
 
 // DELETE trip data
 const deleteTrip = async (req, res) => {
-    const tripId = req.params.tripId;
     try {
-        // delete trip by tripId
+        const tripId = req.params.tripId;
         const deletedCount = await Trip.destroy({ where: { trip_id: tripId } });
         if (deletedCount === 0) {
             return res.status(404).json({ message: "Trip not found" });
         }
-        // update sharedtrips table
-        res.status(204).json();
+        res.status(204).send();
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: "Internal Server Error", error: err.message });
+        res.status(500).json({ message: "Internal Server Error"});
     }
 };
 
@@ -123,11 +121,10 @@ const downloadTripData = async (req, res) => {
             start_date: trip.start_date,
             end_date: trip.end_date,
             budget: trip.budget,
-            image: trip.image,
         };
 
         // Define fields for trip data
-        const tripFields = ['name', 'start_date', 'end_date', 'budget', 'image'];
+        const tripFields = ['name', 'start_date', 'end_date', 'budget'];
         const csvTrip = parse(tripData, { fields: tripFields });
 
         // Prepare expenses data for CSV
@@ -166,4 +163,3 @@ module.exports = {
     deleteTrip,
     downloadTripData
 };
-

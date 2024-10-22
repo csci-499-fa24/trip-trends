@@ -1,0 +1,36 @@
+.dropdown-container {
+    margin: 0;
+    padding: 0;
+}
+
+.dropdown-button {
+    color: black;
+    box-shadow: none;
+}
+
+.dropdown-button:hover {
+    background-color: #7cb37b;
+    color: white;
+    box-shadow: none;
+}
+
+.dropdown-button:active,
+.dropdown-button:focus {
+    background-color: #7cb37b;
+    color: white;
+    box-shadow: none;
+}
+
+.dropdown-menu {
+    background-color: white !important;
+}
+
+.dropdown-item {
+    color: black !important;
+    background-color: white !important;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa !important;
+    color: black !important;
+}

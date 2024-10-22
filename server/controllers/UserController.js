@@ -3,23 +3,23 @@ const jwt = require('jsonwebtoken');
 
 
 // POST new user data
-const createUser = async (req, res) => {
-    const { fName, lName, email, image } = req.body;
-    try {
-        // create model instance 
-        const newUser = await User.create({ fname: fName, lname: lName, email, image });
-        res.status(201).json({ data: newUser });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Internal Server Error", error: err.message });
-    }
-};
+// const createUser = async (req, res) => {
+//     const { fName, lName, email, image } = req.body;
+//     try {
+//         // create model instance 
+//         const newUser = await User.create({ fname: fName, lname: lName, email, image });
+//         res.status(201).json({ data: newUser });
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).json({ message: "Internal Server Error", error: err.message });
+//     }
+// };
 
 // GET all user data
 const getUsers = async (req, res) => {
     try {
         const allUsers = await User.findAll();
-        res.json({ data: allUsers });
+        res.status(200).json({ data: allUsers });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });
@@ -34,7 +34,7 @@ const getUserById = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-        res.json({ data: user });
+        res.status(200).json({ data: user });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });
@@ -45,15 +45,24 @@ const getUserById = async (req, res) => {
 const updateUser = async (req, res) => {
     const userId = req.params.userId;
     const { fname, lname, email, image } = req.body;
+
     try {
-        // find user by userId
+        // Find the user by userId
         const user = await User.findByPk(userId);
         if (!user) {
-            return res.status(404).json();
+            return res.status(404).send();
         }
-        // update user data
-        const updatedUser = await user.update({ fname, lname, email, image });
-        res.json({ data: updatedUser });
+
+        // Only update fields that are provided
+        const updatedData = {};
+        if (fname) updatedData.fname = fname;
+        if (lname) updatedData.lname = lname;
+        if (email) updatedData.email = email;
+        if (image) updatedData.image = image;
+
+        // Update user data
+        const updatedUser = await user.update(updatedData);
+        res.status(200).json({ data: updatedUser });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });
@@ -115,7 +124,7 @@ const createGoogleUser = async (req, res) => {
 };
 
 module.exports = {
-    createUser,
+    //createUser,
     getUsers,
     getUserById,
     updateUser,

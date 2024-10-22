@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
-import logo from '../img/Logo.png';
 import '../css/homepage.css';
 import axios from 'axios';
 import { GoogleOAuthProvider, googleLogout } from '@react-oauth/google';
@@ -21,7 +20,7 @@ import Point from 'ol/geom/Point';
 import { boundingExtent } from 'ol/extent';
 import { fromLonLat } from 'ol/proj';
 import Link from 'next/link';
-import { debounce } from 'lodash'; // for rate limiting when calling the OpenCage API on every keystroke
+import { debounce } from 'lodash';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -47,7 +46,6 @@ function homepage() {
     const [userName, setUserName] = useState("[NAME]");
     const [trips, setTrips] = useState([]);
     const [allTripLocations, setAllTripLocations] = useState([]);
-    // const [allTripLocationFlags, setAllTripLocationFlags] = useState(new Array(allTripLocations.length).fill(""));
     const [expandedTripId, setExpandedTripId] = useState(null);
     const [isPopUpVisible, setPopUpVisible] = useState(false);
     const [newTripData, setNewTripData] = useState({
@@ -59,10 +57,14 @@ function homepage() {
     });
     const [newTripLocation, setNewTripLocation] = useState({ trip_locations: [] });
     const [tempLocation, setTempLocation] = useState('');
-    const mapRef = useRef(null); // Reference for the map
+    const mapRef = useRef(null);
     const [suggestions, setSuggestions] = useState([]);
     const [locationsNotProvided, setLocationsNotProvided] = useState(false);
     const [userId, setUserId] = useState(null);
+    const [profileDropdownVisible, setProfileDropdownVisible] = useState(false);
+    const [profileImageUrl, setProfileImageUrl] = useState('');
+    const [animatedTripId, setAnimationForTripId] = useState(null);
+
 
     const handleLogout = () => {
         googleLogout();
@@ -70,14 +72,27 @@ function homepage() {
         window.location.href = '/signup';
     };
 
-    // Used to display user's name if token exists
-    const handleToken = () => {
+    // Used to display user's name
+    const fetchUserName = async () => {
+        const userId = localStorage.getItem("user_id");
+        try {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/${userId}`);
+            const userData = response.data.data;
+            if (userData) {
+                setUserName(userData.fname); // Set the username from the database
+            }
+        } catch (error) {
+            console.error("Error fetching user details:", error);
+        }
+    };
+
+    // Used to display user's image if token exists
+    const handleToken = async () => {
         const token = localStorage.getItem("token");
         if (token) {
             const userCredential = jwtDecode(token);
-            const userName = userCredential.given_name;
-            console.log(userCredential);
-            setUserName(userName);
+            const userProfileImage = userCredential.picture;
+            setProfileImageUrl(userProfileImage);
         } else {
             console.log("Token not found. Redirecting to sign in page.");
             window.location.href = '/signup';
@@ -96,6 +111,7 @@ function homepage() {
     }
 
     useEffect(() => {
+        fetchUserName();
         handleToken();
         getUserId();
     }, []);
@@ -105,10 +121,8 @@ function homepage() {
             console.error("User ID is not set.");
             return;
         }
-        console.log("Fetching trips for user ID:", userId);
         try {
             const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/users/${userId}`);
-            console.log(response.data);
             setTrips(response.data.data);
         } catch (err) {
             console.error(err);
@@ -120,9 +134,18 @@ function homepage() {
         fetchUserTrips(); // Call the function to fetch trips on component mount
     }, [userId]);
 
+
     // Toggle the expanded state of a trip
-    const toggleTripDetails = (tripId) => {
+    const toggleTripDetails = async (tripId) => {
         setExpandedTripId(prevId => (prevId === tripId ? null : tripId));
+        setAnimationForTripId(tripId); // enable animation
+        setTimeout(() => setAnimationForTripId(null), 300); // for trip divider when toggled
+        try {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${tripId}`);
+
+        } catch (error) {
+            console.error('Error fetching trip locations:', error);
+        }
     };
 
     // Captures new input instantly in each popup field
@@ -177,28 +200,16 @@ function homepage() {
             console.error("User ID is not available.");
             return;
         }
+        let locations_response = null;
         try {
-            const locations_response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/users/${userId}`);
-            const loc_data = locations_response.data.data;
-          
-            if (!loc_data || loc_data.length === 0) {
-              console.log('No trip locations found.');
-              setAllTripLocations([]);    
-            } 
-            else {
-                const locations = loc_data.map(location => ({
-                trip_id: location.trip_id,
-                location: location.location,
-                latitude: location.latitude,
-                longitude: location.longitude
-              }));
-              console.log("Location Objects", locations);
-              setAllTripLocations(locations);
-            }
-          
-          } catch (error) {
-            console.error('Error fetching trip locations from user:', error);
-          }
+            locations_response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/users/${userId}`);
+
+        } catch (error) {
+            console.error("Error getting all trip locations from user:", error);
+        }
+        const loc_data = locations_response.data.data;
+        const locations = loc_data.map(location => { return { "trip_id": location.trip_id, "location": location.location, "latitude": location.latitude, "longitude": location.longitude }; });
+        setAllTripLocations(locations);
     };
 
     const submitNewTrip = async (e) => {
@@ -210,23 +221,21 @@ function homepage() {
             return;
         }
         try {
-            console.log("User ID:", userId);
             let trip_submission_response = null;
             try {
                 trip_submission_response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/users/${userId}`, newTripData); // locations not needed for a trip submission
+                toast.success("Trip successfully created!");
             } catch (error) {
                 console.error("Error submitting trip data:", error);
+                toast.error("Trip creation failed. Please try again later.");
             }
 
             const trip_id = trip_submission_response.data.data.trip_id;
-            console.log("Trip ID:", trip_id);
-            console.log("Trip Locations: ", newTripLocation.trip_locations);
             const num_trip_locs = newTripLocation.trip_locations.length;
 
             // For every location, create a trip location entry
             for (let i = 0; i < num_trip_locs; i++) {
                 let a_trip_location = { trip_id: trip_id, location: newTripLocation.trip_locations[i] };
-                console.log(`Trip Location ${i + 1}:`, a_trip_location);
                 let geocode_response = null;
                 try {
                     geocode_response = await axios.get(`https://api.opencagedata.com/geocode/v1/json`, {
@@ -239,24 +248,16 @@ function homepage() {
                 catch (error) {
                     console.error("Error fetching geocode response using trip location.")
                 }
-
                 let trimmed_location = null;
-                const components_result = geocode_response?.data?.results?.[0]?.components; // ensures error isn't thrown if null
-                const location_type = components_result?._type;
-                if (components_result && components_result[location_type] != null) {
-                    trimmed_location = components_result[location_type];
-                } 
-                else if (components_result && components_result._normalized_city != null) {
-                    trimmed_location = components_result._normalized_city;
-                } 
-                else {
+                const location_type = geocode_response.data.results[0].components._type;
+                try {
+                    trimmed_location = geocode_response.data.results[0].components[location_type];
+                    a_trip_location.location = trimmed_location;
+                }
+                catch {
                     trimmed_location = a_trip_location.location; // original location
                 }
 
-                a_trip_location.location = trimmed_location;
-
-                console.log("Final Trip Location:", a_trip_location.location);
-                
                 // POST trip location
                 try {
                     await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${trip_id}`, a_trip_location);
@@ -268,9 +269,8 @@ function homepage() {
                 // UPDATE the trip location with location coordinates
                 const lat = geocode_response.data.results[0].geometry.lat;
                 const long = geocode_response.data.results[0].geometry.lng;
-                console.log("Latitude:", lat);
-                console.log("Longitude:", long);
-                const coordinates = { "latitude": lat, "longitude": long };
+                const currency = geocode_response.data.results[0].annotations.currency.iso_code;
+                const coordinates = { "latitude": lat, "longitude": long, "currency_code": currency };
                 try {
                     await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${trip_id}/${a_trip_location.location}`, coordinates);
                 } catch (error) {
@@ -281,14 +281,8 @@ function homepage() {
 
             // A shared trip will be under the user who created the trip to support future shared trips
             const shared_trip = { user_id: userId, trip_id: trip_id };
-            console.log("Shared Trip:", shared_trip);
-            // console.log("User ID:", userId, "Type:", typeof userId);
-            // console.log("Trip ID:", trip_id, "Type:", typeof trip_id);  
-            console.log(`Sending request to: ${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/users/${userId}/trips/${trip_id}`);
-            // await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/users/${userId}/trips/${trip_id}`, shared_trip);
 
             setPopUpVisible(false); // Close the popup
-            toast.success("Trip successfully created!");
             setNewTripData({ name: '', start_date: '', end_date: '', budget: '' }); // Reset form fields
             setNewTripLocation({ trip_locations: [] }); // Reset locations
 
@@ -298,7 +292,6 @@ function homepage() {
             setLocationsNotProvided(false);
 
         } catch (error) {
-            toast.error("There was an error creating your trip.");
             console.error("Error creating trip:", error);
         }
 
@@ -316,6 +309,7 @@ function homepage() {
     useEffect(() => {
         // Initialize the OpenLayers map after the component mounts
         if (mapRef.current) {
+            const mapContainer = mapRef.current;
             const features = allTripLocations.map(location => {
                 if (location.latitude && location.longitude) {
                     const feature = new Feature({
@@ -359,6 +353,20 @@ function homepage() {
                 console.error('Invalid extent:', extent);
             }
 
+            // Listen for map interactions (drag, zoom, etc.)
+            map.on('pointerdown', () => {
+                mapContainer.classList.add('active'); // Enable map interactions
+            });
+
+            // When the pointer leaves the map, disable interaction
+            map.on('pointerup', () => {
+                mapContainer.classList.remove('active'); // Allow scrolling again
+            });
+
+            map.on('mouseout', () => {
+                mapContainer.classList.remove('active'); // Reset on mouse out
+            });
+
             // Click markers to trigger dropdown and scroll to divider
             map.on('singleclick', (event) => {
                 const feature = map.forEachFeatureAtPixel(event.pixel, (feat) => feat);
@@ -371,8 +379,10 @@ function homepage() {
                     if (tripElement) {
                         tripElement.scrollIntoView({ behavior: 'smooth' });
                     }
-
-                    toggleTripDetails(tripId);
+                    // Delay the toggleTripDetails call
+                    setTimeout(() => {
+                        toggleTripDetails(tripId);
+                    }, 1000); // Delay before toggling
                 } else {
                     console.log('No marker found.');
                 }
@@ -415,151 +425,204 @@ function homepage() {
         }
     }, [allTripLocations]); // rerenders when trip locations are updated
 
+    const toggleProfileDropdown = () => {
+        setProfileDropdownVisible(!profileDropdownVisible);
+    };
+
+    const handleChangeDisplayName = async () => {
+        const newDisplayName = prompt('Enter a new display name:');
+        if (newDisplayName) {
+            setUserName(newDisplayName);
+            try {
+                const newUserData = {
+                    fname: newDisplayName, // Assuming the new display name is the first name
+                };
+
+                // Send the PUT request to update user details
+                const response = await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/${userId}`, newUserData);
+
+                // Update the frontend state after successful update
+                setUserName(newDisplayName);
+                toast.success("Display name successfully updated!")
+                // console.log('Display name updated successfully:', response.data);
+            } catch (error) {
+                console.error('Error updating display name:', error);
+                toast.error("Display name failed to updated.")
+            }
+        }
+    };
+
     return (
-        <div className="dashboard">
-            <ToastContainer hideProgressBar={true} />
-            {/* Header section */}
-            <header className="header">
-                <div className="logo-container">
-                    <Image src={logo} alt="Logo" width={300} height={300} priority />
+        <div className='main-container'>
+        <GoogleOAuthProvider clientId={googleID}>
+            <ToastContainer />
+            <div className="dashboard">
+                {/* Header section */}
+                <header className="header">
+                        TRIP TRENDS
+
+                    {/* Profile Container on the right */}
+                    <div className="profile-container">
+                        <Image
+                            className="profile-icon"
+                            src={profileImageUrl} // User's Google profile image
+                            alt="Profile"
+                            width={40}
+                            height={40}
+                            onClick={toggleProfileDropdown} // Toggle dropdown on click
+                        />
+                        {profileDropdownVisible && (
+                        <div className="dropdown">
+                            <div className="dropdown-item" onClick={handleLogout}>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                                </svg>
+                                Logout
+                            </div>
+                            <div className="dropdown-item" onClick={handleChangeDisplayName}>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+                                </svg>
+                                Change Display Name
+                            </div>
+                        </div>
+                    )}
+
+                    </div>
+                </header>
+
+                {/* Welcome section */}
+                <div className="welcome-section">
+                    <h1>Welcome Back, {userName}!</h1>
+                    <br></br>
+                    <button onClick={() => setPopUpVisible(true)} className='create-trip'>New Trip</button>
+                    <br></br>
+                    <br></br>
+                    <p>See everywhere you've gone:</p>
                 </div>
-                <div className="left-rectangle"></div>
-                <div className="right-rectangle"></div>
-            </header>
 
-            <GoogleOAuthProvider clientId={googleID}>
-                <button onClick={handleLogout} className='logout'>Logout</button>
-            </GoogleOAuthProvider>
-
-            {/* Welcome section */}
-            <div className="welcome-section">
-                <h1>Welcome Back, {userName}!</h1>
-                <br></br>
-                <button onClick={() => setPopUpVisible(true)} className='create-trip'>Create a Trip</button>
-                <br></br>
-                <br></br>
-                <p>See everywhere you've gone:</p>
-            </div>
-
-            {/* Create a trip popup form */}
-            <div className="trip-form">
-                {isPopUpVisible && (
-                    <div className="modal">
-                        <div className="modal-content">
-                            <span className="close" onClick={() => setPopUpVisible(false)}>&times;</span>
-                            <h2 className="new-trip-title">New Trip</h2>
-                            <form onSubmit={submitNewTrip}>
-                                <label className="new-trip-field-label">
-                                    Trip Name:
-                                    <input type="text" name="name" value={newTripData.name} onChange={newTripInputChange} required />
-                                </label>
-
-                                <div className="date-fields">
+                {/* Create a trip popup form */}
+                <div className="trip-form">
+                    {isPopUpVisible && (
+                        <div className="modal">
+                            <div className="modal-content">
+                                <span className="close" onClick={() => setPopUpVisible(false)}>&times;</span>
+                                <h2 className="new-trip-title">New Trip</h2>
+                                <form onSubmit={submitNewTrip}>
                                     <label className="new-trip-field-label">
-                                        Start Date:
-                                        <input type="date" name="start_date" value={newTripData.start_date} onChange={newTripInputChange} required />
+                                        Trip Name:
+                                        <input type="text" name="name" value={newTripData.name} onChange={newTripInputChange} required />
                                     </label>
+
+                                    <div className="date-fields">
+                                        <label className="new-trip-field-label">
+                                            Start Date:
+                                            <input type="date" name="start_date" value={newTripData.start_date} onChange={newTripInputChange} required />
+                                        </label>
+                                        <label className="new-trip-field-label">
+                                            End Date:
+                                            <input type="date" name="end_date" value={newTripData.end_date} onChange={newTripInputChange} required />
+                                        </label>
+                                    </div>
+
                                     <label className="new-trip-field-label">
-                                        End Date:
-                                        <input type="date" name="end_date" value={newTripData.end_date} onChange={newTripInputChange} required />
+                                        Budget:
+                                        <input type="number" name="budget" value={newTripData.budget} onChange={newTripInputChange} required />
                                     </label>
-                                </div>
 
-                                <label className="new-trip-field-label">
-                                    Budget:
-                                    <input type="number" name="budget" value={newTripData.budget} onChange={newTripInputChange} required />
-                                </label>
+                                    <label className="new-trip-field-label">
+                                        Locations:
+                                        <input
+                                            type="text"
+                                            name="trip_locations"
+                                            placeholder="Enter city or country"
+                                            value={tempLocation}
+                                            onChange={newTripLocInputChange}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault(); // Prevent form submission
+                                                }
+                                            }}
+                                        />
+                                    </label>
 
-                                <label className="new-trip-field-label">
-                                    Locations:
-                                    <input
-                                        type="text"
-                                        name="trip_locations"
-                                        placeholder="Enter city or country"
-                                        value={tempLocation}
-                                        onChange={newTripLocInputChange}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                e.preventDefault(); // Prevent form submission
-                                            }
-                                        }}
-                                    />
-                                </label>
-
-                                <div>
-                                    {newTripLocation.trip_locations.map((location, index) => (
-                                        <div key={index} className="selected-location">
-                                            <span className="location-text">{location}</span>
-                                            <button type="button" onClick={() => {
-                                                setNewTripLocation(prev => ({
-                                                    trip_locations: prev.trip_locations.filter((loc, i) => i !== index) // Remove selected location
-                                                }));
-                                            }}>Remove</button>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                {isPopUpVisible && (
-                                    <div className="dropdown-suggestions">
-                                        {suggestions.map((suggestion, index) => (
-                                            <div
-                                                key={index}
-                                                className="dropdown-suggestion"
-                                                onClick={() => selectSuggestion(suggestion)}
-                                            >
-                                                {suggestion}
+                                    <div>
+                                        {newTripLocation.trip_locations.map((location, index) => (
+                                            <div key={index} className="selected-location">
+                                                <span className="location-text">{location}</span>
+                                                <button type="button" onClick={() => {
+                                                    setNewTripLocation(prev => ({
+                                                        trip_locations: prev.trip_locations.filter((loc, i) => i !== index) // Remove selected location
+                                                    }));
+                                                }}>Remove</button>
                                             </div>
                                         ))}
                                     </div>
-                                )}
 
-                                <button type="submit" className="submit-new-trip-button">Create</button>
-                            </form>
-                        </div>
-                    </div>
-                )}
-            </div>
-
-            {/* Map section */}
-            <div ref={mapRef} style={{ height: '400px', width: '100%' }}></div>
-
-            {/* Recent trips section */}
-            <div className="recent-trips">
-                <br></br>
-                <h2>Recent Trips</h2>
-                <br></br>
-                <br></br>
-                {trips.length === 0 ? (
-                    <p>Loading trips...</p>
-                ) : (
-                    Array.isArray(trips) && trips.length > 0 ? (
-                        <ul>
-                            {trips.map(trip => (
-                                <li key={trip.trip_id}>
-                                    <div
-                                        id={`trip-${trip.trip_id}`} // unique ID for each trip 
-                                        onClick={() => toggleTripDetails(trip.trip_id)} style={{ cursor: 'pointer', padding: '10px', border: '1px solid #ccc', marginBottom: '5px', backgroundColor: '#134a09' }}>
-                                        {trip.name}
-                                    </div>
-                                    {expandedTripId === trip.trip_id && (
-                                        <div style={{ padding: '10px', backgroundColor: '#134a09', border: '1px solid #ccc' }}>
-                                            <p>
-                                                <strong>Dates:</strong> {trip.start_date} - {trip.end_date}
-                                            </p>
-                                            <p><strong>Budget:</strong> ${trip.budget}</p>
-                                            <Link href={`/singletrip?tripId=${trip.trip_id}`} style={{ color: 'white', textDecoration: 'underline' }}>
-                                                See more
-                                            </Link>
+                                    {isPopUpVisible && (
+                                        <div className="dropdown-suggestions">
+                                            {suggestions.map((suggestion, index) => (
+                                                <div
+                                                    key={index}
+                                                    className="dropdown-suggestion"
+                                                    onClick={() => selectSuggestion(suggestion)}
+                                                >
+                                                    {suggestion}
+                                                </div>
+                                            ))}
                                         </div>
                                     )}
-                                </li>
-                            ))}
-                        </ul>
+
+                                    <button type="submit" className="submit-new-trip-button">Create</button>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Map section */}
+                <div ref={mapRef} style={{ height: '400px', width: '100%' }}></div>
+
+                {/* Recent trips section */}
+                <div className="recent-trips">
+                    <br></br>
+                    <h2>Recent Trips</h2>
+                    <br></br>
+                    {trips.length === 0 ? (
+                        <p>No trips created.</p>
                     ) : (
-                        <p>No trips available.</p>
-                    )
-                )}
+                        Array.isArray(trips) && trips.length > 0 ? (
+                            <div>
+                                {trips.map(trip => (
+                                    <div key={trip.trip_id}>
+                                        <div
+                                            id={`trip-${trip.trip_id}`} // Unique ID for each trip 
+                                            onClick={() => toggleTripDetails(trip.trip_id)}
+                                            className={animatedTripId === trip.trip_id ? "shake" : ''} // Apply animation
+                                            style={{ cursor: 'pointer', padding: '10px', border: '1px solid #ccc', marginBottom: '5px', backgroundColor: expandedTripId === trip.trip_id ? '#2e7d32' : '#588157' }}>
+                                            {trip.name}
+                                        </div>
+                                        {expandedTripId === trip.trip_id && (
+                                            <div style={{ padding: '10px', backgroundColor: expandedTripId === trip.trip_id ? '#2e7d32' : '#588157', border: '1px solid #ccc' }}>
+                                                <p>
+                                                    <strong>Dates:</strong> {trip.start_date} - {trip.end_date}
+                                                </p>
+                                                <p><strong>Budget:</strong> ${trip.budget}</p>
+                                                <Link href={`/singletrip?tripId=${trip.trip_id}`} style={{ color: 'white', textDecoration: 'underline' }}>
+                                                    See more
+                                                </Link>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p>No trips available.</p>
+                        )
+                    )}
+                </div>
             </div>
+        </GoogleOAuthProvider>
         </div>
     );
 }

@@ -11,7 +11,6 @@ const createExpense = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });
-
     }
 };
 
@@ -19,7 +18,7 @@ const createExpense = async (req, res) => {
 const getExpenses = async (req, res) => {
     try {
         const allExpenses = await Expense.findAll();
-        res.json({ data: allExpenses });
+        res.status(200).json({ data: allExpenses });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });
@@ -34,7 +33,7 @@ const getExpenseById = async (req, res) => {
         if (!expense) {
             return res.status(404).json({ message: "Expense not found" });
         }
-        res.json({ data: expense });
+        res.status(200).json({ data: expense });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });
@@ -52,7 +51,7 @@ const getExpensesByTripId = async (req, res) => {
         if (!expense || expense.length === 0) {
             return res.status(404).json({ message: "Expense not found" });
         }
-        res.json({ data: expense });
+        res.status(200).json({ data: expense });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });
@@ -71,7 +70,7 @@ const updateExpense = async (req, res) => {
         }
         // update expense data
         const updatedExpense = await expense.update({ tripId, name, amount, category, currency, posted, notes, image });
-        res.json({ data: updatedExpense });
+        res.status(200).json({ data: updatedExpense });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });
@@ -87,7 +86,7 @@ const deleteExpense = async (req, res) => {
         if (deletedCount === 0) {
             return res.status(404).json({ message: "Expense not found" });
         }
-        res.status(204).json();
+        res.status(204).send();
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });

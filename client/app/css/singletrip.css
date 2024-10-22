@@ -2,11 +2,38 @@
 .main-container {
     display: flex;
     flex-direction: column;
-    align-items: center;
 }
 
-.button {
-    box-shadow: 0 10px 20px -8px rgba(0, 0, 0, .7);
+.field-pair {
+    display: flex;
+    gap: 15px;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.half-width {
+    flex: 1;
+}
+
+.new-expense-field-label input,
+.new-expense-field-label select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    background-color: black;
+    color: white;
+    font-size: 15px;
+    transition: border-color 0.3s ease;
+    filter: invert(1);
+}
+
+.new-expense-field-label input,
+.new-expense-field-label select,
+.new-expense-field-label input[type="date"] {
+    box-sizing: border-box;
+    height: 40px;
 }
 
 .create-expense {
@@ -49,33 +76,17 @@
     transform: translate(50%, -50%);
 }
 
-.modal {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    backdrop-filter: blur(2px);
-}
-
 .modal-content {
-    max-width: 100vh;
+    max-width: 30% !important;
     max-height: 300vh;
+    overflow-x: auto;
     overflow-y: auto;
     padding: 20px;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+    margin: 10px;
+    width: 100%;
 }
 
 .new-expense-title {
@@ -93,34 +104,11 @@
     color: #333;
 }
 
-.new-expense-field-label input {
-    padding: 8px;
-    margin-top: 5px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    background-color: black;
-    /* input bkgd will be white */
-    font-size: 15px;
-    transition: border-color 0.3s ease;
-    width: 100%;
-    color: white;
-    /* text input will be black */
-    filter: invert(1);
-}
-
-/* the date input fields */
 .new-expense-field-label input[type="date"] {
     cursor: pointer;
 }
 
-/* the container holding the dates */
-.date-fields {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-}
 
-/* animation for the create expense button */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -135,27 +123,38 @@
 
 .submit-new-expense-button {
     padding: 8px;
-    background-color: #134a09;
+    background-color:var(--lightgreen);
     color: white;
     border: none;
     width: 40%;
-    /* Width of the button */
     border-radius: 10px;
     font-size: 15px;
     cursor: pointer;
     align-self: center;
 }
 
-.close {
-    position: relative;
-    font-weight: bold;
-    color: black;
+.edit-expense-title {
     font-size: 24px;
-    cursor: pointer;
-    z-index: 10000;
+    color: black;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 15px;
 }
 
-.new-expense-field-label select {
+.edit-expense-field-label {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.edit-expense-field-label input[type="date"] {
+    cursor: pointer;
+}
+
+.edit-expense-field-label input,
+.edit-expense-field-label select {
+    width: 100%;
     padding: 8px;
     margin-top: 5px;
     border-radius: 10px;
@@ -164,19 +163,52 @@
     color: white;
     font-size: 15px;
     transition: border-color 0.3s ease;
-    width: 100%;
     filter: invert(1);
 }
 
-.highlighted-date {
-    background-color: #77DD77 !important;
-    color: white !important;
+.edit-expense-field-label input[type="date"] {
+    box-sizing: border-box;
+    height: 40px;
+}
+
+.submit-edit-expense-button {
+    padding: 8px;
+    background-color: var(--lightgreen);
+    color: white;
+    border: none;
+    width: 90%;
+    border-radius: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    align-self: center;
+}
+
+.delete-expense-button {
+    padding: 8px;
+    background-color: #8B0000;
+    color: white;
+    border: none;
+    width: 90%;
+    border-radius: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    align-self: center;
 }
 
 .highlighted-date {
     background-color: #77DD77 !important;
     color: white !important;
 }
+
+.highlighted-date {
+    background-color: var(--lightgreen) !important;
+    color: white !important;
+}
+
+.calendar-container{
+    width: 200%
+}
+
 
 .react-calendar__tile--active {
     background-color: green !important;
@@ -184,13 +216,15 @@
 
 .react-calendar__navigation button:hover {
     background-color: green;
-    
+
 }
 
 .react-calendar {
+    width: 100%;
     border: none;
     border-radius: 10px;
     overflow: hidden;
+    size-adjust: auto;
 }
 
 .react-calendar__tile {
@@ -233,25 +267,25 @@
     margin-bottom: 10px;
 }
 
-.homeCorner {
-    position: absolute;
-    top: 100px;
-}
-
 .col {
     display: flex;
-    justify-content: center; 
+    justify-content: center;
     align-items: center;
 }
 
 .meter-container {
-    border: 2px solid black;
-    border-radius: 8px;
-    width: 400px;
-    display: flex; 
+    /* border: 2px solid black; */
+    width: 100%;
+    height: 90%;
+    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    margin: 20px 0;
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 #budgetTitle {
@@ -260,82 +294,8 @@
     margin-bottom: 0;
 }
 
-.logo-container{
-    z-index: 1; 
-    position: relative; 
-}
-
-.left-rectangle, .right-rectangle {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: black;
-    height: 25px; /* Height of the rectangle */
-}
-
-.left-rectangle {
-    left: 0;
-    width: 690px; /* Width of the left rectangle */
-}
-
-.right-rectangle {
-    right: 0;
-    width: 690px; /* Width of the right rectangle */
-}
-
-#budget-text{
+#budget-text {
     margin-top: 0;
-}
-
-.download-trip-data-btn {
-    display: block;
-    margin: 20px auto;
-    padding: 10px 20px;
-    background-color: #134a09;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 8px;
-}
-  
-.download-trip-data-btn:hover {
-    background-color: #45a049;
-}
-
-.delete-trip-button {
-    display: block;
-    margin: 20px auto;
-    padding: 10px 20px;
-    background-color: #a51414ab;
-    color: white;
-    border: none;
-    cursor: pointer;
-    text-align: center;
-    border-radius: 8px;
-    transition: all 0.5s;
-    overflow: hidden;
-}
-
-.delete-trip-button:hover {
-    background-color: #c91515f0;
-    padding-right: 20px;
-}
-
-.filter-button {
-    background-color: transparent; 
-    border: none; 
-    box-shadow: none; 
-    outline: none; 
-    cursor: pointer; 
-    padding: 0; 
-    align-items: center; 
-    justify-content: center; 
-}
-
-
-.filter-icon {
-    width: 6vh; 
-    height: auto;
 }
 
 .filter-popup {
@@ -362,7 +322,7 @@
 .filter-popup-close {
     position: absolute;
     top: 10px;
-    left: 20px; 
+    left: 20px;
     color: #aaa;
     font-size: 28px;
     font-weight: bold;
@@ -380,10 +340,10 @@
 }
 
 .filter-option-button {
-    background-color: transparent; 
+    background-color: transparent;
     color: black;
     padding: 10px 20px;
-    border: 2px solid black; 
+    border: 2px solid black;
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
@@ -393,8 +353,8 @@
 }
 
 .filter-option-button:hover {
-    background-color: #134a09; 
-    color: white; 
+    background-color: var(--lightgreen);
+    color: white;
 }
 
 .applied-filter {
@@ -405,7 +365,9 @@
     padding: 5px 10px;
     border-radius: 5px;
     white-space: nowrap;
+    margin-left: 10px; 
 }
+
 
 .clear-filter-btn {
     background: none;
@@ -413,17 +375,47 @@
     color: #ff0000;
     cursor: pointer;
     font-size: 16px;
-    margin-left: 10px; 
+    margin-left: 10px;
 }
 
 .filter-section {
-    display: flex; 
+    display: flex;
     align-items: center;
     gap: 10px;
 }
 
+.expense-table-container {
+    width: 64.5%;
+    float: left;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    margin-left: 20px;
+}
+
+.expense-table th {
+    text-align: center;
+}
+
+.expense-table td {
+    text-align: left;
+    vertical-align: middle;
+}
+
+.expense-table td:nth-child(2) {
+    text-align: right;
+}
+
+.expense-table td:nth-child(3),
+.expense-table td:nth-child(4),
+.expense-table td:nth-child(5),
+.expense-table td:nth-child(7) {
+    text-align: center;
+}
+
 .edit-expense {
-    background-color: #134a09;
+    background-color: var(--lightgreen);
     position: relative;
     padding: 5px 10px;
     font-size: 14px;
@@ -435,6 +427,8 @@
     transition: all 0.5s;
     overflow: hidden;
     box-shadow: none;
+    display: inline-block;
+    margin: 0 auto;
 }
 
 .edit-expense:after {
@@ -459,4 +453,254 @@
     opacity: 1;
     right: 50%;
     transform: translate(50%, -50%);
+}
+
+.pie-chart-container {
+    width: 300px;
+    height: 300px;
+    margin: 0 auto;
+    float: right;
+    top: 0;
+}
+
+
+.exchange-rates-container {
+    width:30%;
+    max-width: 600px;
+    overflow: hidden;
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    margin-right: 40px;
+    float:right;
+}
+
+
+.exchange-rates-container .exchange-rates-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+
+.exchange-rates-container .exchange-rates-table th {
+    background-color: #f5f5f5;
+    color: black;
+    font-weight: bold;
+    padding: 10px;
+    text-align: center;
+    border-bottom: 2px solid gray;
+}
+
+.exchange-rates-container .exchange-rates-table td {
+    padding: 10px;
+    text-align: center;
+    font-size: 1.1em;
+    border: 1px solid gray;
+}
+
+.exchange-rates-container .exchange-rates-table tr:first-child td {
+    font-weight: bold;
+}
+
+.exchange-rates-container .exchange-rates-table th:first-child,
+.exchange-rates-container .exchange-rates-table td:first-child {
+    border-left: none;
+}
+
+.exchange-rates-container .exchange-rates-table th:last-child,
+.exchange-rates-container .exchange-rates-table td:last-child {
+    border-right: none;
+}
+
+.exchange-rates-container .exchange-rates-table th:first-child {
+    border-top-left-radius: 10px;
+}
+
+.exchange-rates-container .exchange-rates-table th:last-child {
+    border-top-right-radius: 10px;
+}
+
+.exchange-rates-container .exchange-rates-table td:first-child:last-child {
+    border-bottom-left-radius: 10px;
+}
+
+.exchange-rates-container .exchange-rates-table td:last-child:last-child {
+    border-bottom-right-radius: 10px;
+}
+
+.error {
+    color: red;
+}
+
+.success {
+    color: var(--lightgreen);
+}
+
+/* Icon bar styling */
+.top-icon-header {
+    width: auto;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: 10px;
+    position: absolute;
+    top: 95px;
+    margin-left: 5 px;
+    height: 40px;
+    aspect-ratio: 1 / 1;
+    z-index: 1000;
+}
+
+.icon-bar-header {
+    width: 490px;
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
+    background-color: white;
+    margin-left: 5 px;
+}
+
+.icon-div {
+    height: 56px;
+    width: 56px;
+    margin: 0 10px;
+    padding: 10px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    transition: none;
+}
+
+.icon-div .icon-SVG {
+    height: 26px;
+    aspect-ratio: 1 / 1;
+    transition: transform 300ms ease;
+}
+
+.icon-SVG svg {
+    color: black; 
+}
+
+.icon-text {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px);
+    background-color: rgb(85, 83, 83);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.icon-div:hover .icon-text,
+.icon-div:focus-visible .icon-text {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-15px);
+}
+
+.icon-div:hover .icon-SVG {
+    transform: scale(1.2);
+}
+
+.icon-div:hover,
+.icon-div:focus-visible {
+    background-color: rgb(228, 228, 228);
+}
+
+.icon-div:active {
+    opacity: 0.9;
+}
+
+/* .spacer {
+    flex-grow: 1;
+}
+
+.divider {
+    height: 40px;
+    width: 2px;
+    margin: 0 16px; 
+    background-color: rgb(192, 192, 192);
+    display: inline-block; 
+} */
+
+.trip-overview {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 20px 0;
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.trip-overview-div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.trip-overview-circle {
+    width: 50px;
+    height: 50px;
+    background-color: rgb(214, 213, 213);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+#trip-locations-circle {
+    width: 50px;
+    height: 50px;
+    background-color: rgb(214, 213, 213);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 10px; 
+    margin-top: 13px; 
+}
+
+.trip-overview-content p {
+    margin: 5px 0 0;
+    font-size: 17px;
+    color: black;
+
+}
+
+.delete-icon:hover {
+    color: rgb(255, 31, 31);
+}
+
+.delete-icon .icon-text {
+    background-color: rgb(235, 5, 5);
+}
+
+.exchange-table-dropdown input,
+.exchange-table-dropdown select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    background-color: black;
+    color: white;
+    font-size: 15px;
+    transition: border-color 0.3s ease;
+    filter: invert(1);
+    text-align: center;
 }
