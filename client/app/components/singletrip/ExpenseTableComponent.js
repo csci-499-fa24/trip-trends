@@ -1,7 +1,44 @@
-import React from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
 import Table from 'react-bootstrap/Table';
 
-const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, isEditPopupVisible}) => {
+const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, currencyCodes, expenseCategories}) => {
+    const [isEditPopupVisible, setEditPopupVisible] = useState(false);
+    const [selectedExpense, setSelectedExpense] = useState(null);
+    const handleEditChange = (e) => {
+        const { name, value } = e.target;
+        setSelectedExpense((prev) => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const submitEditExpense = async (expenseID) => {
+        axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/${expenseID}`, selectedExpense)
+            .then(response => {
+                console.log(response)
+                window.location.reload();
+                setEditPopupVisible(false);
+            })
+            .catch(error => {
+                console.error('Error editing expense:', error);
+            });
+    };
+
+    const deleteExpense = async (expenseID) => {
+        if (window.confirm('Please confirm expense deletion. This action cannot be undone.')) {
+            axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/${expenseID}`)
+                .then(response => {
+                    console.log(response);
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.error('Error deleting expense:', error);
+                });
+            setEditPopupVisible(false);
+        }
+    };
+    
     return (
         <div> 
             {expenseData && expenseData.data ? (
