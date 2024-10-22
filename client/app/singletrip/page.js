@@ -1,22 +1,24 @@
 'use client';
 
+// Import packages
 import React, { useEffect, useState } from 'react';
 import '../css/singletrip.css';
 import axios from 'axios';
-import Table from 'react-bootstrap/Table';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Link from 'next/link';
-import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css';
-import { parseISO, startOfDay, endOfDay } from 'date-fns';
 import ReactSpeedometer, { Transition } from 'react-d3-speedometer';
-import { Pie } from 'react-chartjs-2';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
+
+// Import components
 import DeleteTripComponent from '../components/singletrip/DeleteTripComponent';
 import ShareTripComponent from '../components/singletrip/ShareTripComponent';
 import EditTripComponent from '../components/singletrip/EditTripComponent';
-import LocationsDropdownComponent from '../components/singletrip/LocationsDropdownComponent';
-import DefaultTripImagesComponent from '../components/singletrip/DefaultTripImagesComponent';
+import DownloadTripComponent from '../components/singletrip/DownloadTripComponent';
+import CategoryDataComponent from '../components/singletrip/CategoryDataComponent';
+import ExpenseFormComponent from '../components/singletrip/ExpenseFormComponent';
+import GeneralTripInfoComponent from '../components/singletrip/GeneralTripInfoComponent';
+import ExpenseTableComponent from '../components/singletrip/ExpenseTableComponent';
 
 Chart.register(ArcElement, Tooltip, Legend);
 
@@ -66,15 +68,11 @@ function Singletrip() {
             await import('bootstrap/dist/js/bootstrap.bundle.min.js');
         };
         loadBootstrap();
-    }, []);
 
-    useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get('tripId');
         setTripId(id);
-    }, []);
 
-    useEffect(() => {
         if (tripId) {
             fetchTripData();
             fetchExpenseData();
@@ -133,8 +131,6 @@ function Singletrip() {
 
 
     useEffect(() => {
-        console.log('fetching user role...');
-        console.log('Trip ID:', tripId);
         const fetchUserRole = async () => {
             const userId = localStorage.getItem("user_id");
             console.log('User ID:', userId);
@@ -158,7 +154,7 @@ function Singletrip() {
         };
         fetchUserRole();
     }, [tripId]);
-
+    
     const isOwner = userRole === 'owner';
 
     useEffect(() => {
@@ -310,44 +306,6 @@ function Singletrip() {
         }
     };
 
-    const downloadTripData = async () => {
-        try {
-            const response = await axios({
-                url: `${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/download/${tripId}`,
-                method: 'GET',
-                responseType: 'blob'
-            });
-
-            console.log(response.headers)
-
-            const contentDisposition = response.headers['content-disposition'];
-            let filename = `${tripData.data.name}.csv`; 
-            if (contentDisposition && contentDisposition.includes('filename=')) {
-                const filenamePart = contentDisposition.split('filename=')[1];
-                filename = filenamePart.replace(/"/g, ''); // Clean up the filename
-            }
-
-            // Create a blob from the CSV data
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', filename);
-            document.body.appendChild(link);
-            link.click();
-            link.parentNode.removeChild(link);
-        } catch (error) {
-            console.error('Error downloading trip data:', error);
-        }
-    };
-
-    const newExpenseInputChange = (e) => {
-        const { name, value } = e.target;
-        if (name === 'currency') {
-            setSelectedCurrency(value); // Update selected currency
-        }
-        setNewExpenseData({ ...newExpenseData, [name]: value });
-    };
-
     const submitNewExpense = async (e) => {
         e.preventDefault();
 
@@ -375,26 +333,6 @@ function Singletrip() {
         } catch (error) {
             console.error("Error fetching currency symbols:", error);
         }
-    };
-
-    const getTripDates = () => {
-        if (!tripData) {
-            return { startDate: null, endDate: null };
-        }
-
-        const startDate = startOfDay(parseISO(tripData.data.start_date));
-        const endDate = endOfDay(parseISO(tripData.data.end_date));
-
-        return { startDate, endDate };
-    };
-
-    const { startDate, endDate } = getTripDates();
-
-    const isDateInRange = (date) => {
-        if (!startDate || !endDate) {
-            return false;
-        }
-        return date >= startDate && date <= endDate;
     };
 
     const handleFilterChange = (filterValue) => {
@@ -444,18 +382,6 @@ function Singletrip() {
         }
     };
 
-    const DateComponent = ({ dateStr }) => {
-        const dateObj = new Date(dateStr);
-        const options = { month: 'long', day: 'numeric' };
-        const formattedDate = dateObj.toLocaleDateString('en-US', options);
-    
-        return (
-            <span>
-                {dateObj.toLocaleDateString('en-US', options)}
-            </span>
-        );
-    };
-
     return (
         <div className="main-container">
             <div>
@@ -486,55 +412,7 @@ function Singletrip() {
                             <DeleteTripComponent tripId={tripId} userRole={userRole} />
                         </header>
                         {/* General Trip Info*/}
-                        <div className="trip-overview">
-                            <div className="trip-overview-div">
-                                <div className="trip-overview-circle">🗓️</div>
-                                <div className="trip-overview-content">
-                                    <p><DateComponent dateStr={tripData.data.start_date}/> - <DateComponent dateStr={tripData.data.end_date}/></p>
-                                </div>
-                            </div>
-
-                            <div className="trip-overview-div">
-                                <div className="trip-overview-circle">💰</div>
-                                <div className="trip-overview-content">
-                                    <p>${tripData.data.budget}</p>
-                                </div>
-                            </div>
-
-                            <div className="trip-overview-div">
-                                <div id="trip-locations-circle">📍</div>
-                                <div className="trip-overview-content">
-                                    <div className='dropdown-container'>
-                                        <LocationsDropdownComponent tripLocations={tripLocations} />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <br></br>
-                        <div className='row'>
-                                <div className='col'>
-                                    <DefaultTripImagesComponent tripId={tripId} tripLocations={tripLocations} />
-                                </div>
-                                <div className='col' style={{ flexDirection: "column" }}>
-                                    <div className="meter-container">
-                                        <p id='budgetTitle'>Your Trip Calendar:</p>
-                                        <br></br>
-                                        <Calendar
-                                            tileClassName={({ date }) => {
-                                                if (isDateInRange(date)) {
-                                                    return 'highlighted-date';
-                                                }
-                                                if (date.toDateString() === endDate.toDateString()) {
-
-                                                    return 'highlighted-date';
-                                                }
-                                                return null;
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                        </div>
+                        <GeneralTripInfoComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} />
                         {/* Trip Calendar and Budget Meter */}
                         <div className='container'>
                             <div className='row'>
@@ -602,15 +480,7 @@ function Singletrip() {
                                 {/* Pie Chart */}
                                 <div className='col'>
                                     <div className="meter-container">
-                                        <div>
-                                            {categoryData && categoryData.datasets && categoryData.datasets.length > 0 ? (
-                                                <div className="pie-chart-container">
-                                                    <Pie data={categoryData} />
-                                                </div>
-                                            ) : (
-                                                <p>No expense data available to display.</p>
-                                            )}
-                                        </div>
+                                        <CategoryDataComponent categoryData={categoryData} />
                                     </div>
                                 </div>
                             </div>
@@ -647,16 +517,8 @@ function Singletrip() {
                                 <div class="divider"></div> */}
 
                                 {/* Download Trip Button */}
-                                <div class="icon-div" tooltip="Download Trip" tabindex="0">
-                                    <div class="icon-SVG">
-                                        <svg
-                                            onClick={downloadTripData}
-                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.3" stroke="currentColor" class="size-6">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                                        </svg>
-                                        <span class="icon-text">Download Trip</span>
-                                    </div>
-                                </div>
+                                <DownloadTripComponent tripData={tripData} tripId = {tripId} />
+
                                 {/* Add Image Button */}
                                 <div class="icon-div" tooltip="Add Image" tabindex="0">
                                     <div class="icon-SVG">
@@ -680,151 +542,7 @@ function Singletrip() {
                         </div>
 
                         {/* Expense Table */}
-                        {expenseData && expenseData.data ? (
-                            <div>
-                                <div className="expense-table-container">
-                                    <Table striped bordered hover size="sm" responsive="sm" className="expense-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Name</th>
-                                                <th>Amount</th>
-                                                <th>Currency</th>
-                                                <th>Category</th>
-                                                <th>Date Posted</th>
-                                                <th>Notes</th>
-                                                <th>Modify</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {expenseData.data.map((expense) => (
-                                                <tr key={expense.expense_id}>
-                                                    <td>{expense.name}</td>
-                                                    <td>{expense.amount}</td>
-                                                    <td>{expense.currency}</td>
-                                                    <td>{expense.category}</td>
-                                                    <td>{expense.posted}</td>
-                                                    <td>{expense.notes}</td>
-                                                    <td>
-                                                        {/* <div onClick={() => { setEditPopupVisible(true); setSelectedExpense(expense) }} className='edit-expense'>Edit Expense</div> */}
-                                                        <div class="icon-div" tooltip="Edit Trip" tabindex="0">
-                                                            <div class="icon-SVG">
-                                                                <svg
-                                                                    onClick={() => {
-                                                                        setEditPopupVisible(true);
-                                                                        setSelectedExpense(expense);
-                                                                    }}
-                                                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                                                                </svg>
-                                                                <span class="icon-text">Edit Expense</span>
-                                                            </div>
-                                                        </div>
-                                                        <div className="expense-form">
-                                                            {isEditPopupVisible && selectedExpense && (
-                                                                <div className="modal">
-                                                                    <div className="modal-content">
-                                                                        <span className="close" onClick={() => setEditPopupVisible(false)}>&times;</span>
-                                                                        <h2 className="edit-expense-title">Edit or Delete Expense</h2>
-                                                                        <form onSubmit={(e) => {
-                                                                            e.preventDefault();
-                                                                            submitEditExpense(selectedExpense.expense_id);
-                                                                        }}>
-                                                                            <label className="edit-expense-field-label">
-                                                                                Expense Name:
-                                                                                <input
-                                                                                    type="text"
-                                                                                    name="name"
-                                                                                    value={selectedExpense.name}
-                                                                                    onChange={handleEditChange}
-                                                                                    required
-                                                                                />
-                                                                            </label>
-                                                                            <div className="field-pair">
-                                                                                <label className="edit-expense-field-label">
-                                                                                    Amount:
-                                                                                    <input
-                                                                                        type="number"
-                                                                                        name="amount"
-                                                                                        value={selectedExpense.amount}
-                                                                                        onChange={handleEditChange}
-                                                                                        required
-                                                                                    />
-                                                                                </label>
-                                                                                <label className="edit-expense-field-label">
-                                                                                    Currency:
-                                                                                    <select
-                                                                                        name="currency"
-                                                                                        value={selectedExpense.currency}
-                                                                                        onChange={handleEditChange}
-                                                                                        required
-                                                                                    >
-                                                                                        <option value="">Select Currency</option>
-                                                                                        {currencyCodes.map((code) => (
-                                                                                            <option key={code} value={code}>{code}</option>
-                                                                                        ))}
-                                                                                    </select>
-                                                                                </label>
-                                                                            </div>
-                                                                            <div className="field-pair">
-                                                                                <label className="edit-expense-field-label">
-                                                                                    Category:
-                                                                                    <select
-                                                                                        name="category"
-                                                                                        value={selectedExpense.category}
-                                                                                        onChange={handleEditChange}
-                                                                                        required
-                                                                                    >
-                                                                                        <option value="">Select Category</option>
-                                                                                        {expenseCategories.map((category) => (
-                                                                                            <option key={category} value={category}>{category}</option>
-                                                                                        ))}
-                                                                                    </select>
-                                                                                </label>
-                                                                                <label className="edit-expense-field-label">
-                                                                                    Date:
-                                                                                    <input
-                                                                                        type="date"
-                                                                                        name="posted"
-                                                                                        value={selectedExpense.posted}
-                                                                                        onChange={handleEditChange}
-                                                                                        required
-                                                                                    />
-                                                                                </label>
-                                                                            </div>
-                                                                            <label className="edit-expense-field-label">
-                                                                                Notes:
-                                                                                <input
-                                                                                    type="text"
-                                                                                    name="notes"
-                                                                                    value={selectedExpense.notes}
-                                                                                    onChange={handleEditChange}
-                                                                                />
-                                                                            </label>
-                                                                            <div className='container'>
-                                                                                <div className='row'>
-                                                                                    <div className='col'>
-                                                                                        <button type="submit" className="submit-edit-expense-button">Edit</button>
-                                                                                    </div>
-                                                                                    <div className='col'>
-                                                                                        <button type="button" onClick={() => deleteExpense(selectedExpense.expense_id)} className="delete-expense-button">Delete</button>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </form>
-                                                                    </div>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </Table>
-                                </div>
-                            </div>
-                        ) : (
-                            <p>No expenses yet...</p>
-                        )}
+                        <ExpenseTableComponent tripData={tripData} tripId = {tripId} tripLocations = {tripLocations} expenseData={expenseData} isEditPopupVisible={isEditPopupVisible} />
 
                     </div>
                 ) : (
@@ -834,124 +552,19 @@ function Singletrip() {
                 )}
 
                 {/* Create a expense popup form */}
-                <div className="expense-form">
-                    {isPopUpVisible && (
-                        <div className="modal">
-                            <div className="modal-content">
-                                <span className="close" onClick={() => setPopUpVisible(false)}>&times;</span>
-                                <h2 className="new-expense-title">New Expense</h2>
-                                <form onSubmit={submitNewExpense}>
-                                    <label className="new-expense-field-label">
-                                        Expense Name:
-                                        <input
-                                            type="text"
-                                            name="name"
-                                            value={newExpenseData.name}
-                                            onChange={newExpenseInputChange}
-                                            required
-                                        />
-                                    </label>
-
-                                    <div className="field-pair">
-                                        <label className="new-expense-field-label half-width">
-                                            Amount:
-                                            <input
-                                                type="number"
-                                                name="amount"
-                                                value={newExpenseData.amount}
-                                                onChange={newExpenseInputChange}
-                                                required
-                                            />
-                                        </label>
-                                        <label className="new-expense-field-label half-width">
-                                            Currency:
-                                            <select
-                                                name="currency"
-                                                value={selectedCurrency}
-                                                onChange={(e) => {
-                                                    setSelectedCurrency(e.target.value); // Update selected currency state
-                                                    newExpenseInputChange(e); // Call your input change handler
-                                                }}
-                                                required
-                                            >
-                                                <option value="">Select Currency</option>
-
-                                                {/* Display the selected currency at the top if it exists and it's not USD */}
-                                                {selectedCurrency && selectedCurrency !== "USD" && (
-                                                    <option value={selectedCurrency}>{selectedCurrency}</option>
-                                                )}
-
-                                                {/* Recommended currencies section */}
-                                                {otherCurrencies
-                                                    .filter(code => code !== selectedCurrency) // Exclude selected currency
-                                                    .length > 0 && (
-                                                        <optgroup label="Recommended">
-                                                            {otherCurrencies
-                                                                .filter(code => code !== selectedCurrency) // Exclude selected currency
-                                                                .map((code, index) => (
-                                                                    <option key={`other-${index}`} value={code}>{code}</option>
-                                                                ))}
-                                                        </optgroup>
-                                                    )}
-
-                                                {/* Always place USD after other currencies */}
-                                                <optgroup label="Other">
-                                                    <option value="USD">USD</option>
-
-                                                    {/* Display remaining currency codes, excluding selectedCurrency and other currencies */}
-                                                    {currencyCodes
-                                                        .filter(code => code !== selectedCurrency && code !== "USD" && !otherCurrencies.includes(code))
-                                                        .map((code) => (
-                                                            <option key={code} value={code}>{code}</option>
-                                                        ))}
-                                                </optgroup>
-                                            </select>
-                                        </label>
-
-                                    </div>
-
-                                    <div className="field-pair">
-                                        <label className="new-expense-field-label half-width">
-                                            Category:
-                                            <select
-                                                name="category"
-                                                value={newExpenseData.category}
-                                                onChange={newExpenseInputChange}
-                                                required
-                                            >
-                                                <option value="">Select Category</option>
-                                                {expenseCategories.map((category) => (
-                                                    <option key={category} value={category}>{category}</option>
-                                                ))}
-                                            </select>
-                                        </label>
-                                        <label className="new-expense-field-label half-width">
-                                            Date:
-                                            <input
-                                                type="date"
-                                                name="posted"
-                                                value={newExpenseData.posted}
-                                                onChange={newExpenseInputChange}
-                                                required
-                                            />
-                                        </label>
-                                    </div>
-
-                                    <label className="new-expense-field-label">
-                                        Notes:
-                                        <input
-                                            type="text"
-                                            name="notes"
-                                            value={newExpenseData.notes}
-                                            onChange={newExpenseInputChange}
-                                        />
-                                    </label>
-                                    <button type="submit" className="submit-new-expense-button">Create</button>
-                                </form>
-                            </div>
-                        </div>
-                    )}
-                </div>
+                <ExpenseFormComponent
+                    tripId={tripId}
+                    newExpenseData={newExpenseData}
+                    setNewExpenseData={setNewExpenseData}
+                    selectedCurrency={selectedCurrency}
+                    setSelectedCurrency={setSelectedCurrency}
+                    submitNewExpense={submitNewExpense}
+                    isPopUpVisible={isPopUpVisible}
+                    setPopUpVisible={setPopUpVisible}
+                    otherCurrencies={otherCurrencies}
+                    currencyCodes={currencyCodes}
+                    expenseCategories={expenseCategories}
+                />
 
                 {/* Create a filter popup form */}
                 <div className="filter-container">
