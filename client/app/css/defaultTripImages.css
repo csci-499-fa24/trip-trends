@@ -1,0 +1,17 @@
+.image-wrapper {
+    width: 100%; 
+    max-width: 1200px; 
+    height: 380px; 
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px; 
+}
+
+.trip-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; 
+    object-position: center; 
+    border-radius: 12px; 
+}
