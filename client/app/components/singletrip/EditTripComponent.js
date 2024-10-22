@@ -23,6 +23,9 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
             await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`, requestBody);
             toast.success("Trip updated successfully!");
             setIsOpen(false);
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
         } catch (error) {
             console.error('Error updating trip:', error);
             toast.error("Error updating trip. Please try again.");
@@ -54,7 +57,7 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
                                 Name:
                                 <input
                                     type="text"
-                                    value={tripData.data.name}
+                                    value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     required
                                 />
@@ -64,7 +67,7 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
                                 Start Date:
                                 <input
                                     type="date"
-                                    value={tripData.data.start_date}
+                                    value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
                                     required
                                 />
@@ -74,7 +77,7 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
                                 End Date:
                                 <input
                                     type="date"
-                                    value={tripData.data.end_date}
+                                    value={endDate}
                                     onChange={(e) => setEndDate(e.target.value)}
                                     required
                                 />
@@ -84,7 +87,7 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
                                 Budget:
                                 <input
                                     type="number"
-                                    value={tripData.data.budget}
+                                    value={budget}
                                     onChange={(e) => setBudget(e.target.value)}
                                     required
                                 />
