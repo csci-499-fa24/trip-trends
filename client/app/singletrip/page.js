@@ -16,10 +16,11 @@ import homeIcon from '../img/homeIcon.png';
 import Link from 'next/link';
 import { Pie } from 'react-chartjs-2';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
-import DeleteTripComponent from '../components/DeleteTripComponent';
-import ShareTripComponent from '../components/ShareTripComponent';
+import DeleteTripComponent from '../components/singletrip/DeleteTripComponent';
+import ShareTripComponent from '../components/singletrip/ShareTripComponent';
 import { createApi } from 'unsplash-js';
-import LocationsDropdownComponent from '../components/LocationsDropdownComponent';
+import LocationsDropdownComponent from '../components/singletrip/LocationsDropdownComponent';
+import DefaultTripImagesComponent from '../components/singletrip/DefaultTripImagesComponent';
 
 Chart.register(ArcElement, Tooltip, Legend);
 
@@ -330,7 +331,7 @@ function Singletrip() {
             console.log(response.headers)
 
             const contentDisposition = response.headers['content-disposition'];
-            let filename = `trip_${tripId}.csv`; // Default filename
+            let filename = `${tripData.data.name}.csv`; 
             if (contentDisposition && contentDisposition.includes('filename=')) {
                 const filenamePart = contentDisposition.split('filename=')[1];
                 filename = filenamePart.replace(/"/g, ''); // Clean up the filename
@@ -474,31 +475,47 @@ function Singletrip() {
         }
     };
 
-    const unsplash = createApi({
-        accessKey: process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY
-      });
+    // const unsplash = createApi({
+    //     accessKey: process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY
+    //   });
 
-    const getImageURL = async (trip_location) => {
-        try {
-            const response = await unsplash.search.getPhotos({
-            query: trip_location,
-            page: 1,
-            perPage: 10,
-        });
+    // const getImageURL = async (trip_location) => {
+    //     try {
+    //         const response = await unsplash.search.getPhotos({
+    //         query: trip_location,
+    //         page: 1,
+    //         perPage: 10,
+    //     });
 
-        if (response.response.results.length > 0) {
-            const images = response.response.results.map(image => image.urls.raw); // array of 10 images
+    //     if (response.response.results.length > 0) {
+    //         const images = response.response.results.map(image => image.urls.raw); // array of 10 images
 
-            const random_index = Math.floor(Math.random() * response.response.results.length);
-            const imageURL = images[random_index]
-            console.log(`Image URL for ${trip_location}:`, imageURL); // Display the random image URL
-            // console.log(images); // Array of image URLs
-          } else {
-            console.log('No images found.');
-          }
-        } catch (error) {
-          console.error('Error fetching images:', error);
-        }
+    //         const random_index = Math.floor(Math.random() * response.response.results.length);
+    //         const imageURL = images[random_index]
+    //         console.log(`Image URL for ${trip_location}:`, imageURL); // Display the random image URL
+    //         // console.log(images); // Array of image URLs
+    //       } else {
+    //         console.log('No images found.');
+    //       }
+    //     } catch (error) {
+    //       console.error('Error fetching images:', error);
+    //     }
+    // };
+
+    // useEffect(() => {
+    //     console.log("tripLocations in parent:", tripLocations); 
+    // }, [tripLocations]);
+    
+    const DateComponent = ({ dateStr }) => {
+        const dateObj = new Date(dateStr);
+        const options = { month: 'long', day: 'numeric' };
+        const formattedDate = dateObj.toLocaleDateString('en-US', options);
+    
+        return (
+            <span>
+                {dateObj.toLocaleDateString('en-US', options)}
+            </span>
+        );
     };
 
     return (
@@ -513,12 +530,16 @@ function Singletrip() {
                     <div>
                         <h1 id='tripName'>{tripData.data.name}</h1>
                         <header class="top-icon-header">
-                            <div class="icon-div" tooltip="Home" tabindex="0">
-                                <Link href={'/homepage'}>
-                                    <Image src={homeIcon} alt="homepage" width={"55"} height={"55"} />
-                                </Link>
-                                <span class="icon-text">Home</span>
-                            </div>
+                                <div class="icon-div" tooltip="Home" tabindex="0">
+                                    <div class="icon-SVG">
+                                        <Link href={`/homepage`}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                                            </svg>
+                                        </Link>
+                                        <span class="icon-text">Home</span>
+                                    </div>
+                                </div>
                             {/* Share Trip Button */}
                             <ShareTripComponent tripId={tripId} isOwner={isOwner} />
                             {/* Delete Trip Button */}
@@ -529,31 +550,32 @@ function Singletrip() {
                             <div className="trip-overview-div">
                                 <div className="trip-overview-circle">🗓️</div>
                                 <div className="trip-overview-content">
-                                    <h3>START</h3>
-                                    <p>{tripData.data.start_date}</p>
-                                </div>
-                            </div>
-
-                            <div className="trip-overview-div">
-                                <div className="trip-overview-circle">🗓️</div>
-                                <div className="trip-overview-content">
-                                    <h3>END</h3>
-                                    <p>{tripData.data.end_date}</p>
+                                    <p><DateComponent dateStr={tripData.data.start_date}/> - <DateComponent dateStr={tripData.data.end_date}/></p>
                                 </div>
                             </div>
 
                             <div className="trip-overview-div">
                                 <div className="trip-overview-circle">💰</div>
                                 <div className="trip-overview-content">
-                                    <h3>BUDGET</h3>
                                     <p>${tripData.data.budget}</p>
+                                </div>
+                            </div>
+
+                            <div className="trip-overview-div">
+                                <div id="trip-locations-circle">📍</div>
+                                <div className="trip-overview-content">
+                                    <div className='dropdown-container'>
+                                        <LocationsDropdownComponent tripLocations={tripLocations} />
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Trip Calendar and Budget Meter */}
-                        <div className='container'>
-                            <div className='row'>
+                        <br></br>
+                        <div className='row'>
+                                <div className='col'>
+                                    <DefaultTripImagesComponent tripId={tripId} tripLocations={tripLocations} />
+                                </div>
                                 <div className='col' style={{ flexDirection: "column" }}>
                                     <div className="meter-container">
                                         <p id='budgetTitle'>Your Trip Calendar:</p>
@@ -572,6 +594,11 @@ function Singletrip() {
                                         />
                                     </div>
                                 </div>
+                        </div>
+                        {/* Trip Calendar and Budget Meter */}
+                        <div className='container'>
+                            <div className='row'>
+                               
                                 <div className='col'>
                                     <div className="meter-container">
                                         <p id='budgetTitle'>Your Budget Meter:</p>
@@ -698,9 +725,6 @@ function Singletrip() {
                                         </svg>
                                         <span class="icon-text">Add Image</span>
                                     </div>
-                                </div>
-                                <div className='dropdown-container'>
-                                    <LocationsDropdownComponent tripLocations={tripLocations} />
                                 </div>
                                 
                                 {/* Applied filter popup */}
@@ -848,12 +872,6 @@ function Singletrip() {
                         ) : (
                             <p>No expenses yet...</p>
                         )}
-                        {/* Gallery of Photos like Google Photos or Photos on iPhone
-                        {tripData.data.image ? (
-                            <p>{tripData.data.image}</p>
-                        ) : (
-                            <p>[Gallery of photos]</p>
-                        )} */}
 
                     </div>
                 ) : (
