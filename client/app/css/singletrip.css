@@ -206,7 +206,10 @@
 }
 
 .calendar-container{
-    width: 200%
+    width: 110%;
+    height: 100%;
+    margin-left: 5% !important;
+    /* background-color: grey; */
 }
 
 
@@ -220,20 +223,23 @@
 }
 
 .react-calendar {
-    width: 100%;
+    width: 100% !important; /* Set desired width */
+    height: 100% !important; /* Auto height */
     border: none;
     border-radius: 10px;
     overflow: hidden;
-    size-adjust: auto;
 }
 
 .react-calendar__tile {
     box-shadow: none;
     transition: none;
     border-radius: 6px;
+    padding: 15px !important; /* Increase padding for tiles */
+    font-size: 1.2em !important; /* Increase tile text size */
 }
 
 .react-calendar__tile--active {
+    background-color: green !important;
     box-shadow: none;
 }
 
@@ -254,6 +260,7 @@
     background-color: white;
     color: black;
     border-radius: 8px;
+    font-size: 1.2em; /* Increase header text size */
 }
 
 .react-calendar__tile {

@@ -4,12 +4,12 @@ import { parseISO, startOfDay, endOfDay } from 'date-fns';
 import LocationsDropdownComponent from '../singletrip/LocationsDropdownComponent';
 import DefaultTripImagesComponent from '../singletrip/DefaultTripImagesComponent';
 
-const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations }) => {
+const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expences }) => {
     const DateComponent = ({ dateStr }) => {
         const dateObj = new Date(dateStr);
         const options = { month: 'long', day: 'numeric' };
         const formattedDate = dateObj.toLocaleDateString('en-US', options);
-    
+
         return (
             <span>
                 {dateObj.toLocaleDateString('en-US', options)}
@@ -37,6 +37,20 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations }) => {
 
     const { startDate, endDate } = getTripDates();
 
+    const renderTileContent = (date) => {
+        const targetDate = new Date(2024, 9, 23); // October is the 9th month (zero-indexed)
+
+        if (date.toDateString() === targetDate.toDateString()) {
+            return (
+                <div style={{ textAlign: 'center' }}> {/* Center the content */}
+                    <span style={{ color: 'red' }}>10</span> {/* Display "10" underneath */}
+                </div>
+            );
+        }
+
+        return null;
+    };
+
     return (
         <div>
             <div className="trip-overview">
@@ -44,7 +58,7 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations }) => {
                     <div className="trip-overview-circle">🗓️</div>
                     <div className="trip-overview-content">
                         <p>
-                            <DateComponent dateStr={tripData.data.start_date} /> - 
+                            <DateComponent dateStr={tripData.data.start_date} /> -
                             <DateComponent dateStr={tripData.data.end_date} />
                         </p>
                     </div>
@@ -73,22 +87,32 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations }) => {
                     <DefaultTripImagesComponent tripId={tripId} tripLocations={tripLocations} />
                 </div>
                 <div className='col' style={{ flexDirection: "column" }}>
-                    <div className="meter-container">
-                        <p id='budgetTitle'>Your Trip Calendar:</p>
-                        <br />
+                    <div className="calendar-container">
+                        {/* <p id='budgetTitle'>Your Trip Calendar:</p>
+                        <br /> */}
                         <Calendar
                             tileClassName={({ date }) => {
                                 if (isDateInRange(date)) {
                                     return 'highlighted-date';
                                 }
-                                if (date.toDateString() === endDate.toDateString()) {
-                                    return 'highlighted-date';
-                                }
                                 return null;
                             }}
+                        // tileContent={({ date }) => renderTileContent(date)} // Render content on specific dates
                         />
                     </div>
                 </div>
+            </div>
+
+
+            <div>
+                <h2>Expense USD</h2>
+                <ul>
+                    {expences.map((expense) => (
+                        <li key={expense.expense_id}>
+                            Amount: {expense.amountInUSD}, Category: {expense.posted}
+                        </li>
+                    ))}
+                </ul>
             </div>
         </div>
     );
