@@ -101,18 +101,19 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses })
                     <Calendar
                         tileClassName={({ date }) => {
                             if (isDateInRange(date)) {
-                                return 'highlighted-date'; // Highlight date if it falls within the range
+                                return 'highlighted-date'; 
                             }
-                            return null; // No highlight otherwise
+                            return null; 
                         }}
                         tileContent={({ date }) => {
-                            const dateKey = date.toDateString(); // Get the date key
+                            const dateKey = date.toDateString(); 
                             const total = totalExpensesByDate[dateKey];
 
                             return (
-                                <div style={{ textAlign: 'center' }}>
-                                    {/* <div>{date.getDate()}</div> Display the actual date */}
-                                    {total !== undefined && <div>${total.toFixed(2)}</div>} {/* Show total if defined */}
+                                <div className="tile-content"> 
+                                    {total !== undefined && (
+                                        <div className="expense-amount">${total.toFixed(2)}</div> // Show total if defined
+                                    )}
                                 </div>
                             );
                         }}
