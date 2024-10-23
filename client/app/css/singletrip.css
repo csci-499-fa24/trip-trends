@@ -234,8 +234,8 @@
     box-shadow: none;
     transition: none;
     border-radius: 6px;
-    padding: 15px !important; /* Increase padding for tiles */
-    font-size: 1.2em !important; /* Increase tile text size */
+    padding: 10px !important; /* Increase padding for tiles */
+    font-size: 1em !important; /* Increase tile text size */
 }
 
 .react-calendar__tile--active {

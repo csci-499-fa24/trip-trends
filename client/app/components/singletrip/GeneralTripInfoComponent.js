@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Calendar from 'react-calendar';
 import { parseISO, startOfDay, endOfDay } from 'date-fns';
 import LocationsDropdownComponent from '../singletrip/LocationsDropdownComponent';
 import DefaultTripImagesComponent from '../singletrip/DefaultTripImagesComponent';
 
-const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expences }) => {
+const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses }) => {
+    const [totalExpensesByDate, setTotalExpensesByDate] = useState({});
+
     const DateComponent = ({ dateStr }) => {
         const dateObj = new Date(dateStr);
         const options = { month: 'long', day: 'numeric' };
@@ -37,19 +39,28 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expences })
 
     const { startDate, endDate } = getTripDates();
 
-    const renderTileContent = (date) => {
-        const targetDate = new Date(2024, 9, 23); // October is the 9th month (zero-indexed)
 
-        if (date.toDateString() === targetDate.toDateString()) {
-            return (
-                <div style={{ textAlign: 'center' }}> {/* Center the content */}
-                    <span style={{ color: 'red' }}>10</span> {/* Display "10" underneath */}
-                </div>
-            );
-        }
+    useEffect(() => {
+        const totals = {};
+        expenses.forEach(expense => {
+            // Split the date string to create a Date object
+            const [year, month, day] = expense.posted.split('-').map(Number);
+            // Create a date object using the year, month (0-indexed), and day
+            const date = new Date(year, month - 1, day); // month is 0-indexed in JS
 
-        return null;
-    };
+            // Normalize to the start of the day
+            date.setHours(0, 0, 0, 0);
+            const dateKey = date.toDateString();
+
+            const amount = parseFloat(expense.amountInUSD);
+            if (!totals[dateKey]) {
+                totals[dateKey] = 0;
+            }
+            totals[dateKey] += amount;
+        });
+        console.log("Totals by date:", totals);
+        setTotalExpensesByDate(totals);
+    }, [expenses]);
 
     return (
         <div>
@@ -87,33 +98,28 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expences })
                     <DefaultTripImagesComponent tripId={tripId} tripLocations={tripLocations} />
                 </div>
                 <div className='col' style={{ flexDirection: "column" }}>
-                    <div className="calendar-container">
-                        {/* <p id='budgetTitle'>Your Trip Calendar:</p>
-                        <br /> */}
-                        <Calendar
-                            tileClassName={({ date }) => {
-                                if (isDateInRange(date)) {
-                                    return 'highlighted-date';
-                                }
-                                return null;
-                            }}
-                        // tileContent={({ date }) => renderTileContent(date)} // Render content on specific dates
-                        />
-                    </div>
+                    <Calendar
+                        tileClassName={({ date }) => {
+                            if (isDateInRange(date)) {
+                                return 'highlighted-date'; // Highlight date if it falls within the range
+                            }
+                            return null; // No highlight otherwise
+                        }}
+                        tileContent={({ date }) => {
+                            const dateKey = date.toDateString(); // Get the date key
+                            const total = totalExpensesByDate[dateKey];
+
+                            return (
+                                <div style={{ textAlign: 'center' }}>
+                                    {/* <div>{date.getDate()}</div> Display the actual date */}
+                                    {total !== undefined && <div>${total.toFixed(2)}</div>} {/* Show total if defined */}
+                                </div>
+                            );
+                        }}
+                    />
                 </div>
             </div>
 
-
-            <div>
-                <h2>Expense USD</h2>
-                <ul>
-                    {expences.map((expense) => (
-                        <li key={expense.expense_id}>
-                            Amount: {expense.amountInUSD}, Category: {expense.posted}
-                        </li>
-                    ))}
-                </ul>
-            </div>
         </div>
     );
 };

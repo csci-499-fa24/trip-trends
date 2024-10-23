@@ -366,7 +366,7 @@ function Singletrip() {
                             <DeleteTripComponent tripId={tripId} userRole={userRole} />
                         </header>
                         {/* General Trip Info*/}
-                        <GeneralTripInfoComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expences={expenseUSD}/>
+                        <GeneralTripInfoComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenses={expenseUSD}/>
                         {/* Trip Calendar and Budget Meter */}
                         <div className='container'>
                             <div className='row'>
