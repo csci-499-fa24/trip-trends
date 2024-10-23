@@ -72,6 +72,20 @@ function Singletrip() {
             }
         }
     }, []);
+    
+    // Fetch home currency when userId changes
+    useEffect(() => {
+        const getHomeCurrency = async () => {
+            if (userId) {
+                const currency = await fetchHomeCurrency(userId);
+                if (currency) {
+                    setHomeCurrency(currency);  // Only set if currency is valid
+                }
+            }
+        };
+    
+        getHomeCurrency(); // Fetch home currency when userId is available
+    }, [userId]);
 
     const fetchTripData = () => {
         if (tripId) {
@@ -234,6 +248,25 @@ function Singletrip() {
             });
 
     }, [tripId]);
+    
+    useEffect(() => {
+        if (homeCurrency) {
+            // Only call fetchCurrencyRates when homeCurrency is successfully fetched
+            fetchCurrencyRates(fetchedExpenseData);
+        } else {
+            console.error("Home currency not set. Unable to fetch exchange rates.");
+        }
+    }, [homeCurrency, fetchedExpenseData]); // Dependencies: re-run if homeCurrency or expenses change
+
+    const fetchHomeCurrency = async (userId) => {
+        try {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/${userId}/home-currency`);
+            return response.data.home_currency;
+        } catch (error) {
+            console.error('Error fetching home currency:', error);
+            return null; // Handle error as needed
+        }
+    };
 
     useEffect(() => {
         const getExchangeRates = async () => {
@@ -261,38 +294,6 @@ function Singletrip() {
 
         getExchangeRates();
     }, [selectedCurrency]);
-
-    useEffect(() => {
-        const getHomeCurrency = async () => {
-            const currency = await fetchHomeCurrency(userId);
-            if (currency) {
-                setHomeCurrency(currency);  // Only set if currency is valid
-            }
-        };
-    
-        if (userId) {
-            getHomeCurrency(); // Fetch home currency when the component mounts
-        }
-    }, [userId]);
-    
-    useEffect(() => {
-        if (homeCurrency) {
-            // Only call fetchCurrencyRates when homeCurrency is successfully fetched
-            fetchCurrencyRates(fetchedExpenseData);
-        } else {
-            console.error("Home currency not set. Unable to fetch exchange rates.");
-        }
-    }, [homeCurrency, fetchedExpenseData]); // Dependencies: re-run if homeCurrency or expenses change
-
-    const fetchHomeCurrency = async (userId) => {
-        try {
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/${userId}/home-currency`);
-            return response.data.home_currency;
-        } catch (error) {
-            console.error('Error fetching home currency:', error);
-            return null; // Handle error as needed
-        }
-    };
 
     const fetchCurrencyRates = async (expenses) => {
         try {
