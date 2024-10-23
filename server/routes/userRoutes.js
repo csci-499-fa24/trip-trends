@@ -8,5 +8,6 @@ router.get("/:userId", UserController.getUserById);
 router.put("/:userId", UserController.updateUser);
 router.delete("/:userId", UserController.deleteUser);
 router.post("/auth/google", UserController.createGoogleUser);
+router.get("/:userId/home-currency", UserController.getUserHomeCurrency);
 
 module.exports = router;

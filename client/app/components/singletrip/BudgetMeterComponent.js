@@ -1,13 +1,13 @@
 import React from 'react';
 import ReactSpeedometer, { Transition } from 'react-d3-speedometer';
 
-const BudgetMeterComponent = ({ tripData, expenseData, totalUSDExpenses}) => {
+const BudgetMeterComponent = ({ tripData, expenseData, totalExpenses, homeCurrency}) => {
     return(
         <div>
             <p id='budgetTitle'>Your Budget Meter:</p>
-            {expenseData && expenseData.data && totalUSDExpenses === 0 ? (
+            {expenseData && expenseData.data && totalExpenses === 0 ? (
                 <p>Loading your budget data...</p>
-            ) : totalUSDExpenses > tripData.data.budget ? (
+            ) : totalExpenses > tripData.data.budget ? (
                 <div style={{
                     marginTop: "10px",
                     width: "350px",
@@ -37,7 +37,7 @@ const BudgetMeterComponent = ({ tripData, expenseData, totalUSDExpenses}) => {
                         width={300}
                         minValue={0}
                         maxValue={tripData.data.budget}
-                        value={totalUSDExpenses.toFixed(2)}
+                        value={totalExpenses.toFixed(2)}
                         needleColor="steelblue"
                         needleTransitionDuration={2500}
                         needleTransition={Transition.easeBounceOut}
@@ -47,14 +47,16 @@ const BudgetMeterComponent = ({ tripData, expenseData, totalUSDExpenses}) => {
                 </div>
             )}
             <p id='budgetTitle'>Your Budget Data:</p>
-            {expenseData && expenseData.data && totalUSDExpenses === 0 ? (
+            {expenseData && expenseData.data && totalExpenses === 0 ? (
                 <p>Loading your budget data...</p>
             ) : (
                 <div style={{ textAlign: 'center' }}>
-                    <p style={{ textDecoration: "underline", display: "inline" }}>Total Expenses in USD:</p>
-                    <span>  ${totalUSDExpenses.toFixed(2)}</span>
-                    {totalUSDExpenses > tripData.data.budget ? (
-                        <p id='budget-text'>You are <strong>${(totalUSDExpenses - tripData.data.budget).toFixed(2)}</strong> over your budget.</p>
+                    <p style={{ textDecoration: "underline", display: "inline" }}>
+                        Total Expenses in {homeCurrency}:
+                    </p>
+                    <span>  ${totalExpenses.toFixed(2)}</span>
+                    {totalExpenses > tripData.data.budget ? (
+                        <p id='budget-text'>You are <strong>${(totalExpenses - tripData.data.budget).toFixed(2)}</strong> over your budget.</p>
                     ) : (
                         <p>You are within your budget.</p>
                     )}

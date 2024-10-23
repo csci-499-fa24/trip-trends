@@ -44,7 +44,7 @@ const getUserById = async (req, res) => {
 // PUT request to update user data
 const updateUser = async (req, res) => {
     const userId = req.params.userId;
-    const { fname, lname, email, image } = req.body;
+    const { fname, lname, email, image, home_currency } = req.body;
 
     try {
         // Find the user by userId
@@ -59,6 +59,7 @@ const updateUser = async (req, res) => {
         if (lname) updatedData.lname = lname;
         if (email) updatedData.email = email;
         if (image) updatedData.image = image;
+        if (home_currency) updatedData.home_currency = home_currency;
 
         // Update user data
         const updatedUser = await user.update(updatedData);
@@ -112,7 +113,8 @@ const createGoogleUser = async (req, res) => {
                 fname: firstName,
                 lname: lastName,
                 email,
-                image: picture
+                image: picture,
+                home_currency: 'USD'
             });
 
             return res.status(201).json({ message: 'User created successfully', user: newUser });
@@ -123,11 +125,31 @@ const createGoogleUser = async (req, res) => {
     }
 };
 
+const getUserHomeCurrency = async (req, res) => {
+    const userId = req.params.userId;
+
+    try {
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Assuming home_currency is a field in your User model
+        res.status(200).json({ home_currency: user.home_currency });
+    } catch (error) {
+        console.error('Error fetching user home currency:', error);
+        res.status(500).json({ message: "Internal Server Error", error: error.message });
+    }
+};
+
+
+
 module.exports = {
     //createUser,
     getUsers,
     getUserById,
     updateUser,
     deleteUser,
-    createGoogleUser
+    createGoogleUser,
+    getUserHomeCurrency,
 };
