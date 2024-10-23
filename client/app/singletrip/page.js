@@ -29,7 +29,8 @@ function Singletrip() {
     const [tripData, setTripData] = useState(null);
     const [userRole, setUserRole] = useState(null);
     const [expenseData, setExpenseData] = useState([]);
-    const [totalUSDExpenses, setTotalUSDExpenses] = useState(0);
+    const [fetchedExpenseData, setFetchedExpenseData] = useState([]);
+    const [totalExpenses, setTotalExpenses] = useState(0);
     const [currencyCodes, setCurrencyCodes] = useState([]);
     const [selectedCurrency, setSelectedCurrency] = useState('');
     const [otherCurrencies, setOtherCurrencies] = useState([]);
@@ -60,6 +61,8 @@ function Singletrip() {
         "Other"
     ]);
     const isOwner = userRole === 'owner';
+    const userId = localStorage.getItem("user_id");
+    const [homeCurrency, setHomeCurrency] = useState(null);
 
     const fetchTripData = () => {
         if (tripId) {
@@ -78,14 +81,12 @@ function Singletrip() {
             .then(response => {
                 setExpenseData(response.data);
                 setOriginalData(response.data);
-                const fetchedExpenses = response.data.data;
+                setFetchedExpenseData(response.data.data);
 
                 const savedFilter = localStorage.getItem('selectedFilter');
                 if (savedFilter) {
                     applyFilter(savedFilter, response.data);
                 }
-
-                fetchCurrencyRates(fetchedExpenses);
             })
             .catch(error => {
                 console.error('Error fetching trip data:', error);
@@ -95,8 +96,6 @@ function Singletrip() {
     const fetchTripLocations = () => {
         axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${tripId}`)
             .then(response => {
-                // console.log("TRIP LOCATIONS");
-                // console.log(response.data);
                 setSelectedCurrency(response.data.data[0].currency_code)
                 const locations = response.data.data;
                 setTripLocations(locations.map(location => location.location));
@@ -110,77 +109,13 @@ function Singletrip() {
             });
     };
 
-    const fetchCurrencyRates = async (expenses) => {
-        try {
-            const currencyPromises = expenses
-                .filter(expense => expense.currency) // Filter out expenses with invalid currencies
-                .map(expense => {
-                    const targetCurrency = expense.currency;
-                    return axios.get(`https://hexarate.paikama.co/api/rates/latest/${targetCurrency}?target=USD`);
-                });
-
-            // Proceed only if there are valid currency requests
-            if (currencyPromises.length > 0) {
-                const currencyResponses = await Promise.all(currencyPromises);
-                const currencyRates = currencyResponses.map((response, index) => ({
-                    currency: expenses[index].currency, // Get the corresponding currency
-                    rate: response.data.data.mid // Adjust according to the response structure
-                }));
-
-                // Convert expenses to USD and accumulate category data
-                const categoryTotals = {};
-                const convertedExpenses = expenses.map((expense, index) => {
-                    const rate = currencyRates.find(rate => rate.currency === expense.currency)?.rate || 1; // Default to 1 if not found
-                    const amountInUSD = (parseFloat(expense.amount) * rate).toFixed(2); // Convert amount to USD
-
-                    // Accumulate totals by category
-                    if (!categoryTotals[expense.category]) {
-                        categoryTotals[expense.category] = 0;
-                    }
-                    categoryTotals[expense.category] += parseFloat(amountInUSD);
-
-                    setTotalUSDExpenses(prevTotal => prevTotal + parseFloat(amountInUSD));
-
-                    return {
-                        ...expense,
-                        amountInUSD // Add converted amount to expense
-                    };
-                });
-
-                // Prepare data for pie chart
-                const labels = Object.keys(categoryTotals);
-                const data = Object.values(categoryTotals);
-
-                setCategoryData({
-                    labels,
-                    datasets: [{
-                        label: 'Expenses by Category',
-                        data,
-                        backgroundColor: [
-                            '#2A9D8F', '#e76f51', '#E9C46A', '#F4A261', '#c476bf', '#264653', '#e5989b', '#9d0208', '#e4c1f9',
-                            '#bc6c25', '#fca311', '#d62828', '#003049', '#00a896', '#f77f00', '#8338ec', '#fb5607'
-                        ],
-                        hoverOffset: 4
-                    }]
-                });
-
-                // console.log('Converted expenses:', convertedExpenses);
-            } else {
-                console.warn('No valid currencies found for conversion.');
-            }
-
-        } catch (error) {
-            console.error('Error fetching currency rates:', error);
-        }
-    };
-
     const submitNewExpense = async (e) => {
         e.preventDefault();
 
         const updatedExpenseData = {
             ...newExpenseData,
             trip_id: tripId,
-            currency: selectedCurrency || 'USD',
+            currency: selectedCurrency || homeCurrency,
         };
 
         try {
@@ -249,8 +184,6 @@ function Singletrip() {
         }
 
         const fetchUserRole = async () => {
-            const userId = localStorage.getItem("user_id");
-            console.log('User ID:', userId);
             if (tripId && userId) {
                 try {
                     const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/trips/${tripId}`);
@@ -299,12 +232,11 @@ function Singletrip() {
 
             try {
                 for (let currency of otherCurrencies) {
-                    const response = await axios.get(`https://hexarate.paikama.co/api/rates/latest/USD`, {
+                    const response = await axios.get(`https://hexarate.paikama.co/api/rates/latest/${homeCurrency}`, {
                         params: {
                             target: currency
                         }
                     });
-                    //console.log('API Response:', response.data);
 
                     if (response.data && response.data.data && response.data.data.mid) {
                         rates[currency] = response.data.data.mid;
@@ -320,6 +252,98 @@ function Singletrip() {
 
         getExchangeRates();
     }, [selectedCurrency]);
+
+    useEffect(() => {
+        const getHomeCurrency = async () => {
+            const currency = await fetchHomeCurrency(userId);
+            if (currency) {
+                setHomeCurrency(currency);  // Only set if currency is valid
+            }
+        };
+    
+        if (userId) {
+            getHomeCurrency(); // Fetch home currency when the component mounts
+        }
+    }, [userId]);
+    
+    useEffect(() => {
+        if (homeCurrency) {
+            // Only call fetchCurrencyRates when homeCurrency is successfully fetched
+            fetchCurrencyRates(fetchedExpenseData);
+        } else {
+            console.error("Home currency not set. Unable to fetch exchange rates.");
+        }
+    }, [homeCurrency, fetchedExpenseData]); // Dependencies: re-run if homeCurrency or expenses change
+
+    const fetchHomeCurrency = async (userId) => {
+        try {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/${userId}/home-currency`);
+            return response.data.home_currency;
+        } catch (error) {
+            console.error('Error fetching home currency:', error);
+            return null; // Handle error as needed
+        }
+    };
+
+    const fetchCurrencyRates = async (expenses) => {
+        try {
+            const currencyPromises = expenses
+                .filter(expense => expense.currency) // Filter out expenses with invalid currencies
+                .map(expense => {
+                    const targetCurrency = expense.currency;
+                    return axios.get(`https://hexarate.paikama.co/api/rates/latest/${targetCurrency}?target=${homeCurrency}`);
+                });
+    
+            if (currencyPromises.length > 0) {
+                const currencyResponses = await Promise.all(currencyPromises);
+                const currencyRates = currencyResponses.map((response, index) => ({
+                    currency: expenses[index].currency,
+                    rate: response.data.data.mid // Assuming correct response structure
+                }));
+    
+                // Convert expenses to homeCurrency and accumulate category data
+                const categoryTotals = {};
+                const convertedExpenses = expenses.map((expense, index) => {
+                    const rate = currencyRates.find(rate => rate.currency === expense.currency)?.rate || 1;
+                    const amountInHomeCurrency = (parseFloat(expense.amount) * rate).toFixed(2);
+    
+                    // Accumulate totals by category
+                    if (!categoryTotals[expense.category]) {
+                        categoryTotals[expense.category] = 0;
+                    }
+                    categoryTotals[expense.category] += parseFloat(amountInHomeCurrency);
+    
+                    setTotalExpenses(prevTotal => prevTotal + parseFloat(amountInHomeCurrency));
+    
+                    return {
+                        ...expense,
+                        amountInHomeCurrency // Add converted amount to expense
+                    };
+                });
+    
+                // Prepare data for pie chart
+                const labels = Object.keys(categoryTotals);
+                const data = Object.values(categoryTotals);
+    
+                setCategoryData({
+                    labels,
+                    datasets: [{
+                        label: `Expenses by Category in ${homeCurrency}`,
+                        data,
+                        backgroundColor: [
+                            '#2A9D8F', '#e76f51', '#E9C46A', '#F4A261', '#c476bf', '#264653', '#e5989b', '#9d0208', '#e4c1f9',
+                            '#bc6c25', '#fca311', '#d62828', '#003049', '#00a896', '#f77f00', '#8338ec', '#fb5607'
+                        ],
+                        hoverOffset: 4
+                    }]
+                });
+            } else {
+                console.warn('No valid currencies found for conversion.');
+            }
+        } catch (error) {
+            console.error('Error fetching currency rates:', error);
+        }
+    };    
 
     return (
         <div className="main-container">
@@ -357,7 +381,7 @@ function Singletrip() {
                             <div className='row'>  
                                 <div className='col'>
                                     <div className="meter-container"> 
-                                        <BudgetMeterComponent tripData={tripData} expenseData={expenseData} totalUSDExpenses={totalUSDExpenses} />
+                                        <BudgetMeterComponent tripData={tripData} expenseData={expenseData} totalExpenses={totalExpenses} homeCurrency={homeCurrency}/>
                                     </div>
                                 </div>
                                 {/* Pie Chart */}
@@ -490,7 +514,7 @@ function Singletrip() {
 
                 <div>
                     {/* Exchange Rate Table */}
-                    <ExchangeRateTableComponent exchangeRates={exchangeRates} currencyCodes={currencyCodes}/>
+                    <ExchangeRateTableComponent exchangeRates={exchangeRates} currencyCodes={currencyCodes} homeCurrency={homeCurrency}/>
                 </div>
             </div >
         </div >

@@ -125,6 +125,25 @@ const createGoogleUser = async (req, res) => {
     }
 };
 
+const getUserHomeCurrency = async (req, res) => {
+    const userId = req.params.userId;
+
+    try {
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Assuming home_currency is a field in your User model
+        res.status(200).json({ home_currency: user.home_currency });
+    } catch (error) {
+        console.error('Error fetching user home currency:', error);
+        res.status(500).json({ message: "Internal Server Error", error: error.message });
+    }
+};
+
+
+
 module.exports = {
     //createUser,
     getUsers,
@@ -132,4 +151,5 @@ module.exports = {
     updateUser,
     deleteUser,
     createGoogleUser,
+    getUserHomeCurrency,
 };
