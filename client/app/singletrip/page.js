@@ -185,9 +185,9 @@ function Singletrip() {
         }
         let sortedExpenses;
         if (filterOption === 'highest') {
-            sortedExpenses = [...data].sort((a, b) => parseFloat(b.amountInUSD) - parseFloat(a.amountInUSD));
+            sortedExpenses = [...data].sort((a, b) => parseFloat(b.amountInHomeCurrency) - parseFloat(a.amountInHomeCurrency));
         } else if (filterOption === 'lowest') {
-            sortedExpenses = [...data].sort((a, b) => parseFloat(a.amountInUSD) - parseFloat(b.amountInUSD));
+            sortedExpenses = [...data].sort((a, b) => parseFloat(a.amountInHomeCurrency) - parseFloat(b.amountInHomeCurrency));
         } else if (filterOption === 'recent') {
             sortedExpenses = [...data].sort((a, b) => new Date(b.posted) - new Date(a.posted));
         } else if (filterOption === 'oldest') {
@@ -311,6 +311,11 @@ function Singletrip() {
         getExchangeRates();
     }, [selectedCurrency]);
 
+
+    useEffect(() => {
+        console.log(expenseUSD);
+    },[expenseUSD])
+
     const fetchCurrencyRates = async (expenses) => {
         try {
             const currencyPromises = expenses
@@ -346,6 +351,7 @@ function Singletrip() {
                         amountInHomeCurrency // Add converted amount to expense
                     };
                 });
+                setExpenseUSD(convertedExpenses);
     
                 // Prepare data for pie chart
                 const labels = Object.keys(categoryTotals);

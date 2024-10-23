@@ -52,7 +52,7 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses })
             date.setHours(0, 0, 0, 0);
             const dateKey = date.toDateString();
 
-            const amount = parseFloat(expense.amountInUSD);
+            const amount = parseFloat(expense.amountInHomeCurrency);
             if (!totals[dateKey]) {
                 totals[dateKey] = 0;
             }
@@ -112,7 +112,7 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses })
                             return (
                                 <div className="tile-content"> 
                                     {total !== undefined && (
-                                        <div className="expense-amount">${total.toFixed(2)}</div> // Show total if defined
+                                        <div className="expense-amount">{total.toFixed(2)}</div> // Show total if defined
                                     )}
                                 </div>
                             );
