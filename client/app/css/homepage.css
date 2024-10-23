@@ -4,47 +4,21 @@
     font-family: Arial, sans-serif;
 }
 
-.header {
-    display: flex;
-    justify-content: space-between; 
-    align-items: center; 
-    padding: 0; 
-    height: 150px; 
-    background-color: white;
-    position: relative;
-}
-
-.left-rectangle,
-.right-rectangle {
-    position: absolute;
-    top: 50%;
-    height: 20px; 
-    width: 40%; 
-    background-color: black;
-    transform: translateY(-50%);
-}
-
-.left-rectangle {
-    left: 0;
-}
-
-.right-rectangle {
-    right: 0;
-}
-
 .welcome-section {
     text-align: left;
-    padding: 10px;
+    padding: 20px;
     background-color: #FFFFFF;
     color: black;
     font-size: 21px;
+    font-weight: bold;
 }
 
 .recent-trips {
     padding: 10px;
-    background-color: black;
+    background-color:var(--darkgreen);;
     color: white;
     height: auto; 
+    text-align: center;
 }
 
 .trip {
@@ -52,18 +26,12 @@
     border: 1px solid white;
     padding: 10px;
     background-color: rgba(255, 255, 255, 0.1); 
-}
-
-.logo-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-grow: 1; 
-    text-align: center;
+    width: 80%;
+    margin: 0 auto;
 }
 
 .logout {
-    background-color: #134a09;
+    background-color: var(--lightgreen);
     color: white;
     border: none; 
     padding: 10px 20px;
@@ -75,16 +43,12 @@
 }
 
 .logout:hover{
-    background-color: green;
+    background-color: var(--lightgreen);
     transition: 0.2s;
 }
 
-button{
-    box-shadow: 0 10px 20px -8px rgba(0, 0, 0, .7);
-}
-
 .create-trip {
-    background-color: #134a09;
+    background-color: var(--lightgreen);
     position: relative;
     padding: 10px 20px;
     font-size: 16px;
@@ -120,34 +84,15 @@ button{
     transform: translate(50%, -50%);
 }
 
-.modal {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-    position: fixed;
-    z-index: 1000; /* equivalent to bring to front*/
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    backdrop-filter: blur(2px);
-}
-
+/* model and form are in global */
 .modal-content {
     max-height: 80vh;
     overflow-y: auto; 
     padding: 20px; 
     background-color: white;
     border-radius: 8px; 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
-    width: 500px; /*fixed width so the suggestions don't cause the form to change size*/
-}
-
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 500px; 
 }
 
 .new-trip-title {
@@ -184,13 +129,6 @@ form {
     cursor: pointer;
 }
 
-/* the container holding the dates */
-.date-fields {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-}
-
 /* animation for the create trip button */
 @keyframes fadeIn {
     from {
@@ -205,7 +143,7 @@ form {
 
 .submit-new-trip-button { 
     padding: 8px; 
-    background-color: #134a09;
+    background-color:var(--lightgreen);
     color: white;
     border: none;
     width: 40%; /* Width of the button */
@@ -213,15 +151,6 @@ form {
     font-size: 15px; 
     cursor: pointer;
     align-self: center;
-}
-
-.close {
-    position: relative;
-    font-weight: bold;
-    color: black; 
-    font-size: 24px;
-    cursor: pointer;
-    z-index: 10000; 
 }
 
 .dropdown-suggestion {
@@ -255,6 +184,7 @@ form {
     border-radius: 8px; 
     pointer-events: none;
     opacity: 0;
+
     transition: opacity 0.3s, transform 0.3s ease-out;
     z-index: 1000;
     font-size: 14px; 
@@ -265,7 +195,6 @@ form {
 
 .map-container {
     height: 400px;
-    width: 100%;
     position: relative;
     z-index: 0;
     overflow: hidden;
@@ -280,29 +209,47 @@ form {
     position: absolute; 
     right: 0; 
     background-color: transparent; 
-    border: none;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); 
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); 
     z-index: 1000;
-    align-items: center;
-    justify-content: center;
     display: flex;
-    flex-direction: column;
+    flex-direction: column; 
+    border-radius: 12px;
+    overflow: hidden; 
+    min-width: 150px;
 }
 
 .dropdown-item {
-    text-align: center;
-    padding: 10px;
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
     cursor: pointer;
-    background-color: #134a09;
+    background-color: var(--lightgreen);
+    transition: background-color 0.3s ease; 
+    border-radius: 0px;
+    white-space: nowrap;
+    font-size: 13px;
+    line-height: 1.2;
 }
 
 .dropdown-item:hover {
-    background-color: rgb(8, 148, 8);
+    background-color: #13874d95; 
+    color: white;
+}
+
+.dropdown-item:active {
+    background-color: #0c6a3e; 
+}
+
+.dropdown-item svg {
+    margin-right: 8px;
+    width: 20px;
+    height: 20px;
 }
 
 .profile-container {
     position: absolute;
-    top: 10px;
+    top: 90px;
     right: 15px;
 }
 
@@ -321,3 +268,4 @@ form {
 .shake {
     animation: pop 0.4s;
 }
+

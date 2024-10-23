@@ -7,59 +7,50 @@ const createSharedTrip = async (req, res) => {
     const userId = req.params.userId;
     const tripId = req.params.tripId;
     const { email, role } = req.body; // destructure role and email from req.body
-    console.log("Request Params:", req.params);
-    console.log("Request Headers:", req.headers || "No headers available");
-    console.log("Request Body:", req.body || "No body provided");
 
     try {
         // validate userId and tripId
         if (!userId || !tripId) {
             return res.status(400).json({ message: "userId and tripId are required" });
         }
-        // if role is provided in the request body
-        if (req.body) {
-            // check if current user is the owner of the trip
-            const sharedTrip = await SharedTrip.findOne({ 
-                where: { 
-                    user_id: userId, 
-                    trip_id: tripId 
-                }
-            });
-            if (!sharedTrip || sharedTrip.role !== 'owner') {
-                return res.status(403).json({ message: "You do not have permission to share this trip" });
+        // check if current user is the owner of the trip
+        const sharedTrip = await SharedTrip.findOne({ 
+            where: { 
+                user_id: userId, 
+                trip_id: tripId 
             }
-            // find user by email
-            const newParticipant = await User.findOne({ where: { email } });
-            if (!newParticipant) {
-                return res.status(404).json({ message: "User with email not found" });
+        });
+        if (!sharedTrip || sharedTrip.role !== 'owner') {
+            return res.status(403).json({ message: "You do not have permission to share this trip" });
+        }
+        // find user by email
+        const newParticipant = await User.findOne({ where: { email } });
+        if (!newParticipant) {
+            return res.status(404).json({ message: "User with email not found" });
+        }
+        // check if user is already participant in trip
+        const existingSharedTrip = await SharedTrip.findOne({
+            where: {
+                user_id: newParticipant.user_id,
+                trip_id: tripId
             }
-            // check if user is already participant in trip
-            const existingSharedTrip = await SharedTrip.findOne({
+        });
+        if (existingSharedTrip) {
+            // update role if the user is already participant
+            await SharedTrip.update({ role }, {
                 where: {
                     user_id: newParticipant.user_id,
                     trip_id: tripId
                 }
             });
-            if (existingSharedTrip) {
-                // update role if the user is already participant
-                await SharedTrip.update({ role }, {
-                    where: {
-                        user_id: newParticipant.user_id,
-                        trip_id: tripId
-                    }
-                });
-                return res.status(200).json({ message: "User role updated" });
-            }
-            // create new shared trip for new participant
-            const newSharedTrip = await SharedTrip.create({
-                user_id: newParticipant.user_id,
-                trip_id: tripId,
-                role: role
-            });
-            return res.status(201).json({ data: newSharedTrip });
+            return res.status(200).json({ message: "User role updated" });
         }
-        // if no role provided, create new shared trip with current user as owner
-        const newSharedTrip = await SharedTrip.create({ user_id: userId, trip_id: tripId, role: 'owner' });
+        // create new shared trip for new participant
+        const newSharedTrip = await SharedTrip.create({
+            user_id: newParticipant.user_id,
+            trip_id: tripId,
+            role: role
+        });
         return res.status(201).json({ data: newSharedTrip });
     } catch (err) {
         console.error(err);
@@ -145,7 +136,6 @@ const deleteSharedTrip = async (req, res) => {
 
 module.exports = {
     createSharedTrip,
-    // addSharedTrip,
     getSharedTrips,
     getSharedTripsByUserId,
     getSharedTripsByTripId,

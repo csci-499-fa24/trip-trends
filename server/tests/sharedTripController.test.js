@@ -31,12 +31,60 @@ describe('SharedTrip Controller', () => {
         jest.clearAllMocks();
     });
 
+    it('should return 400 if userId or tripId is missing', async () => {
+        await createSharedTrip(mockRequest, mockResponse);
+        
+        expect(mockResponse.status).toHaveBeenCalledWith(400);
+        expect(mockResponse.json).toHaveBeenCalledWith({ message: "userId and tripId are required" });
+    });
+
+    it('should return 403 if the current user is not the owner', async () => {
+        mockRequest.params = { userId: '1', tripId: '3' };
+        mockRequest.body = { email: 'user@example.com', role: 'editor' };
+
+        SharedTrip.findOne.mockResolvedValueOnce({ user_id: '1', trip_id: '3', role: 'editor' });
+        User.findOne.mockResolvedValue({ user_id: '2', email: 'user@example.com' });
+
+        await createSharedTrip(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(403);
+        expect(mockResponse.json).toHaveBeenCalledWith({ message: "You do not have permission to share this trip" });
+    });
+    
+    it('should return 404 if user to be added does not have email in database', async () => {
+        mockRequest.params = { userId: '1', tripId: '3' };
+        mockRequest.body = { email: 'user@example.com', role: 'editor' };
+
+        SharedTrip.findOne.mockResolvedValueOnce({ user_id: '1', trip_id: '3', role: 'owner' });
+        User.findOne.mockResolvedValueOnce(null);
+
+        await createSharedTrip(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(404);
+        expect(mockResponse.json).toHaveBeenCalledWith({ message: "User with email not found" });
+    });
+
+    it('should update user role and return 200 status', async () => {
+        mockRequest.params = { userId: '1', tripId: '3' };
+        mockRequest.body = { email: 'user@example.com', role: 'editor' };
+
+        SharedTrip.findOne.mockResolvedValueOnce({ user_id: '1', trip_id: '3', role: 'owner' });
+        User.findOne.mockResolvedValueOnce({ user_id: '2', email: 'user@example.com' });
+        SharedTrip.findOne.mockResolvedValueOnce({ user_id: '2', email: 'user@example.com', role: 'viewer' });
+        SharedTrip.create.mockResolvedValue({ user_id: '2', trip_id: '3', role: 'editor' });
+
+        await createSharedTrip(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(200);
+        expect(mockResponse.json).toHaveBeenCalledWith({ message: "User role updated" });
+    });
+
     it('should create a new shared trip and return 201 status', async () => {
         mockRequest.params = { userId: '1', tripId: '3' };
         mockRequest.body = { email: 'user@example.com', role: 'editor' };
 
         SharedTrip.findOne.mockResolvedValueOnce({ user_id: '1', trip_id: '3', role: 'owner' });
-        User.findOne.mockResolvedValue({ user_id: '2', email: 'user@example.com' });
+        User.findOne.mockResolvedValueOnce({ user_id: '2', email: 'user@example.com' });
         SharedTrip.findOne.mockResolvedValueOnce(null);
         SharedTrip.create.mockResolvedValue({ user_id: '2', trip_id: '3', role: 'editor' });
 
@@ -44,13 +92,6 @@ describe('SharedTrip Controller', () => {
 
         expect(mockResponse.status).toHaveBeenCalledWith(201);
         expect(mockResponse.json).toHaveBeenCalledWith({ data: { user_id: '2', trip_id: '3', role: 'editor' } });
-    });
-
-    it('should return 400 if userId or tripId is missing', async () => {
-        await createSharedTrip(mockRequest, mockResponse);
-        
-        expect(mockResponse.status).toHaveBeenCalledWith(400);
-        expect(mockResponse.json).toHaveBeenCalledWith({ message: "userId and tripId are required" });
     });
 
     it('should get all shared trips', async () => {

@@ -1,0 +1,150 @@
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    max-width: 400px;
+    width: 90%;
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.close {
+    cursor: pointer;
+    font-size: 24px;
+    color: black;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+.share-trip-title {
+    font-size: 24px;
+    color: black; 
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.share-trip-field-label {
+    font-size: 1rem;
+    margin-bottom: 10px;
+    color: black; 
+}
+
+.share-trip-field-label input,
+.share-trip-field-label select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    color: black; 
+    font-size: 15px;
+    transition: border-color 0.3s ease;
+}
+
+.share-trip-field-label input:focus,
+.share-trip-field-label select:focus {
+    border-color: var(--lightgreen);
+}
+
+.share-trip-button {
+    padding: 10px;
+    background-color: var(--lightgreen);
+    color: white;
+    border: none;
+    width: 50%;
+    border-radius: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    align-self: center;
+    margin-top: 15px; 
+}
+
+.share-trip-button:hover {
+    background-color: var(--lightergreen);
+}
+
+
+.edit-trip-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(2px);
+}
+
+.edit-trip-form {
+    max-width: 400px;
+    width: 90%;
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative; /* Allow positioning for close button */
+}
+
+.edit-trip-title {
+    font-size: 24px;
+    color: black; 
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.edit-trip-field-label {
+    font-size: 1rem;
+    margin-bottom: 10px;
+    color: black; 
+}
+
+.edit-trip-field-label input,
+.edit-trip-field-label select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    color: black; 
+    font-size: 15px;
+    transition: border-color 0.3s ease;
+}
+
+.edit-trip-field-label input:focus,
+.edit-trip-field-label select:focus {
+    border-color: var(--lightgreen);
+}
+
+.edit-trip-button {
+    padding: 10px;
+    background-color: var(--lightgreen);
+    color: white;
+    border: none;
+    width: 50%;
+    border-radius: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    align-self: center;
+    margin-top: 15px; 
+}
+
+.edit-trip-button:hover {
+    background-color: var(--lightergreen);
+}
