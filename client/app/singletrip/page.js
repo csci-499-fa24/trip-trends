@@ -61,8 +61,17 @@ function Singletrip() {
         "Other"
     ]);
     const isOwner = userRole === 'owner';
-    const userId = localStorage.getItem("user_id");
+    const [userId, setUserId] = useState(null);
     const [homeCurrency, setHomeCurrency] = useState(null);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const storedUserId = localStorage.getItem("user_id");
+            if (storedUserId) {
+                setUserId(storedUserId);
+            }
+        }
+    }, []);
 
     const fetchTripData = () => {
         if (tripId) {
