@@ -33,6 +33,7 @@ function Singletrip() {
     const [fetchedExpenseData, setFetchedExpenseData] = useState([]);
     const [convertedHomeCurrencyExpenseData, setconvertedHomeCurrencyExpenseData] = useState([])
     const [totalExpenses, setTotalExpenses] = useState(0);
+    const [expenseUSD, setExpenseUSD] = useState([]);
     const [currencyCodes, setCurrencyCodes] = useState([]);
     const [selectedCurrency, setSelectedCurrency] = useState('');
     const [otherCurrencies, setOtherCurrencies] = useState([]);
@@ -101,6 +102,14 @@ function Singletrip() {
         }
     };
 
+    useEffect(() => {
+        const savedFilter = localStorage.getItem('selectedFilter');
+        if (savedFilter && expenseUSD.length > 0) {
+            console.log(expenseUSD); 
+            applyFilter(savedFilter, expenseUSD); 
+        }
+    }, [expenseUSD]);
+
     const fetchExpenseData = () => {
         axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/trips/${tripId}`)
             .then(response => {
@@ -108,9 +117,12 @@ function Singletrip() {
                 setOriginalData(response.data);
                 setFetchedExpenseData(response.data.data);
 
+                fetchCurrencyRates(fetchedExpenses);
+
                 const savedFilter = localStorage.getItem('selectedFilter');
                 if (savedFilter) {
-                    applyFilter(savedFilter, response.data);
+                    console.log(expenseUSD);
+                    applyFilter(savedFilter, expenseUSD);
                 }
             })
             .catch(error => {
@@ -168,16 +180,20 @@ function Singletrip() {
         setFilterPopupVisible(false);
     };
 
-    const applyFilter = (filterOption, data = originalData) => {
+    const applyFilter = (filterOption, data = expenseUSD) => {
+        if (!Array.isArray(data)) {
+            console.error('Data is not an array:', data);
+            return;
+        }
         let sortedExpenses;
         if (filterOption === 'highest') {
-            sortedExpenses = [...data.data].sort((a, b) => b.amount - a.amount);
+            sortedExpenses = [...data].sort((a, b) => parseFloat(b.amountInHomeCurrency) - parseFloat(a.amountInHomeCurrency));
         } else if (filterOption === 'lowest') {
-            sortedExpenses = [...data.data].sort((a, b) => a.amount - b.amount);
+            sortedExpenses = [...data].sort((a, b) => parseFloat(a.amountInHomeCurrency) - parseFloat(b.amountInHomeCurrency));
         } else if (filterOption === 'recent') {
-            sortedExpenses = [...data.data].sort((a, b) => new Date(b.posted) - new Date(a.posted));
+            sortedExpenses = [...data].sort((a, b) => new Date(b.posted) - new Date(a.posted));
         } else if (filterOption === 'oldest') {
-            sortedExpenses = [...data.data].sort((a, b) => new Date(a.posted) - new Date(b.posted));
+            sortedExpenses = [...data].sort((a, b) => new Date(a.posted) - new Date(b.posted));
         }
         setExpenseData({ data: sortedExpenses });
         setSelectedFilter(filterOption);
@@ -297,6 +313,11 @@ function Singletrip() {
         getExchangeRates();
     }, [selectedCurrency]);
 
+
+    useEffect(() => {
+        console.log(expenseUSD);
+    },[expenseUSD])
+
     const fetchCurrencyRates = async (expenses) => {
         try {
             const currencyPromises = expenses
@@ -334,6 +355,7 @@ function Singletrip() {
                 });
 
                 setconvertedHomeCurrencyExpenseData(convertedExpenses)
+                setExpenseUSD(convertedExpenses);
     
                 // Prepare data for pie chart
                 const labels = Object.keys(categoryTotals);
@@ -370,17 +392,17 @@ function Singletrip() {
                 {tripData ? (
                     <div>
                         <h1 id='tripName'>{tripData.data.name}</h1>
-                        <header class="top-icon-header">
-                                <div class="icon-div" tooltip="Home" tabindex="0">
-                                    <div class="icon-SVG">
-                                        <Link href={`/homepage`}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                                            </svg>
-                                        </Link>
-                                        <span class="icon-text">Home</span>
-                                    </div>
+                        <header className="top-icon-header">
+                            <div className="icon-div" tooltip="Home" tabIndex="0">
+                                <div className="icon-SVG">
+                                    <Link href={`/homepage`}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                                        </svg>
+                                    </Link>
+                                    <span className="icon-text">Home</span>
                                 </div>
+                            </div>
                             {/* Share Trip Button */}
                             <ShareTripComponent tripId={tripId} isOwner={isOwner} />
                             {/* Edit Trip Button */}
@@ -389,10 +411,10 @@ function Singletrip() {
                             <DeleteTripComponent tripId={tripId} userRole={userRole} />
                         </header>
                         {/* General Trip Info*/}
-                        <GeneralTripInfoComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} />
+                        <GeneralTripInfoComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenses={expenseUSD}/>
                         {/* Trip Calendar and Budget Meter */}
                         <div className='container'>
-                            <div className='row'>  
+                            <div className='row'>
                                 <div className='col'>
                                     <div className="meter-container"> 
                                         <BudgetMeterComponent tripData={tripData} expenseData={expenseData} totalExpenses={totalExpenses} homeCurrency={homeCurrency}/>
@@ -413,46 +435,46 @@ function Singletrip() {
                         <br></br>
                         {/* Icon Bar Above Expenses */}
                         <div>
-                            <header class="icon-bar-header">
+                            <header className="icon-bar-header">
                                 {/* Add Expense Button */}
-                                <div class="icon-div" tooltip="Add Expense" tabindex="0">
-                                    <div class="icon-SVG">
+                                <div className="icon-div" tooltip="Add Expense" tabIndex="0">
+                                    <div className="icon-SVG">
                                         <svg
                                             onClick={() => setPopUpVisible(true)}
-                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.3" stroke="currentColor" class="size-6">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                         </svg>
-                                        <span class="icon-text">Add Expense</span>
+                                        <span className="icon-text">Add Expense</span>
                                     </div>
                                 </div>
                                 {/* Filter Expenses Button */}
-                                <div class="icon-div" tooltip="Filter" tabindex="0">
-                                    <div class="icon-SVG">
+                                <div className="icon-div" tooltip="Filter" tabIndex="0">
+                                    <div className="icon-SVG">
                                         <svg
                                             onClick={() => setFilterPopupVisible(true)}
-                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.3" stroke="currentColor" class="size-6" >
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6" >
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
                                         </svg>
-                                        <span class="icon-text">Filter</span>
+                                        <span className="icon-text">Filter</span>
 
                                     </div>
                                 </div>
-                                {/* <div class="spacer"></div>
-                                <div class="divider"></div> */}
+                                {/* <div className="spacer"></div>
+                                <div className="divider"></div> */}
 
                                 {/* Download Trip Button */}
-                                <DownloadTripComponent tripData={tripData} tripId = {tripId} />
+                                <DownloadTripComponent tripData={tripData} tripId={tripId} />
 
                                 {/* Add Image Button */}
-                                <div class="icon-div" tooltip="Add Image" tabindex="0">
-                                    <div class="icon-SVG">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.3" stroke="currentColor" class="size-6">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                                <div className="icon-div" tooltip="Add Image" tabIndex="0">
+                                    <div className="icon-SVG">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                                         </svg>
-                                        <span class="icon-text">Add Image</span>
+                                        <span className="icon-text">Add Image</span>
                                     </div>
                                 </div>
-                                
+
                                 {/* Applied filter popup */}
                                 {selectedFilter && (
                                     <div className="applied-filter">
@@ -466,8 +488,8 @@ function Singletrip() {
                         </div>
 
                         {/* Expense Table */}
-                        <ExpenseTableComponent tripData={tripData} tripId = {tripId} tripLocations = {tripLocations} expenseData={expenseData} 
-                        currencyCodes={currencyCodes} expenseCategories={expenseCategories} />
+                        <ExpenseTableComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenseData={expenseData}
+                            currencyCodes={currencyCodes} expenseCategories={expenseCategories} />
 
                     </div>
                 ) : (
