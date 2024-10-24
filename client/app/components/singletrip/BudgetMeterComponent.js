@@ -54,7 +54,7 @@ const BudgetMeterComponent = ({ tripData, expenseData, totalExpenses, homeCurren
                     <p style={{ textDecoration: "underline", display: "inline" }}>
                         Total Expenses in {homeCurrency}:
                     </p>
-                    <span>  ${totalExpenses.toFixed(2)}</span>
+                    <span>  {totalExpenses.toFixed(2)}</span>
                     {totalExpenses > tripData.data.budget ? (
                         <p id='budget-text'>You are <strong>${(totalExpenses - tripData.data.budget).toFixed(2)}</strong> over your budget.</p>
                     ) : (
