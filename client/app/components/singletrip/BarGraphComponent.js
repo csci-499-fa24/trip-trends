@@ -27,6 +27,18 @@ const BarGraphComponent = ({ tripData, expenseData, categoryData }) => {
 
     // put together all the total expenses for each category for each day
     const expensesByCategory = {};
+    // make 3 different stacks with 3 categories each
+    const categoryStackMap = {
+        'Phone/Internet': 'essential',
+        'Health/Safety': 'essential',
+        'Food/Drink': 'essential',
+        'Flights': 'travel',
+        'Accommodations': 'travel',
+        'Transport': 'travel',
+        'Activities': 'leisure',
+        'Shopping': 'leisure',
+        'Other': 'leisure',
+    };
     expenseData.forEach(expense => {
         const date = dayjs(expense.posted).format('YYYY-MM-DD');
         const category = expense.category;
@@ -62,6 +74,7 @@ const BarGraphComponent = ({ tripData, expenseData, categoryData }) => {
             id: category,
             label: category,
             data: categoryDataPoints,
+            stack: categoryStackMap[category],
         };
     });
 
