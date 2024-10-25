@@ -1,0 +1,26 @@
+.recent-trips-container {
+    flex: 1;
+    background-color: #f5f5f5;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.recent-trips-container h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.trip-card {
+    display: flex;
+    align-items: center;
+    background-color: #d8e9d6;
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+/* .trip-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+} */
