@@ -167,18 +167,18 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses })
                                 top: `${boxPosition.top}px`,
                                 left: `${boxPosition.left}px`,
                                 background: 'rgba(0, 0, 0, 0.7)', 
-                                color: 'white', 
-                                border: '1px solid #ccc',
+                                color: 'white',
                                 borderRadius: '5px',
                                 padding: '10px',
-                                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                                 zIndex: 1000,
+                                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
                             }}
                         >
-                            <ul>
+                            <ul style={{ listStyleType: 'none', padding: 0 }}>
                                 {selectedDate.expenses.map((expense, index) => (
-                                    <li key={index}>
-                                        <strong>{expense.name}</strong>: {expense.amountInHomeCurrency}
+                                    <li key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                                        <span style={{ flex: 1 }}>{expense.name}</span>
+                                        <span style={{ width: '80px', textAlign: 'right' }}>{expense.amountInHomeCurrency}</span> {/* Fixed width for amount */}
                                     </li>
                                 ))}
                             </ul>
