@@ -24,6 +24,7 @@ import { debounce } from 'lodash';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import HomeCurrencyPopupComponent from '../components/homepage/HomeCurrencyPopupComponent';
+import RecentTripsComponent from '../components/homepage/RecentTripsComponent';
 
 // Custom marker icon style
 const customDefaultMarker = new Style({
@@ -599,6 +600,8 @@ function homepage() {
 
                 {/* Map section */}
                 <div ref={mapRef} style={{ height: '400px', width: '100%' }}></div>
+
+                <RecentTripsComponent trips={trips} />
 
                 {/* Recent trips section */}
                 <div className="recent-trips">
