@@ -36,11 +36,11 @@ const User = sequelize.define('user', {
     image: {
         type: DataTypes.STRING(255),
         allowNull: true
+    },
+    home_currency: {
+        type: DataTypes.STRING(3),
+        allowNull: true,
     }
-    // password: {
-    //     type: DataTypes.STRING(255),
-    //     allowNull: false
-    // }
 }, {
     tableName: 'users',
     timestamps: false

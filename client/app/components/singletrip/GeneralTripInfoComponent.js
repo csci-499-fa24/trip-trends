@@ -1,15 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Calendar from 'react-calendar';
 import { parseISO, startOfDay, endOfDay } from 'date-fns';
 import LocationsDropdownComponent from '../singletrip/LocationsDropdownComponent';
 import DefaultTripImagesComponent from '../singletrip/DefaultTripImagesComponent';
 
-const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations }) => {
+const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses }) => {
+    const [totalExpensesByDate, setTotalExpensesByDate] = useState({});
+
     const DateComponent = ({ dateStr }) => {
         const dateObj = new Date(dateStr);
         const options = { month: 'long', day: 'numeric' };
         const formattedDate = dateObj.toLocaleDateString('en-US', options);
-    
+
         return (
             <span>
                 {dateObj.toLocaleDateString('en-US', options)}
@@ -37,6 +39,29 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations }) => {
 
     const { startDate, endDate } = getTripDates();
 
+
+    useEffect(() => {
+        const totals = {};
+        expenses.forEach(expense => {
+            // Split the date string to create a Date object
+            const [year, month, day] = expense.posted.split('-').map(Number);
+            // Create a date object using the year, month (0-indexed), and day
+            const date = new Date(year, month - 1, day); // month is 0-indexed in JS
+
+            // Normalize to the start of the day
+            date.setHours(0, 0, 0, 0);
+            const dateKey = date.toDateString();
+
+            const amount = parseFloat(expense.amountInHomeCurrency);
+            if (!totals[dateKey]) {
+                totals[dateKey] = 0;
+            }
+            totals[dateKey] += amount;
+        });
+        console.log("Totals by date:", totals);
+        setTotalExpensesByDate(totals);
+    }, [expenses]);
+
     return (
         <div>
             <div className="trip-overview">
@@ -44,7 +69,7 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations }) => {
                     <div className="trip-overview-circle">🗓️</div>
                     <div className="trip-overview-content">
                         <p>
-                            <DateComponent dateStr={tripData.data.start_date} /> - 
+                            <DateComponent dateStr={tripData.data.start_date} /> -
                             <DateComponent dateStr={tripData.data.end_date} />
                         </p>
                     </div>
@@ -73,23 +98,29 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations }) => {
                     <DefaultTripImagesComponent tripId={tripId} tripLocations={tripLocations} />
                 </div>
                 <div className='col' style={{ flexDirection: "column" }}>
-                    <div className="meter-container">
-                        <p id='budgetTitle'>Your Trip Calendar:</p>
-                        <br />
-                        <Calendar
-                            tileClassName={({ date }) => {
-                                if (isDateInRange(date)) {
-                                    return 'highlighted-date';
-                                }
-                                if (date.toDateString() === endDate.toDateString()) {
-                                    return 'highlighted-date';
-                                }
-                                return null;
-                            }}
-                        />
-                    </div>
+                    <Calendar
+                        tileClassName={({ date }) => {
+                            if (isDateInRange(date)) {
+                                return 'highlighted-date'; 
+                            }
+                            return null; 
+                        }}
+                        tileContent={({ date }) => {
+                            const dateKey = date.toDateString(); 
+                            const total = totalExpensesByDate[dateKey];
+
+                            return (
+                                <div className="tile-content"> 
+                                    {total !== undefined && (
+                                        <div className="expense-amount">{total.toFixed(2)}</div> // Show total if defined
+                                    )}
+                                </div>
+                            );
+                        }}
+                    />
                 </div>
             </div>
+
         </div>
     );
 };

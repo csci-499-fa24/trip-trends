@@ -196,8 +196,8 @@
 }
 
 .highlighted-date {
-    background-color: #77DD77 !important;
-    color: white !important;
+    background-color: rgba(0, 128, 0, 0.5); /* Slightly transparent green */
+    border-radius: 5px;
 }
 
 .highlighted-date {
@@ -206,7 +206,10 @@
 }
 
 .calendar-container{
-    width: 200%
+    width: 110%;
+    height: 100%;
+    margin-left: 5% !important;
+    /* background-color: grey; */
 }
 
 
@@ -220,20 +223,24 @@
 }
 
 .react-calendar {
-    width: 100%;
+    width: 100% !important; /* Set desired width */
+    height: 100% !important; /* Auto height */
     border: none;
     border-radius: 10px;
     overflow: hidden;
-    size-adjust: auto;
 }
 
 .react-calendar__tile {
     box-shadow: none;
     transition: none;
     border-radius: 6px;
+    padding: 10px !important; /* Increase padding for tiles */
+    font-size: 1em !important; /* Increase tile text size */
+    font-weight: bold !important;
 }
 
 .react-calendar__tile--active {
+    background-color: green !important;
     box-shadow: none;
 }
 
@@ -254,11 +261,30 @@
     background-color: white;
     color: black;
     border-radius: 8px;
+    font-size: 1.2em; /* Increase header text size */
 }
 
 .react-calendar__tile {
     color: black;
     border-radius: 5px;
+}
+
+.tile-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center the content */
+    justify-content: center; /* Center the content vertically */
+    height: 100%; /* Make sure the content takes the full height of the tile */
+}
+
+.date-number {
+    font-weight: bold;
+    font-size: 1.2em; /* Slightly larger font for date */
+}
+
+.expense-amount {
+    font-size: 0.9em; /* Smaller font for expenses */
+    color: rgb(243, 133, 133); /* Change color to green for expenses */
 }
 
 #tripName {
@@ -292,6 +318,7 @@
     margin-top: 10px;
     font-weight: 600;
     margin-bottom: 0;
+    text-align: center;
 }
 
 #budget-text {
