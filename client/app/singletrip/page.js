@@ -314,9 +314,9 @@ function Singletrip() {
     }, [selectedCurrency]);
 
 
-    useEffect(() => {
-        console.log(expenseUSD);
-    },[expenseUSD])
+    // useEffect(() => {
+    //     console.log(expenseUSD);
+    // },[expenseUSD])
 
     const fetchCurrencyRates = async (expenses) => {
         try {

@@ -43,10 +43,8 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses })
     useEffect(() => {
         const totals = {};
         expenses.forEach(expense => {
-            // Split the date string to create a Date object
             const [year, month, day] = expense.posted.split('-').map(Number);
-            // Create a date object using the year, month (0-indexed), and day
-            const date = new Date(year, month - 1, day); // month is 0-indexed in JS
+            const date = new Date(year, month - 1, day); 
 
             // Normalize to the start of the day
             date.setHours(0, 0, 0, 0);
@@ -58,7 +56,7 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses })
             }
             totals[dateKey] += amount;
         });
-        console.log("Totals by date:", totals);
+       // console.log("Totals by date:", totals);
         setTotalExpensesByDate(totals);
     }, [expenses]);
 
