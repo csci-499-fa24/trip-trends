@@ -598,10 +598,16 @@ function homepage() {
                     )}
                 </div>
 
-                {/* Map section */}
-                <div ref={mapRef} style={{ height: '400px', width: '100%' }}></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    {/* Map section */}
+                    <div ref={mapRef} style={{ height: '537px', width: '65%' }}></div>
 
-                <RecentTripsComponent trips={trips} />
+                    {/* Recent Trips section */}
+                    <div style={{ width: '35%', marginLeft: '10px' }}>
+                        <RecentTripsComponent trips={trips} />
+                    </div>
+                </div>
+
 
                 {/* Recent trips section */}
                 <div className="recent-trips">
