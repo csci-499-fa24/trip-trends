@@ -20,6 +20,7 @@ import GeneralTripInfoComponent from '../components/singletrip/GeneralTripInfoCo
 import ExpenseTableComponent from '../components/singletrip/ExpenseTableComponent';
 import BudgetMeterComponent from '../components/singletrip/BudgetMeterComponent';
 import ExchangeRateTableComponent from '../components/singletrip/ExchangeRateTableComponent'
+import BarGraphComponent from '../components/singletrip/BarGraphComponent';
 
 Chart.register(ArcElement, Tooltip, Legend);
 
@@ -30,6 +31,7 @@ function Singletrip() {
     const [userRole, setUserRole] = useState(null);
     const [expenseData, setExpenseData] = useState([]);
     const [fetchedExpenseData, setFetchedExpenseData] = useState([]);
+    const [convertedHomeCurrencyExpenseData, setconvertedHomeCurrencyExpenseData] = useState([])
     const [totalExpenses, setTotalExpenses] = useState(0);
     const [expenseUSD, setExpenseUSD] = useState([]);
     const [currencyCodes, setCurrencyCodes] = useState([]);
@@ -312,9 +314,9 @@ function Singletrip() {
     }, [selectedCurrency]);
 
 
-    useEffect(() => {
-        console.log(expenseUSD);
-    },[expenseUSD])
+    // useEffect(() => {
+    //     console.log(expenseUSD);
+    // },[expenseUSD])
 
     const fetchCurrencyRates = async (expenses) => {
         try {
@@ -351,6 +353,8 @@ function Singletrip() {
                         amountInHomeCurrency // Add converted amount to expense
                     };
                 });
+
+                setconvertedHomeCurrencyExpenseData(convertedExpenses)
                 setExpenseUSD(convertedExpenses);
     
                 // Prepare data for pie chart
@@ -423,6 +427,9 @@ function Singletrip() {
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div className="meter-container">
+                            <BarGraphComponent tripData={tripData} expenseData={convertedHomeCurrencyExpenseData} categoryData={categoryData} />
                         </div>
 
                         <br></br>
