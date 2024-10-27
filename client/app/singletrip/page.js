@@ -5,14 +5,10 @@ import React, { useEffect, useState } from 'react';
 import '../css/singletrip.css';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Link from 'next/link';
 import 'react-calendar/dist/Calendar.css';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 
 // Import components
-import DeleteTripComponent from '../components/singletrip/DeleteTripComponent';
-import ShareTripComponent from '../components/singletrip/ShareTripComponent';
-import EditTripComponent from '../components/singletrip/EditTripComponent';
 import DownloadTripComponent from '../components/singletrip/DownloadTripComponent';
 import CategoryDataComponent from '../components/singletrip/CategoryDataComponent';
 import ExpenseFormComponent from '../components/singletrip/ExpenseFormComponent';
@@ -20,6 +16,10 @@ import GeneralTripInfoComponent from '../components/singletrip/GeneralTripInfoCo
 import ExpenseTableComponent from '../components/singletrip/ExpenseTableComponent';
 import BudgetMeterComponent from '../components/singletrip/BudgetMeterComponent';
 import ExchangeRateTableComponent from '../components/singletrip/ExchangeRateTableComponent'
+import HeaderComponent from '../components/HeaderComponent';
+import TripIconBarComponent from '../components/singletrip/TripIconBarComponent';
+import HeaderComponent from '../components/HeaderComponent';
+import TripIconBarComponent from '../components/singletrip/TripIconBarComponent';
 import BarGraphComponent from '../components/singletrip/BarGraphComponent';
 
 Chart.register(ArcElement, Tooltip, Legend);
@@ -29,6 +29,8 @@ function Singletrip() {
     const [tripId, setTripId] = useState(null);
     const [tripData, setTripData] = useState(null);
     const [userRole, setUserRole] = useState(null);
+    const [userId, setUserId] = useState(null);
+    const [userName, setUserName] = useState('');
     const [expenseData, setExpenseData] = useState([]);
     const [fetchedExpenseData, setFetchedExpenseData] = useState([]);
     const [convertedHomeCurrencyExpenseData, setconvertedHomeCurrencyExpenseData] = useState([])
@@ -225,6 +227,11 @@ function Singletrip() {
         }
 
         const fetchUserRole = async () => {
+            const user_id = localStorage.getItem("user_id");
+            if (user_id) {
+                setUserId(user_id);
+            }
+            // console.log('User ID:', userId);
             if (tripId && userId) {
                 try {
                     const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/trips/${tripId}`);
@@ -385,31 +392,12 @@ function Singletrip() {
         <div className="main-container">
             <div>
                 {/* Header section */}
-                <div className="header">
-                    TRIP TRENDS
-                </div>
+                <HeaderComponent headerTitle={tripData ? tripData.data.name : ''} setUserName={setUserName} userId={userId} />
 
                 {tripData ? (
                     <div>
-                        <h1 id='tripName'>{tripData.data.name}</h1>
-                        <header className="top-icon-header">
-                            <div className="icon-div" tooltip="Home" tabIndex="0">
-                                <div className="icon-SVG">
-                                    <Link href={`/homepage`}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                                        </svg>
-                                    </Link>
-                                    <span className="icon-text">Home</span>
-                                </div>
-                            </div>
-                            {/* Share Trip Button */}
-                            <ShareTripComponent tripId={tripId} isOwner={isOwner} />
-                            {/* Edit Trip Button */}
-                            <EditTripComponent tripId={tripId} tripData={tripData} tripLocations={tripLocations} userRole={userRole} onUpdate={fetchTripData} />
-                            {/* Delete Trip Button */}
-                            <DeleteTripComponent tripId={tripId} userRole={userRole} />
-                        </header>
+                        {/* Icon Bar Above Trip Info */}
+                        <TripIconBarComponent tripId={tripId} userId={userId} isOwner={isOwner} tripData={tripData} tripLocations={tripLocations} userRole={userRole} fetchTripData={fetchTripData} />
                         {/* General Trip Info*/}
                         <GeneralTripInfoComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenses={expenseUSD}/>
                         {/* Trip Calendar and Budget Meter */}

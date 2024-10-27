@@ -30,7 +30,7 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses })
         if (!tripData) {
             return { startDate: null, endDate: null };
         }
-
+        
         const startDate = startOfDay(parseISO(tripData.data.start_date));
         const endDate = endOfDay(parseISO(tripData.data.end_date));
 
@@ -69,7 +69,7 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses })
                     <div className="trip-overview-circle">🗓️</div>
                     <div className="trip-overview-content">
                         <p>
-                            <DateComponent dateStr={tripData.data.start_date} /> -
+                            <DateComponent dateStr={tripData.data.start_date} /> {' ~ '} 
                             <DateComponent dateStr={tripData.data.end_date} />
                         </p>
                     </div>

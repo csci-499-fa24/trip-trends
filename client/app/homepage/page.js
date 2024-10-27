@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import Image from 'next/image';
 import '../css/homepage.css';
 import axios from 'axios';
 import { GoogleOAuthProvider, googleLogout } from '@react-oauth/google';
@@ -20,9 +19,12 @@ import Point from 'ol/geom/Point';
 import { boundingExtent } from 'ol/extent';
 import { fromLonLat } from 'ol/proj';
 import Link from 'next/link';
-import { debounce } from 'lodash';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import HeaderComponent from '../components/HeaderComponent';
+import TripFormComponent from '../components/homepage/TripFormComponent';
+import HeaderComponent from '../components/HeaderComponent';
+import TripFormComponent from '../components/homepage/TripFormComponent';
 import HomeCurrencyPopupComponent from '../components/homepage/HomeCurrencyPopupComponent';
 
 // Custom marker icon style
@@ -44,7 +46,7 @@ const googleID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
 function homepage() {
     // States
-    const [userName, setUserName] = useState("[NAME]");
+    const [userName, setUserName] = useState("");
     const [trips, setTrips] = useState([]);
     const [allTripLocations, setAllTripLocations] = useState([]);
     const [expandedTripId, setExpandedTripId] = useState(null);
@@ -62,25 +64,15 @@ function homepage() {
     const [suggestions, setSuggestions] = useState([]);
     const [locationsNotProvided, setLocationsNotProvided] = useState(false);
     const [userId, setUserId] = useState(null);
-    const [profileDropdownVisible, setProfileDropdownVisible] = useState(false);
-    const [profileImageUrl, setProfileImageUrl] = useState('');
     const [animatedTripId, setAnimationForTripId] = useState(null);
-    const [currencyPopupVisible, setCurrencyPopupVisible] = useState(false);
-
-
-    const handleLogout = () => {
-        googleLogout();
-        localStorage.removeItem("token");
-        window.location.href = '/signup';
-    };
 
     // Used to display user's name
     const fetchUserName = async () => {
         const userId = localStorage.getItem("user_id");
         try {
             const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/${userId}`);
-            const userData = response.data.data;
-            if (userData) {
+            if (response.data && response.data.data) {
+                const userData = response.data.data;
                 setUserName(userData.fname); // Set the username from the database
             }
         } catch (error) {
@@ -88,13 +80,10 @@ function homepage() {
         }
     };
 
-    // Used to display user's image if token exists
     const handleToken = async () => {
         const token = localStorage.getItem("token");
         if (token) {
             const userCredential = jwtDecode(token);
-            const userProfileImage = userCredential.picture;
-            setProfileImageUrl(userProfileImage);
         } else {
             console.log("Token not found. Redirecting to sign in page.");
             window.location.href = '/signup';
@@ -133,7 +122,9 @@ function homepage() {
     };
 
     useEffect(() => {
-        fetchUserTrips(); // Call the function to fetch trips on component mount
+        if (userId) {
+            fetchUserTrips(); // Call the function to fetch trips on component mount
+        }
     }, [userId]);
 
 
@@ -150,52 +141,52 @@ function homepage() {
         }
     };
 
-    // Captures new input instantly in each popup field
-    const newTripInputChange = (e) => {
-        const { name, value } = e.target;
-        setNewTripData({ ...newTripData, [name]: value });
-    };
+    // // Captures new input instantly in each popup field
+    // const newTripInputChange = (e) => {
+    //     const { name, value } = e.target;
+    //     setNewTripData({ ...newTripData, [name]: value });
+    // };
 
-    const newTripLocInputChange = (e) => {
-        const value = e.target.value;
-        setTempLocation(value);
-        fetchLocationSuggestions(value);
-    };
+    // const newTripLocInputChange = (e) => {
+    //     const value = e.target.value;
+    //     setTempLocation(value);
+    //     fetchLocationSuggestions(value);
+    // };
 
-    const fetchLocationSuggestions = useCallback(debounce(async (query) => {
-        if (query) {
-            try {
-                const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json`, {
-                    params: {
-                        q: query,
-                        key: process.env.NEXT_PUBLIC_OPENCAGE_API_KEY, // Using OpenCage API key
-                        limit: 5 // Limit the number of suggestions
-                    }
-                });
-                const results = response.data.results.map(result => result.formatted); // Extract formatted addresses
-                setSuggestions(results); // Set suggestions state
-            } catch (error) {
-                console.error('Error fetching location suggestions:', error);
-                setSuggestions([]); // Clear suggestions on error
-            }
-        } else {
-            setSuggestions([]);
-        }
-    }, 200), // debounce delay to reduce the number of API calls to avoid errors
-        []);
+    // const fetchLocationSuggestions = useCallback(debounce(async (query) => {
+    //     if (query) {
+    //         try {
+    //             const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json`, {
+    //                 params: {
+    //                     q: query,
+    //                     key: process.env.NEXT_PUBLIC_OPENCAGE_API_KEY, // Using OpenCage API key
+    //                     limit: 5 // Limit the number of suggestions
+    //                 }
+    //             });
+    //             const results = response.data.results.map(result => result.formatted); // Extract formatted addresses
+    //             setSuggestions(results); // Set suggestions state
+    //         } catch (error) {
+    //             console.error('Error fetching location suggestions:', error);
+    //             setSuggestions([]); // Clear suggestions on error
+    //         }
+    //     } else {
+    //         setSuggestions([]);
+    //     }
+    // }, 200), // debounce delay to reduce the number of API calls to avoid errors
+    //     []);
 
-    const selectSuggestion = (suggestion) => {
-        // Check if the suggestion is not already included and if the max limit is not reached
-        if (!newTripLocation.trip_locations.includes(suggestion) && newTripLocation.trip_locations.length < 10) {
-            setNewTripLocation(prev => ({
-                trip_locations: [...prev.trip_locations, suggestion] // Add selected suggestion to locations array
-            }));
-        } else if (newTripLocation.trip_locations.length >= 10) {
-            alert("You can only add a maximum of 10 locations."); // Alert if limit is reached
-        }
-        setSuggestions([]); // Clear suggestions after selection
-        setTempLocation(''); // Clear input field after selection
-    };
+    // const selectSuggestion = (suggestion) => {
+    //     // Check if the suggestion is not already included and if the max limit is not reached
+    //     if (!newTripLocation.trip_locations.includes(suggestion) && newTripLocation.trip_locations.length < 10) {
+    //         setNewTripLocation(prev => ({
+    //             trip_locations: [...prev.trip_locations, suggestion] // Add selected suggestion to locations array
+    //         }));
+    //     } else if (newTripLocation.trip_locations.length >= 10) {
+    //         alert("You can only add a maximum of 10 locations."); // Alert if limit is reached
+    //     }
+    //     setSuggestions([]); // Clear suggestions after selection
+    //     setTempLocation(''); // Clear input field after selection
+    // };
 
     const fetchTripLocations = async () => {
         if (!userId) {
@@ -214,90 +205,87 @@ function homepage() {
         setAllTripLocations(locations);
     };
 
-    const submitNewTrip = async (e) => {
-        e.preventDefault();
-        // No locations selected
-        if (newTripLocation.trip_locations.length === 0) {
-            setLocationsNotProvided(true);
-            alert("Please provide at least one location.")
-            return;
-        }
-        try {
-            let trip_submission_response = null;
-            try {
-                trip_submission_response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/users/${userId}`, newTripData); // locations not needed for a trip submission
-                toast.success("Trip successfully created!");
-            } catch (error) {
-                console.error("Error submitting trip data:", error);
-                toast.error("Trip creation failed. Please try again later.");
-            }
+    // const submitNewTrip = async (e) => {
+    //     e.preventDefault();
+    //     // No locations selected
+    //     if (newTripLocation.trip_locations.length === 0) {
+    //         setLocationsNotProvided(true);
+    //         alert("Please provide at least one location.")
+    //         return;
+    //     }
+    //     try {
+    //         let trip_submission_response = null;
+    //         try {
+    //             trip_submission_response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/users/${userId}`, newTripData); // locations not needed for a trip submission
+    //             toast.success("Trip successfully created!");
+    //         } catch (error) {
+    //             console.error("Error submitting trip data:", error);
+    //             toast.error("Trip creation failed. Please try again later.");
+    //         }
 
-            const trip_id = trip_submission_response.data.data.trip_id;
-            const num_trip_locs = newTripLocation.trip_locations.length;
+    //         const trip_id = trip_submission_response.data.data.trip_id;
+    //         const num_trip_locs = newTripLocation.trip_locations.length;
 
-            // For every location, create a trip location entry
-            for (let i = 0; i < num_trip_locs; i++) {
-                let a_trip_location = { trip_id: trip_id, location: newTripLocation.trip_locations[i] };
-                let geocode_response = null;
-                try {
-                    geocode_response = await axios.get(`https://api.opencagedata.com/geocode/v1/json`, {
-                        params: {
-                            q: a_trip_location.location,
-                            key: process.env.NEXT_PUBLIC_OPENCAGE_API_KEY
-                        }
-                    });
-                }
-                catch (error) {
-                    console.error("Error fetching geocode response using trip location.")
-                }
-                let trimmed_location = null;
-                const location_type = geocode_response.data.results[0].components._type;
-                try {
-                    trimmed_location = geocode_response.data.results[0].components[location_type];
-                    a_trip_location.location = trimmed_location;
-                }
-                catch {
-                    trimmed_location = a_trip_location.location; // original location
-                }
+    //         // For every location, create a trip location entry
+    //         for (let i = 0; i < num_trip_locs; i++) {
+    //             let a_trip_location = { trip_id: trip_id, location: newTripLocation.trip_locations[i] };
+    //             let geocode_response = null;
+    //             try {
+    //                 geocode_response = await axios.get(`https://api.opencagedata.com/geocode/v1/json`, {
+    //                     params: {
+    //                         q: a_trip_location.location,
+    //                         key: process.env.NEXT_PUBLIC_OPENCAGE_API_KEY
+    //                     }
+    //                 });
+    //             }
+    //             catch (error) {
+    //                 console.error("Error fetching geocode response using trip location.")
+    //             }
+    //             let trimmed_location = null;
+    //             const location_type = geocode_response.data.results[0].components._type;
+    //             try {
+    //                 trimmed_location = geocode_response.data.results[0].components[location_type];
+    //                 a_trip_location.location = trimmed_location;
+    //             }
+    //             catch {
+    //                 trimmed_location = a_trip_location.location; // original location
+    //             }
 
-                // POST trip location
-                try {
-                    await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${trip_id}`, a_trip_location);
-                }
-                catch (error) {
-                    console.error(`Error creating trip location ${i + 1}:`, error);
-                }
+    //             // POST trip location
+    //             try {
+    //                 await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${trip_id}`, a_trip_location);
+    //             }
+    //             catch (error) {
+    //                 console.error(`Error creating trip location ${i + 1}:`, error);
+    //             }
 
-                // UPDATE the trip location with location coordinates
-                const lat = geocode_response.data.results[0].geometry.lat;
-                const long = geocode_response.data.results[0].geometry.lng;
-                const currency = geocode_response.data.results[0].annotations.currency.iso_code;
-                const coordinates = { "latitude": lat, "longitude": long, "currency_code": currency };
-                try {
-                    await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${trip_id}/${a_trip_location.location}`, coordinates);
-                } catch (error) {
-                    console.error("Error updating trip location with coordinates");
-                }
+    //             // UPDATE the trip location with location coordinates
+    //             const lat = geocode_response.data.results[0].geometry.lat;
+    //             const long = geocode_response.data.results[0].geometry.lng;
+    //             const currency = geocode_response.data.results[0].annotations.currency.iso_code;
+    //             const coordinates = { "latitude": lat, "longitude": long, "currency_code": currency };
+    //             try {
+    //                 await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${trip_id}/${a_trip_location.location}`, coordinates);
+    //             } catch (error) {
+    //                 console.error("Error updating trip location with coordinates");
+    //             }
 
-            }
+    //         }
+            
+    //         setPopUpVisible(false); // Close the popup
+    //         setNewTripData({ name: '', start_date: '', end_date: '', budget: '' }); // Reset form fields
+    //         setNewTripLocation({ trip_locations: [] }); // Reset locations
 
-            // A shared trip will be under the user who created the trip to support future shared trips
-            const shared_trip = { user_id: userId, trip_id: trip_id };
+    //         // Refresh trips and trip locations
+    //         await fetchUserTrips();
+    //         await fetchTripLocations();
+    //         setLocationsNotProvided(false);
 
-            setPopUpVisible(false); // Close the popup
-            setNewTripData({ name: '', start_date: '', end_date: '', budget: '' }); // Reset form fields
-            setNewTripLocation({ trip_locations: [] }); // Reset locations
+    //     } catch (error) {
+    //         console.error("Error creating trip:", error);
+    //     }
 
-            // Refresh trips and trip locations
-            await fetchUserTrips();
-            await fetchTripLocations();
-            setLocationsNotProvided(false);
-
-        } catch (error) {
-            console.error("Error creating trip:", error);
-        }
-
-    };
+    // };
 
     useEffect(() => {
         handleToken();
@@ -305,7 +293,9 @@ function homepage() {
     }, []);
 
     useEffect(() => {
-        fetchTripLocations();
+        if (userId) {
+            fetchTripLocations();
+        }
     }, [userId]);
 
     useEffect(() => {
@@ -341,18 +331,22 @@ function homepage() {
                 }),
             });
 
-            // Zoom out to fit all the markers
-            const extent = boundingExtent(features.map(feature => feature.getGeometry().getCoordinates()));
-            // Validate extent
-            if (extent.length === 4 &&
-                extent.every(coord => Number.isFinite(coord))) {
-                try {
-                    map.getView().fit(extent, { padding: [40, 40, 40, 40], maxZoom: 15 });
-                } catch (error) {
-                    console.error('Error fitting view to extent:', error);
+            if (features.length > 0) {
+                // Zoom out to fit all the markers
+                const extent = boundingExtent(features.map(feature => feature.getGeometry().getCoordinates()));
+                // Validate extent
+                if (extent.length === 4 &&
+                    extent.every(coord => Number.isFinite(coord))) {
+                    try {
+                        map.getView().fit(extent, { padding: [40, 40, 40, 40], maxZoom: 15 });
+                    } catch (error) {
+                        console.error('Error fitting view to extent:', error);
+                    }
+                } else {
+                    console.error('Invalid extent:', extent);
                 }
             } else {
-                console.error('Invalid extent:', extent);
+                console.error('No features found.');
             }
 
             // Listen for map interactions (drag, zoom, etc.)
@@ -513,13 +507,29 @@ function homepage() {
                     <h1>Welcome Back, {userName}!</h1>
                     <br></br>
                     <button onClick={() => setPopUpVisible(true)} className='create-trip'>New Trip</button>
+                    {isPopUpVisible && (
+                        <TripFormComponent
+                            isPopUpVisible={isPopUpVisible} 
+                            setPopUpVisible={setPopUpVisible} 
+                            userId={userId} 
+                        />
+                    )}
                     <br></br>
                     <br></br>
                     <p>See everywhere you've gone:</p>
                 </div>
-
+                {/* <div>
+                    <button onClick={() => setPopUpVisible(true)}>Create New Trip</button>
+                    {isPopUpVisible && (
+                        <TripFormComponent
+                            isPopUpVisible={isPopUpVisible} 
+                            setPopUpVisible={setPopUpVisible} 
+                            userId={userId} 
+                        />
+                    )}
+                </div> */}
                 {/* Create a trip popup form */}
-                <div className="trip-form">
+                {/* <div className="trip-form">
                     {isPopUpVisible && (
                         <div className="modal">
                             <div className="modal-content">
