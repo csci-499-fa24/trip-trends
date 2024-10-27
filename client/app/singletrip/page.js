@@ -66,7 +66,7 @@ function Singletrip() {
         "Other"
     ]);
     const isOwner = userRole === 'owner';
-    const [userId, setUserId] = useState(null);
+    // const [userId, setUserId] = useState(null);
     const [homeCurrency, setHomeCurrency] = useState(null);
 
     useEffect(() => {
@@ -321,9 +321,9 @@ function Singletrip() {
     }, [selectedCurrency]);
 
 
-    useEffect(() => {
-        console.log(expenseUSD);
-    },[expenseUSD])
+    // useEffect(() => {
+    //     console.log(expenseUSD);
+    // },[expenseUSD])
 
     const fetchCurrencyRates = async (expenses) => {
         try {

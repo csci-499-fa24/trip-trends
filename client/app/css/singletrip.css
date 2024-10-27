@@ -738,3 +738,13 @@
     filter: invert(1);
     text-align: center;
 }
+
+
+.expense-box ul {
+    list-style-type: none; /* Removes the bullet points */
+    padding-left: 0; /* Removes default padding */
+}
+
+.expense-box li {
+    margin-bottom: 4px; /* Optional: adds space between list items */
+}
