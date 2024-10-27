@@ -5,9 +5,33 @@ import '../../css/recentTrips.css';
 
 const RecentTripsComponent = ({ trips }) => {
     const [tripLocations, setTripLocations] = useState({});
-    const recentTrips = trips
-        .sort((a, b) => new Date(b.start_date) - new Date(a.start_date))
-        .slice(0, 3);    
+    const [recentTrips, setRecentTrips] = useState([]);
+
+    useEffect(() => {
+        // Function to find the three most recent trips
+        const findRecentTrips = () => {
+            if (trips.length === 0) return [];
+
+            // Initialize an array to hold the three most recent trips
+            const recent = [];
+            for (let trip of trips) {
+                // Check if the trip is among the three most recent
+                if (recent.length < 3) {
+                    recent.push(trip);
+                } else {
+                    const oldestIndex = recent.findIndex(t => new Date(t.start_date) < new Date(trip.start_date));
+                    if (oldestIndex > -1) {
+                        recent[oldestIndex] = trip; // Replace the oldest trip
+                    }
+                }
+            }
+            return recent;
+        };
+
+        const updatedRecentTrips = findRecentTrips();
+        setRecentTrips(updatedRecentTrips);
+    }, [trips]);
+
     const fetchAllTripLocations = async () => {
         const locations = await Promise.all(
             recentTrips.map(trip => {
@@ -22,15 +46,20 @@ const RecentTripsComponent = ({ trips }) => {
                     });
             })
         );
+
         const locationsByTripId = locations.reduce((acc, { tripId, locations }) => {
             acc[tripId] = locations;
             return acc;
         }, {});
         setTripLocations(locationsByTripId);
     };
+
     useEffect(() => {
-        fetchAllTripLocations();
+        if (recentTrips.length > 0) {
+            fetchAllTripLocations();
+        }
     }, [recentTrips]);
+
     const handleTripClick = (tripId) => {
         window.location.href = `/singletrip?tripId=${tripId}`;
     };
