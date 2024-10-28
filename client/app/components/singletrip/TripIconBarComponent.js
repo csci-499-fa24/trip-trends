@@ -1,5 +1,6 @@
 import ShareTripComponent from "./ShareTripComponent"
 import EditTripComponent from "./EditTripComponent"
+import DownloadTripComponent from "./DownloadTripComponent"
 import DeleteTripComponent from "./DeleteTripComponent"
 import Link from "next/link"
 import { useEffect, useState } from "react"
@@ -25,7 +26,7 @@ const TripIconBarComponent = ({ tripId, userId, isOwner, tripData, tripLocations
     // console.log("sharedUsers:", sharedUsers);
 
     return (
-        <header className="icon-bar-header">
+        <header className="top-icon-bar-header">
             {/* Shared users */}
             {/* <div className="shared-users"> */}
             
@@ -45,6 +46,8 @@ const TripIconBarComponent = ({ tripId, userId, isOwner, tripData, tripLocations
             <ShareTripComponent tripId={tripId} isOwner={isOwner} />
             {/* Edit Trip Button */}
             <EditTripComponent tripId={tripId} tripData={tripData} tripLocations={tripLocations} userRole={userRole} onUpdate={fetchTripData} />
+            {/* Download Trip Button */}
+            <DownloadTripComponent tripData={tripData} tripId={tripId} />
             {/* Delete Trip Button */}
             <DeleteTripComponent tripId={tripId} userRole={userRole} />
         </header>

@@ -154,6 +154,7 @@
 }
 
 .dropdown-suggestion {
+    position: absolute;
     color: black;
     background-color: white;
     padding: 8px;
@@ -238,7 +239,7 @@
 }
 
 /* move to make more modular */
-.icon-div {
+.icon-div  {
     height: 56px;
     width: 56px;
     margin: 0 10px;
@@ -250,7 +251,6 @@
     position: relative;
     cursor: pointer;
     transition: none;
-    float: right;
 }
 
 .icon-div .icon-SVG {

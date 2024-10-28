@@ -100,6 +100,7 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses })
 
     return (
         <div>
+            <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Trip Info</h2>
             <div className="trip-overview">
                 <div className="trip-overview-div">
                     <div className="trip-overview-circle">🗓️</div>
