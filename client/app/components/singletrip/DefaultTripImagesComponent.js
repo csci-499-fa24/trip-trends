@@ -82,6 +82,7 @@ const DefaultTripImagesComponent = ({ tripId, tripLocations }) => {
 
   useEffect(() => {
     if (tripLocations.length > 0) {
+      // console.log("Fetching images based on tripLocations:", tripLocations);
       fetchImages(); // when trip locations are available
     }
   }, [tripLocations]);

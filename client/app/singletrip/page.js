@@ -5,14 +5,10 @@ import React, { useEffect, useState } from 'react';
 import '../css/singletrip.css';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Link from 'next/link';
 import 'react-calendar/dist/Calendar.css';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 
 // Import components
-import DeleteTripComponent from '../components/singletrip/DeleteTripComponent';
-import ShareTripComponent from '../components/singletrip/ShareTripComponent';
-import EditTripComponent from '../components/singletrip/EditTripComponent';
 import DownloadTripComponent from '../components/singletrip/DownloadTripComponent';
 import CategoryDataComponent from '../components/singletrip/CategoryDataComponent';
 import ExpenseFormComponent from '../components/singletrip/ExpenseFormComponent';
@@ -20,7 +16,10 @@ import GeneralTripInfoComponent from '../components/singletrip/GeneralTripInfoCo
 import ExpenseTableComponent from '../components/singletrip/ExpenseTableComponent';
 import BudgetMeterComponent from '../components/singletrip/BudgetMeterComponent';
 import ExchangeRateTableComponent from '../components/singletrip/ExchangeRateTableComponent'
+import HeaderComponent from '../components/HeaderComponent';
+import TripIconBarComponent from '../components/singletrip/TripIconBarComponent';
 import BarGraphComponent from '../components/singletrip/BarGraphComponent';
+import SpendingCirclesComponent from '../components/singletrip/SpendingCirclesComponent';
 
 Chart.register(ArcElement, Tooltip, Legend);
 
@@ -29,6 +28,8 @@ function Singletrip() {
     const [tripId, setTripId] = useState(null);
     const [tripData, setTripData] = useState(null);
     const [userRole, setUserRole] = useState(null);
+    const [userId, setUserId] = useState(null);
+    const [userName, setUserName] = useState('');
     const [expenseData, setExpenseData] = useState([]);
     const [fetchedExpenseData, setFetchedExpenseData] = useState([]);
     const [convertedHomeCurrencyExpenseData, setconvertedHomeCurrencyExpenseData] = useState([])
@@ -64,8 +65,9 @@ function Singletrip() {
         "Other"
     ]);
     const isOwner = userRole === 'owner';
-    const [userId, setUserId] = useState(null);
+    // const [userId, setUserId] = useState(null);
     const [homeCurrency, setHomeCurrency] = useState(null);
+    const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -225,6 +227,11 @@ function Singletrip() {
         }
 
         const fetchUserRole = async () => {
+            const user_id = localStorage.getItem("user_id");
+            if (user_id) {
+                setUserId(user_id);
+            }
+            // console.log('User ID:', userId);
             if (tripId && userId) {
                 try {
                     const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/trips/${tripId}`);
@@ -381,57 +388,80 @@ function Singletrip() {
         }
     };    
 
-    return (
-        <div className="main-container">
-            <div>
-                {/* Header section */}
-                <div className="header">
-                    TRIP TRENDS
-                </div>
+    const toggleVisibility = () => {
+        setIsVisible(prevState => !prevState);
+    };
 
+    return (
+        <div>
+            {/* Header section */}
+            <HeaderComponent headerTitle={tripData ? tripData.data.name : ''} setUserName={setUserName} userId={userId} />
+            <div className="main-container">
                 {tripData ? (
                     <div>
-                        <h1 id='tripName'>{tripData.data.name}</h1>
-                        <header className="top-icon-header">
-                            <div className="icon-div" tooltip="Home" tabIndex="0">
-                                <div className="icon-SVG">
-                                    <Link href={`/homepage`}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                                        </svg>
-                                    </Link>
-                                    <span className="icon-text">Home</span>
-                                </div>
-                            </div>
-                            {/* Share Trip Button */}
-                            <ShareTripComponent tripId={tripId} isOwner={isOwner} />
-                            {/* Edit Trip Button */}
-                            <EditTripComponent tripId={tripId} tripData={tripData} tripLocations={tripLocations} userRole={userRole} onUpdate={fetchTripData} />
-                            {/* Delete Trip Button */}
-                            <DeleteTripComponent tripId={tripId} userRole={userRole} />
-                        </header>
-                        {/* General Trip Info*/}
-                        <GeneralTripInfoComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenses={expenseUSD}/>
-                        {/* Trip Calendar and Budget Meter */}
                         <div className='container'>
-                            <div className='row'>
-                                <div className='col'>
-                                    <div className="meter-container"> 
-                                        <BudgetMeterComponent tripData={tripData} expenseData={expenseData} totalExpenses={totalExpenses} homeCurrency={homeCurrency}/>
-                                    </div>
-                                </div>
-                                {/* Pie Chart */}
-                                <div className='col'>
-                                    <div className="meter-container">
-                                        <CategoryDataComponent categoryData={categoryData} />
+                            {/* Icon Bar Above Trip Info */}
+                            <TripIconBarComponent tripId={tripId} userId={userId} isOwner={isOwner} tripData={tripData} tripLocations={tripLocations} userRole={userRole} fetchTripData={fetchTripData} />
+                            {/* General Trip Info*/}
+                            <GeneralTripInfoComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenses={expenseUSD}/>
+                        </div>
+                        <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Expenses</h2>
+                        <SpendingCirclesComponent 
+                            totalExpenses={totalExpenses}
+                            homeCurrency={homeCurrency}
+                            tripData={tripData}
+                        />
+                        {/* Data Visualisations Toggle */}
+                        <div className='toggle-container'>
+                            <div className='row justify-content-center'>
+                                <div className='col-auto'>
+                                    <div 
+                                        className='icon-div toggle-icon' 
+                                        tabIndex="0"
+                                        onClick={toggleVisibility}
+                                    >
+                                        <div className="icon-SVG">
+                                            {isVisible ? (
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 18.75 7.5-7.5 7.5 7.5" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 7.5-7.5 7.5 7.5" />
+                                                </svg>
+                                            ) : (
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 5.25 7.5 7.5 7.5-7.5m-15 6 7.5 7.5 7.5-7.5" />
+                                                </svg>
+                                            )}
+                                            <span className="icon-text">{isVisible ? 'Hide Visualizations' : 'Show Visualizations'}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                        
+                            {isVisible && (
+                                <>
+                                <div className='row'>
+                                    {/* Budget Meter */}
+                                    <div className='col'>
+                                        <div className="meter-container"> 
+                                            <BudgetMeterComponent tripData={tripData} expenseData={expenseData} totalExpenses={totalExpenses} homeCurrency={homeCurrency}/>
+                                        </div>
+                                    </div>
+                                    {/* Pie Chart */}
+                                    <div className='col'>
+                                        <div className="meter-container">
+                                            <CategoryDataComponent categoryData={categoryData} />
+                                        </div>
+                                    </div>
+                                </div>
+                                {/* Bar Graph */}
+                                <div className="meter-container">
+                                    <BarGraphComponent tripData={tripData} expenseData={convertedHomeCurrencyExpenseData} categoryData={categoryData} />
+                                </div>
+                             </>
+                            )}
                         </div>
-                        <div className="meter-container">
-                            <BarGraphComponent tripData={tripData} expenseData={convertedHomeCurrencyExpenseData} categoryData={categoryData} />
-                        </div>
-
+                        
+                        
                         <br></br>
                         {/* Icon Bar Above Expenses */}
                         <div>
@@ -462,8 +492,6 @@ function Singletrip() {
                                 {/* <div className="spacer"></div>
                                 <div className="divider"></div> */}
 
-                                {/* Download Trip Button */}
-                                <DownloadTripComponent tripData={tripData} tripId={tripId} />
 
                                 {/* Add Image Button */}
                                 <div className="icon-div" tooltip="Add Image" tabIndex="0">
@@ -486,10 +514,16 @@ function Singletrip() {
                                 )}
                             </header>
                         </div>
-
-                        {/* Expense Table */}
-                        <ExpenseTableComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenseData={expenseData}
-                            currencyCodes={currencyCodes} expenseCategories={expenseCategories} />
+                        <div className='expense-container'>
+                            {/* Expense Table */}
+                            <ExpenseTableComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenseData={expenseData}
+                                currencyCodes={currencyCodes} expenseCategories={expenseCategories} />
+                        
+                            <div>
+                            {/* Exchange Rate Table */}
+                            <ExchangeRateTableComponent exchangeRates={exchangeRates} currencyCodes={currencyCodes} homeCurrency={homeCurrency}/>
+                        </div>
+                </div>
 
                     </div>
                 ) : (
@@ -551,10 +585,7 @@ function Singletrip() {
                     )}
                 </div>
 
-                <div>
-                    {/* Exchange Rate Table */}
-                    <ExchangeRateTableComponent exchangeRates={exchangeRates} currencyCodes={currencyCodes} homeCurrency={homeCurrency}/>
-                </div>
+                
             </div >
         </div >
     );
