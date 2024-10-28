@@ -1,9 +1,4 @@
 /* singletrip.css */
-.main-container {
-    display: flex;
-    flex-direction: column;
-}
-
 .field-pair {
     display: flex;
     gap: 15px;
@@ -214,11 +209,11 @@
 
 
 .react-calendar__tile--active {
-    background-color: green !important;
+    background-color: var(--lightgreen) !important;
 }
 
 .react-calendar__navigation button:hover {
-    background-color: green;
+    background-color: var(--lightgreen);
 
 }
 
@@ -240,7 +235,7 @@
 }
 
 .react-calendar__tile--active {
-    background-color: green !important;
+    background-color: var(--lightgreen) !important;
     box-shadow: none;
 }
 
@@ -419,15 +414,21 @@
     border-radius: 10px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
     margin-left: 20px;
+    max-height: 400px; 
+    overflow-y: auto; 
+    overflow-x: hidden; 
+    margin-right: 20px;
 }
 
 .expense-table th {
     text-align: center;
+    padding: auto;
 }
 
 .expense-table td {
     text-align: left;
     vertical-align: middle;
+    padding: 10px;
 }
 
 .expense-table td:nth-child(2) {
@@ -565,27 +566,28 @@
 }
 
 /* Icon bar styling */
-.top-icon-header {
-    width: auto;
+.top-icon-bar-header {
     display: flex;
+    /* justify-content: center; */
     align-items: center;
-    position: relative;
-    padding: 10px;
-    position: absolute;
-    top: 95px;
-    margin-left: 5 px;
-    height: 40px;
-    aspect-ratio: 1 / 1;
-    z-index: 1000;
+    background-color: white; 
+    /* margin: 30px auto; Center the icon bar */
+    max-width: 500px;
+    margin: 50px 10px 0px 0px;
 }
 
 .icon-bar-header {
-    width: 490px;
+    /* width: 490px;
     padding: 0 14px;
     display: flex;
     align-items: center;
     background-color: white;
-    margin-left: 5 px;
+    margin-left: 5 px; */
+    display: flex;
+    align-items: center;
+    padding: 20px; /* Adjust spacing as needed */
+    background-color: white; /* Optional background color */
+    margin: 0; /* Center the icon bar */
 }
 
 .icon-div {
@@ -662,11 +664,13 @@
     display: flex;
     justify-content: space-around;
     align-items: center;
-    margin: 20px 0;
+    margin: 0px auto 30px auto;
     padding: 20px;
     background-color: #f5f5f5;
     border-radius: 10px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 1000px;
+    
 }
 
 .trip-overview-div {
@@ -740,4 +744,75 @@
 
 .expense-box li {
     margin-bottom: 4px; /* Optional: adds space between list items */
+}
+
+/* Toggle */
+.toggle-container {
+    margin: 30px auto;
+    gap: 20px;
+}
+
+.spending-circles-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 50px; 
+    padding: 20px;
+}
+
+.circle-card {
+    background-color: #f5f5f5;
+    text-align: center;
+    border-radius: 50%; 
+    width: 200px; 
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    justify-content: center;
+}
+
+.circle-card:nth-child(2) {
+    width: 250px; 
+    height: 250px;
+}
+
+.circle-card-spending {
+    font-size: 30px; 
+    font-weight: bold; 
+}
+
+.circle-card-spending:nth-child(2) {
+    font-size: 100px; 
+    color: #134a09;
+}
+
+.above-budget {
+    background-color: #c58c8c
+}
+
+.below-budget {
+    background-color: var(--lightergreen)
+}
+
+.expense-card-container {
+    padding: 20px;
+}
+
+.card {
+    transition: transform 0.2s;
+    border-radius: 10px;
+    background-color: #f5f5f5;
+}
+
+.card:hover {
+    transform: scale(1.02);
+}
+
+.expense-container {
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    gap: 20px;
+    
 }
