@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ReceiptImageComponent from './ReceiptImageComponent';
 
 const ExpenseFormComponent = ({ 
     tripId, 
@@ -28,6 +29,9 @@ const ExpenseFormComponent = ({
                     <div className="modal-content">
                         <span className="close" onClick={() => setPopUpVisible(false)}>&times;</span>
                         <h2 className="new-expense-title">New Expense</h2>
+                        <br></br>
+                        <ReceiptImageComponent tripId = {tripId}/>
+                        <br></br>
                         <form onSubmit={submitNewExpense}>
                             <label className="new-expense-field-label">
                                 Expense Name:
