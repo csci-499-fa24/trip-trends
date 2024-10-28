@@ -7,10 +7,11 @@ import { toast } from 'react-toastify';
 
 const TripFormComponent = ( {isPopUpVisible, setPopUpVisible, userId} ) => {
     // const router = useRouter();
+    const today = new Date().toISOString().split('T')[0];
     const [newTripData, setNewTripData] = useState({
         name: '',
-        start_date: '',
-        end_date: '',
+        start_date: today,
+        end_date: today,
         budget: 0,
         image: null
     });
@@ -197,11 +198,18 @@ const TripFormComponent = ( {isPopUpVisible, setPopUpVisible, userId} ) => {
                                 {newTripLocation.trip_locations.map((location, index) => (
                                     <div key={index} className="selected-location">
                                         <span className="location-text">{location}</span>
-                                        <button type="button" onClick={() => {
-                                            setNewTripLocation(prev => ({
-                                                trip_locations: prev.trip_locations.filter((loc, i) => i !== index) // Remove selected location
-                                            }));
-                                        }}>Remove</button>
+                                        <div className="icon-div" tooltip="Remove" tabIndex="0" onClick={() => {
+                                                setNewTripLocation(prev => ({
+                                                    trip_locations: prev.trip_locations.filter((loc, i) => i !== index) // Remove selected location
+                                                }));
+                                            }}>
+                                                <div className="icon-SVG">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="remove-icon">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                                    </svg>
+                                                <span className="icon-text">Remove</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -220,7 +228,7 @@ const TripFormComponent = ( {isPopUpVisible, setPopUpVisible, userId} ) => {
                                 </div>
                             )}
     
-                            <button type="submit" className="submit-new-trip-button">Create</button>
+                            <button type="submit" className="button">Create</button>
                         </form>
                     </div>
                 </div>

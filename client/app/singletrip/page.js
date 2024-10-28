@@ -18,8 +18,6 @@ import BudgetMeterComponent from '../components/singletrip/BudgetMeterComponent'
 import ExchangeRateTableComponent from '../components/singletrip/ExchangeRateTableComponent'
 import HeaderComponent from '../components/HeaderComponent';
 import TripIconBarComponent from '../components/singletrip/TripIconBarComponent';
-import HeaderComponent from '../components/HeaderComponent';
-import TripIconBarComponent from '../components/singletrip/TripIconBarComponent';
 import BarGraphComponent from '../components/singletrip/BarGraphComponent';
 
 Chart.register(ArcElement, Tooltip, Legend);
@@ -389,11 +387,10 @@ function Singletrip() {
     };    
 
     return (
-        <div className="main-container">
-            <div>
-                {/* Header section */}
-                <HeaderComponent headerTitle={tripData ? tripData.data.name : ''} setUserName={setUserName} userId={userId} />
-
+        <div>
+            {/* Header section */}
+            <HeaderComponent headerTitle={tripData ? tripData.data.name : ''} setUserName={setUserName} userId={userId} />
+            <div className="main-container">
                 {tripData ? (
                     <div>
                         {/* Icon Bar Above Trip Info */}

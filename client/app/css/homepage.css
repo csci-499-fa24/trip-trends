@@ -19,6 +19,7 @@
     color: white;
     height: auto; 
     text-align: center;
+    border-radius: 8px;
 }
 
 .trip {
@@ -236,30 +237,63 @@
     animation: pop 0.4s;
 }
 
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5); /* Dimmed background */
-    display: flex;
-    justify-content: center;
+/* move to make more modular */
+.icon-div {
+    height: 56px;
+    width: 56px;
+    margin: 0 10px;
+    padding: 10px;
+    border-radius: 12px;
+    display: inline-flex;
     align-items: center;
-    z-index: 1000; /* Ensure modal is on top */
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    transition: none;
+    float: right;
 }
 
-.modal-content {
-    max-width: 30% !important;
-    max-height: 300vh;
-    overflow-x: auto;
-    overflow-y: auto;
-    padding: 20px;
-    background-color: white;
-    color: black;
+.icon-div .icon-SVG {
+    height: 26px;
+    aspect-ratio: 1 / 1;
+    transition: transform 300ms ease;
+}
+
+.icon-SVG svg {
+    color: black; 
+}
+
+.icon-text {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px);
+    background-color: rgb(85, 83, 83);
+    color: white;
+    padding: 4px 8px;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    margin: 10px;
-    width: 100%;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.icon-div:hover .icon-text,
+.icon-div:focus-visible .icon-text {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-15px);
+}
+
+.icon-div:hover .icon-SVG {
+    transform: scale(1.2);
+}
+
+.icon-div:hover,
+.icon-div:focus-visible {
+    background-color: rgb(228, 228, 228);
+}
+
+.icon-div:active {
+    opacity: 0.9;
 }
 

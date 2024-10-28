@@ -45,7 +45,7 @@ const ShareTripComponent = ({ tripId, isOwner }) => {
                     <svg
                     onClick={() => setIsOpen(true)}
                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
                     </svg>
                 <span className="icon-text">Share Trip</span>
                 </div>
@@ -83,7 +83,7 @@ const ShareTripComponent = ({ tripId, isOwner }) => {
                                 </select>
                             </label>
 
-                            <button type="submit" className="share-trip-button">Confirm Share</button>
+                            <button type="submit" className="share-trip-button">Confirm</button>
                         </form>
                     </div>
                 </div>

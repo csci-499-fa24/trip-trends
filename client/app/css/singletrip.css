@@ -209,11 +209,11 @@
 
 
 .react-calendar__tile--active {
-    background-color: green !important;
+    background-color: var(--lightgreen) !important;
 }
 
 .react-calendar__navigation button:hover {
-    background-color: green;
+    background-color: var(--lightgreen);
 
 }
 
@@ -235,7 +235,7 @@
 }
 
 .react-calendar__tile--active {
-    background-color: green !important;
+    background-color: var(--lightgreen) !important;
     box-shadow: none;
 }
 
