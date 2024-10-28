@@ -4,6 +4,7 @@ const cors = require('cors')
 const app = express();
 const db = require('./config/db');
 const { syncDatabase } = require('./models');
+const fileUpload = require('express-fileupload');
 
 // import route modules
 const userRoutes = require('./routes/userRoutes');
@@ -19,6 +20,7 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
     next();
 });
+app.use(fileUpload())
 
 // check if server is running
 app.get("/api/home", (req, res) => {
