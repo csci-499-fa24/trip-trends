@@ -7,6 +7,7 @@ const createExpense = async (req, res) => {
     const imageFile = req.files?.image ? req.files.image : null; // uploaded img withing the 'img' key
     const { expenseId, name, amount, category, currency, posted, notes } = req.body;
 
+    let imageBuffer = null;
     try {
         if (imageFile) {
             imageBuffer = imageFile.data;

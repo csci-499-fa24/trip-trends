@@ -59,7 +59,7 @@ describe('Expense Controller', () => {
 
     it('should create a new expense without image and return 201 status', async () => {
         const mockTripId = '1234';
-        const inputExpense = { name: 'Brunch', amount: 50, category: 'Food' };
+        const inputExpense = { name: 'Brunch', amount: 50, category: 'Food', image: null };
         const createdExpense = { expense_id: '3', trip_id: mockTripId, ...inputExpense };
 
         mockRequest.params.tripId = mockTripId;
@@ -75,6 +75,7 @@ describe('Expense Controller', () => {
             name: inputExpense.name,
             amount: inputExpense.amount,
             category: inputExpense.category,
+            image: null
         }));
         expect(mockResponse.status).toHaveBeenCalledWith(201);
         expect(mockResponse.json).toHaveBeenCalledWith({ data: createdExpense });
