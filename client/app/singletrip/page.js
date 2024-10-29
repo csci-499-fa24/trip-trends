@@ -156,7 +156,11 @@ function Singletrip() {
         };
 
         try {
-            await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/trips/${tripId}`, updatedExpenseData);
+            await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/trips/${tripId}`, updatedExpenseData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data' // image purposes
+                }
+            });
 
             setNewExpenseData({
                 trip_id: '',
@@ -165,13 +169,14 @@ function Singletrip() {
                 currency: '',
                 category: '',
                 posted: '',
-                notes: ''
+                notes: '',
+                image: null
             });
 
-            window.location.reload();
+            // window.location.reload();
             setPopUpVisible(false);
         } catch (error) {
-            console.error("Error fetching currency symbols:", error);
+            console.error("Error submitting new expense:", error);
         }
     };
 
@@ -512,7 +517,6 @@ function Singletrip() {
                     currencyCodes={currencyCodes}
                     expenseCategories={expenseCategories}
                 />
-
                 {/* Create a filter popup form */}
                 <div className="filter-container">
                     {isFilterPopupVisible && (
