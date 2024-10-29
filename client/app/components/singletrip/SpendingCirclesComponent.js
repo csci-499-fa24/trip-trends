@@ -13,15 +13,15 @@ const SpendingCirclesComponent = ({ totalExpenses, homeCurrency, tripData }) => 
     return (
         <div className="spending-circles-container">
             <div className="circle-card">
-                <div className="circle-card-spending">${avgDailySpending}</div>
+                <div className="circle-card-spending">{avgDailySpending}</div>
                 <p>Avg. Daily Spending</p>
             </div>
             <div className={`circle-card ${exceedsBudget ? 'above-budget' : 'below-budget'}`}>
-                <div className="circle-card-spending">${totalSpending}</div>
+                <div className="circle-card-spending">{totalSpending}</div>
                 <p>Total Spending</p>
             </div>
             <div className="circle-card">
-                <div className="circle-card-spending">${forecastedSpending}</div>
+                <div className="circle-card-spending">{forecastedSpending}</div>
                 <p>Forecasted Spending</p>
             </div>
         </div>

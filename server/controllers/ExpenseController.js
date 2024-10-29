@@ -1,13 +1,20 @@
 const Expense = require('../models/Expense');
+const { fromBuffer } = require('file-type');
 
-// POST new expense data
+// POST new expense data with image handling
 const createExpense = async (req, res) => {
     const tripId = req.params.tripId;
-    const { expenseId, name, amount, category, currency, posted, notes, image } = req.body;
+    const imageFile = req.files?.image ? req.files.image : null; // uploaded img withing the 'img' key
+    const { expenseId, name, amount, category, currency, posted, notes } = req.body;
+
     try {
-        // create a model instance 
-        const newExpense = await Expense.create({ expense_id: expenseId, trip_id: tripId, name, amount, category, currency, posted, notes, image });
+        if (imageFile) {
+            imageBuffer = imageFile.data;
+        }
+
+        const newExpense = await Expense.create({ expense_id: expenseId, trip_id: tripId, name, amount, category, currency, posted, notes, image: imageBuffer });
         res.status(201).json({ data: newExpense });
+
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });
@@ -58,6 +65,32 @@ const getExpensesByTripId = async (req, res) => {
     }
 };
 
+// GET expense image using ExpenseID
+const getReceiptImageByExpenseId = async (req, res) => {
+    const expenseId = req.params.expenseId;
+    try {
+        const expense = await Expense.findByPk(expenseId);
+        if (!expenseId) {
+            return res.status(400).json({ message: "Expense ID is required" });
+        }
+        if (!expense) {
+            return res.status(404).json({ message: "Expense not found" });
+        }
+        if (!expense.image) {
+            return res.status(200).json({ message: "Receipt image not added" });
+        }
+
+        const imageBuffer = expense.image; // buffer is in BYTEA format
+        // const { mime } = await fromBuffer(imageBuffer);
+        res.type("image/png"); // image content type
+        res.status(200).send(imageBuffer);  
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
+    }
+};
+
 // PUT request to update expense data
 const updateExpense = async (req, res) => {
     const expenseId = req.params.expenseId;
@@ -98,6 +131,7 @@ module.exports = {
     getExpenses,
     getExpenseById,
     getExpensesByTripId,
+    getReceiptImageByExpenseId,
     updateExpense,
     deleteExpense
 };

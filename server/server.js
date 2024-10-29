@@ -4,6 +4,21 @@ const cors = require('cors')
 const app = express();
 const db = require('./config/db');
 const { syncDatabase } = require('./models');
+const fileUpload = require('express-fileupload');
+const corsOptions ={
+    origin:'*', 
+    credentials:true, //access-control-allow-credentials:true
+    optionSuccessStatus:200,
+ }
+
+// middleware
+app.use(cors(corsOptions))
+app.use(express.json());
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
+    next();
+});
+app.use(fileUpload())
 
 // import route modules
 const userRoutes = require('./routes/userRoutes');
@@ -12,13 +27,6 @@ const sharedTripRoutes = require('./routes/sharedTripRoutes');
 const expenseRoutes = require('./routes/expenseRoutes');
 const tripLocationRoutes = require('./routes/tripLocationRoutes');
 const imageRoutes = require('./routes/imageRoutes');
-
-app.use(cors());
-app.use(express.json());
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
-    next();
-});
 
 // check if server is running
 app.get("/api/home", (req, res) => {

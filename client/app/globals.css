@@ -150,9 +150,9 @@ button {
   align-self: center;
 }
 
-button:hover {
+/* button:hover {
   background-color: var(--lightergreen);
-}
+} */
 
 .center-container {
   text-align: center;
@@ -193,6 +193,7 @@ form {
   font-size: 24px;
   cursor: pointer;
   z-index: 10000;
+  left: 45%;
 }
 
 @media (prefers-color-scheme: dark) {
