@@ -20,7 +20,8 @@ describe('Expense Controller', () => {
     beforeEach(() => {
         mockRequest = {
             body: {},
-            params: {}
+            params: {},
+            files: {}
         };
         mockResponse = {
             status: jest.fn().mockReturnThis(),
@@ -34,22 +35,51 @@ describe('Expense Controller', () => {
         jest.clearAllMocks();
     });
 
-    it('should create new expense and return 201 status', async () => {
+    it('should create new expense with image and return 201 status', async () => {
         const mockTripId = '1234';
-        mockRequest.params = { tripId: mockTripId };
-    
         const inputExpense = { name: 'Brunch', amount: 50, category: 'Food' };
-        const createdExpense = { expense_id: '3', trip_id: mockTripId, ...inputExpense };
+        const createdExpense = { expense_id: '3', trip_id: mockTripId, ...inputExpense, image: Buffer.from('test-image-data') };
+
+        mockRequest.params.tripId = mockTripId;
         mockRequest.body = inputExpense;
+        mockRequest.files.image = { data: Buffer.from('test-image-data') };
     
         Expense.create.mockResolvedValue(createdExpense);
     
         await createExpense(mockRequest, mockResponse);
     
-        expect(Expense.create).toHaveBeenCalledWith({ trip_id: mockTripId, ...inputExpense });
+        expect(Expense.create).toHaveBeenCalledWith({
+            trip_id: mockTripId,
+            ...inputExpense,
+            image: mockRequest.files.image.data
+        });
         expect(mockResponse.status).toHaveBeenCalledWith(201);
         expect(mockResponse.json).toHaveBeenCalledWith({ data: createdExpense });
     });      
+
+    it('should create a new expense without image and return 201 status', async () => {
+        const mockTripId = '1234';
+        const inputExpense = { name: 'Brunch', amount: 50, category: 'Food', image: null };
+        const createdExpense = { expense_id: '3', trip_id: mockTripId, ...inputExpense };
+
+        mockRequest.params.tripId = mockTripId;
+        mockRequest.body = inputExpense;
+
+        Expense.create.mockResolvedValue(createdExpense);
+
+        await createExpense(mockRequest, mockResponse);
+
+        expect(Expense.create).toHaveBeenCalledTimes(1); // Debug line
+        expect(Expense.create).toHaveBeenCalledWith(expect.objectContaining({
+            trip_id: mockTripId,
+            name: inputExpense.name,
+            amount: inputExpense.amount,
+            category: inputExpense.category,
+            image: null
+        }));
+        expect(mockResponse.status).toHaveBeenCalledWith(201);
+        expect(mockResponse.json).toHaveBeenCalledWith({ data: createdExpense });
+    });
 
     it('should return all expenses and a 200 status', async () => {
         const expenses = [
@@ -245,10 +275,12 @@ describe('Expense Controller', () => {
 
         await createExpense(mockRequest, mockResponse);
 
+        expect(Expense.create).toHaveBeenCalled();
         expect(mockResponse.status).toHaveBeenCalledWith(500);
         expect(mockResponse.json).toHaveBeenCalledWith({
             message: 'Internal Server Error',
             error: error.message
         });
+        expect(console.error).toHaveBeenCalledWith(error);
     });
 });
