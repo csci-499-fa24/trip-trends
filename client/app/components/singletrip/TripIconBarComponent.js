@@ -34,11 +34,11 @@ const TripIconBarComponent = ({ tripId, userId, isOwner, tripData, tripLocations
             
             {/* </div> */}
             {/* Home Button */}
-            <div className="icon-div" tooltip="Home" tabIndex="0">
-                    <div onClick={() => window.location.href = ‘/homepage’}>
-                        <Image src={homeIcon} alt= “homepage” width={55} height={55} />
-                    </div>
-                    <span class= “icon-text” > Home </span>
+            <div class="icon-div" tooltip="Home" tabindex="0">
+                <div onClick={() => window.location.href = '/homepage'}>
+                    <Image src={homeIcon} alt="homepage" width={55} height={55} />
+                </div>
+                    <span class="icon-text">Home</span>
             </div>
             {/* Share Trip Button */}
             <ShareTripComponent tripId={tripId} isOwner={isOwner} />
