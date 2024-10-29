@@ -1,9 +1,4 @@
 /* singletrip.css */
-.main-container {
-    display: flex;
-    flex-direction: column;
-}
-
 .field-pair {
     display: flex;
     gap: 15px;
@@ -77,7 +72,7 @@
 }
 
 .modal-content {
-    max-width: 30% !important;
+    max-width: 35% !important;
     max-height: 300vh;
     overflow-x: auto;
     overflow-y: auto;
@@ -196,8 +191,8 @@
 }
 
 .highlighted-date {
-    background-color: #77DD77 !important;
-    color: white !important;
+    background-color: rgba(0, 128, 0, 0.5); /* Slightly transparent green */
+    border-radius: 5px;
 }
 
 .highlighted-date {
@@ -206,34 +201,41 @@
 }
 
 .calendar-container{
-    width: 200%
+    width: 110%;
+    height: 100%;
+    margin-left: 5% !important;
+    /* background-color: grey; */
 }
 
 
 .react-calendar__tile--active {
-    background-color: green !important;
+    background-color: var(--lightgreen) !important;
 }
 
 .react-calendar__navigation button:hover {
-    background-color: green;
+    background-color: var(--lightgreen);
 
 }
 
 .react-calendar {
-    width: 100%;
+    width: 100% !important; /* Set desired width */
+    height: 100% !important; /* Auto height */
     border: none;
     border-radius: 10px;
     overflow: hidden;
-    size-adjust: auto;
 }
 
 .react-calendar__tile {
     box-shadow: none;
     transition: none;
     border-radius: 6px;
+    padding: 10px !important; /* Increase padding for tiles */
+    font-size: 1em !important; /* Increase tile text size */
+    font-weight: bold !important;
 }
 
 .react-calendar__tile--active {
+    background-color: var(--lightgreen) !important;
     box-shadow: none;
 }
 
@@ -254,11 +256,30 @@
     background-color: white;
     color: black;
     border-radius: 8px;
+    font-size: 1.2em; /* Increase header text size */
 }
 
 .react-calendar__tile {
     color: black;
     border-radius: 5px;
+}
+
+.tile-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center the content */
+    justify-content: center; /* Center the content vertically */
+    height: 100%; /* Make sure the content takes the full height of the tile */
+}
+
+.date-number {
+    font-weight: bold;
+    font-size: 1.2em; /* Slightly larger font for date */
+}
+
+.expense-amount {
+    font-size: 0.9em; /* Smaller font for expenses */
+    color: rgb(243, 133, 133); /* Change color to green for expenses */
 }
 
 #tripName {
@@ -292,6 +313,7 @@
     margin-top: 10px;
     font-weight: 600;
     margin-bottom: 0;
+    text-align: center;
 }
 
 #budget-text {
@@ -392,15 +414,21 @@
     border-radius: 10px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
     margin-left: 20px;
+    max-height: 400px; 
+    overflow-y: auto; 
+    overflow-x: hidden; 
+    margin-right: 20px;
 }
 
 .expense-table th {
     text-align: center;
+    padding: auto;
 }
 
 .expense-table td {
     text-align: left;
     vertical-align: middle;
+    padding: 10px;
 }
 
 .expense-table td:nth-child(2) {
@@ -538,27 +566,28 @@
 }
 
 /* Icon bar styling */
-.top-icon-header {
-    width: auto;
+.top-icon-bar-header {
     display: flex;
+    /* justify-content: center; */
     align-items: center;
-    position: relative;
-    padding: 10px;
-    position: absolute;
-    top: 95px;
-    margin-left: 5 px;
-    height: 40px;
-    aspect-ratio: 1 / 1;
-    z-index: 1000;
+    background-color: white; 
+    /* margin: 30px auto; Center the icon bar */
+    max-width: 500px;
+    margin: 50px 10px 0px 0px;
 }
 
 .icon-bar-header {
-    width: 490px;
+    /* width: 490px;
     padding: 0 14px;
     display: flex;
     align-items: center;
     background-color: white;
-    margin-left: 5 px;
+    margin-left: 5 px; */
+    display: flex;
+    align-items: center;
+    padding: 20px; /* Adjust spacing as needed */
+    background-color: white; /* Optional background color */
+    margin: 0; /* Center the icon bar */
 }
 
 .icon-div {
@@ -635,11 +664,13 @@
     display: flex;
     justify-content: space-around;
     align-items: center;
-    margin: 20px 0;
+    margin: 0px auto 30px auto;
     padding: 20px;
     background-color: #f5f5f5;
     border-radius: 10px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 1000px;
+    
 }
 
 .trip-overview-div {
@@ -703,4 +734,99 @@
     transition: border-color 0.3s ease;
     filter: invert(1);
     text-align: center;
+}
+
+
+.expense-box ul {
+    list-style-type: none; /* Removes the bullet points */
+    padding-left: 0; /* Removes default padding */
+}
+
+.expense-box li {
+    margin-bottom: 4px; /* Optional: adds space between list items */
+}
+
+.expense-row-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+}
+
+.upload-section {
+    margin-left: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Toggle */
+.toggle-container {
+    margin: 30px auto;
+    gap: 20px;
+}
+
+.spending-circles-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 50px; 
+    padding: 20px;
+}
+
+.circle-card {
+    background-color: #f5f5f5;
+    text-align: center;
+    border-radius: 50%; 
+    width: 200px; 
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    justify-content: center;
+}
+
+.circle-card:nth-child(2) {
+    width: 250px; 
+    height: 250px;
+}
+
+.circle-card-spending {
+    font-size: 30px; 
+    font-weight: bold; 
+}
+
+.circle-card-spending:nth-child(2) {
+    font-size: 100px; 
+    color: #134a09;
+}
+
+.above-budget {
+    background-color: #c58c8c
+}
+
+.below-budget {
+    background-color: var(--lightergreen)
+}
+
+.expense-card-container {
+    padding: 20px;
+}
+
+.card {
+    transition: transform 0.2s;
+    border-radius: 10px;
+    background-color: #f5f5f5;
+}
+
+.card:hover {
+    transform: scale(1.02);
+}
+
+.expense-container {
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    gap: 20px;
+    
 }

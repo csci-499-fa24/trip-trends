@@ -15,8 +15,6 @@ const DefaultTripImagesComponent = ({ tripId, tripLocations }) => {
 
   // Uses the Unsplash API to fetch one pgoto based on a single trip location
   const getImageURL = async (trip_location) => {
-    console.log('Querying Unsplash with:', trip_location);
-
     try {
       const response = await unsplash.search.getPhotos({
         query: trip_location,
@@ -24,19 +22,14 @@ const DefaultTripImagesComponent = ({ tripId, tripLocations }) => {
         perPage: 10,
         orientation: 'landscape'
       });
-
-      console.log("Unsplash API response", response);
       if (response.response && response.response.results.length > 0) {
         const images = response.response.results.map(image => image.urls.regular); // array of 10 images
 
         const random_index = Math.floor(Math.random() * response.response.results.length); // random index img to set as image url
         const imageURL = images[random_index]
-        console.log(`Image URL for ${trip_location}:`, imageURL);
-        // console.log(images); // Array of image URLs
         return imageURL;
         } 
         else {
-          console.log(`No images found for location: ${trip_location}`);
           return null;
         }
       } catch (error) {
@@ -50,9 +43,6 @@ const DefaultTripImagesComponent = ({ tripId, tripLocations }) => {
       const imageURLs = await Promise.all(tripLocations.map(async (location) => {
         const a_image_url = await getImageURL(location); 
         const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/images/trips/${tripId}`, { image_url: a_image_url });
-        console.log('Axios response:', response);
-        // console.log(response); 
-        console.log(a_image_url);
         return a_image_url; // accumulate imageURLs
       }));
   
@@ -75,7 +65,6 @@ const DefaultTripImagesComponent = ({ tripId, tripLocations }) => {
       hasFetchedImages.current = true;
 
       const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/images/trips/${tripId}`);
-      console.log(response);
       if (response.data && Array.isArray(response.data.data) && response.data.data.length > 0) {
         // map over the data to extract the image URLs
         const imageURLs = response.data.data.map(item => item.image_url);
@@ -93,7 +82,7 @@ const DefaultTripImagesComponent = ({ tripId, tripLocations }) => {
 
   useEffect(() => {
     if (tripLocations.length > 0) {
-      console.log("Fetching images based on tripLocations:", tripLocations);
+      // console.log("Fetching images based on tripLocations:", tripLocations);
       fetchImages(); // when trip locations are available
     }
   }, [tripLocations]);

@@ -1,42 +1,48 @@
 'use client';
 
+// Import packages
 import React, { useEffect, useState } from 'react';
 import '../css/singletrip.css';
 import axios from 'axios';
-import Table from 'react-bootstrap/Table';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Link from 'next/link';
-import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css';
-import { parseISO, startOfDay, endOfDay } from 'date-fns';
-import ReactSpeedometer, { Transition } from 'react-d3-speedometer';
-import { Pie } from 'react-chartjs-2';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
-import DeleteTripComponent from '../components/singletrip/DeleteTripComponent';
-import ShareTripComponent from '../components/singletrip/ShareTripComponent';
-import EditTripComponent from '../components/singletrip/EditTripComponent';
-import LocationsDropdownComponent from '../components/singletrip/LocationsDropdownComponent';
-import DefaultTripImagesComponent from '../components/singletrip/DefaultTripImagesComponent';
+
+// Import components
+import DownloadTripComponent from '../components/singletrip/DownloadTripComponent';
+import CategoryDataComponent from '../components/singletrip/CategoryDataComponent';
+import ExpenseFormComponent from '../components/singletrip/ExpenseFormComponent';
+import GeneralTripInfoComponent from '../components/singletrip/GeneralTripInfoComponent';
+import ExpenseTableComponent from '../components/singletrip/ExpenseTableComponent';
+import BudgetMeterComponent from '../components/singletrip/BudgetMeterComponent';
+import ExchangeRateTableComponent from '../components/singletrip/ExchangeRateTableComponent'
+import HeaderComponent from '../components/HeaderComponent';
+import TripIconBarComponent from '../components/singletrip/TripIconBarComponent';
+import BarGraphComponent from '../components/singletrip/BarGraphComponent';
+import SpendingCirclesComponent from '../components/singletrip/SpendingCirclesComponent';
+
+
 
 Chart.register(ArcElement, Tooltip, Legend);
 
 function Singletrip() {
     const [categoryData, setCategoryData] = useState({ labels: [], datasets: [] });
-    const [customCurrency, setCustomCurrency] = useState('');
-    const [exchangeRate, setExchangeRate] = useState(null);
     const [tripId, setTripId] = useState(null);
     const [tripData, setTripData] = useState(null);
     const [userRole, setUserRole] = useState(null);
+    const [userId, setUserId] = useState(null);
+    const [userName, setUserName] = useState('');
     const [expenseData, setExpenseData] = useState([]);
-    const [totalUSDExpenses, setTotalUSDExpenses] = useState(0);
+    const [fetchedExpenseData, setFetchedExpenseData] = useState([]);
+    const [convertedHomeCurrencyExpenseData, setconvertedHomeCurrencyExpenseData] = useState([])
+    const [totalExpenses, setTotalExpenses] = useState(0);
+    const [expenseUSD, setExpenseUSD] = useState([]);
     const [currencyCodes, setCurrencyCodes] = useState([]);
     const [selectedCurrency, setSelectedCurrency] = useState('');
     const [otherCurrencies, setOtherCurrencies] = useState([]);
     const [exchangeRates, setExchangeRates] = useState({});
     const [isPopUpVisible, setPopUpVisible] = useState(false);
     const [isFilterPopupVisible, setFilterPopupVisible] = useState(false);
-    const [isEditPopupVisible, setEditPopupVisible] = useState(false);
-    const [selectedExpense, setSelectedExpense] = useState(null);
     const [originalData, setOriginalData] = useState([]);
     const [selectedFilter, setSelectedFilter] = useState('');
     const [tripLocations, setTripLocations] = useState([]);
@@ -60,27 +66,33 @@ function Singletrip() {
         "Health/Safety",
         "Other"
     ]);
+    const isOwner = userRole === 'owner';
+    // const [userId, setUserId] = useState(null);
+    const [homeCurrency, setHomeCurrency] = useState(null);
+    const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        const loadBootstrap = async () => {
-            await import('bootstrap/dist/js/bootstrap.bundle.min.js');
-        };
-        loadBootstrap();
-    }, []);
-
-    useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const id = urlParams.get('tripId');
-        setTripId(id);
-    }, []);
-
-    useEffect(() => {
-        if (tripId) {
-            fetchTripData();
-            fetchExpenseData();
-            fetchTripLocations();
+        if (typeof window !== 'undefined') {
+            const storedUserId = localStorage.getItem("user_id");
+            if (storedUserId) {
+                setUserId(storedUserId);
+            }
         }
-    }, [tripId]);
+    }, []);
+    
+    // Fetch home currency when userId changes
+    useEffect(() => {
+        const getHomeCurrency = async () => {
+            if (userId) {
+                const currency = await fetchHomeCurrency(userId);
+                if (currency) {
+                    setHomeCurrency(currency);  // Only set if currency is valid
+                }
+            }
+        };
+    
+        getHomeCurrency(); // Fetch home currency when userId is available
+    }, [userId]);
 
     const fetchTripData = () => {
         if (tripId) {
@@ -94,19 +106,28 @@ function Singletrip() {
         }
     };
 
+    useEffect(() => {
+        const savedFilter = localStorage.getItem('selectedFilter');
+        if (savedFilter && expenseUSD.length > 0) {
+            console.log(expenseUSD); 
+            applyFilter(savedFilter, expenseUSD); 
+        }
+    }, [expenseUSD]);
+
     const fetchExpenseData = () => {
         axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/trips/${tripId}`)
             .then(response => {
                 setExpenseData(response.data);
                 setOriginalData(response.data);
-                const fetchedExpenses = response.data.data;
+                setFetchedExpenseData(response.data.data);
+
+                fetchCurrencyRates(fetchedExpenses);
 
                 const savedFilter = localStorage.getItem('selectedFilter');
                 if (savedFilter) {
-                    applyFilter(savedFilter, response.data);
+                    console.log(expenseUSD);
+                    applyFilter(savedFilter, expenseUSD);
                 }
-
-                fetchCurrencyRates(fetchedExpenses);
             })
             .catch(error => {
                 console.error('Error fetching trip data:', error);
@@ -116,8 +137,6 @@ function Singletrip() {
     const fetchTripLocations = () => {
         axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${tripId}`)
             .then(response => {
-                // console.log("TRIP LOCATIONS");
-                // console.log(response.data);
                 setSelectedCurrency(response.data.data[0].currency_code)
                 const locations = response.data.data;
                 setTripLocations(locations.map(location => location.location));
@@ -131,13 +150,95 @@ function Singletrip() {
             });
     };
 
+    const submitNewExpense = async (e) => {
+        e.preventDefault();
+
+        const updatedExpenseData = {
+            ...newExpenseData,
+            trip_id: tripId,
+            currency: selectedCurrency || homeCurrency,
+        };
+
+        try {
+            await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/trips/${tripId}`, updatedExpenseData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data' // image purposes
+                }
+            });
+
+            setNewExpenseData({
+                trip_id: '',
+                name: '',
+                amount: '',
+                currency: '',
+                category: '',
+                posted: '',
+                notes: '',
+                image: null
+            });
+
+            window.location.reload();
+            setPopUpVisible(false);
+        } catch (error) {
+            console.error("Error submitting new expense:", error);
+        }
+    };
+
+    const handleFilterChange = (filterValue) => {
+        applyFilter(filterValue);
+        setFilterPopupVisible(false);
+    };
+
+    const applyFilter = (filterOption, data = expenseUSD) => {
+        if (!Array.isArray(data)) {
+            console.error('Data is not an array:', data);
+            return;
+        }
+        let sortedExpenses;
+        if (filterOption === 'highest') {
+            sortedExpenses = [...data].sort((a, b) => parseFloat(b.amountInHomeCurrency) - parseFloat(a.amountInHomeCurrency));
+        } else if (filterOption === 'lowest') {
+            sortedExpenses = [...data].sort((a, b) => parseFloat(a.amountInHomeCurrency) - parseFloat(b.amountInHomeCurrency));
+        } else if (filterOption === 'recent') {
+            sortedExpenses = [...data].sort((a, b) => new Date(b.posted) - new Date(a.posted));
+        } else if (filterOption === 'oldest') {
+            sortedExpenses = [...data].sort((a, b) => new Date(a.posted) - new Date(b.posted));
+        }
+        setExpenseData({ data: sortedExpenses });
+        setSelectedFilter(filterOption);
+        localStorage.setItem('selectedFilter', filterOption);
+    };
+
+    const clearFilter = () => {
+        setSelectedFilter('');
+        setExpenseData(originalData); // Reset to the original list
+
+        // Remove the filter from localStorage
+        localStorage.removeItem('selectedFilter');
+    };
 
     useEffect(() => {
-        console.log('fetching user role...');
-        console.log('Trip ID:', tripId);
+        const loadBootstrap = async () => {
+            await import('bootstrap/dist/js/bootstrap.bundle.min.js');
+        };
+        loadBootstrap();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('tripId');
+        setTripId(id);
+
+        if (tripId) {
+            fetchTripData();
+            fetchExpenseData();
+            fetchTripLocations();
+        }
+
         const fetchUserRole = async () => {
-            const userId = localStorage.getItem("user_id");
-            console.log('User ID:', userId);
+            const user_id = localStorage.getItem("user_id");
+            if (user_id) {
+                setUserId(user_id);
+            }
+            // console.log('User ID:', userId);
             if (tripId && userId) {
                 try {
                     const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/trips/${tripId}`);
@@ -157,103 +258,7 @@ function Singletrip() {
             }
         };
         fetchUserRole();
-    }, [tripId]);
 
-    const isOwner = userRole === 'owner';
-
-    useEffect(() => {
-        const getExchangeRates = async () => {
-            const rates = {};
-
-            try {
-                for (let currency of otherCurrencies) {
-                    const response = await axios.get(`https://hexarate.paikama.co/api/rates/latest/USD`, {
-                        params: {
-                            target: currency
-                        }
-                    });
-                    //console.log('API Response:', response.data);
-
-                    if (response.data && response.data.data && response.data.data.mid) {
-                        rates[currency] = response.data.data.mid;
-                    } else {
-                        console.error('Invalid response structure:', response.data);
-                    }
-                }
-                setExchangeRates(rates);
-            } catch (error) {
-                console.error('Error fetching exchange rates:', error);
-            }
-        };
-
-        getExchangeRates();
-    }, [selectedCurrency]);
-
-    const fetchCurrencyRates = async (expenses) => {
-        try {
-            const currencyPromises = expenses
-                .filter(expense => expense.currency) // Filter out expenses with invalid currencies
-                .map(expense => {
-                    const targetCurrency = expense.currency;
-                    return axios.get(`https://hexarate.paikama.co/api/rates/latest/${targetCurrency}?target=USD`);
-                });
-
-            // Proceed only if there are valid currency requests
-            if (currencyPromises.length > 0) {
-                const currencyResponses = await Promise.all(currencyPromises);
-                const currencyRates = currencyResponses.map((response, index) => ({
-                    currency: expenses[index].currency, // Get the corresponding currency
-                    rate: response.data.data.mid // Adjust according to the response structure
-                }));
-
-                // Convert expenses to USD and accumulate category data
-                const categoryTotals = {};
-                const convertedExpenses = expenses.map((expense, index) => {
-                    const rate = currencyRates.find(rate => rate.currency === expense.currency)?.rate || 1; // Default to 1 if not found
-                    const amountInUSD = (parseFloat(expense.amount) * rate).toFixed(2); // Convert amount to USD
-
-                    // Accumulate totals by category
-                    if (!categoryTotals[expense.category]) {
-                        categoryTotals[expense.category] = 0;
-                    }
-                    categoryTotals[expense.category] += parseFloat(amountInUSD);
-
-                    setTotalUSDExpenses(prevTotal => prevTotal + parseFloat(amountInUSD));
-
-                    return {
-                        ...expense,
-                        amountInUSD // Add converted amount to expense
-                    };
-                });
-
-                // Prepare data for pie chart
-                const labels = Object.keys(categoryTotals);
-                const data = Object.values(categoryTotals);
-
-                setCategoryData({
-                    labels,
-                    datasets: [{
-                        label: 'Expenses by Category',
-                        data,
-                        backgroundColor: [
-                            '#2A9D8F', '#e76f51', '#E9C46A', '#F4A261', '#c476bf', '#264653', '#e5989b', '#9d0208', '#e4c1f9',
-                            '#bc6c25', '#fca311', '#d62828', '#003049', '#00a896', '#f77f00', '#8338ec', '#fb5607'
-                        ],
-                        hoverOffset: 4
-                    }]
-                });
-
-                // console.log('Converted expenses:', convertedExpenses);
-            } else {
-                console.warn('No valid currencies found for conversion.');
-            }
-
-        } catch (error) {
-            console.error('Error fetching currency rates:', error);
-        }
-    };
-
-    useEffect(() => {
         const config = {
             method: 'get',
             maxBodyLength: Infinity,
@@ -275,398 +280,237 @@ function Singletrip() {
             });
 
     }, [tripId]);
-
-    const handleEditChange = (e) => {
-        const { name, value } = e.target;
-        setSelectedExpense((prev) => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
-    const submitEditExpense = async (expenseID) => {
-        axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/${expenseID}`, selectedExpense)
-            .then(response => {
-                console.log(response)
-                window.location.reload();
-                setEditPopupVisible(false);
-            })
-            .catch(error => {
-                console.error('Error editing expense:', error);
-            });
-    };
-
-    const deleteExpense = async (expenseID) => {
-        if (window.confirm('Please confirm expense deletion. This action cannot be undone.')) {
-            axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/${expenseID}`)
-                .then(response => {
-                    console.log(response);
-                    window.location.reload();
-                })
-                .catch(error => {
-                    console.error('Error deleting expense:', error);
-                });
-            setEditPopupVisible(false);
+    
+    useEffect(() => {
+        if (homeCurrency) {
+            // Only call fetchCurrencyRates when homeCurrency is successfully fetched
+            fetchCurrencyRates(fetchedExpenseData);
+        } else {
+            console.error("Home currency not set. Unable to fetch exchange rates.");
         }
-    };
+    }, [homeCurrency, fetchedExpenseData]); // Dependencies: re-run if homeCurrency or expenses change
 
-    const downloadTripData = async () => {
+    const fetchHomeCurrency = async (userId) => {
         try {
-            const response = await axios({
-                url: `${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/download/${tripId}`,
-                method: 'GET',
-                responseType: 'blob'
-            });
-
-            console.log(response.headers)
-
-            const contentDisposition = response.headers['content-disposition'];
-            let filename = `${tripData.data.name}.csv`; 
-            if (contentDisposition && contentDisposition.includes('filename=')) {
-                const filenamePart = contentDisposition.split('filename=')[1];
-                filename = filenamePart.replace(/"/g, ''); // Clean up the filename
-            }
-
-            // Create a blob from the CSV data
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', filename);
-            document.body.appendChild(link);
-            link.click();
-            link.parentNode.removeChild(link);
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/${userId}/home-currency`);
+            return response.data.home_currency;
         } catch (error) {
-            console.error('Error downloading trip data:', error);
+            console.error('Error fetching home currency:', error);
+            return null; // Handle error as needed
         }
     };
 
-    const newExpenseInputChange = (e) => {
-        const { name, value } = e.target;
-        if (name === 'currency') {
-            setSelectedCurrency(value); // Update selected currency
-        }
-        setNewExpenseData({ ...newExpenseData, [name]: value });
-    };
+    useEffect(() => {
+        const getExchangeRates = async () => {
+            const rates = {};
 
-    const submitNewExpense = async (e) => {
-        e.preventDefault();
+            try {
+                for (let currency of otherCurrencies) {
+                    const response = await axios.get(`https://hexarate.paikama.co/api/rates/latest/${homeCurrency}`, {
+                        params: {
+                            target: currency
+                        }
+                    });
 
-        const updatedExpenseData = {
-            ...newExpenseData,
-            trip_id: tripId,
-            currency: selectedCurrency || 'USD',
+                    if (response.data && response.data.data && response.data.data.mid) {
+                        rates[currency] = response.data.data.mid;
+                    } else {
+                        console.error('Invalid response structure:', response.data);
+                    }
+                }
+                setExchangeRates(rates);
+            } catch (error) {
+                console.error('Error fetching exchange rates:', error);
+            }
         };
 
+        getExchangeRates();
+    }, [selectedCurrency]);
+
+
+    // useEffect(() => {
+    //     console.log(expenseUSD);
+    // },[expenseUSD])
+
+    const fetchCurrencyRates = async (expenses) => {
         try {
-            await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/trips/${tripId}`, updatedExpenseData);
-
-            setNewExpenseData({
-                trip_id: '',
-                name: '',
-                amount: '',
-                currency: '',
-                category: '',
-                posted: '',
-                notes: ''
-            });
-
-            window.location.reload();
-            setPopUpVisible(false);
-        } catch (error) {
-            console.error("Error fetching currency symbols:", error);
-        }
-    };
-
-    const getTripDates = () => {
-        if (!tripData) {
-            return { startDate: null, endDate: null };
-        }
-
-        const startDate = startOfDay(parseISO(tripData.data.start_date));
-        const endDate = endOfDay(parseISO(tripData.data.end_date));
-
-        return { startDate, endDate };
-    };
-
-    const { startDate, endDate } = getTripDates();
-
-    const isDateInRange = (date) => {
-        if (!startDate || !endDate) {
-            return false;
-        }
-        return date >= startDate && date <= endDate;
-    };
-
-    const handleFilterChange = (filterValue) => {
-        applyFilter(filterValue);
-        setFilterPopupVisible(false);
-    };
-
-    const applyFilter = (filterOption, data = originalData) => {
-        let sortedExpenses;
-        if (filterOption === 'highest') {
-            sortedExpenses = [...data.data].sort((a, b) => b.amount - a.amount);
-        } else if (filterOption === 'lowest') {
-            sortedExpenses = [...data.data].sort((a, b) => a.amount - b.amount);
-        } else if (filterOption === 'recent') {
-            sortedExpenses = [...data.data].sort((a, b) => new Date(b.posted) - new Date(a.posted));
-        } else if (filterOption === 'oldest') {
-            sortedExpenses = [...data.data].sort((a, b) => new Date(a.posted) - new Date(b.posted));
-        }
-        setExpenseData({ data: sortedExpenses });
-        setSelectedFilter(filterOption);
-        localStorage.setItem('selectedFilter', filterOption);
-    };
-
-    const clearFilter = () => {
-        setSelectedFilter('');
-        setExpenseData(originalData); // Reset to the original list
-
-        // Remove the filter from localStorage
-        localStorage.removeItem('selectedFilter');
-    };
-
-    const handleCurrencyChange = async (e) => {
-        const currency = e.target.value;
-        setCustomCurrency(currency);
-
-        // Fetch the exchange rate relative to USD
-        try {
-            const response = await axios.get(`https://hexarate.paikama.co/api/rates/latest/USD?target=${currency}`);
-            //if (response.data && response.data.rate) {
-            console.log(response.data.data.mid);
-            setExchangeRate(response.data.data.mid);
-            // } else {
-            //  console.error("Invalid response from the API");
-            // }
-        } catch (error) {
-            console.error("Error fetching exchange rate:", error);
-        }
-    };
-
-    const DateComponent = ({ dateStr }) => {
-        const dateObj = new Date(dateStr);
-        const options = { month: 'long', day: 'numeric' };
-        const formattedDate = dateObj.toLocaleDateString('en-US', options);
+            const currencyPromises = expenses
+                .filter(expense => expense.currency) // Filter out expenses with invalid currencies
+                .map(expense => {
+                    const targetCurrency = expense.currency;
+                    return axios.get(`https://hexarate.paikama.co/api/rates/latest/${targetCurrency}?target=${homeCurrency}`);
+                });
     
-        return (
-            <span>
-                {dateObj.toLocaleDateString('en-US', options)}
-            </span>
-        );
+            if (currencyPromises.length > 0) {
+                const currencyResponses = await Promise.all(currencyPromises);
+                const currencyRates = currencyResponses.map((response, index) => ({
+                    currency: expenses[index].currency,
+                    rate: response.data.data.mid // Assuming correct response structure
+                }));
+    
+                // Convert expenses to homeCurrency and accumulate category data
+                const categoryTotals = {};
+                const convertedExpenses = expenses.map((expense, index) => {
+                    const rate = currencyRates.find(rate => rate.currency === expense.currency)?.rate || 1;
+                    const amountInHomeCurrency = (parseFloat(expense.amount) * rate).toFixed(2);
+    
+                    // Accumulate totals by category
+                    if (!categoryTotals[expense.category]) {
+                        categoryTotals[expense.category] = 0;
+                    }
+                    categoryTotals[expense.category] += parseFloat(amountInHomeCurrency);
+    
+                    setTotalExpenses(prevTotal => prevTotal + parseFloat(amountInHomeCurrency));
+    
+                    return {
+                        ...expense,
+                        amountInHomeCurrency // Add converted amount to expense
+                    };
+                });
+
+                setconvertedHomeCurrencyExpenseData(convertedExpenses)
+                setExpenseUSD(convertedExpenses);
+    
+                // Prepare data for pie chart
+                const labels = Object.keys(categoryTotals);
+                const data = Object.values(categoryTotals);
+    
+                setCategoryData({
+                    labels,
+                    datasets: [{
+                        label: `Expenses by Category in ${homeCurrency}`,
+                        data,
+                        backgroundColor: [
+                            '#2A9D8F', '#e76f51', '#E9C46A', '#F4A261', '#c476bf', '#264653', '#e5989b', '#9d0208', '#e4c1f9',
+                            '#bc6c25', '#fca311', '#d62828', '#003049', '#00a896', '#f77f00', '#8338ec', '#fb5607'
+                        ],
+                        hoverOffset: 4
+                    }]
+                });
+            } else {
+                console.warn('No valid currencies found for conversion.');
+            }
+        } catch (error) {
+            console.error('Error fetching currency rates:', error);
+        }
+    };    
+
+    const toggleVisibility = () => {
+        setIsVisible(prevState => !prevState);
     };
 
     return (
-        <div className="main-container">
-            <div>
-                {/* Header section */}
-                <div className="header">
-                    TRIP TRENDS
-                </div>
-
+        <div>
+            {/* Header section */}
+            <HeaderComponent headerTitle={tripData ? tripData.data.name : ''} setUserName={setUserName} userId={userId} />
+            <div className="main-container">
                 {tripData ? (
                     <div>
-                        <h1 id='tripName'>{tripData.data.name}</h1>
-                        <header class="top-icon-header">
-                                <div class="icon-div" tooltip="Home" tabindex="0">
-                                    <div class="icon-SVG">
-                                        <Link href={`/homepage`}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                                            </svg>
-                                        </Link>
-                                        <span class="icon-text">Home</span>
-                                    </div>
-                                </div>
-                            {/* Share Trip Button */}
-                            <ShareTripComponent tripId={tripId} isOwner={isOwner} />
-                            {/* Edit Trip Button */}
-                            <EditTripComponent tripId={tripId} tripData={tripData} tripLocations={tripLocations} userRole={userRole} onUpdate={fetchTripData} />
-                            {/* Delete Trip Button */}
-                            <DeleteTripComponent tripId={tripId} userRole={userRole} />
-                        </header>
-                        {/* General Trip Info*/}
-                        <div className="trip-overview">
-                            <div className="trip-overview-div">
-                                <div className="trip-overview-circle">🗓️</div>
-                                <div className="trip-overview-content">
-                                    <p><DateComponent dateStr={tripData.data.start_date}/> - <DateComponent dateStr={tripData.data.end_date}/></p>
-                                </div>
-                            </div>
-
-                            <div className="trip-overview-div">
-                                <div className="trip-overview-circle">💰</div>
-                                <div className="trip-overview-content">
-                                    <p>${tripData.data.budget}</p>
-                                </div>
-                            </div>
-
-                            <div className="trip-overview-div">
-                                <div id="trip-locations-circle">📍</div>
-                                <div className="trip-overview-content">
-                                    <div className='dropdown-container'>
-                                        <LocationsDropdownComponent tripLocations={tripLocations} />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <br></br>
-                        <div className='row'>
-                                <div className='col'>
-                                    <DefaultTripImagesComponent tripId={tripId} tripLocations={tripLocations} />
-                                </div>
-                                <div className='col' style={{ flexDirection: "column" }}>
-                                    <div className="meter-container">
-                                        <p id='budgetTitle'>Your Trip Calendar:</p>
-                                        <br></br>
-                                        <Calendar
-                                            tileClassName={({ date }) => {
-                                                if (isDateInRange(date)) {
-                                                    return 'highlighted-date';
-                                                }
-                                                if (date.toDateString() === endDate.toDateString()) {
-
-                                                    return 'highlighted-date';
-                                                }
-                                                return null;
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                        </div>
-                        {/* Trip Calendar and Budget Meter */}
                         <div className='container'>
-                            <div className='row'>
-                               
-                                <div className='col'>
-                                    <div className="meter-container">
-                                        <p id='budgetTitle'>Your Budget Meter:</p>
-                                        {expenseData && expenseData.data && totalUSDExpenses === 0 ? (
-                                            <p>Loading your budget data...</p>
-                                        ) : totalUSDExpenses > tripData.data.budget ? (
-                                            <div style={{
-                                                marginTop: "10px",
-                                                width: "350px",
-                                                height: "200px",
-                                                marginLeft: "50px"
-                                            }}>
-                                                <ReactSpeedometer
-                                                    width={300}
-                                                    minValue={0}
-                                                    maxValue={tripData.data.budget}
-                                                    value={tripData.data.budget}
-                                                    needleColor="steelblue"
-                                                    needleTransitionDuration={2500}
-                                                    needleTransition={Transition.easeBounceOut}
-                                                    segments={4}
-                                                    segmentColors={["#a3be8c", "#ebcb8b", "#d08770", "#bf616a"]}
-                                                />
-                                            </div>
-                                        ) : (
-                                            <div style={{
-                                                marginTop: "10px",
-                                                width: "350px",
-                                                height: "200px",
-                                                marginLeft: "50px",
-                                            }}>
-                                                <ReactSpeedometer
-                                                    width={300}
-                                                    minValue={0}
-                                                    maxValue={tripData.data.budget}
-                                                    value={totalUSDExpenses.toFixed(2)}
-                                                    needleColor="steelblue"
-                                                    needleTransitionDuration={2500}
-                                                    needleTransition={Transition.easeBounceOut}
-                                                    segments={4}
-                                                    segmentColors={["#a3be8c", "#ebcb8b", "#d08770", "#bf616a"]}
-                                                />
-                                            </div>
-                                        )}
-                                        <p id='budgetTitle'>Your Budget Data:</p>
-                                        {expenseData && expenseData.data && totalUSDExpenses === 0 ? (
-                                            <p>Loading your budget data...</p>
-                                        ) : (
-                                            <div style={{ textAlign: 'center' }}>
-                                                <p style={{ textDecoration: "underline", display: "inline" }}>Total Expenses in USD:</p>
-                                                <span>  ${totalUSDExpenses.toFixed(2)}</span>
-                                                {totalUSDExpenses > tripData.data.budget ? (
-                                                    <p id='budget-text'>You are <strong>${(totalUSDExpenses - tripData.data.budget).toFixed(2)}</strong> over your budget.</p>
-                                                ) : (
-                                                    <p>You are within your budget.</p>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                                {/* Pie Chart */}
-                                <div className='col'>
-                                    <div className="meter-container">
-                                        <div>
-                                            {categoryData && categoryData.datasets && categoryData.datasets.length > 0 ? (
-                                                <div className="pie-chart-container">
-                                                    <Pie data={categoryData} />
-                                                </div>
+                            {/* Icon Bar Above Trip Info */}
+                            <TripIconBarComponent tripId={tripId} userId={userId} isOwner={isOwner} tripData={tripData} tripLocations={tripLocations} userRole={userRole} fetchTripData={fetchTripData} />
+                            {/* General Trip Info*/}
+                            <GeneralTripInfoComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenses={expenseUSD}/>
+                        </div>
+                        <br></br>
+                        <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Expenses in {homeCurrency}</h2>
+                        <SpendingCirclesComponent 
+                            totalExpenses={totalExpenses}
+                            homeCurrency={homeCurrency}
+                            tripData={tripData}
+                        />
+                        {/* Data Visualisations Toggle */}
+                        <div className='toggle-container'>
+                            <div className='row justify-content-center'>
+                                <div className='col-auto'>
+                                    <div 
+                                        className='icon-div toggle-icon' 
+                                        tabIndex="0"
+                                        onClick={toggleVisibility}
+                                    >
+                                        <div className="icon-SVG">
+                                            {isVisible ? (
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 18.75 7.5-7.5 7.5 7.5" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 7.5-7.5 7.5 7.5" />
+                                                </svg>
                                             ) : (
-                                                <p>No expense data available to display.</p>
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 5.25 7.5 7.5 7.5-7.5m-15 6 7.5 7.5 7.5-7.5" />
+                                                </svg>
                                             )}
+                                            <span className="icon-text">{isVisible ? 'Hide Visualizations' : 'Show Visualizations'}</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                        
+                            {isVisible && (
+                                <>
+                                <div className='row'>
+                                    {/* Budget Meter */}
+                                    <div className='col'>
+                                        <div className="meter-container"> 
+                                            <BudgetMeterComponent tripData={tripData} expenseData={expenseData} totalExpenses={totalExpenses} homeCurrency={homeCurrency}/>
+                                        </div>
+                                    </div>
+                                    {/* Pie Chart */}
+                                    <div className='col'>
+                                        <div className="meter-container">
+                                            <CategoryDataComponent categoryData={categoryData} />
+                                        </div>
+                                    </div>
+                                </div>
+                                {/* Bar Graph */}
+                                <div className="meter-container">
+                                    <BarGraphComponent tripData={tripData} expenseData={convertedHomeCurrencyExpenseData} categoryData={categoryData} />
+                                </div>
+                             </>
+                            )}
                         </div>
-
+                        
+                        
                         <br></br>
                         {/* Icon Bar Above Expenses */}
                         <div>
-                            <header class="icon-bar-header">
+                            <header className="icon-bar-header">
                                 {/* Add Expense Button */}
-                                <div class="icon-div" tooltip="Add Expense" tabindex="0">
-                                    <div class="icon-SVG">
+                                <div className="icon-div" tooltip="Add Expense" tabIndex="0">
+                                    <div className="icon-SVG">
                                         <svg
                                             onClick={() => setPopUpVisible(true)}
-                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.3" stroke="currentColor" class="size-6">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                         </svg>
-                                        <span class="icon-text">Add Expense</span>
+                                        <span className="icon-text">Add Expense</span>
                                     </div>
                                 </div>
                                 {/* Filter Expenses Button */}
-                                <div class="icon-div" tooltip="Filter" tabindex="0">
-                                    <div class="icon-SVG">
+                                <div className="icon-div" tooltip="Filter" tabIndex="0">
+                                    <div className="icon-SVG">
                                         <svg
                                             onClick={() => setFilterPopupVisible(true)}
-                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.3" stroke="currentColor" class="size-6" >
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6" >
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
                                         </svg>
-                                        <span class="icon-text">Filter</span>
+                                        <span className="icon-text">Filter</span>
 
                                     </div>
                                 </div>
-                                {/* <div class="spacer"></div>
-                                <div class="divider"></div> */}
+                                {/* <div className="spacer"></div>
+                                <div className="divider"></div> */}
 
-                                {/* Download Trip Button */}
-                                <div class="icon-div" tooltip="Download Trip" tabindex="0">
-                                    <div class="icon-SVG">
-                                        <svg
-                                            onClick={downloadTripData}
-                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.3" stroke="currentColor" class="size-6">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                                        </svg>
-                                        <span class="icon-text">Download Trip</span>
-                                    </div>
-                                </div>
+
                                 {/* Add Image Button */}
-                                <div class="icon-div" tooltip="Add Image" tabindex="0">
-                                    <div class="icon-SVG">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.3" stroke="currentColor" class="size-6">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                                <div className="icon-div" tooltip="Add Image" tabIndex="0">
+                                    <div className="icon-SVG">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                                         </svg>
-                                        <span class="icon-text">Add Image</span>
+                                        <span className="icon-text">Add Image</span>
                                     </div>
                                 </div>
-                                
+
                                 {/* Applied filter popup */}
                                 {selectedFilter && (
                                     <div className="applied-filter">
@@ -678,153 +522,16 @@ function Singletrip() {
                                 )}
                             </header>
                         </div>
-
-                        {/* Expense Table */}
-                        {expenseData && expenseData.data ? (
+                        <div className='expense-container'>
+                            {/* Expense Table */}
+                            <ExpenseTableComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenseData={expenseData}
+                                currencyCodes={currencyCodes} expenseCategories={expenseCategories} />
+                        
                             <div>
-                                <div className="expense-table-container">
-                                    <Table striped bordered hover size="sm" responsive="sm" className="expense-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Name</th>
-                                                <th>Amount</th>
-                                                <th>Currency</th>
-                                                <th>Category</th>
-                                                <th>Date Posted</th>
-                                                <th>Notes</th>
-                                                <th>Modify</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {expenseData.data.map((expense) => (
-                                                <tr key={expense.expense_id}>
-                                                    <td>{expense.name}</td>
-                                                    <td>{expense.amount}</td>
-                                                    <td>{expense.currency}</td>
-                                                    <td>{expense.category}</td>
-                                                    <td>{expense.posted}</td>
-                                                    <td>{expense.notes}</td>
-                                                    <td>
-                                                        {/* <div onClick={() => { setEditPopupVisible(true); setSelectedExpense(expense) }} className='edit-expense'>Edit Expense</div> */}
-                                                        <div class="icon-div" tooltip="Edit Trip" tabindex="0">
-                                                            <div class="icon-SVG">
-                                                                <svg
-                                                                    onClick={() => {
-                                                                        setEditPopupVisible(true);
-                                                                        setSelectedExpense(expense);
-                                                                    }}
-                                                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                                                                </svg>
-                                                                <span class="icon-text">Edit Expense</span>
-                                                            </div>
-                                                        </div>
-                                                        <div className="expense-form">
-                                                            {isEditPopupVisible && selectedExpense && (
-                                                                <div className="modal">
-                                                                    <div className="modal-content">
-                                                                        <span className="close" onClick={() => setEditPopupVisible(false)}>&times;</span>
-                                                                        <h2 className="edit-expense-title">Edit or Delete Expense</h2>
-                                                                        <form onSubmit={(e) => {
-                                                                            e.preventDefault();
-                                                                            submitEditExpense(selectedExpense.expense_id);
-                                                                        }}>
-                                                                            <label className="edit-expense-field-label">
-                                                                                Expense Name:
-                                                                                <input
-                                                                                    type="text"
-                                                                                    name="name"
-                                                                                    value={selectedExpense.name}
-                                                                                    onChange={handleEditChange}
-                                                                                    required
-                                                                                />
-                                                                            </label>
-                                                                            <div className="field-pair">
-                                                                                <label className="edit-expense-field-label">
-                                                                                    Amount:
-                                                                                    <input
-                                                                                        type="number"
-                                                                                        name="amount"
-                                                                                        value={selectedExpense.amount}
-                                                                                        onChange={handleEditChange}
-                                                                                        required
-                                                                                    />
-                                                                                </label>
-                                                                                <label className="edit-expense-field-label">
-                                                                                    Currency:
-                                                                                    <select
-                                                                                        name="currency"
-                                                                                        value={selectedExpense.currency}
-                                                                                        onChange={handleEditChange}
-                                                                                        required
-                                                                                    >
-                                                                                        <option value="">Select Currency</option>
-                                                                                        {currencyCodes.map((code) => (
-                                                                                            <option key={code} value={code}>{code}</option>
-                                                                                        ))}
-                                                                                    </select>
-                                                                                </label>
-                                                                            </div>
-                                                                            <div className="field-pair">
-                                                                                <label className="edit-expense-field-label">
-                                                                                    Category:
-                                                                                    <select
-                                                                                        name="category"
-                                                                                        value={selectedExpense.category}
-                                                                                        onChange={handleEditChange}
-                                                                                        required
-                                                                                    >
-                                                                                        <option value="">Select Category</option>
-                                                                                        {expenseCategories.map((category) => (
-                                                                                            <option key={category} value={category}>{category}</option>
-                                                                                        ))}
-                                                                                    </select>
-                                                                                </label>
-                                                                                <label className="edit-expense-field-label">
-                                                                                    Date:
-                                                                                    <input
-                                                                                        type="date"
-                                                                                        name="posted"
-                                                                                        value={selectedExpense.posted}
-                                                                                        onChange={handleEditChange}
-                                                                                        required
-                                                                                    />
-                                                                                </label>
-                                                                            </div>
-                                                                            <label className="edit-expense-field-label">
-                                                                                Notes:
-                                                                                <input
-                                                                                    type="text"
-                                                                                    name="notes"
-                                                                                    value={selectedExpense.notes}
-                                                                                    onChange={handleEditChange}
-                                                                                />
-                                                                            </label>
-                                                                            <div className='container'>
-                                                                                <div className='row'>
-                                                                                    <div className='col'>
-                                                                                        <button type="submit" className="submit-edit-expense-button">Edit</button>
-                                                                                    </div>
-                                                                                    <div className='col'>
-                                                                                        <button type="button" onClick={() => deleteExpense(selectedExpense.expense_id)} className="delete-expense-button">Delete</button>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </form>
-                                                                    </div>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </Table>
-                                </div>
-                            </div>
-                        ) : (
-                            <p>No expenses yet...</p>
-                        )}
+                            {/* Exchange Rate Table */}
+                            <ExchangeRateTableComponent exchangeRates={exchangeRates} currencyCodes={currencyCodes} homeCurrency={homeCurrency}/>
+                        </div>
+                </div>
 
                     </div>
                 ) : (
@@ -834,125 +541,19 @@ function Singletrip() {
                 )}
 
                 {/* Create a expense popup form */}
-                <div className="expense-form">
-                    {isPopUpVisible && (
-                        <div className="modal">
-                            <div className="modal-content">
-                                <span className="close" onClick={() => setPopUpVisible(false)}>&times;</span>
-                                <h2 className="new-expense-title">New Expense</h2>
-                                <form onSubmit={submitNewExpense}>
-                                    <label className="new-expense-field-label">
-                                        Expense Name:
-                                        <input
-                                            type="text"
-                                            name="name"
-                                            value={newExpenseData.name}
-                                            onChange={newExpenseInputChange}
-                                            required
-                                        />
-                                    </label>
-
-                                    <div className="field-pair">
-                                        <label className="new-expense-field-label half-width">
-                                            Amount:
-                                            <input
-                                                type="number"
-                                                name="amount"
-                                                value={newExpenseData.amount}
-                                                onChange={newExpenseInputChange}
-                                                required
-                                            />
-                                        </label>
-                                        <label className="new-expense-field-label half-width">
-                                            Currency:
-                                            <select
-                                                name="currency"
-                                                value={selectedCurrency}
-                                                onChange={(e) => {
-                                                    setSelectedCurrency(e.target.value); // Update selected currency state
-                                                    newExpenseInputChange(e); // Call your input change handler
-                                                }}
-                                                required
-                                            >
-                                                <option value="">Select Currency</option>
-
-                                                {/* Display the selected currency at the top if it exists and it's not USD */}
-                                                {selectedCurrency && selectedCurrency !== "USD" && (
-                                                    <option value={selectedCurrency}>{selectedCurrency}</option>
-                                                )}
-
-                                                {/* Recommended currencies section */}
-                                                {otherCurrencies
-                                                    .filter(code => code !== selectedCurrency) // Exclude selected currency
-                                                    .length > 0 && (
-                                                        <optgroup label="Recommended">
-                                                            {otherCurrencies
-                                                                .filter(code => code !== selectedCurrency) // Exclude selected currency
-                                                                .map((code, index) => (
-                                                                    <option key={`other-${index}`} value={code}>{code}</option>
-                                                                ))}
-                                                        </optgroup>
-                                                    )}
-
-                                                {/* Always place USD after other currencies */}
-                                                <optgroup label="Other">
-                                                    <option value="USD">USD</option>
-
-                                                    {/* Display remaining currency codes, excluding selectedCurrency and other currencies */}
-                                                    {currencyCodes
-                                                        .filter(code => code !== selectedCurrency && code !== "USD" && !otherCurrencies.includes(code))
-                                                        .map((code) => (
-                                                            <option key={code} value={code}>{code}</option>
-                                                        ))}
-                                                </optgroup>
-                                            </select>
-                                        </label>
-
-                                    </div>
-
-                                    <div className="field-pair">
-                                        <label className="new-expense-field-label half-width">
-                                            Category:
-                                            <select
-                                                name="category"
-                                                value={newExpenseData.category}
-                                                onChange={newExpenseInputChange}
-                                                required
-                                            >
-                                                <option value="">Select Category</option>
-                                                {expenseCategories.map((category) => (
-                                                    <option key={category} value={category}>{category}</option>
-                                                ))}
-                                            </select>
-                                        </label>
-                                        <label className="new-expense-field-label half-width">
-                                            Date:
-                                            <input
-                                                type="date"
-                                                name="posted"
-                                                value={newExpenseData.posted}
-                                                onChange={newExpenseInputChange}
-                                                required
-                                            />
-                                        </label>
-                                    </div>
-
-                                    <label className="new-expense-field-label">
-                                        Notes:
-                                        <input
-                                            type="text"
-                                            name="notes"
-                                            value={newExpenseData.notes}
-                                            onChange={newExpenseInputChange}
-                                        />
-                                    </label>
-                                    <button type="submit" className="submit-new-expense-button">Create</button>
-                                </form>
-                            </div>
-                        </div>
-                    )}
-                </div>
-
+                <ExpenseFormComponent
+                    tripId={tripId}
+                    newExpenseData={newExpenseData}
+                    setNewExpenseData={setNewExpenseData}
+                    selectedCurrency={selectedCurrency}
+                    setSelectedCurrency={setSelectedCurrency}
+                    submitNewExpense={submitNewExpense}
+                    isPopUpVisible={isPopUpVisible}
+                    setPopUpVisible={setPopUpVisible}
+                    otherCurrencies={otherCurrencies}
+                    currencyCodes={currencyCodes}
+                    expenseCategories={expenseCategories}
+                />
                 {/* Create a filter popup form */}
                 <div className="filter-container">
                     {isFilterPopupVisible && (
@@ -990,50 +591,12 @@ function Singletrip() {
                         </div>
                     )}
                 </div>
+            <br></br>
+            <br></br>
+            <br></br>
+            <br></br>
 
-                <div>
-                    {/* Exchange Rate Table */}
-                    <div className="exchange-rates-container">
-                        <table className="exchange-rates-table">
-                            <thead>
-                                <tr>
-                                    <th>Currency</th>
-                                    <th>Rate (Relative to USD)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {Object.keys(exchangeRates).map((currency) => (
-                                    <tr key={currency}>
-                                        <td>{currency}</td>
-                                        <td>{exchangeRates[currency]}</td>
-                                    </tr>
-                                ))}
-                                {/* Last row for dropdown selection and its rate */}
-                                {/* {customCurrency && ( */}
-                                <tr>
-                                    <td className="exchange-table-dropdown">
-                                        {/* Dropdown for currency codes */}
-                                        <label htmlFor="currency-select"></label>
-                                        <select
-                                            id="currency-select"
-                                            value={customCurrency}
-                                            onChange={handleCurrencyChange}
-                                        >
-                                            <option value="">Currency</option>
-                                            {currencyCodes.map((code) => (
-                                                <option key={code} value={code}>
-                                                    {code}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </td>
-                                    <td>{exchangeRate !== null ? exchangeRate : 'N/A'}</td>
-                                </tr>
-                                {/* )} */}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                
             </div >
         </div >
     );
