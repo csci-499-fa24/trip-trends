@@ -9,17 +9,18 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
     if (userRole == 'viewer') return null;
 
     const [isOpen, setIsOpen] = useState(false);
-    const [name, setName] = useState(tripData?.name || "");
-    const [startDate, setStartDate] = useState(tripData?.start_date || "");
-    const [endDate, setEndDate] = useState(tripData?.end_date || "");
-    const [budget, setBudget] = useState(tripData?.budget || "");
+    const [name, setName] = useState(tripData.data?.name || "");
+    const [startDate, setStartDate] = useState(tripData.data?.start_date || "");
+    const [endDate, setEndDate] = useState(tripData.data?.end_date || "");
+    const [budget, setBudget] = useState(tripData.data?.budget || ""); 
+    // console.log(startDate, endDate);   
 
     // console.log(name, startDate, endDate, budget);
-
+    
     const handleEdit = async (e) => {
         e.preventDefault();
         try {
-            const requestBody = { name, startDate, endDate, budget };
+            const requestBody = { name, start_date: startDate, end_date: endDate, budget }; 
             await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`, requestBody);
             toast.success("Trip updated successfully!");
             setIsOpen(false);
@@ -93,7 +94,7 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
                                 />
                             </label>
 
-                            <button type="submit" className="share-trip-button">Submit Change</button>
+                            <button type="submit" className="share-trip-button">Submit</button>
                         </form>
                     </div>
                 </div>

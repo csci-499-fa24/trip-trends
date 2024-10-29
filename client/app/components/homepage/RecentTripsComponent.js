@@ -79,7 +79,7 @@ const RecentTripsComponent = ({ trips }) => {
                     </div>
                     <div className="trip-info">
                         <h3>{trip.name}</h3>
-                        <p>{trip.start_date} – {trip.end_date}</p>
+                        <p>{trip.start_date} ~ {trip.end_date}</p>
                     </div>
                 </div>
             ))}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import Table from 'react-bootstrap/Table';
+import { Card, CardContent, Typography, Button, Grid, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 
 const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, currencyCodes, expenseCategories}) => {
     const [isEditPopupVisible, setEditPopupVisible] = useState(false);
@@ -26,7 +27,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
     };
 
     const deleteExpense = async (expenseID) => {
-        if (window.confirm('Please confirm expense deletion. This action cannot be undone.')) {
+        if (window.confirm('Confirm expense deletion. This action cannot be undone.')) {
             axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/${expenseID}`)
                 .then(response => {
                     console.log(response);
@@ -38,6 +39,30 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
             setEditPopupVisible(false);
         }
     };
+
+    const getCategoryIcon = (category) => {
+        switch (category) {
+            case 'Flights':
+                return '✈️'; 
+            case 'Accommodations':
+                return '🏨'; 
+            case 'Food/Drink':
+                return '🍽️'; 
+            case 'Transport':
+                return '🚗'; 
+            case 'Activities':
+                return '🎢'; 
+            case 'Shopping':
+                return '🛍️'; 
+            case 'Phone/Internet':
+                return '📱'; 
+            case 'Health/Safety':
+                return '🚑';
+            case 'Other':
+                return '🌈'; 
+        }
+    };
+    
     
     return (
         <div> 
@@ -51,9 +76,9 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
                                     <th>Amount</th>
                                     <th>Currency</th>
                                     <th>Category</th>
-                                    <th>Date Posted</th>
+                                    <th>Date</th>
                                     <th>Notes</th>
-                                    <th>Modify</th>
+                                    <th>Edit</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -62,8 +87,11 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
                                         <td>{expense.name}</td>
                                         <td>{expense.amount}</td>
                                         <td>{expense.currency}</td>
-                                        <td>{expense.category}</td>
-                                        <td>{expense.posted}</td>
+                                        <td>{getCategoryIcon(expense.category)}</td>
+                                        <td>
+                                            {expense.posted.split('-')[0]}<br />
+                                            {expense.posted.split('-')[1]}-{expense.posted.split('-')[2]}
+                                        </td>
                                         <td>{expense.notes}</td>
                                         <td>
                                             {/* <div onClick={() => { setEditPopupVisible(true); setSelectedExpense(expense) }} className='edit-expense'>Edit Expense</div> */}
@@ -191,3 +219,4 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
 };
 
 export default ExpenseTableComponent;
+
