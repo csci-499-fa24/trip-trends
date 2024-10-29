@@ -72,7 +72,7 @@
 }
 
 .modal-content {
-    max-width: 30% !important;
+    max-width: 35% !important;
     max-height: 300vh;
     overflow-x: auto;
     overflow-y: auto;
@@ -744,6 +744,20 @@
 
 .expense-box li {
     margin-bottom: 4px; /* Optional: adds space between list items */
+}
+
+.expense-row-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+}
+
+.upload-section {
+    margin-left: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* Toggle */

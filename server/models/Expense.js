@@ -42,10 +42,10 @@ const Expense = sequelize.define('expense', {
         type: DataTypes.TEXT,
         allowNull: true,
     },
-    image: {
-        type: DataTypes.STRING(255),
-        allowNull: true,
-    }
+        image: {
+            type: DataTypes.BLOB,
+            allowNull: true,
+        }
 }, {
     tableName: 'expenses',
     timestamps: false
