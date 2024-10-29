@@ -410,7 +410,8 @@ function Singletrip() {
                             {/* General Trip Info*/}
                             <GeneralTripInfoComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenses={expenseUSD}/>
                         </div>
-                        <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Expenses</h2>
+                        <br></br>
+                        <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Expenses in {homeCurrency}</h2>
                         <SpendingCirclesComponent 
                             totalExpenses={totalExpenses}
                             homeCurrency={homeCurrency}
