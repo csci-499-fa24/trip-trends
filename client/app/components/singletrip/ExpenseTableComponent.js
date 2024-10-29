@@ -87,7 +87,6 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
                                         <td>{expense.name}</td>
                                         <td>{expense.amount}</td>
                                         <td>{expense.currency}</td>
-                                        <td>{getCategoryIcon(expense.category)}</td>
                                         <td>
                                             {expense.posted.split('-')[0]}<br />
                                             {expense.posted.split('-')[1]}-{expense.posted.split('-')[2]}

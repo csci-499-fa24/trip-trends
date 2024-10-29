@@ -8,7 +8,6 @@ const createExpense = async (req, res) => {
     const { expenseId, name, amount, category, currency, posted, notes } = req.body;
 
     try {
-        let imageBase64 = null; // when there is no image uploaded
         if (imageFile) {
             imageBuffer = imageFile.data;
         }
