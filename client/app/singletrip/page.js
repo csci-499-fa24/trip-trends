@@ -21,6 +21,8 @@ import TripIconBarComponent from '../components/singletrip/TripIconBarComponent'
 import BarGraphComponent from '../components/singletrip/BarGraphComponent';
 import SpendingCirclesComponent from '../components/singletrip/SpendingCirclesComponent';
 
+
+
 Chart.register(ArcElement, Tooltip, Legend);
 
 function Singletrip() {

@@ -5,6 +5,8 @@ import DeleteTripComponent from "./DeleteTripComponent"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import axios from "axios"
+import Image from 'next/image';
+import homeIcon from "../../img/homeIcon.png";
 
 const TripIconBarComponent = ({ tripId, userId, isOwner, tripData, tripLocations, userRole, fetchTripData }) => {
     const [sharedUsers, setSharedUsers] = useState([]);
@@ -33,14 +35,10 @@ const TripIconBarComponent = ({ tripId, userId, isOwner, tripData, tripLocations
             {/* </div> */}
             {/* Home Button */}
             <div className="icon-div" tooltip="Home" tabIndex="0">
-                <div className="icon-SVG">
-                    <Link href={`/homepage`}>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                        </svg>
-                    </Link>
-                    <span className="icon-text">Home</span>
-                </div>
+                    <div onClick={() => window.location.href = ‘/homepage’}>
+                        <Image src={homeIcon} alt= “homepage” width={55} height={55} />
+                    </div>
+                    <span class= “icon-text” > Home </span>
             </div>
             {/* Share Trip Button */}
             <ShareTripComponent tripId={tripId} isOwner={isOwner} />
