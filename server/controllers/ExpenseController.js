@@ -1,40 +1,26 @@
 const Expense = require('../models/Expense');
 const { fromBuffer } = require('file-type');
 
-// POST new expense data
+// POST new expense data with image handling
 const createExpense = async (req, res) => {
     const tripId = req.params.tripId;
-    const { expenseId, name, amount, category, currency, posted, notes, image } = req.body;
+    const imageFile = req.files?.image ? req.files.image : null; // uploaded img withing the 'img' key
+    const { expenseId, name, amount, category, currency, posted, notes } = req.body;
+
     try {
-        // create a model instance 
-        const newExpense = await Expense.create({ expense_id: expenseId, trip_id: tripId, name, amount, category, currency, posted, notes, image });
+        let imageBase64 = null; // when there is no image uploaded
+        if (imageFile) {
+            imageBuffer = imageFile.data;
+        }
+
+        const newExpense = await Expense.create({ expense_id: expenseId, trip_id: tripId, name, amount, category, currency, posted, notes, image: imageBuffer });
         res.status(201).json({ data: newExpense });
+
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });
     }
 };
-
-// POST receipt with empty expense data
-const uploadReceipt = async (req, res) => {
-    const tripId = req.params.tripId;
-    const image = req.files.img;
-    const { expenseId } = req.body;
-    try {
-        if (!image) {
-            return res.status(400).json({ message: "No image uploaded." });
-        }
-
-        // convert image to base 64 string
-        const imageBase64 = image.data.toString('base64');
-
-        const newExpense = await Expense.create({ expense_id: expenseId, trip_id: tripId, name: "", amount: 0, category: "", currency: "", posted: '2024-01-01', notes: null, image: imageBase64 });
-        res.status(201).json({ data: newExpense });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Internal Server Error", error: err.message });
-    }
-}; 
 
 // GET all expense data
 const getExpenses = async (req, res) => {
@@ -83,7 +69,6 @@ const getExpensesByTripId = async (req, res) => {
 // GET expense image using ExpenseID
 const getReceiptImageByExpenseId = async (req, res) => {
     const expenseId = req.params.expenseId;
-    console.log(expenseId);
     try {
         const expense = await Expense.findByPk(expenseId);
         if (!expenseId) {
@@ -96,11 +81,10 @@ const getReceiptImageByExpenseId = async (req, res) => {
             return res.status(200).json({ message: "Receipt image not added" });
         }
 
-        const imageBuffer = Buffer.from(expense.image, 'base64');
-        const { mime } = await fromBuffer(imageBuffer);
-        res.type(mime); // image content type
-        res.status(200);
-        res.send(imageBuffer);  
+        const imageBuffer = expense.image; // buffer is in BYTEA format
+        // const { mime } = await fromBuffer(imageBuffer);
+        res.type("image/png"); // image content type
+        res.status(200).send(imageBuffer);  
 
     } catch (err) {
         console.error(err);
@@ -145,7 +129,6 @@ const deleteExpense = async (req, res) => {
 
 module.exports = {
     createExpense,
-    uploadReceipt,
     getExpenses,
     getExpenseById,
     getExpensesByTripId,
