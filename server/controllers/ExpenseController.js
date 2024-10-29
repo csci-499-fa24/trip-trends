@@ -1,4 +1,5 @@
 const Expense = require('../models/Expense');
+const { fromBuffer } = require('file-type');
 
 // POST new expense data with image handling
 const createExpense = async (req, res) => {
