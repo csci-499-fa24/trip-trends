@@ -115,7 +115,7 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses })
                 <div className="trip-overview-div">
                     <div className="trip-overview-circle">💰</div>
                     <div className="trip-overview-content">
-                        <p>${tripData.data.budget}</p>
+                        <p>{tripData.data.budget}</p>
                     </div>
                 </div>
 
