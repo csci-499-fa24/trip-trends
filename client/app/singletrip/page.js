@@ -175,7 +175,7 @@ function Singletrip() {
                 image: null
             });
 
-            // window.location.reload();
+            window.location.reload();
             setPopUpVisible(false);
         } catch (error) {
             console.error("Error submitting new expense:", error);
