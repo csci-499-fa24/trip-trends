@@ -33,15 +33,13 @@ const ExchangeRateTableComponent = ({ exchangeRates, currencyCodes, homeCurrency
                 <thead>
                     <tr>
                         <th>Currency</th>
-                        <th>Rate (Relative to {homeCurrency})</th> {/* Updated header */}
-                    </tr>
+                        <th>Rate (Relative to {homeCurrency})</th> {/* Updated header */}</tr>
                 </thead>
                 <tbody>
                     {Object.keys(exchangeRates).map((currency) => (
                         <tr key={currency}>
                             <td>{currency}</td>
-                            <td>{exchangeRates[currency]}</td>
-                        </tr>
+                            <td>{exchangeRates[currency]}</td></tr>
                     ))}
                     {/* Last row for dropdown selection and its rate */}
                     <tr>
@@ -61,8 +59,7 @@ const ExchangeRateTableComponent = ({ exchangeRates, currencyCodes, homeCurrency
                                 ))}
                             </select>
                         </td>
-                        <td>{exchangeRate !== null ? exchangeRate : 'N/A'}</td>
-                    </tr>
+                        <td>{exchangeRate !== null ? exchangeRate : 'N/A'}</td></tr>
                 </tbody>
             </table>
         </div>

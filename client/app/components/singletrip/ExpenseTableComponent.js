@@ -78,8 +78,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
                                     <th>Category</th>
                                     <th>Date</th>
                                     <th>Notes</th>
-                                    <th>Edit</th>
-                                </tr>
+                                    <th>Edit</th></tr>
                             </thead>
                             <tbody>
                                 {expenseData.data.map((expense) => (
@@ -87,7 +86,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
                                         <td>{expense.name}</td>
                                         <td>{expense.amount}</td>
                                         <td>{expense.currency}</td>
-                                        <td>{getCategoryIcon(expense.category)}</td>
+                                        <td>{expense.category}</td>
                                         <td>
                                             {expense.posted.split('-')[0]}<br />
                                             {expense.posted.split('-')[1]}-{expense.posted.split('-')[2]}
@@ -204,8 +203,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
                                                     </div>
                                                 )}
                                             </div>
-                                        </td>
-                                    </tr>
+                                        </td></tr>
                                 ))}
                             </tbody>
                         </Table>

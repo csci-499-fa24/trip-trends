@@ -816,3 +816,7 @@
     gap: 20px;
     
 }
+
+.container {
+    margin: 50px auto;
+}
