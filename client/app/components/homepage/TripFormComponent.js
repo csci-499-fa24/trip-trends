@@ -31,6 +31,7 @@ const TripFormComponent = ( {isPopUpVisible, setPopUpVisible, userId} ) => {
         setTempLocation(value);
         fetchLocationSuggestions(value);
     };
+
     const fetchLocationSuggestions = useCallback(debounce(async (query) => {
         if (query) {
             try {
@@ -78,18 +79,16 @@ const TripFormComponent = ( {isPopUpVisible, setPopUpVisible, userId} ) => {
             let trip_submission_response = null;
             try {
                 trip_submission_response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/users/${userId}`, newTripData); // locations not needed for a trip submission
-                toast.success("Trip successfully created!");
             } catch (error) {
                 console.error("Error submitting trip data:", error);
-                toast.error("Trip creation failed. Please try again later.");
             }
 
             const trip_id = trip_submission_response.data.data.trip_id;
             const num_trip_locs = newTripLocation.trip_locations.length;
 
             // For every location, create a trip location entry
-            for (let i = 0; i < num_trip_locs; i++) {
-                let a_trip_location = { trip_id: trip_id, location: newTripLocation.trip_locations[i] };
+            for (let i = 0; i < num_trip_locs; i++){
+                let a_trip_location = {trip_id: trip_id, location: newTripLocation.trip_locations[i]};
                 let geocode_response = null;
                 try {
                     geocode_response = await axios.get(`https://api.opencagedata.com/geocode/v1/json`, {
@@ -111,7 +110,7 @@ const TripFormComponent = ( {isPopUpVisible, setPopUpVisible, userId} ) => {
                 catch {
                     trimmed_location = a_trip_location.location; // original location
                 }
-
+                
                 // POST trip location
                 try {
                     await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${trip_id}`, a_trip_location);
@@ -124,7 +123,7 @@ const TripFormComponent = ( {isPopUpVisible, setPopUpVisible, userId} ) => {
                 const lat = geocode_response.data.results[0].geometry.lat;
                 const long = geocode_response.data.results[0].geometry.lng;
                 const currency = geocode_response.data.results[0].annotations.currency.iso_code;
-                const coordinates = { "latitude": lat, "longitude": long, "currency_code": currency };
+                const coordinates = {"latitude": lat, "longitude": long, "currency_code": currency};
                 try {
                     await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${trip_id}/${a_trip_location.location}`, coordinates);
                 } catch (error) {
@@ -132,11 +131,13 @@ const TripFormComponent = ( {isPopUpVisible, setPopUpVisible, userId} ) => {
                 }
 
             }
+
+            // A shared trip will be under the user who created the trip to support future shared trips
+            const shared_trip = {user_id: userId, trip_id: trip_id};
             
             setPopUpVisible(false); // Close the popup
             setNewTripData({ name: '', start_date: '', end_date: '', budget: '' }); // Reset form fields
             setNewTripLocation({ trip_locations: [] }); // Reset locations
-            // await router.push(`/singletrip?tripId=${trip_id}`); 
 
             // Refresh trips and trip locations
             await fetchUserTrips();
@@ -148,92 +149,86 @@ const TripFormComponent = ( {isPopUpVisible, setPopUpVisible, userId} ) => {
         }
 
     };
+
     return (
-        // Create a trip popup form 
+        // Create a trip popup form
         <div className="trip-form">
-            {isPopUpVisible && (
-                <div className="modal">
-                    <div className="modal-content">
-                        <span className="close" onClick={() => setPopUpVisible(false)}>&times;</span>
-                        <h2 className="new-trip-title">New Trip</h2>
-                        <form onSubmit={submitNewTrip}>
+        {isPopUpVisible && (
+            <div className="modal">
+                <div className="modal-content">
+                    <span className="close" onClick={() => setPopUpVisible(false)}>&times;</span>
+                    <h2 className="new-trip-title">New Trip</h2>
+                    <form onSubmit={submitNewTrip}>
+                        <label className="new-trip-field-label">
+                            Trip Name:
+                            <input type="text" name="name" value={newTripData.name} onChange={newTripInputChange} required />
+                        </label>
+
+                        <div className="date-fields">
                             <label className="new-trip-field-label">
-                                Trip Name:
-                                <input type="text" name="name" value={newTripData.name} onChange={newTripInputChange} required />
+                                Start Date:
+                                <input type="date" name="start_date" value={newTripData.start_date} onChange={newTripInputChange} required />
                             </label>
-    
-                            <div className="date-fields">
-                                <label className="new-trip-field-label">
-                                    Start Date:
-                                    <input type="date" name="start_date" value={newTripData.start_date} onChange={newTripInputChange} required />
-                                </label>
-                                <label className="new-trip-field-label">
-                                    End Date:
-                                    <input type="date" name="end_date" value={newTripData.end_date} onChange={newTripInputChange} required />
-                                </label>
-                            </div>
-    
                             <label className="new-trip-field-label">
-                                Budget:
-                                <input type="number" name="budget" value={newTripData.budget} onChange={newTripInputChange} required />
+                                End Date:
+                                <input type="date" name="end_date" value={newTripData.end_date} onChange={newTripInputChange} required />
                             </label>
-    
-                            <label className="new-trip-field-label">
-                                Locations:
-                                <input
-                                    type="text"
-                                    name="trip_locations"
-                                    placeholder="Enter city or country"
-                                    value={tempLocation}
-                                    onChange={newTripLocInputChange}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                            e.preventDefault(); // Prevent form submission
-                                        }
-                                    }}
-                                />
-                            </label>
-    
-                            <div>
-                                {newTripLocation.trip_locations.map((location, index) => (
-                                    <div key={index} className="selected-location">
-                                        <span className="location-text">{location}</span>
-                                        <div className="icon-div" tooltip="Remove" tabIndex="0" onClick={() => {
-                                                setNewTripLocation(prev => ({
-                                                    trip_locations: prev.trip_locations.filter((loc, i) => i !== index) // Remove selected location
-                                                }));
-                                            }}>
-                                                <div className="icon-SVG">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="remove-icon">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-                                                    </svg>
-                                                <span className="icon-text">Remove</span>
-                                            </div>
-                                        </div>
+                        </div>
+
+                        <label className="new-trip-field-label">
+                            Budget:
+                            <input type="number" name="budget" value={newTripData.budget} onChange={newTripInputChange} required />
+                        </label>
+
+                        <label className="new-trip-field-label">
+                            Locations:
+                            <input
+                                type="text"
+                                name="trip_locations"
+                                placeholder="Enter city or country"
+                                value={tempLocation}
+                                onChange={newTripLocInputChange}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault(); // Prevent form submission
+                                    }
+                                }}
+                            />
+                        </label>
+
+                        <div>
+                            {newTripLocation.trip_locations.map((location, index) => (
+                                <div key={index} className="selected-location">
+                                    <span className="location-text">{location}</span>
+                                    <button type="button" onClick={() => {
+                                        setNewTripLocation(prev => ({
+                                            trip_locations: prev.trip_locations.filter((loc, i) => i !== index) // Remove selected location
+                                        }));
+                                    }}>Remove</button>
+                                </div>
+                            ))}
+                        </div>
+
+                        {isPopUpVisible && (
+                            <div className="dropdown-suggestions">
+                                {suggestions.map((suggestion, index) => (
+                                    <div
+                                        key={index}
+                                        className="dropdown-suggestion"
+                                        onClick={() => selectSuggestion(suggestion)}
+                                    >
+                                        {suggestion}
                                     </div>
                                 ))}
                             </div>
-    
-                            {isPopUpVisible && (
-                                <div className="dropdown-suggestions">
-                                    {suggestions.map((suggestion, index) => (
-                                        <div
-                                            key={index}
-                                            className="dropdown-suggestion"
-                                            onClick={() => selectSuggestion(suggestion)}
-                                        >
-                                            {suggestion}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-    
-                            <button type="submit" className="button">Create</button>
-                        </form>
-                    </div>
+                        )}
+
+                        <button type="submit" className="submit-new-trip-button">Create</button>
+                    </form>
                 </div>
-            )}
-        </div>
+            </div>
+        )}
+    </div>
     );
 };
 

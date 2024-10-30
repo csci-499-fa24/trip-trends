@@ -24,6 +24,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import HeaderComponent from '../components/HeaderComponent';
 import TripFormComponent from '../components/homepage/TripFormComponent';
 import RecentTripsComponent from '../components/homepage/RecentTripsComponent';
+import TripsDisplayComponent from '../components/homepage/TripsDisplayComponent';
 
 // Custom marker icon style
 const customDefaultMarker = new Style({
@@ -332,53 +333,22 @@ function homepage() {
                 </div>
         
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-
+                    
                     {/* Map section */}
                     <div ref={mapRef} style={{ height: '537px', width: '65%' }}></div>
-
+                    
                     {/* Recent Trips section */}
                     <div style={{ width: '35%', marginLeft: '10px' }}>
                         <RecentTripsComponent trips={trips} />
                     </div>
+                    
                 </div>
 
                 <br /><br />
-                {/* Recent trips section */}
-                <div className="recent-trips">
-                    <h2>Recent Trips</h2>
-                    <br />
-                    {trips.length === 0 ? (
-                        <p>No trips created.</p>
-                    ) : (
-                        Array.isArray(trips) ? (
-                            <div>
-                                {trips.map(trip => (
-                                    <div key={trip.trip_id}>
-                                        <div
-                                            id={`trip-${trip.trip_id}`} // Unique ID for each trip 
-                                            onClick={() => toggleTripDetails(trip.trip_id)}
-                                            className={animatedTripId === trip.trip_id ? "shake" : ''} // Apply animation
-                                            style={{ cursor: 'pointer', padding: '10px', border: '1px solid #ccc', marginBottom: '5px', backgroundColor: expandedTripId === trip.trip_id ? '#2e7d32' : '#588157' }}>
-                                            {trip.name}
-                                        </div>
-                                        {expandedTripId === trip.trip_id && (
-                                            <div style={{ padding: '10px', backgroundColor: expandedTripId === trip.trip_id ? '#2e7d32' : '#588157', border: '1px solid #ccc' }}>
-                                                <p><strong>Dates:</strong> {trip.start_date} ~ {trip.end_date}</p>
-                                                <p><strong>Budget:</strong> ${trip.budget}</p>
-                                                <Link href={`/singletrip?tripId=${trip.trip_id}`} style={{ color: 'white', textDecoration: 'underline' }}>
-                                                    See more
-                                                </Link>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <p>No trips available.</p>
-                        )
-                    )}
-                </div>
-            
+
+                {/* All Trips Section */}
+                <TripsDisplayComponent trips={trips} />
+
             </div>
         </GoogleOAuthProvider>
     );

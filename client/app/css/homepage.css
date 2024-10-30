@@ -13,23 +13,6 @@
     font-weight: bold;
 }
 
-.recent-trips {
-    padding: 10px;
-    background-color:var(--darkgreen);;
-    color: white;
-    height: auto; 
-    text-align: center;
-    border-radius: 8px;
-}
-
-.trip {
-    margin-bottom: 10px;
-    border: 1px solid white;
-    padding: 10px;
-    background-color: rgba(255, 255, 255, 0.1); 
-    margin: 0 auto;
-}
-
 .logout {
     background-color: var(--lightgreen);
     color: white;
