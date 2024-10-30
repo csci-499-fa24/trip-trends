@@ -5,28 +5,13 @@ import '../css/homepage.css';
 import axios from 'axios';
 import { GoogleOAuthProvider, googleLogout } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
-import pinIcon from '../img/redPin.png';
 import 'ol/ol.css';
-import Map from 'ol/Map';
-import View from 'ol/View';
-import TileLayer from 'ol/layer/Tile';
-import OSM from 'ol/source/OSM';
-import VectorLayer from 'ol/layer/Vector';
-import VectorSource from 'ol/source/Vector';
-import { Icon, Style } from 'ol/style';
-import Feature from 'ol/Feature';
-import Point from 'ol/geom/Point';
-import { boundingExtent } from 'ol/extent';
-import { fromLonLat } from 'ol/proj';
-import Link from 'next/link';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import HeaderComponent from '../components/HeaderComponent';
-import TripFormComponent from '../components/homepage/TripFormComponent';
 import MapComponent from '../components/homepage/MapComponent';
 import RecentTripsComponent from '../components/homepage/RecentTripsComponent';
 import TripsDisplayComponent from '../components/homepage/TripsDisplayComponent';
-
 
 const googleID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 

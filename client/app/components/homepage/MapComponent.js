@@ -1,5 +1,3 @@
-// components/homepage/MapComponent.js
-
 import React, { useRef, useEffect } from 'react';
 import Map from 'ol/Map';
 import View from 'ol/View';
