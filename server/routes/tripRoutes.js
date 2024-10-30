@@ -9,5 +9,9 @@ router.get("/:tripId", TripController.getTripById);
 router.put("/:tripId", TripController.updateTrip);
 router.delete("/:tripId", TripController.deleteTrip);
 router.get('/download/:tripId', TripController.downloadTripData);
+router.post('/:tripId/images', TripController.createTripImage);
+router.get('/trip-images/:imageId', TripController.getTripImage);
+router.get('/:tripId/images', TripController.getImagesByTripId);
+
 
 module.exports = router;
