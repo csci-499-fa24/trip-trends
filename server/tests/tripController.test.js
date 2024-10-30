@@ -30,12 +30,14 @@ describe('Trip Controller', () => {
     beforeEach(() => {
         mockRequest = {
             body: {},
-            params: {}
+            params: {},
+            files: {}
         };
         mockResponse = {
             status: jest.fn().mockReturnThis(),
             json: jest.fn(),
             send: jest.fn(),
+            type: jest.fn().mockReturnThis(),
         };
         console.error = jest.fn(); // suppress error logs
     });
@@ -305,13 +307,89 @@ describe('Trip Controller', () => {
             data: Buffer.from('mock image data'), // Mock uploaded image data
         };
 
-        // Mock the create method to throw an error
         TripImages.create.mockRejectedValue(new Error('Database error'));
 
         await createTripImage(mockRequest, mockResponse);
 
         expect(mockResponse.status).toHaveBeenCalledWith(500);
         expect(mockResponse.json).toHaveBeenCalledWith({ message: "Internal Server Error", error: "Database error" });
+    });
+
+    it('should return 400 if no image ID is provided', async () => {
+        mockRequest.params.imageId = undefined;
+    
+        await getTripImage(mockRequest, mockResponse);
+    
+        expect(mockResponse.status).toHaveBeenCalledWith(400);
+        expect(mockResponse.json).toHaveBeenCalledWith({ message: "Image ID is required" });
+    });
+    
+    it('should return 404 if the image is not found', async () => {
+        const imageId = 1; // Example image ID
+        mockRequest.params.imageId = imageId; // Set image ID in params
+    
+        TripImages.findByPk.mockResolvedValue(null);
+    
+        await getTripImage(mockRequest, mockResponse);
+    
+        expect(mockResponse.status).toHaveBeenCalledWith(404);
+        expect(mockResponse.json).toHaveBeenCalledWith({ message: "Image not found" });
+    });
+    
+    it('should return 200 and the image buffer if the image exists', async () => {
+        const imageId = 1; // Example image ID
+        mockRequest.params.imageId = imageId; // Set image ID in params
+    
+        const mockImageBuffer = Buffer.from('mock image data'); // Mock image data
+        TripImages.findByPk.mockResolvedValue({ image: mockImageBuffer }); // Mock image object
+    
+        await getTripImage(mockRequest, mockResponse);
+    
+        expect(mockResponse.type).toHaveBeenCalledWith("image/png");
+        expect(mockResponse.status).toHaveBeenCalledWith(200);
+        expect(mockResponse.send).toHaveBeenCalledWith(mockImageBuffer);
+    });
+
+    it('should return 400 if no trip ID is provided', async () => {
+        // No trip ID in params
+        mockRequest.params.tripId = undefined;
+    
+        // Call the controller function
+        await getImagesByTripId(mockRequest, mockResponse);
+    
+        expect(mockResponse.status).toHaveBeenCalledWith(400);
+        expect(mockResponse.json).toHaveBeenCalledWith({ message: "Trip ID is required" });
+    });
+    
+    it('should return 404 if no images are found for the trip', async () => {
+        const tripId = 1; // Example trip ID
+        mockRequest.params.tripId = tripId; // Set trip ID in params
+    
+        TripImages.findAll.mockResolvedValue([]);
+    
+        await getImagesByTripId(mockRequest, mockResponse);
+    
+        expect(mockResponse.status).toHaveBeenCalledWith(404);
+        expect(mockResponse.json).toHaveBeenCalledWith({ message: "No images found for this trip" });
+    });
+    
+    it('should return 200 and an array of image info if images are found', async () => {
+        const tripId = 1; // Example trip ID
+        mockRequest.params.tripId = tripId; // Set trip ID in params
+    
+        const mockTripImages = [
+            { image_id: 1, trip_id: tripId },
+            { image_id: 2, trip_id: tripId },
+        ];
+        TripImages.findAll.mockResolvedValue(mockTripImages);
+    
+        await getImagesByTripId(mockRequest, mockResponse);
+    
+        expect(mockResponse.status).toHaveBeenCalledWith(200);
+        expect(mockResponse.json).toHaveBeenCalledWith([
+            { image_id: 1, trip_id: tripId, image_url: "/api/trips/trip-images/1" },
+            { image_id: 2, trip_id: tripId, image_url: "/api/trips/trip-images/2" },
+        ]);
     });
 });
 
