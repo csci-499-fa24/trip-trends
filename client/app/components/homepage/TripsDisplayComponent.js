@@ -8,12 +8,13 @@ import Typography from "@mui/material/Typography";
 // import Button from "@mui/material/Button";
 import CardActionArea from "@mui/material/CardActionArea";
 // import CardActions from "@mui/material/CardActions";
+import TripFormComponent from "./TripFormComponent";
 import DefaultTripImagesComponent from "../singletrip/DefaultTripImagesComponent";
 // import ShareTripComponent from "../singletrip/ShareTripComponent";
 // import DeleteTripComponent from "../singletrip/DeleteTripComponent";
 import "../../css/tripsDisplay.css";
 
-const TripsDisplayComponent = ({ trips }) => {
+const TripsDisplayComponent = ({ trips, userId }) => {
     const [tripLocations, setTripLocations] = useState({});
     const [isPopUpVisible, setPopUpVisible] = useState(false);
 
