@@ -223,7 +223,7 @@ const TripFormComponent = ( {isPopUpVisible, setPopUpVisible, userId} ) => {
                             </div>
                         )}
 
-                        <button type="submit" className="submit-new-trip-button">Create</button>
+                        <button type="submit" className="button">Create</button>
                     </form>
                 </div>
             </div>

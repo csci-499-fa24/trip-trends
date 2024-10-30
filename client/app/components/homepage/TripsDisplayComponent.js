@@ -3,18 +3,19 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
+// import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
+// import Button from "@mui/material/Button";
 import CardActionArea from "@mui/material/CardActionArea";
-import CardActions from "@mui/material/CardActions";
+// import CardActions from "@mui/material/CardActions";
 import DefaultTripImagesComponent from "../singletrip/DefaultTripImagesComponent";
-import ShareTripComponent from "../singletrip/ShareTripComponent";
-import DeleteTripComponent from "../singletrip/DeleteTripComponent";
+// import ShareTripComponent from "../singletrip/ShareTripComponent";
+// import DeleteTripComponent from "../singletrip/DeleteTripComponent";
 import "../../css/tripsDisplay.css";
 
 const TripsDisplayComponent = ({ trips }) => {
     const [tripLocations, setTripLocations] = useState({});
+    const [isPopUpVisible, setPopUpVisible] = useState(false);
 
     const fetchAllTripLocations = async () => {
         const locations = await Promise.all(
@@ -46,8 +47,7 @@ const TripsDisplayComponent = ({ trips }) => {
         
         const startMonthYear = start.toLocaleDateString('en-US', options);
         const endMonthYear = end.toLocaleDateString('en-US', options);
-        console.log("startMonthYear:", startMonthYear);
-        console.log("endMonthYear:", endMonthYear.split(' ')[0]);
+        
         if (start.getFullYear() === end.getFullYear()) {
             if (start.getMonth() === end.getMonth()) {
                 return `${startMonthYear}`; // same month
@@ -73,7 +73,19 @@ const TripsDisplayComponent = ({ trips }) => {
         <div className="trips-display">
             <br />
             <h2>All Trips</h2>
-            <br />
+            <div className="button-container">
+                <div className="button" onClick={() => setPopUpVisible(true)}>
+                    New Trip
+                </div>
+            </div>
+            
+            {isPopUpVisible && (
+                <TripFormComponent
+                    isPopUpVisible={isPopUpVisible} 
+                    setPopUpVisible={setPopUpVisible} 
+                    userId={userId} 
+                />
+            )}
             {trips.length === 0 ? (
                 <p>No trips created.</p>
             ) : (
@@ -90,6 +102,13 @@ const TripsDisplayComponent = ({ trips }) => {
                                 <CardContent>
                                     <Typography gutterBottom variant="h5" component="div" sx={{ fontWeight: 'bold' }}>
                                         {trip.name}
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ color: "text.secondary", marginTop: "8px" }}>
+                                        {tripLocations[trip.trip_id]?.slice(0, 3).map((location, index) => (
+                                            <span key={index}>
+                                                {location}{index < tripLocations[trip.trip_id].slice(0, 3).length - 1 ? ', ' : ''}
+                                            </span>
+                                        ))} 
                                     </Typography>
                                     <Typography variant="body2" sx={{ color: "text.secondary" }}>
                                         {formatTripDates(trip.start_date, trip.end_date)}

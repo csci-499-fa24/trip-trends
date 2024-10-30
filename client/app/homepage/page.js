@@ -313,23 +313,10 @@ function homepage() {
             <div className='main-container'>
                 {/* Welcome section */}
                 <div className="welcome-section">
-                    <h1>Welcome Back, {userName}!</h1>
-                    <br /> 
-                    <button 
-                        onClick={() => setPopUpVisible(true)} 
-                        className='create-trip'>
-                        New Trip
-                    </button>
+                    <h1>Welcome, {userName}!</h1>
                     
-                    {isPopUpVisible && (
-                        <TripFormComponent
-                            isPopUpVisible={isPopUpVisible} 
-                            setPopUpVisible={setPopUpVisible} 
-                            userId={userId} 
-                        />
-                    )}
                     <br /><br />
-                    <p>See everywhere you've gone:</p>
+                    <p>See your trip history:</p>
                 </div>
         
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>

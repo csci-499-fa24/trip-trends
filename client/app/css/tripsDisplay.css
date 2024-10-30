@@ -16,7 +16,7 @@
 
 .trips-display-card {
     padding: 10px;
-    border-radius: 10px;
+    border-radius: 10px !important;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -34,7 +34,7 @@
     display: flex; /* Use flexbox for centering */
     justify-content: center; /* Center the image horizontally */
     align-items: center; /* Center the image vertically */
-    border-radius: 8px; 
+    border-radius: 10px; 
 }
 
 .trips-display-image-wrapper img {
