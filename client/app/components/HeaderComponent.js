@@ -31,6 +31,7 @@ const HeaderComponent = ({ headerTitle, setUserName, userId }) => {
                         alt="Logo"
                         width={120} 
                         height={120}
+                        priority
                     />
                 </div>
             </Link>

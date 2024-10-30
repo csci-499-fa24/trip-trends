@@ -78,8 +78,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
                                     <th>Category</th>
                                     <th>Date</th>
                                     <th>Notes</th>
-                                    <th>Edit</th>
-                                </tr>
+                                    <th>Edit</th></tr>
                             </thead>
                             <tbody>
                                 {expenseData.data.map((expense) => (
@@ -204,8 +203,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
                                                     </div>
                                                 )}
                                             </div>
-                                        </td>
-                                    </tr>
+                                        </td></tr>
                                 ))}
                             </tbody>
                         </Table>

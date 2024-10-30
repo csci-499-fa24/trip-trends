@@ -1,5 +1,6 @@
 const SharedTrip = require('../models/SharedTrip');
 const User = require('../models/User');
+const nodemailer = require('nodemailer');
 
 // needs to be further implemented
 // POST new trip for user

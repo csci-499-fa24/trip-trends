@@ -1,5 +1,7 @@
 import React from 'react';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const DownloadTripComponent = ({ tripData , tripId }) => {
     const downloadTripData = async () => {
@@ -27,8 +29,10 @@ const DownloadTripComponent = ({ tripData , tripId }) => {
             document.body.appendChild(link);
             link.click();
             link.parentNode.removeChild(link);
+            toast.success('Trip data downloaded successfully!');
         } catch (error) {
             console.error('Error downloading trip data:', error);
+            toast.error('Error downloading trip data. Please try again.');
         }
     };
 
