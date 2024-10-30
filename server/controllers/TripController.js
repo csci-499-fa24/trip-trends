@@ -162,10 +162,11 @@ const createTripImage = async (req, res) => {
 
     let imageBuffer = null;
     try {
-        // Handle the image file if it exists
-        if (imageFile) {
-            imageBuffer = imageFile.data;
+        if (!imageFile) {
+            return res.status(400).json({ message: "No image file uploaded" });
         }
+    
+        let imageBuffer = imageFile.data;
 
         // Create a new record in the trip_images table
         const newTripImage = await TripImages.create({
