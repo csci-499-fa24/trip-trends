@@ -1,0 +1,111 @@
+.dropdown-suggestion {
+    color: black;
+    background-color: white;
+    padding: 8px;
+    cursor: pointer;
+}
+
+.dropdown-suggestion:hover {
+    background-color: rgb(8, 148, 8);
+}
+
+.dropdown-suggestions {
+
+    background-color: white; /* Background for visibility */
+    border: 1px solid #ccc; /* Border for separation */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Adds depth */
+    max-height: 200px; /* Limit height */
+    overflow-y: auto; /* Scroll if too many items */
+    z-index: 1000; /* Ensure it appears above other elements */
+    width: 100%; /* Match the width of the input */
+    display: block;
+}
+
+.dropdown-suggestion {
+    color: black;
+    background-color: white;
+    padding: 8px;
+    cursor: pointer;
+}
+
+.dropdown-suggestion:hover {
+    background-color: var( --lightgreen); /* Change background color on hover */
+    color: white; /* Change text color on hover for contrast */
+}
+
+.selected-location {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.location-text {
+    color: black;
+    font-weight: bold;
+}
+
+.icon-div  {
+    height: 20px;
+    width: 20px;
+    margin: 0 10px;
+    padding: 0px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    transition: none;
+}
+
+.icon-div .icon-SVG {
+    height: 26px;
+    aspect-ratio: 1 / 1;
+    transition: transform 300ms ease;
+}
+
+.icon-SVG svg {
+    color: black; 
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+}
+
+.icon-SVG svg:hover {
+    background-color: var(--lightergreen);
+}
+
+.icon-text {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px);
+    background-color: rgb(85, 83, 83);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.icon-div:hover .icon-text,
+.icon-div:focus-visible .icon-text {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-15px);
+}
+
+.icon-div:hover .icon-SVG {
+    transform: scale(1.2);
+}
+
+.icon-div:hover,
+.icon-div:focus-visible {
+    background-color: #f5f5f5;
+}
+
+.icon-div:active {
+    opacity: 0.9;
+}
