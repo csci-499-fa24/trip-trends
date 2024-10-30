@@ -1,8 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import { debounce } from 'lodash';
 import '../../css/homepage.css';
+import '../../css/tripForm.css';
 import { toast } from 'react-toastify';
 
 const TripFormComponent = ( {isPopUpVisible, setPopUpVisible, userId} ) => {
@@ -79,8 +80,10 @@ const TripFormComponent = ( {isPopUpVisible, setPopUpVisible, userId} ) => {
             let trip_submission_response = null;
             try {
                 trip_submission_response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/users/${userId}`, newTripData); // locations not needed for a trip submission
+                toast.success("Trip created successfully!");
             } catch (error) {
                 console.error("Error submitting trip data:", error);
+                toast.error("Error submitting trip data. Please try again.");
             }
 
             const trip_id = trip_submission_response.data.data.trip_id;
@@ -150,6 +153,10 @@ const TripFormComponent = ( {isPopUpVisible, setPopUpVisible, userId} ) => {
 
     };
 
+    useEffect(() => {
+        console.log(suggestions); // Check the suggestions here
+    }, [suggestions]);
+
     return (
         // Create a trip popup form
         <div className="trip-form">
@@ -200,16 +207,21 @@ const TripFormComponent = ( {isPopUpVisible, setPopUpVisible, userId} ) => {
                             {newTripLocation.trip_locations.map((location, index) => (
                                 <div key={index} className="selected-location">
                                     <span className="location-text">{location}</span>
-                                    <button type="button" onClick={() => {
+                                    <div className="icon-SVG" onClick={() => {
                                         setNewTripLocation(prev => ({
                                             trip_locations: prev.trip_locations.filter((loc, i) => i !== index) // Remove selected location
                                         }));
-                                    }}>Remove</button>
+                                    }}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                        </svg>
+                                        <span className="icon-text">Remove</span>
+                                    </div>
                                 </div>
                             ))}
                         </div>
 
-                        {isPopUpVisible && (
+                        {suggestions.length > 0 && (
                             <div className="dropdown-suggestions">
                                 {suggestions.map((suggestion, index) => (
                                     <div

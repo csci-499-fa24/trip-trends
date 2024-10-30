@@ -158,7 +158,7 @@ function homepage() {
                 <br /><br />
 
                 {/* All Trips Section */}
-                <TripsDisplayComponent trips={trips} />
+                <TripsDisplayComponent trips={trips} userId={userId} />
 
             </div>
         </GoogleOAuthProvider>
