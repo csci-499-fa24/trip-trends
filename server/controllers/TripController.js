@@ -1,6 +1,7 @@
 const Trip = require('../models/Trip');
 const SharedTrip = require('../models/SharedTrip');
 const Expense = require('../models/Expense');
+const TripImages = require('../models/TripImages'); // Ensure this path is correct
 const { parse } = require('json2csv');
 
 // POST new trip data
@@ -154,6 +155,106 @@ const downloadTripData = async (req, res) => {
     }
 };
 
+
+const createTripImage = async (req, res) => {
+    const tripId = req.params.tripId;
+    const imageFile = req.files?.image ? req.files.image : null; // Uploaded image within the 'image' key
+
+    let imageBuffer = null;
+    try {
+        if (!imageFile) {
+            return res.status(400).json({ message: "No image file uploaded" });
+        }
+    
+        let imageBuffer = imageFile.data;
+
+        // Create a new record in the trip_images table
+        const newTripImage = await TripImages.create({
+            trip_id: tripId,
+            image: imageBuffer
+        });
+
+        res.status(201).json({ data: newTripImage });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
+    }
+};
+
+// GET trip image using image ID
+const getTripImage = async (req, res) => {
+    const imageId = req.params.imageId; // Extract image ID from request parameters
+
+    try {
+        // Check if imageId is provided
+        if (!imageId) {
+            return res.status(400).json({ message: "Image ID is required" });
+        }
+
+        // Find the trip image by its ID
+        const tripImage = await TripImages.findByPk(imageId);
+
+        // Check if the image exists
+        if (!tripImage) {
+            return res.status(404).json({ message: "Image not found" });
+        }
+
+        // Check if the image buffer exists
+        if (!tripImage.image) {
+            return res.status(200).json({ message: "Trip image not added" });
+        }
+
+        const imageBuffer = tripImage.image; // Buffer in BYTEA format
+
+        // Set the response type and send the image buffer
+        res.type("image/png"); // Set content type to PNG
+        res.status(200).send(imageBuffer); // Send the image buffer
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
+    }
+};
+
+const getImagesByTripId = async (req, res) => {
+    const tripId = req.params.tripId; // Extract trip ID from request parameters
+
+    try {
+        // Check if tripId is provided
+        if (!tripId) {
+            return res.status(400).json({ message: "Trip ID is required" });
+        }
+
+        // Find all images associated with the trip ID
+        const tripImages = await TripImages.findAll({
+            where: { trip_id: tripId }
+        });
+
+        // Check if any images were found
+        if (tripImages.length === 0) {
+            return res.status(404).json({ message: "No images found for this trip" });
+        }
+
+        // Create an array to hold image information
+        const imageInfo = tripImages.map((tripImage) => {
+            return {
+                image_id: tripImage.image_id,
+                trip_id: tripImage.trip_id,
+                image_url: `/api/trips/trip-images/${tripImage.image_id}` // URL to fetch the image
+            };
+        });
+
+        // Return the array of image information
+        res.status(200).json(imageInfo);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
+    }
+};
+
+
+
 module.exports = {
     createTrip,
     getTrips,
@@ -161,5 +262,8 @@ module.exports = {
     getTripById,
     updateTrip,
     deleteTrip,
-    downloadTripData
+    downloadTripData,
+    createTripImage,
+    getTripImage,
+    getImagesByTripId
 };

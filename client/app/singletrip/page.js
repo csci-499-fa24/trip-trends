@@ -20,6 +20,8 @@ import HeaderComponent from '../components/HeaderComponent';
 import TripIconBarComponent from '../components/singletrip/TripIconBarComponent';
 import BarGraphComponent from '../components/singletrip/BarGraphComponent';
 import SpendingCirclesComponent from '../components/singletrip/SpendingCirclesComponent';
+import TripImageComponent from '../components/singletrip/TripImageComponent';
+
 
 
 
@@ -598,6 +600,13 @@ function Singletrip() {
 
                 
             </div >
+
+
+
+            <div>
+            {/* Call the ImagesComponent and pass the tripId */}
+            <TripImageComponent tripId={tripId} />
+        </div>
         </div >
     );
 }
