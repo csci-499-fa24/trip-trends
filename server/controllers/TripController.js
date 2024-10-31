@@ -253,6 +253,28 @@ const getImagesByTripId = async (req, res) => {
     }
 };
 
+const deleteTripImage = async (req, res) => {
+    const imageId = req.params.imageId; // Extract the image ID from request parameters
+
+    try {
+        // Find the image by its ID
+        const image = await TripImages.findByPk(imageId);
+
+        // Check if the image exists
+        if (!image) {
+            return res.status(404).json({ message: "Image not found" });
+        }
+
+        // Delete the image
+        await image.destroy();
+
+        res.status(200).json({ message: "Image deleted successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
+    }
+};
+
 
 
 module.exports = {
@@ -265,5 +287,6 @@ module.exports = {
     downloadTripData,
     createTripImage,
     getTripImage,
-    getImagesByTripId
+    getImagesByTripId,
+    deleteTripImage
 };

@@ -12,6 +12,7 @@ router.get('/download/:tripId', TripController.downloadTripData);
 router.post('/:tripId/images', TripController.createTripImage);
 router.get('/trip-images/:imageId', TripController.getTripImage);
 router.get('/:tripId/images', TripController.getImagesByTripId);
+router.delete('/delete-images/:imageId', TripController.deleteTripImage);
 
 
 module.exports = router;
