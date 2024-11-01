@@ -23,6 +23,7 @@ const TripImageComponent = ({ tripId }) => {
         fetchImages();
     }, [tripId]);
 
+
     return (
         <div>
             <h2>Images for Trip ID: {tripId}</h2>
