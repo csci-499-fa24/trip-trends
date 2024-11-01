@@ -1,7 +1,7 @@
 const Trip = require('../models/Trip');
 const SharedTrip = require('../models/SharedTrip');
 const Expense = require('../models/Expense');
-const TripImages = require('../models/TripImages'); // Ensure this path is correct
+const TripImages = require('../models/TripImages'); 
 const { parse } = require('json2csv');
 
 // POST new trip data
@@ -155,29 +155,50 @@ const downloadTripData = async (req, res) => {
     }
 };
 
-
 const createTripImage = async (req, res) => {
     const tripId = req.params.tripId;
-    const imageFile = req.files?.image ? req.files.image : null; // Uploaded image within the 'image' key
 
-    let imageBuffer = null;
     try {
-        if (!imageFile) {
-            return res.status(400).json({ message: "No image file uploaded" });
+        // Check if any files were uploaded
+        if (!req.files || !req.files.images) {
+            return res.status(400).json({ message: "No image files uploaded" });
         }
-    
-        let imageBuffer = imageFile.data;
 
-        // Create a new record in the trip_images table
-        const newTripImage = await TripImages.create({
-            trip_id: tripId,
-            image: imageBuffer
+        let imageFile = req.files.images;
+        // Convert to array if single file
+        if (!Array.isArray(imageFile)) {
+            imageFile = [imageFile];
+        }
+
+        const newTripImages = [];
+
+        // Process each image
+        for (const file of imageFile) {
+            // Convert the file data to a buffer
+            const imageBuffer = file.data;
+
+            // Create a new record in the trip_images table
+            const newTripImage = await TripImages.create({
+                trip_id: tripId,
+                image: imageBuffer
+            });
+
+            newTripImages.push(newTripImage);
+        }
+
+        res.status(201).json({ 
+            success: true,
+            message: 'Images uploaded successfully',
+            data: newTripImages 
         });
 
-        res.status(201).json({ data: newTripImage });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: "Internal Server Error", error: err.message });
+        res.status(500).json({ 
+            success: false,
+            message: "Internal Server Error", 
+            error: err.message 
+        });
     }
 };
 
