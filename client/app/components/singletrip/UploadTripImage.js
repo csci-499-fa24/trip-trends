@@ -7,7 +7,6 @@ const TripImageComponent = ({ tripId }) => {
     const [error, setError] = useState(null);
     const fileInputRef = useRef();
     const [uploading, setUploading] = useState(false);
-    const [successMessage, setSuccessMessage] = useState('');
 
 
 
@@ -27,7 +26,9 @@ const TripImageComponent = ({ tripId }) => {
                 const fileType = file.type;
                 if (fileType !== 'image/png' && fileType !== 'image/jpeg') {
                     validFiles = false;
-                    toast.error(`Invalid file type: ${file.name}. Only PNG and JPEG formats are allowed.`);
+                    toast.error(`Invalid file type: ${file.name}. Only PNG and JPEG formats are allowed.`, {
+                        autoClose: 3000, // Toast will disappear after 3 seconds
+                    });
                 } else {
                     formData.append('images', file);
                 }
@@ -39,7 +40,6 @@ const TripImageComponent = ({ tripId }) => {
 
             try {
                 setUploading(true);
-                toast.dismiss();
 
                 const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}/images`, formData, {
                     headers: {
@@ -48,12 +48,16 @@ const TripImageComponent = ({ tripId }) => {
                 });
 
                 // Show success toast
-                toast.success('Images uploaded successfully!');
+                toast.success('Images uploaded successfully!', {
+                    autoClose: 3000, // Toast will disappear after 3 seconds
+                });
                 console.log('Images uploaded successfully:', response.data);
             } catch (error) {
                 console.error('Error uploading images:', error);
                 // Show error toast
-                toast.error('Failed to upload images. Please try again.');
+                toast.error('Failed to upload images. Please try again.', {
+                    autoClose: 3000, // Toast will disappear after 3 seconds
+                });
             } finally {
                 setUploading(false); // Reset uploading state
             }
@@ -85,8 +89,8 @@ const TripImageComponent = ({ tripId }) => {
             
             </div>
 
-            {/* Toast Container */}
-            <ToastContainer />
+            {/* Toast Container
+            <ToastContainer /> */}
 
         </div>
     );
