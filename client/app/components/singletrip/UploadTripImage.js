@@ -12,7 +12,6 @@ const TripImageComponent = ({ tripId }) => {
 
 
     const handleAddImageClick = () => {
-        // Trigger the hidden file input
         fileInputRef.current.click();
     };
 
@@ -34,14 +33,12 @@ const TripImageComponent = ({ tripId }) => {
                 }
             });
 
-            // If there are no valid files, stop the upload
             if (!validFiles) {
                 return;
             }
 
             try {
                 setUploading(true);
-                // Reset any previous notifications
                 toast.dismiss();
 
                 const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}/images`, formData, {
@@ -81,12 +78,11 @@ const TripImageComponent = ({ tripId }) => {
                     type="file"
                     ref={fileInputRef}
                     onChange={handleFileChange}
-                    multiple // Allow multiple file selection
-                    style={{ display: 'none' }} // Hide the input
+                    multiple 
+                    style={{ display: 'none' }} 
                 />
 
-                {/* Uploading state
-                {uploading && <p>Uploading images...</p>} */}
+            
             </div>
 
             {/* Toast Container */}

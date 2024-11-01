@@ -276,13 +276,11 @@ describe('Trip Controller', () => {
         mockRequest.params.tripId = tripId;
         mockRequest.files.images = mockImages;
 
-        // Mocking the response of the TripImages.create method
         const createdTripImages = mockImages.map((_, index) => ({
             trip_id: tripId,
             image: `mockImage${index + 1}` // Generate a mock image response
         }));
 
-        // Mocking the TripImages.create method to resolve to the created images
         TripImages.create.mockResolvedValueOnce(createdTripImages[0]); // First image
         TripImages.create.mockResolvedValueOnce(createdTripImages[1]); // Second image
 
