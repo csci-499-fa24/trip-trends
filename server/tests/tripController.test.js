@@ -266,6 +266,59 @@ describe('Trip Controller', () => {
         });
     });
 
+    it('should handle successful image upload', async () => {
+        const tripId = '1';
+        const mockImages = [
+            { data: Buffer.from('image1'), mimetype: 'image/jpeg' },
+            { data: Buffer.from('image2'), mimetype: 'image/jpeg' }
+        ];
+
+        mockRequest.params.tripId = tripId;
+        mockRequest.files.images = mockImages;
+
+        // Mocking the response of the TripImages.create method
+        const createdTripImages = mockImages.map((_, index) => ({
+            trip_id: tripId,
+            image: `mockImage${index + 1}` // Generate a mock image response
+        }));
+
+        // Mocking the TripImages.create method to resolve to the created images
+        TripImages.create.mockResolvedValueOnce(createdTripImages[0]); // First image
+        TripImages.create.mockResolvedValueOnce(createdTripImages[1]); // Second image
+
+        await createTripImage(mockRequest, mockResponse); // Call createTripImage function
+
+        expect(mockResponse.status).toHaveBeenCalledWith(201); // Check for response 201
+        expect(mockResponse.json).toHaveBeenCalledWith({
+            success: true,
+            message: 'Images uploaded successfully',
+            data: expect.arrayContaining([
+                expect.objectContaining({ trip_id: tripId, image: 'mockImage1' }),
+                expect.objectContaining({ trip_id: tripId, image: 'mockImage2' }),
+            ]),
+        });
+        expect(TripImages.create).toHaveBeenCalledTimes(2); // Verify that create was called twice
+    });
+
+    it('should handle internal server error', async () => {
+        const tripId = '1';
+        const mockImages = [{ data: Buffer.from('image1'), mimetype: 'image/jpeg' }];
+        mockRequest.params.tripId = tripId;
+        mockRequest.files.images = mockImages;
+
+        TripImages.create.mockRejectedValue(new Error('Database error')); // Mock error
+
+        await createTripImage(mockRequest, mockResponse); // Call createTripImage function
+
+        expect(mockResponse.status).toHaveBeenCalledWith(500); // Check for response 500
+        expect(mockResponse.json).toHaveBeenCalledWith({
+            success: false,
+            message: "Internal Server Error",
+            error: 'Database error',
+        });
+    });
+
+
     it('should return 400 if no image ID is provided', async () => {
         mockRequest.params.imageId = undefined;
 
