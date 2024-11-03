@@ -49,7 +49,7 @@ function Signup() {
             <div className={`container text-center ${inriaSans.className}`}>
                 <div className='row'>
                     <div className='col-md-6 logo'>
-                        <Image src={logo} alt="Logo" width={"15vw"} height={"15vw"} />
+                        <Image src={logo} alt="Logo" width={"15vw"} height={"15vw"} priority/>
                     </div>
                     <div className='col-md-6 signIn'>
                         <div>

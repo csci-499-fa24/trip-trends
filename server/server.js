@@ -5,11 +5,11 @@ const app = express();
 const db = require('./config/db');
 const { syncDatabase } = require('./models');
 const fileUpload = require('express-fileupload');
-const corsOptions ={
-    origin:'*', 
-    credentials:true, //access-control-allow-credentials:true
-    optionSuccessStatus:200,
- }
+const corsOptions = {
+    origin: '*',
+    credentials: true, //access-control-allow-credentials:true
+    optionSuccessStatus: 200,
+}
 
 // middleware
 app.use(cors(corsOptions))

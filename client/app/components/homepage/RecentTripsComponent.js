@@ -54,6 +54,19 @@ const RecentTripsComponent = ({ trips }) => {
         setTripLocations(locationsByTripId);
     };
 
+    // const formatTripDates = (startDate, endDate) => {
+    //     console.log("startDate:", startDate);
+    //     if (startDate.split('-')[0] === endDate.split('-')[0]) {
+    //         if (startDate.split('-')[1] === endDate.split('-')[1]) {
+    //             return `${startDate.split('-')[1]}/${startDate.split('-')[0].slice(-2)}`; // same month
+    //         } else {
+    //             return `${startDate.split('-')[1]} ~ ${endDate.split('-')[1]}/${startDate.split('-')[0].slice(-2)}`; // same year
+    //         }
+    //     } else {
+    //         return `${startDate.split('-')[1]}/${startDate.split('-')[0].slice(-2)} ~ ${endDate.split('-')[1]}/${endDate.split('-')[0].slice(-2)}`; // diff years
+    //     }
+    // };    
+
     useEffect(() => {
         if (recentTrips.length > 0) {
             fetchAllTripLocations();

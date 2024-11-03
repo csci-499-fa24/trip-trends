@@ -1,8 +1,10 @@
 .recent-trips-container {
     flex: 1;
-    background-color: var(--lightgreen);
     padding: 20px;
     border-radius: 10px;
+    color: black;
+    text-align: center;
+    max-width: fit-content;
 }
 
 .recent-trips-container h2 {
@@ -13,28 +15,29 @@
 .trip-card {
     display: flex;
     align-items: center;
-    background-color: black;
     margin-bottom: 15px;
     padding: 10px;
     border-radius: 10px;
     background-color: var(--lightergreen);
+    color: black;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .trip-image-wrapper {
-    width: 240px; /* Set the desired width */
-    height: 120px; /* Set the desired height */
-    margin-right: 10px; /* Space between image and text */
-    overflow: hidden; /* Ensure anything overflowing is hidden */
-    display: flex; /* Use flexbox for centering */
-    justify-content: center; /* Center the image horizontally */
-    align-items: center; /* Center the image vertically */
+    width: 240px; 
+    height: 120px; 
+    margin-right: 10px;
+    overflow: hidden; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
     border-radius: 8px; 
 }
 
 .trip-image-wrapper img {
-    max-width: 100%; /* Ensure image does not exceed wrapper width */
-    max-height: 100%; /* Ensure image does not exceed wrapper height */
-    object-fit: contain; /* Maintain aspect ratio and fit within the frame */
+    max-width: 100%; 
+    max-height: 100%; 
+    object-fit: contain; 
 }
 
 
