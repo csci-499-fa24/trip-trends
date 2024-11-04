@@ -18,8 +18,10 @@
     "express": "^4.21.1",
     "express-fileupload": "^1.5.1",
     "i": "^0.3.7",
+    "pdfkit": "^0.15.1",
     "sequelize": "^6.37.4",
     "sqlite3": "^5.1.7",
-    "unsplash-js": "^7.0.19"
+    "unsplash-js": "^7.0.19",
+    "xml2js": "^0.6.2"
   }
 }
