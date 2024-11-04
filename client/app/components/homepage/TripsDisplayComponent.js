@@ -13,6 +13,7 @@ import DefaultTripImagesComponent from "../singletrip/DefaultTripImagesComponent
 // import ShareTripComponent from "../singletrip/ShareTripComponent";
 // import DeleteTripComponent from "../singletrip/DeleteTripComponent";
 import "../../css/tripsDisplay.css";
+import SharedUsersComponent from "../singletrip/SharedUsersComponent";
 
 const TripsDisplayComponent = ({ trips, userId }) => {
     const [tripLocations, setTripLocations] = useState({});
@@ -114,6 +115,8 @@ const TripsDisplayComponent = ({ trips, userId }) => {
                                     <Typography variant="body2" sx={{ color: "text.secondary" }}>
                                         {formatTripDates(trip.start_date, trip.end_date)}
                                     </Typography>
+                                    {/* Shared users */}
+                                    {/* <SharedUsersComponent tripId={trip.trip_id} userId={userId} /> */}
                                 </CardContent>
                             </CardActionArea>
                             {/* <CardActions>

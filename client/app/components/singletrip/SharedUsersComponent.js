@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../../css/sharedUsersComponent.css";
+import noImage from "../../img/no-user.png";
 import Image from "next/image";
 import axios from "axios";
 
@@ -47,7 +48,7 @@ const SharedUsersComponent = ({ tripId, userId }) => {
                         onMouseLeave={() => setHoveredUser(null)}
                     >
                         <Image
-                            src={user.image}
+                            src={user.image || noImage}
                             alt={`${user.fname}'s profile`}
                             width={40}
                             height={40}
