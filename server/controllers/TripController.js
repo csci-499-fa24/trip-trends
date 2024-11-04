@@ -3,6 +3,8 @@ const SharedTrip = require('../models/SharedTrip');
 const Expense = require('../models/Expense');
 const TripImages = require('../models/TripImages'); 
 const { parse } = require('json2csv');
+const PDFDocument = require('pdfkit'); 
+const xml2js = require('xml2js'); 
 
 // POST new trip data
 const createTrip = async (req, res) => {
@@ -104,31 +106,26 @@ const deleteTrip = async (req, res) => {
     }
 };
 
-// DOWNLOAD trip data as CSV
+// DOWNLOAD trip data in various formats (CSV, PDF, XML)
 const downloadTripData = async (req, res) => {
     const tripId = req.params.tripId;
+    const format = req.query.format || 'csv'; // Default to CSV if no format is provided
+
     try {
         const trip = await Trip.findByPk(tripId);
         if (!trip) {
             return res.status(404).json({ message: "Trip not found" });
         }
 
-        // Fetch expenses associated with the trip
         const expenses = await Expense.findAll({ where: { trip_id: tripId } });
 
-        // Prepare trip data for CSV
+        // Prepare trip data
         const tripData = {
             name: trip.name,
             start_date: trip.start_date,
             end_date: trip.end_date,
             budget: trip.budget,
         };
-
-        // Define fields for trip data
-        const tripFields = ['name', 'start_date', 'end_date', 'budget'];
-        const csvTrip = parse(tripData, { fields: tripFields });
-
-        // Prepare expenses data for CSV
         const expenseData = expenses.map(expense => ({
             name: expense.name,
             amount: expense.amount,
@@ -138,19 +135,56 @@ const downloadTripData = async (req, res) => {
             notes: expense.notes
         }));
 
-        // Define fields for expense data
-        const expenseFields = ['name', 'amount', 'category', 'currency', 'posted', 'notes'];
-        const csvExpenses = parse(expenseData, { fields: expenseFields });
+        if (format === 'csv') {
+            // Generate CSV
+            const tripFields = ['name', 'start_date', 'end_date', 'budget'];
+            const csvTrip = parse(tripData, { fields: tripFields });
 
-        // Combine both trip and expense CSV
-        const combinedCSV = `${csvTrip}\n\nExpense Data:\n${csvExpenses}`;
+            const expenseFields = ['name', 'amount', 'category', 'currency', 'posted', 'notes'];
+            const csvExpenses = parse(expenseData, { fields: expenseFields });
 
-        // Send CSV file
-        res.setHeader('Content-Disposition', `attachment; filename=trip_${tripId}.csv`);
-        res.setHeader('Content-Type', 'text/csv');
-        res.status(200).send(combinedCSV);
+            const combinedCSV = `${csvTrip}\n\nExpense Data:\n${csvExpenses}`;
+            res.setHeader('Content-Disposition', `attachment; filename=trip_${tripId}.csv`);
+            res.setHeader('Content-Type', 'text/csv');
+            res.status(200).send(combinedCSV);
+
+        } else if (format === 'pdf') {
+            // Generate PDF
+            const doc = new PDFDocument();
+            res.setHeader('Content-Disposition', `attachment; filename=trip_${tripId}.pdf`);
+            res.setHeader('Content-Type', 'application/pdf');
+            doc.pipe(res);
+            doc.fontSize(16).text(`Trip: ${tripData.name}`);
+            doc.fontSize(12).text(`Start Date: ${tripData.start_date}`);
+            doc.text(`End Date: ${tripData.end_date}`);
+            doc.text(`Budget: ${tripData.budget}`);
+            doc.moveDown().text('Expenses:', { underline: true });
+
+            expenseData.forEach(expense => {
+                doc.text(`- ${expense.name} (${expense.category}): ${expense.amount} ${expense.currency}`);
+            });
+
+            doc.end();
+
+        } else if (format === 'xml') {
+            // Generate XML
+            const xmlData = {
+                trip: tripData,
+                expenses: { expense: expenseData }
+            };
+
+            const builder = new xml2js.Builder();
+            const xml = builder.buildObject(xmlData);
+
+            res.setHeader('Content-Disposition', `attachment; filename=trip_${tripId}.xml`);
+            res.setHeader('Content-Type', 'application/xml');
+            res.status(200).send(xml);
+
+        } else {
+            res.status(400).json({ message: "Invalid format requested" });
+        }
     } catch (err) {
-        console.error('Error generating CSV:', err);
+        console.error('Error generating download:', err);
         res.status(500).json({ message: 'Server error', error: err.message });
     }
 };

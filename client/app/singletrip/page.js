@@ -24,8 +24,6 @@ import TripImageComponent from '../components/singletrip/TripImageComponent';
 import UploadTripImage from '../components/singletrip/UploadTripImage';
 
 
-
-
 Chart.register(ArcElement, Tooltip, Legend);
 
 function Singletrip() {
@@ -49,6 +47,8 @@ function Singletrip() {
     const [originalData, setOriginalData] = useState([]);
     const [selectedFilter, setSelectedFilter] = useState('');
     const [tripLocations, setTripLocations] = useState([]);
+    const [selectedCategory, setSelectedCategory]= useState('');
+    const [isDropdownVisible, setIsDropdownVisible] = useState(false);
     const [newExpenseData, setNewExpenseData] = useState({
         trip_id: '',
         name: '',
@@ -192,6 +192,48 @@ function Singletrip() {
         setFilterPopupVisible(false);
     };
 
+    const handleAllCategoriesSelect = () => {
+        setSelectedCategory(""); 
+        setExpenseData({ data: expenseUSD }); 
+        setIsDropdownVisible(false);
+    };
+
+    const handleCategorySelect = (category) => {
+        setSelectedCategory(category);
+        setIsDropdownVisible(false);
+    };
+
+
+    useEffect(()=>{
+        if(selectedCategory)
+        {
+            applyCategoryFilter();
+        }
+
+    },[selectedCategory]);
+
+    const applyCategoryFilter=()=>{
+
+        let filteredData=[];
+
+        if(selectedCategory){
+            expenseUSD.forEach(expense=>{
+
+                if(expense.category===selectedCategory)
+                {
+                    filteredData.push(expense);
+                }
+            })
+        }
+
+        setExpenseData({ data: filteredData });
+    }
+
+    const toggleDropdown = () => {
+        setIsDropdownVisible(!isDropdownVisible);
+    };
+
+
     const applyFilter = (filterOption, data = expenseUSD) => {
         if (!Array.isArray(data)) {
             console.error('Data is not an array:', data);
@@ -254,7 +296,7 @@ function Singletrip() {
                     }
                 } catch (error) {
                     console.error('Error fetching user role:', error);
-                    setError('Error fetching user role. Please try again later.');
+                    // setError('Error fetching user role. Please try again later.');
                 }
             } else {
                 console.log("tripId or userId is missing.");
@@ -582,6 +624,24 @@ function Singletrip() {
                                     >
                                         Oldest
                                     </button>
+                                    
+                                    <div className="filter-option-button">
+                                        <label htmlFor="category" onClick={toggleDropdown} style={{ cursor: 'pointer' }}>
+                                            Select Category
+                                        </label>
+                                        {isDropdownVisible && (
+                                            <div className="custom-dropdown">
+                                            <div className="dropdown-item" onClick={handleAllCategoriesSelect}>
+                                                All Categories
+                                            </div>
+                                            {expenseCategories.map((category) => (
+                                                <div key={category} className="dropdown-item" onClick={() => handleCategorySelect(category)}>
+                                                    {category}
+                                                </div>
+                                            ))}
+                                        </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>

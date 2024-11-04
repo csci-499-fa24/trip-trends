@@ -191,7 +191,7 @@
 }
 
 .highlighted-date {
-    background-color: rgba(0, 128, 0, 0.5); /* Slightly transparent green */
+    background-color: rgba(0, 128, 0, 0.5); 
     border-radius: 5px;
 }
 
@@ -282,19 +282,19 @@
 .tile-content {
     display: flex;
     flex-direction: column;
-    align-items: center; /* Center the content */
-    justify-content: center; /* Center the content vertically */
-    height: 100%; /* Make sure the content takes the full height of the tile */
+    align-items: center;
+    justify-content: center; 
+    height: 100%;
 }
 
 .date-number {
     font-weight: bold;
-    font-size: 1.2em; /* Slightly larger font for date */
+    font-size: 1.2em; 
 }
 
 .expense-amount {
-    font-size: 0.9em; /* Smaller font for expenses */
-    color: rgb(243, 133, 133); /* Change color to green for expenses */
+    font-size: 0.9em; 
+    color: rgb(243, 133, 133); 
 }
 
 #tripName {
