@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import Table from 'react-bootstrap/Table';
+
 import { Card, CardContent, Typography, Button, Grid, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 
 const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, currencyCodes, expenseCategories}) => {
@@ -62,6 +63,55 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
                 return '🌈'; 
         }
     };
+
+    const getCategoryColor = (category) => {
+        switch (category) {
+            case 'Flights':
+                return '#4A90E2'; // Blue
+            case 'Accommodations':
+                return '#7B1FA2'; // Purple
+            case 'Food/Drink':
+                return '#FF5722'; // Orange
+            case 'Transport':
+                return '#2E7D32'; // Green
+            case 'Activities':
+                return '#FFEB3B'; // Yellow
+            case 'Shopping':
+                return '#FF4081'; // Pink
+            case 'Phone/Internet':
+                return '#3F51B5'; // Indigo
+            case 'Health/Safety':
+                return '#F44336'; // Red
+            case 'Other':
+                return '#9E9E9E'; // Grey
+            default:
+                return '#000000'; // Default color
+        }
+    };
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const options = { month: 'long', day: 'numeric' };
+        return date.toLocaleDateString('en-US', options);
+    };
+
+    const getNameIcon = (name, category) => {
+        const words = name.split(' ');
+        let initials = '';
+    
+        if (words.length === 1) {
+            initials = words[0].substring(0, 2).toUpperCase();
+        } else if (words.length > 1) {
+            initials = words[0][0].toUpperCase() + words[1][0].toUpperCase();
+        }
+    
+        return (
+            <span className="name-icon" style={{ backgroundColor: getCategoryColor(category) }}>
+                {initials}
+            </span>
+        );
+    };
+    
     
     
     return (
@@ -69,7 +119,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
             {expenseData && expenseData.data ? (
                 <div>
                     <div className="expense-table-container">
-                        <Table striped bordered hover size="sm" responsive="sm" className="expense-table">
+                        <Table  bordered hover size="sm" >
                             <thead>
                                 <tr>
                                     <th>Name</th>
@@ -81,18 +131,40 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
                                     <th>Edit</th></tr>
                             </thead>
                             <tbody>
-                                {expenseData.data.map((expense) => (
+                            {/* Start of mapping through expenseData.data */}
+                            {expenseData.data.map((expense) => {
+                                // Define the color for the current expense category
+                                const categoryColor = getCategoryColor(expense.category);
+                                
+                                return (
+                                    // Start of a table row for each expense
                                     <tr key={expense.expense_id}>
-                                        <td>{expense.name}</td>
-                                        <td>{expense.amount}</td>
-                                        <td>{expense.currency}</td>
-                                        <td>{expense.category}</td>
-                                        <td>
-                                            {expense.posted.split('-')[0]}<br />
-                                            {expense.posted.split('-')[1]}-{expense.posted.split('-')[2]}
+                                        
+                                        {/* Name cell with color and icon */}
+                                        <td style={{ color: categoryColor }}>
+                                            {getNameIcon(expense.name, expense.category)} {expense.name}
                                         </td>
-                                        <td>{expense.notes}</td>
-                                        <td>
+                                        
+                                        {/* Amount cell with color and "+" sign */}
+                                        <td style={{ color: categoryColor }} className="amount-cell">
+                                            {`+${expense.amount}`}
+                                        </td>
+                                        
+                                        {/* Currency cell with color */}
+                                        <td style={{ color: categoryColor }}>{expense.currency}</td>
+                                        
+                                        {/* Category cell with icon and color */}
+                                        <td style={{ color: categoryColor }}>
+                                            {getCategoryIcon(expense.category)} {expense.category}
+                                        </td>
+                                        
+                                        {/* Date cell with color */}
+                                        <td style={{ color: categoryColor }}>{formatDate(expense.posted)}</td>
+                                        
+                                        {/* Notes cell with color */}
+                                        <td style={{ color: categoryColor }}>{expense.notes}</td>
+                                        {/* Edit button cell with color */}
+                                        <td style={{ color: categoryColor }}>
                                             {/* <div onClick={() => { setEditPopupVisible(true); setSelectedExpense(expense) }} className='edit-expense'>Edit Expense</div> */}
                                             <div className="icon-div" tooltip="Edit Trip" tabIndex="0">
                                                 <div className="icon-SVG">
@@ -101,7 +173,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
                                                             setEditPopupVisible(true);
                                                             setSelectedExpense(expense);
                                                         }}
-                                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
+                                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke={categoryColor} className="size-6">
                                                         <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                                                     </svg>
                                                     <span className="icon-text">Edit Expense</span>
@@ -203,8 +275,10 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
                                                     </div>
                                                 )}
                                             </div>
-                                        </td></tr>
-                                ))}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </Table>
                     </div>
@@ -217,4 +291,3 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
 };
 
 export default ExpenseTableComponent;
-
