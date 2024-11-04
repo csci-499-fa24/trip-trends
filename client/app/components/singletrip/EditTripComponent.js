@@ -17,7 +17,7 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
     const [tripLocationsState, setTripLocationsState] = useState(tripLocations || []);
     const [tempLocation, setTempLocation] = useState('');
     const [suggestions, setSuggestions] = useState([]);
-
+ 
     // console.log(startDate, endDate);   
 
     // console.log(name, startDate, endDate, budget);
@@ -68,7 +68,7 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
         }
 
     };
-
+    console.log(tripLocationsState)
     return (
         <>
             <div className="icon-div" tooltip="Edit Trip" tabIndex="0">
@@ -81,7 +81,7 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
                     <span className="icon-text">Edit Trip</span>
                 </div>
             </div>
-
+            
             {/* Create Edit Trip popup form */}
             {isOpen && (
                 <div className="modal">

@@ -166,6 +166,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
                                         {/* Notes cell with color */}
                                         <td style={{ color: categoryColor }}>{expense.notes}</td>
                                         {/* Edit button cell with color */}
+                                        {userRole == 'owner' || userRole == 'editor' ? (
                                         <td style={{ color: categoryColor }}>
                                             {/* <div onClick={() => { setEditPopupVisible(true); setSelectedExpense(expense) }} className='edit-expense'>Edit Expense</div> */}
                                             <div className="icon-div" tooltip="Edit Trip" tabIndex="0">
@@ -278,6 +279,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
                                                 )}
                                             </div>
                                             </td>
+                                        ) : null}
                                         </tr>
                                     );
                                 })}
