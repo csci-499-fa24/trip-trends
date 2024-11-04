@@ -13,7 +13,7 @@ const SharedUsersComponent = ({ tripId, userId }) => {
         const fetchSharedUsers = async () => {
             try {
                 const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/trips/${tripId}`);
-                const users = response.data.data.filter(user => user.id !== userId);
+                const users = response.data.data.filter(user => user.role !== "owner");
                 setSharedUsers(users);
             } catch (error) {
                 console.error("Error fetching shared users:", error);
