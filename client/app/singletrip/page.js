@@ -24,8 +24,6 @@ import TripImageComponent from '../components/singletrip/TripImageComponent';
 import UploadTripImage from '../components/singletrip/UploadTripImage';
 
 
-
-
 Chart.register(ArcElement, Tooltip, Legend);
 
 function Singletrip() {
@@ -298,7 +296,7 @@ function Singletrip() {
                     }
                 } catch (error) {
                     console.error('Error fetching user role:', error);
-                    setError('Error fetching user role. Please try again later.');
+                    // setError('Error fetching user role. Please try again later.');
                 }
             } else {
                 console.log("tripId or userId is missing.");
