@@ -2,6 +2,7 @@ import ShareTripComponent from "./ShareTripComponent"
 import EditTripComponent from "./EditTripComponent"
 import DownloadTripComponent from "./DownloadTripComponent"
 import DeleteTripComponent from "./DeleteTripComponent"
+import SharedUsersComponent from "./SharedUsersComponent"
 import { useEffect, useState } from "react"
 import axios from "axios"
 
@@ -27,9 +28,7 @@ const TripIconBarComponent = ({ tripId, userId, isOwner, tripData, tripLocations
     return (
         <header className="top-icon-bar-header">
             {/* Shared users */}
-            {/* <div className="shared-users"> */}
-            
-            {/* </div> */}
+            <SharedUsersComponent tripId={tripId} userId={userId} />
             {/* Home Button */}
             <div className="icon-div" tooltip="Home" tabIndex="0">
                     <div onClick={() => window.location.href = '/homepage'}>

@@ -1,0 +1,73 @@
+/* all shared users */
+.whole_container{
+    position: absolute;
+    top: 150px;
+    right: 50px;
+}
+
+.shared-users {
+    position: absolute;
+    right: 0px;
+    display: flex;
+    gap: 5px; 
+    padding: 5px;
+    border-radius: 8px;
+    flex-wrap: wrap;
+}
+
+.shared-with-message {
+    position: relative; 
+    margin-right: 10px; 
+    margin-bottom: 5px;
+}
+
+/* one shared user */
+.shared-user {
+    border-radius: 50%;          
+    overflow: hidden;             
+    width: 40px;                  
+    height: 40px;               
+    display: flex;                
+    justify-content: center;       
+    align-items: center;           
+}
+
+/* image inside the box*/
+.shared-user-image {
+    width: 100%;               
+    height: auto;
+}
+
+.popup {
+    position: absolute;
+    top: 45px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px; 
+    padding: 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000; 
+    white-space: nowrap; 
+    font-size: 14px;
+}
+
+.show-more {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 5px;
+    cursor: pointer;
+}
+
+.show-more-icon {
+    background-color: gray;
+    color: white;
+    border-radius: 50%; 
+    width: 30px; 
+    height: 30px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px; 
+    font-weight: bold;
+}
