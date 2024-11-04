@@ -1,0 +1,16 @@
+/* singletrip.css */
+
+.shared-profile-container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.profile-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+}
