@@ -525,7 +525,7 @@ function Singletrip() {
                         <div className='expense-container'>
                             {/* Expense Table */}
                             <ExpenseTableComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenseData={expenseData}
-                                currencyCodes={currencyCodes} expenseCategories={expenseCategories} />
+                                currencyCodes={currencyCodes} expenseCategories={expenseCategories} userRole={userRole}/>
                         
                             <div>
                             {/* Exchange Rate Table */}

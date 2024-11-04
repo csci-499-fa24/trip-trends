@@ -71,13 +71,11 @@ a {
 
 .logo-container {
   margin-left: 10px; /* Add margin instead of absolute positioning */
-}
-
-.logo-container {
   position: absolute;
   top: 53%;
   left: 30px; 
   transform: translateY(-50%);
+  cursor: pointer;
 }
 
 .profile-container {
