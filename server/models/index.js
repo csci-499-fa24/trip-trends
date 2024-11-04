@@ -25,6 +25,9 @@ Trip.belongsToMany(User, {
     onDelete: 'CASCADE',
 });
 
+User.hasMany(SharedTrip, { foreignKey: 'user_id' });
+SharedTrip.belongsTo(User, { foreignKey: 'user_id' });
+
 // TripLocation associations
 // TripLocation.removeAttribute('id');
 Trip.hasMany(TripLocation, 

@@ -36,6 +36,7 @@ const ShareTripComponent = ({ tripId, isOwner }) => {
                 error.response?.data?.message || "An error occurred while sharing the trip."
             );
         }
+        window.location.reload();
     };
 
     return (
