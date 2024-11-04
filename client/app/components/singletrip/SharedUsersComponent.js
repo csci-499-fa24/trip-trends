@@ -56,7 +56,7 @@ const SharedUsersComponent = ({ tripId, userId }) => {
                         />
                         {hoveredUser === user && (
                             <div className="popup">
-                                {user.fname} {user.lname}
+                                {user.role} <br></br> {user.fname.toUpperCase()} {user.lname.toUpperCase()} 
                             </div>
                         )}
                     </div>

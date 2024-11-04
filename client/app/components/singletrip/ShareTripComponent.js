@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -11,6 +11,21 @@ const ShareTripComponent = ({ tripId, isOwner }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [email, setEmail] = useState("");
     const [role, setRole] = useState("editor");
+    const [sharedUsers, setSharedUsers] = useState([]);
+
+    useEffect(() => {
+        const fetchSharedUsers = async () => {
+            try {
+                const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/trips/${tripId}`);
+                setSharedUsers(response.data.data);
+            } catch (error) {
+                console.error("Error fetching shared users:", error);
+                toast.error("Failed to load shared users.");
+            }
+        };
+
+        fetchSharedUsers();
+    }, [tripId]);
 
     const handleShare = async (e) => {
         e.preventDefault(); // prevent default form submission
@@ -30,6 +45,7 @@ const ShareTripComponent = ({ tripId, isOwner }) => {
             setRole("editor");
             toast.success("Trip shared successfully!");
             setIsOpen(false);
+            window.location.reload();
 
         } catch (error) {
             toast.error(
@@ -37,6 +53,30 @@ const ShareTripComponent = ({ tripId, isOwner }) => {
             );
         }
         window.location.reload();
+    };
+
+    const handleRoleChange = async (userId, newRole) => {
+        try {
+            await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/${userId}/trips/${tripId}`, { role: newRole });
+            setSharedUsers(prevUsers => 
+                prevUsers.map(user => 
+                    user.user_id === userId ? { ...user, role: newRole } : user
+                )
+            );
+            toast.success("Role updated successfully: " + user.name + " now has " + newRole + "access!");
+        } catch (error) {
+            toast.error("Failed to update role.");
+        }
+    };
+
+    const handleRemoveUser = async (userId) => {
+        try {
+            await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/${userId}/trips/${tripId}`);
+            setSharedUsers(prevUsers => prevUsers.filter(user => user.user_id !== userId));
+            toast.success("User removed successfully!");
+        } catch (error) {
+            toast.error("Failed to remove user.");
+        }
     };
 
     return (
@@ -52,7 +92,6 @@ const ShareTripComponent = ({ tripId, isOwner }) => {
                 </div>
             </div>
 
-            
 
             {/* Create Share Trip popup form */}
             {isOpen && (
@@ -84,7 +123,32 @@ const ShareTripComponent = ({ tripId, isOwner }) => {
                                 </select>
                             </label>
 
-                            <button type="submit" className="share-trip-button">Confirm</button>
+                            {/* Display existing shared users */}
+                            <div className="existing-users-section">
+                                {sharedUsers.map(user => (
+                                    <div key={user.user_id} className="share">
+                                        <span className="share-trip-field-label">{user.fname} {user.lname}</span>
+                                        <div className="share-user-actions">
+                                            <select
+                                                value={user.role}
+                                                onChange={(e) => handleRoleChange(user.user_id, e.target.value)}
+                                                className="share-trip-dropdown"
+                                            >
+                                                <option value="owner">Owner</option>
+                                                <option value="editor">Editor</option>
+                                                <option value="viewer">Viewer</option>
+                                            </select>
+                                            <div className="edit-trip-icon-div" onClick={() => handleRemoveUser(user.user_id)}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="edit-trip-icon-SVG">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <button type="submit" className="button">Confirm</button>
                         </form>
                     </div>
                 </div>

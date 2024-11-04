@@ -191,7 +191,7 @@ form {
   font-size: 24px;
   cursor: pointer;
   z-index: 10000;
-  left: 45%;
+  padding: 0px 40px;
 }
 
 @media (prefers-color-scheme: dark) {
