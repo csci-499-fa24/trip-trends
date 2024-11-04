@@ -102,7 +102,7 @@ const getSharedTripsByTripId = async (req, res) => {
             return res.status(404).json({ message: "Shared Trip not found" });
         }
         const result = sharedTrips
-        .filter(sharedTrip => sharedTrip.role !== 'owner')
+        // .filter(sharedTrip => sharedTrip.role !== 'owner')
         .map(sharedTrip => ({
             user_id: sharedTrip.user ? sharedTrip.user.user_id : null,
             fname: sharedTrip.user ? sharedTrip.user.fname : null,
