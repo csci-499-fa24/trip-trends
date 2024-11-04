@@ -1,0 +1,5 @@
+.expense-table-container {
+    background-color: transparent; /* Remove any background color */
+    box-shadow: none; /* Remove any shadow if present */
+    border: none; /* Remove any borders if there are any */
+}
