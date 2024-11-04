@@ -3,7 +3,7 @@ import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../../css/singletrip.css';
-// import '../../css/editTrip.css';
+import '../../css/editTrip.css';
 
 const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
     // hide button if user is not trip owner
@@ -18,6 +18,12 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
     const [tempLocation, setTempLocation] = useState('');
     const [suggestions, setSuggestions] = useState([]);
  
+    useEffect(() => {
+        if (isOpen) {
+            setTripLocationsState(tripLocations || []);
+        }
+    }, [isOpen, tripLocations]);
+
     // console.log(startDate, endDate);   
 
     // console.log(name, startDate, endDate, budget);
@@ -68,7 +74,7 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
         }
 
     };
-    console.log(tripLocationsState)
+    // console.log(tripLocationsState)
     return (
         <>
             <div className="icon-div" tooltip="Edit Trip" tabIndex="0">
@@ -150,26 +156,26 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
 
                             <div>
                                 {tripLocationsState.map((location, index) => (
-                                    <div key={index} className="selected-location">
-                                        <span className="location-text">{location}</span>
-                                        <div className="icon-SVG" onClick={() => {
+                                    <div key={index} className="edit-trip-selected-location">
+                                        <span className="edit-trip-location-text">{location}</span>
+                                        <div className="edit-trip-icon-div" onClick={() => {
                                             setTripLocationsState(prev => prev.filter((loc, i) => i !== index));
                                         }}>
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                                             </svg>
-                                            <span className="icon-text">Remove</span>
+                                            <span className="edit-trip-icon-text">Remove</span>
                                         </div>
                                     </div>
                                 ))}
                             </div>
 
                             {suggestions.length > 0 && (
-                                <div className="dropdown-suggestions">
+                                <div className="edit-trip-suggestion-dropdown">
                                     {suggestions.map((suggestion, index) => (
                                         <div
                                             key={index}
-                                            className="dropdown-suggestion"
+                                            className="edit-trip-suggestion-item"
                                             onClick={() => selectLocation(suggestion)}
                                         >
                                             {suggestion}
