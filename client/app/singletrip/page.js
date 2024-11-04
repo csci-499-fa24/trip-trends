@@ -596,15 +596,15 @@ function Singletrip() {
             <br></br>
             <br></br>
 
-                
+            <div>
+                {/* Call the ImagesComponent and pass the tripId */}
+                <TripImageComponent tripId={tripId} />
+            </div>    
             </div >
 
 
 
-            <div>
-            {/* Call the ImagesComponent and pass the tripId */}
-            <TripImageComponent tripId={tripId} />
-        </div>
+            
         </div >
     );
 }
