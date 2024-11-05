@@ -57,9 +57,9 @@ const ShareTripComponent = ({ tripId, isOwner }) => {
 
     const handleRoleChange = async (userId, newRole) => {
         try {
-            await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/${userId}/trips/${tripId}`, { role: newRole });
-            setSharedUsers(prevUsers => 
-                prevUsers.map(user => 
+            await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/users/${userId}/trips/${tripId}`, { role: newRole });
+            setSharedUsers(prevUsers =>
+                prevUsers.map(user =>
                     user.user_id === userId ? { ...user, role: newRole } : user
                 )
             );
@@ -71,7 +71,7 @@ const ShareTripComponent = ({ tripId, isOwner }) => {
 
     const handleRemoveUser = async (userId) => {
         try {
-            await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/${userId}/trips/${tripId}`);
+            await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/users/${userId}/trips/${tripId}`);
             setSharedUsers(prevUsers => prevUsers.filter(user => user.user_id !== userId));
             toast.success("User removed successfully!");
         } catch (error) {
