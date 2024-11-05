@@ -20,7 +20,8 @@ import HeaderComponent from '../components/HeaderComponent';
 import TripIconBarComponent from '../components/singletrip/TripIconBarComponent';
 import BarGraphComponent from '../components/singletrip/BarGraphComponent';
 import SpendingCirclesComponent from '../components/singletrip/SpendingCirclesComponent';
-
+import TripImageComponent from '../components/singletrip/TripImageComponent';
+import UploadTripImage from '../components/singletrip/UploadTripImage';
 
 
 Chart.register(ArcElement, Tooltip, Legend);
@@ -46,6 +47,8 @@ function Singletrip() {
     const [originalData, setOriginalData] = useState([]);
     const [selectedFilter, setSelectedFilter] = useState('');
     const [tripLocations, setTripLocations] = useState([]);
+    const [selectedCategory, setSelectedCategory]= useState('');
+    const [isDropdownVisible, setIsDropdownVisible] = useState(false);
     const [newExpenseData, setNewExpenseData] = useState({
         trip_id: '',
         name: '',
@@ -189,6 +192,48 @@ function Singletrip() {
         setFilterPopupVisible(false);
     };
 
+    const handleAllCategoriesSelect = () => {
+        setSelectedCategory(""); 
+        setExpenseData({ data: expenseUSD }); 
+        setIsDropdownVisible(false);
+    };
+
+    const handleCategorySelect = (category) => {
+        setSelectedCategory(category);
+        setIsDropdownVisible(false);
+    };
+
+
+    useEffect(()=>{
+        if(selectedCategory)
+        {
+            applyCategoryFilter();
+        }
+
+    },[selectedCategory]);
+
+    const applyCategoryFilter=()=>{
+
+        let filteredData=[];
+
+        if(selectedCategory){
+            expenseUSD.forEach(expense=>{
+
+                if(expense.category===selectedCategory)
+                {
+                    filteredData.push(expense);
+                }
+            })
+        }
+
+        setExpenseData({ data: filteredData });
+    }
+
+    const toggleDropdown = () => {
+        setIsDropdownVisible(!isDropdownVisible);
+    };
+
+
     const applyFilter = (filterOption, data = expenseUSD) => {
         if (!Array.isArray(data)) {
             console.error('Data is not an array:', data);
@@ -251,7 +296,7 @@ function Singletrip() {
                     }
                 } catch (error) {
                     console.error('Error fetching user role:', error);
-                    setError('Error fetching user role. Please try again later.');
+                    // setError('Error fetching user role. Please try again later.');
                 }
             } else {
                 console.log("tripId or userId is missing.");
@@ -474,17 +519,19 @@ function Singletrip() {
                         {/* Icon Bar Above Expenses */}
                         <div>
                             <header className="icon-bar-header">
-                                {/* Add Expense Button */}
-                                <div className="icon-div" tooltip="Add Expense" tabIndex="0">
-                                    <div className="icon-SVG">
-                                        <svg
-                                            onClick={() => setPopUpVisible(true)}
-                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                        </svg>
-                                        <span className="icon-text">Add Expense</span>
+                                {userRole == 'owner' || userRole == 'editor' ? (
+                                    // {/* Add Expense Button */}
+                                    <div className="icon-div" tooltip="Add Expense" tabIndex="0">
+                                        <div className="icon-SVG">
+                                            <svg
+                                                onClick={() => setPopUpVisible(true)}
+                                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            </svg>
+                                            <span className="icon-text">Add Expense</span>
+                                        </div>
                                     </div>
-                                </div>
+                                ) : null}
                                 {/* Filter Expenses Button */}
                                 <div className="icon-div" tooltip="Filter" tabIndex="0">
                                     <div className="icon-SVG">
@@ -502,14 +549,9 @@ function Singletrip() {
 
 
                                 {/* Add Image Button */}
-                                <div className="icon-div" tooltip="Add Image" tabIndex="0">
-                                    <div className="icon-SVG">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-                                        </svg>
-                                        <span className="icon-text">Add Image</span>
-                                    </div>
-                                </div>
+                                {userRole == 'owner' || userRole == 'editor' ? (
+                                    <UploadTripImage tripId={tripId} />
+                                ) : null}
 
                                 {/* Applied filter popup */}
                                 {selectedFilter && (
@@ -525,7 +567,7 @@ function Singletrip() {
                         <div className='expense-container'>
                             {/* Expense Table */}
                             <ExpenseTableComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenseData={expenseData}
-                                currencyCodes={currencyCodes} expenseCategories={expenseCategories} />
+                                currencyCodes={currencyCodes} expenseCategories={expenseCategories} userRole={userRole}/>
                         
                             <div>
                             {/* Exchange Rate Table */}
@@ -586,6 +628,24 @@ function Singletrip() {
                                     >
                                         Oldest
                                     </button>
+                                    
+                                    <div className="filter-option-button">
+                                        <label htmlFor="category" onClick={toggleDropdown} style={{ cursor: 'pointer' }}>
+                                            Select Category
+                                        </label>
+                                        {isDropdownVisible && (
+                                            <div className="custom-dropdown">
+                                            <div className="dropdown-item" onClick={handleAllCategoriesSelect}>
+                                                All Categories
+                                            </div>
+                                            {expenseCategories.map((category) => (
+                                                <div key={category} className="dropdown-item" onClick={() => handleCategorySelect(category)}>
+                                                    {category}
+                                                </div>
+                                            ))}
+                                        </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -598,6 +658,13 @@ function Singletrip() {
 
                 
             </div >
+
+
+
+            <div>
+            {/* Call the ImagesComponent and pass the tripId */}
+            <TripImageComponent tripId={tripId} />
+        </div>
         </div >
     );
 }

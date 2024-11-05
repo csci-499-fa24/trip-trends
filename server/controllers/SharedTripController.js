@@ -1,5 +1,6 @@
 const SharedTrip = require('../models/SharedTrip');
 const User = require('../models/User');
+const nodemailer = require('nodemailer');
 
 // needs to be further implemented
 // POST new trip for user
@@ -85,16 +86,32 @@ const getSharedTripsByUserId = async (req, res) => {
     }
 };
 
-// GET specific shared trip data by tripId
 const getSharedTripsByTripId = async (req, res) => {
     const tripId = req.params.tripId;
-    // const role = req.query.role;
     try {
-        const sharedTrips = await SharedTrip.findAll({ where: { trip_id: tripId } });
+        const sharedTrips = await SharedTrip.findAll({
+            where: { trip_id: req.params.tripId },
+            include: [{
+                model: User,
+                attributes: ['user_id', 'fname', 'lname', 'email', 'image'],
+                as: 'user'
+            }]
+        });     
+        
         if (sharedTrips.length === 0) {
             return res.status(404).json({ message: "Shared Trip not found" });
         }
-        res.json({ data: sharedTrips });
+        const result = sharedTrips
+        // .filter(sharedTrip => sharedTrip.role !== 'owner')
+        .map(sharedTrip => ({
+            user_id: sharedTrip.user ? sharedTrip.user.user_id : null,
+            fname: sharedTrip.user ? sharedTrip.user.fname : null,
+            lname: sharedTrip.user ? sharedTrip.user.lname : null,
+            email: sharedTrip.user ? sharedTrip.user.email : null,
+            image: sharedTrip.user ? sharedTrip.user.image : null,
+            role: sharedTrip.role
+        }));
+        return res.json({ data: result });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });

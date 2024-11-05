@@ -25,8 +25,7 @@
     font-size: 24px;
     color: black;
     position: absolute;
-    right: 10px;
-    top: 10px;
+    right: 0px;
 }
 
 .share-trip-title {
@@ -34,13 +33,15 @@
     color: black; 
     text-align: center;
     font-weight: bold;
-    margin-bottom: 15px;
+    margin-bottom: 40px;
 }
 
 .share-trip-field-label {
     font-size: 1rem;
     margin-bottom: 10px;
     color: black; 
+    align-content: center;
+    justify-content: center;
 }
 
 .share-trip-field-label input,
@@ -87,7 +88,7 @@
     z-index: 1000;
     left: 0;
     top: 0;
-    width: 100%;
+    width: 180%;
     height: 100%;
     backdrop-filter: blur(2px);
 }
@@ -148,4 +149,132 @@
 
 .edit-trip-button:hover {
     background-color: var(--lightergreen);
+}
+
+.share-trip-dropdown {
+    width: fit-content;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    background-color: white;
+    color: black; 
+    font-size: 15px;
+    transition: border-color 0.3s ease;
+    justify-content: right;
+    justify-self: right;
+}
+
+.edit-trip-suggestion-dropdown {
+    background-color: white; 
+    border: 1px solid #ccc; 
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); 
+    max-height: 200px; 
+    overflow-y: auto;
+    z-index: 1000; 
+    width: 100%;
+    display: block;
+}
+
+.edit-trip-suggestion-item {
+    color: black;
+    background-color: white;
+    padding: 8px;
+    cursor: pointer;
+}
+
+.edit-trip-suggestion-item:hover {
+    background-color: var(--lightgreen);
+    color: white; 
+}
+
+.edit-trip-selected-location {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.edit-trip-location-text {
+    color: black;
+    font-weight: bold;
+}
+
+.edit-trip-icon-div {
+    height: 20px;
+    width: 20px;
+    margin: 0 10px;
+    padding: 0;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    transition: none;
+}
+
+.edit-trip-icon-div .edit-trip-icon-SVG {
+    height: 26px;
+    aspect-ratio: 1 / 1;
+    transition: transform 300ms ease;
+}
+
+.edit-trip-icon-SVG svg {
+    color: black; 
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+}
+
+.edit-trip-icon-SVG svg:hover {
+    background-color: var(--lightergreen);
+}
+
+.edit-trip-icon-text {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px);
+    background-color: rgb(85, 83, 83);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.edit-trip-icon-div:hover .edit-trip-icon-text,
+.edit-trip-icon-div:focus-visible .edit-trip-icon-text {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-15px);
+}
+
+.edit-trip-icon-div:hover .edit-trip-icon-SVG {
+    transform: scale(1.2);
+}
+
+.edit-trip-icon-div:hover,
+.edit-trip-icon-div:focus-visible {
+    background-color: #f5f5f5;
+}
+
+.edit-trip-icon-div:active {
+    opacity: 0.9;
+}
+
+.share {
+    display: flex;
+    justify-content: space-between;
+}
+
+.share-user-actions {
+    align-content: center;
+    justify-content: center;
+}
+
+.existing-users-section {
+    margin-top: 30px;
 }

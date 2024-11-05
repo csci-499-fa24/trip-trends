@@ -1,5 +1,5 @@
 const Expense = require('../models/Expense');
-const { fromBuffer } = require('file-type');
+// const { fromBuffer } = require('file-type');
 
 // POST new expense data with image handling
 const createExpense = async (req, res) => {
@@ -59,6 +59,7 @@ const getExpensesByTripId = async (req, res) => {
         if (!expense || expense.length === 0) {
             return res.status(404).json({ message: "Expense not found" });
         }
+        // const totalAmount = expenses.reduce((sum, expense) => sum + expense.amount, 0);
         res.status(200).json({ data: expense });
     } catch (err) {
         console.error(err);

@@ -5,29 +5,13 @@
 }
 
 .welcome-section {
-    text-align: center;
+    text-align: left;
     padding: 20px;
     background-color: #FFFFFF;
     color: black;
     font-size: 21px;
     font-weight: bold;
-}
-
-.recent-trips {
-    padding: 10px;
-    background-color:var(--darkgreen);;
-    color: white;
-    height: auto; 
-    text-align: center;
-    border-radius: 8px;
-}
-
-.trip {
-    margin-bottom: 10px;
-    border: 1px solid white;
-    padding: 10px;
-    background-color: rgba(255, 255, 255, 0.1); 
-    margin: 0 auto;
+    margin-top: 20px;
 }
 
 .logout {
@@ -141,63 +125,27 @@
     }
 }
 
-.submit-new-trip-button { 
-    padding: 8px; 
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin: 30px auto;
+}
+
+.button { 
+    padding: 15px 30px; 
     background-color:var(--lightgreen);
     color: white;
     border: none;
-    width: 40%; /* Width of the button */
+    width: fit-content;
     border-radius: 10px;
     font-size: 15px; 
     cursor: pointer;
     align-self: center;
 }
 
-.dropdown-suggestion {
-    position: absolute;
-    color: black;
-    background-color: white;
-    padding: 8px;
-    cursor: pointer;
-}
-
-.dropdown-suggestion:hover {
-    background-color: rgb(8, 148, 8);
-}
-
-.dropdown-suggestions {
-    position: absolute; /* Positioning */
-    background-color: white; /* Background for visibility */
-    border: 1px solid #ccc; /* Border for separation */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Adds depth */
-    max-height: 200px; /* Limit height */
-    overflow-y: auto; /* Scroll if too many items */
-    z-index: 1000; /* Ensure it appears above other elements */
-    width: 100%; /* Match the width of the input */
-}
-
-.dropdown-suggestion {
-    color: black;
-    background-color: white;
-    padding: 8px;
-    cursor: pointer;
-}
-
-.dropdown-suggestion:hover {
-    background-color: rgb(8, 148, 8); /* Change on hover */
-    color: white; /* Change text color on hover for contrast */
-}
-
-.selected-location {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 5px;
-}
-
-.location-text {
-    color: black;
-    font-weight: bold;
+.button:hover {
+    background-color: var(--lightergreen);
+    transition: 0.2s;
 }
 
 .marker-tooltip {
@@ -297,3 +245,9 @@
     opacity: 0.9;
 }
 
+.all-trips-title {
+    font-size: 24px;
+    margin: 20px 0;
+    text-align: center;
+    color: black;
+}

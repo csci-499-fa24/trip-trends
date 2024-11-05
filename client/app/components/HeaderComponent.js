@@ -24,16 +24,17 @@ const HeaderComponent = ({ headerTitle, setUserName, userId }) => {
     return (
         <header className="header">
             {/* Logo on left */}
-            <Link href="/homepage">
+            <div onClick={() => window.location.href = '/homepage'}>
                 <div className="logo-container">
                     <Image
                         src={logo}
                         alt="Logo"
                         width={120} 
                         height={120}
+                        priority
                     />
                 </div>
-            </Link>
+            </div>
             <div className="header-title">
                 {headerTitle}
             </div>

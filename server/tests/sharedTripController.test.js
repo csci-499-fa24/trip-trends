@@ -131,15 +131,43 @@ describe('SharedTrip Controller', () => {
 
     it('should get shared trips by tripId', async () => {
         const tripId = '2';
-        const mockSharedTrips = [{ user_id: '1', trip_id: tripId }];
+        const mockSharedTrips = [{
+            user_id: '1', 
+            trip_id: tripId, 
+            user: { 
+                user_id: '1', 
+                fname: 'John', 
+                lname: 'Doe', 
+                email: 'john@example.com', 
+                image: 'user-image-url' 
+            },
+            role: 'collaborator' 
+        }];
+        
         mockRequest.params.tripId = tripId;
-
         SharedTrip.findAll.mockResolvedValue(mockSharedTrips);
-
+    
         await getSharedTripsByTripId(mockRequest, mockResponse);
-
-        expect(SharedTrip.findAll).toHaveBeenCalledWith({ where: { trip_id: tripId } });
-        expect(mockResponse.json).toHaveBeenCalledWith({ data: mockSharedTrips });
+    
+        expect(SharedTrip.findAll).toHaveBeenCalledWith({
+            where: { trip_id: tripId },
+            include: [{
+                model: User,
+                attributes: ['user_id', 'fname', 'lname', 'email', 'image'],
+                as: 'user'
+            }]
+        });
+        
+        const expectedResult = mockSharedTrips.map(sharedTrip => ({
+            user_id: sharedTrip.user.user_id,
+            fname: sharedTrip.user.fname,
+            lname: sharedTrip.user.lname,
+            email: sharedTrip.user.email,
+            image: sharedTrip.user.image,
+            role: sharedTrip.role
+        }));
+    
+        expect(mockResponse.json).toHaveBeenCalledWith({ data: expectedResult });
     });
 
     it('should return 404 if no shared trips found for tripId', async () => {
