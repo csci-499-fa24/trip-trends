@@ -119,21 +119,21 @@ const getSharedTripsByTripId = async (req, res) => {
 };
 
 // PUT request to update shared trip data
-// const updateSharedTrip = async (req, res) => {
-//     const { userId, tripId } = req.params;
-//     const updatedData = req.body;
-//     try {
-//         const sharedTrip = await SharedTrip.findOne({ where: { user_id: userId, trip_id: tripId } });
-//         if (!sharedTrip) {
-//             return res.status(404).json({ message: "Shared trip not found" });
-//         }
-//         const updatedSharedTrip = await sharedTrip.update(updatedData);
-//         res.json({ data: updatedSharedTrip });
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({ message: "Internal Server Error", error: err.message });
-//     }
-// };
+const updateSharedTrip = async (req, res) => {
+    const { userId, tripId } = req.params;
+    const updatedData = req.body;
+    try {
+        const sharedTrip = await SharedTrip.findOne({ where: { user_id: userId, trip_id: tripId } });
+        if (!sharedTrip) {
+            return res.status(404).json({ message: "Shared trip not found" });
+        }
+        const updatedSharedTrip = await sharedTrip.update(updatedData);
+        res.json({ data: updatedSharedTrip });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
+    }
+};
 
 // DELETE shared trip data
 const deleteSharedTrip = async (req, res) => {
@@ -156,5 +156,6 @@ module.exports = {
     getSharedTrips,
     getSharedTripsByUserId,
     getSharedTripsByTripId,
+    updateSharedTrip,
     deleteSharedTrip
 };

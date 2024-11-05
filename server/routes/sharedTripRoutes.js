@@ -6,7 +6,7 @@ router.post('/users/:userId/trips/:tripId', SharedTripController.createSharedTri
 router.get('/', SharedTripController.getSharedTrips);
 router.get('/users/:userId', SharedTripController.getSharedTripsByUserId);
 router.get('/trips/:tripId', SharedTripController.getSharedTripsByTripId);
-// router.put('/users/:userId/trips/:tripId', SharedTripController.updateSharedTrip);
+router.put('/users/:userId/trips/:tripId', SharedTripController.updateSharedTrip);
 router.delete('/users/:userId/trips/:tripId', SharedTripController.deleteSharedTrip);
 
 module.exports = router;
