@@ -3,6 +3,7 @@ import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../../css/singletrip.css';
+import '../../css/modifyTrip.css';
 
 const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
     // hide button if user is not trip owner
@@ -13,10 +14,50 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
     const [startDate, setStartDate] = useState(tripData.data?.start_date || "");
     const [endDate, setEndDate] = useState(tripData.data?.end_date || "");
     const [budget, setBudget] = useState(tripData.data?.budget || ""); 
+    const [tripLocationsState, setTripLocationsState] = useState(tripLocations || []);
+    const [tempLocation, setTempLocation] = useState('');
+    const [suggestions, setSuggestions] = useState([]);
+ 
+    useEffect(() => {
+        if (isOpen) {
+            setTripLocationsState(tripLocations || []);
+        }
+    }, [isOpen, tripLocations]);
+
     // console.log(startDate, endDate);   
 
     // console.log(name, startDate, endDate, budget);
-    
+    const fetchLocationSuggestions = async (query) => {
+        if (query) {
+            try {
+                const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json`, {
+                    params: {
+                        q: query,
+                        key: process.env.NEXT_PUBLIC_OPENCAGE_API_KEY,
+                        limit: 5,
+                    },
+                });
+                const results = response.data.results.map(result => result.formatted);
+                setSuggestions(results);
+            } catch (error) {
+                console.error('Error fetching location suggestions:', error);
+                setSuggestions([]);
+            }
+        } else {
+            setSuggestions([]);
+        }
+    };
+
+    const selectLocation = (suggestion) => {
+        if (!tripLocationsState.includes(suggestion) && tripLocationsState.length < 10) {
+            setTripLocationsState(prev => [...prev, suggestion]);
+        } else if (tripLocationsState.length >= 10) {
+            alert("You can only add a maximum of 10 locations.");
+        }
+        setSuggestions([]);
+        setTempLocation('');
+    };
+
     const handleEdit = async (e) => {
         e.preventDefault();
         try {
@@ -33,7 +74,7 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
         }
 
     };
-
+    // console.log(tripLocationsState)
     return (
         <>
             <div className="icon-div" tooltip="Edit Trip" tabIndex="0">
@@ -46,7 +87,7 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
                     <span className="icon-text">Edit Trip</span>
                 </div>
             </div>
-
+            
             {/* Create Edit Trip popup form */}
             {isOpen && (
                 <div className="modal">
@@ -93,6 +134,55 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
                                     required
                                 />
                             </label>
+                            
+                            <label className="share-trip-field-label">
+                                Locations:
+                                <input
+                                    type="text"
+                                    value={tempLocation}
+                                    onChange={(e) => {
+                                        setTempLocation(e.target.value);
+                                        fetchLocationSuggestions(e.target.value);
+                                    }}
+                                    placeholder="Enter city or country"
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            selectLocation(tempLocation);
+                                        }
+                                    }}
+                                />
+                            </label>
+
+                            <div>
+                                {tripLocationsState.map((location, index) => (
+                                    <div key={index} className="edit-trip-selected-location">
+                                        <span className="edit-trip-location-text">{location}</span>
+                                        <div className="edit-trip-icon-div" onClick={() => {
+                                            setTripLocationsState(prev => prev.filter((loc, i) => i !== index));
+                                        }}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                            </svg>
+                                            <span className="edit-trip-icon-text">Remove</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {suggestions.length > 0 && (
+                                <div className="edit-trip-suggestion-dropdown">
+                                    {suggestions.map((suggestion, index) => (
+                                        <div
+                                            key={index}
+                                            className="edit-trip-suggestion-item"
+                                            onClick={() => selectLocation(suggestion)}
+                                        >
+                                            {suggestion}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
 
                             <button type="submit" className="share-trip-button">Submit</button>
                         </form>

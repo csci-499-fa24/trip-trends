@@ -519,17 +519,19 @@ function Singletrip() {
                         {/* Icon Bar Above Expenses */}
                         <div>
                             <header className="icon-bar-header">
-                                {/* Add Expense Button */}
-                                <div className="icon-div" tooltip="Add Expense" tabIndex="0">
-                                    <div className="icon-SVG">
-                                        <svg
-                                            onClick={() => setPopUpVisible(true)}
-                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                        </svg>
-                                        <span className="icon-text">Add Expense</span>
+                                {userRole == 'owner' || userRole == 'editor' ? (
+                                    // {/* Add Expense Button */}
+                                    <div className="icon-div" tooltip="Add Expense" tabIndex="0">
+                                        <div className="icon-SVG">
+                                            <svg
+                                                onClick={() => setPopUpVisible(true)}
+                                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            </svg>
+                                            <span className="icon-text">Add Expense</span>
+                                        </div>
                                     </div>
-                                </div>
+                                ) : null}
                                 {/* Filter Expenses Button */}
                                 <div className="icon-div" tooltip="Filter" tabIndex="0">
                                     <div className="icon-SVG">
@@ -547,7 +549,9 @@ function Singletrip() {
 
 
                                 {/* Add Image Button */}
-                                <UploadTripImage tripId={tripId} />
+                                {userRole == 'owner' || userRole == 'editor' ? (
+                                    <UploadTripImage tripId={tripId} />
+                                ) : null}
 
                                 {/* Applied filter popup */}
                                 {selectedFilter && (
@@ -563,7 +567,7 @@ function Singletrip() {
                         <div className='expense-container'>
                             {/* Expense Table */}
                             <ExpenseTableComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenseData={expenseData}
-                                currencyCodes={currencyCodes} expenseCategories={expenseCategories} />
+                                currencyCodes={currencyCodes} expenseCategories={expenseCategories} userRole={userRole}/>
                         
                             <div>
                             {/* Exchange Rate Table */}

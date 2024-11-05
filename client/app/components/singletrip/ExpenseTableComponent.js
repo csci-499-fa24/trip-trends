@@ -5,7 +5,7 @@ import '../../css/ExpenseTableComponent.css';
 
 import { Card, CardContent, Typography, Button, Grid, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 
-const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, currencyCodes, expenseCategories}) => {
+const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, currencyCodes, expenseCategories, userRole}) => {
     const [isEditPopupVisible, setEditPopupVisible] = useState(false);
     const [selectedExpense, setSelectedExpense] = useState(null);
     const handleEditChange = (e) => {
@@ -129,7 +129,8 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
                                     <th>Category</th>
                                     <th>Date</th>
                                     <th>Notes</th>
-                                    <th>Edit</th></tr>
+                                    {userRole == 'owner' || userRole == 'editor' ? <th>Edit</th> : null}
+                                </tr>
                             </thead>
                             <tbody>
                             {/* Start of mapping through expenseData.data */}
@@ -164,7 +165,10 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
                                         
                                         {/* Notes cell with color */}
                                         <td style={{ color: categoryColor }}>{expense.notes}</td>
+
+                                        
                                         {/* Edit button cell with color */}
+                                        {userRole == 'owner' || userRole == 'editor' ? (
                                         <td style={{ color: categoryColor }}>
                                             {/* <div onClick={() => { setEditPopupVisible(true); setSelectedExpense(expense) }} className='edit-expense'>Edit Expense</div> */}
                                             <div className="icon-div" tooltip="Edit Trip" tabIndex="0">
@@ -277,6 +281,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
                                                 )}
                                             </div>
                                             </td>
+                                        ) : null}
                                         </tr>
                                     );
                                 })}
@@ -290,5 +295,6 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
         </div>
     );
 };
+
 
 export default ExpenseTableComponent;
