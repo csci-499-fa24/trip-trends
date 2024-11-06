@@ -121,7 +121,7 @@ const createGoogleUser = async (req, res) => {
         }
     } catch (error) {
         console.error('Error creating user:', error);
-        return res.status(500).json({ message: 'Error processing request', error: error.message });
+        return res.status(500).json({ message: 'Error processing request'});
     }
 };
 
