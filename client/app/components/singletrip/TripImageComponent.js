@@ -26,7 +26,7 @@ const TripImageComponent = ({ tripId }) => {
 
     return (
         <div>
-            <h2>Images for Trip ID: {tripId}</h2>
+            <h2>Trip Gallery</h2>
             {error && <p>{error}</p>}
             <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                 {images.map(image => (
