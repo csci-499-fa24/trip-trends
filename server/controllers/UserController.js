@@ -98,7 +98,7 @@ const createGoogleUser = async (req, res) => {
         const name = decoded.name;
         const nameParts = name.split(' ');
         const firstName = nameParts[0];
-        const lastName = nameParts[1];
+        const lastName = nameParts[1] || null;
         const picture = decoded.picture;
 
         // Check if the user already exists in the database
@@ -120,8 +120,8 @@ const createGoogleUser = async (req, res) => {
             return res.status(201).json({ message: 'User created successfully', user: newUser });
         }
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'Error processing request' });
+        console.error('Error creating user:', error);
+        return res.status(500).json({ message: 'Error processing request', error: error.message });
     }
 };
 

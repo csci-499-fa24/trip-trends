@@ -21,7 +21,7 @@ function Signup() {
 
     const handleLoginSuccess = async (response) => {
         const token = response.credential
-        const tokenBody = { token: response.credential }
+        const tokenBody = { token: token }
 
         axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/auth/google`, tokenBody)
             .then(response => {
@@ -33,13 +33,13 @@ function Signup() {
                 }, 1500);
             })
             .catch(error => {
-                console.error(error)
+                console.error('Axios error:', error.response ? error.response.data : error.message);
                 toast.error("Sign in failed. Please try again.");
             });
     };
 
     const handleLoginFailure = (error) => {
-        console.error('Signup failed:', error);
+        console.error('Signup failed:', error.response ? error.response.data : error.message);
         toast.error("Sign in failed. Please try again.");
     };
 

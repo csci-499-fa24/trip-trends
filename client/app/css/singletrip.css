@@ -896,3 +896,19 @@
         font-size: 0.8em; 
     }
 }
+
+.trip-card-highlight {
+    animation: highlight 1.25s ease-out;
+}
+
+@keyframes highlight {
+    0% {
+        background-color: rgba(0, 255, 0, 0.3); /* Initial green highlight */
+    }
+    50% {
+        background-color: rgba(0, 255, 0, 0.6); /* Midpoint green color */
+    }
+    100% {
+        background-color: rgba(0, 255, 0, 0); /* Fade out */
+    }
+}

@@ -93,7 +93,13 @@ const TripsDisplayComponent = ({ trips, userId }) => {
             ) : (
                 <div className="trip-cards">
                     {trips.map(trip => (
-                        <Card className="trips-display-card" onClick={() => handleTripClick(trip.trip_id)} key={trip.trip_id} sx={{ width: 300, backgroundColor: 'var(--offwhite)' }}>
+                        <Card 
+                            id={`trip-${trip.trip_id}`}  // Add the id here
+                            className="trips-display-card" 
+                            onClick={() => handleTripClick(trip.trip_id)} 
+                            key={trip.trip_id} 
+                            sx={{ width: 300, backgroundColor: 'var(--offwhite)' }}
+                        >
                             <CardActionArea>
                             <div className="trips-display-image-wrapper">
                                 <DefaultTripImagesComponent 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { toast } from 'react-toastify';
 import axios from 'axios';
 import '../../css/receiptImage.css';
 
@@ -55,10 +56,12 @@ const ReceiptImageComponent = ({ tripId, handleFormData}) => {
                 };
                 reader.readAsDataURL(imageFile);
 
+                toast.success("Receipt uploaded successfully!");
             }
         }
         else {
             console.error('No file chosen');
+            toast.error("Please choose a file to upload.");
         }
     };
     
