@@ -144,23 +144,29 @@ describe('User Controller', () => {
     it('should create a new user if not present on POST /users/google', async () => {
         const mockDecodedToken = {
             email: 'mrs.claus@example.com',
-            name: 'Mrs Claus',
+            name: 'Mrs',  // Only first name provided
             picture: 'http://example.com/mrsclaus-pic.jpg',
         };
-
+    
         jest.spyOn(jwt, 'decode').mockReturnValue(mockDecodedToken);
         User.findOne.mockResolvedValue(null); // Simulating no existing user
-
-        const mockNewUser = { user_id: 2, fname: 'Mrs', lname: 'Claus', email: 'mrs.claus@example.com', image: mockDecodedToken.picture };
+    
+        const mockNewUser = { 
+            user_id: 2, 
+            fname: 'Mrs', 
+            lname: null, // Last name is optional, so it could be null
+            email: 'mrs.claus@example.com', 
+            image: mockDecodedToken.picture 
+        };
         User.create.mockResolvedValue(mockNewUser); // Simulating a new user being created
-
+    
         mockRequest.body.token = 'your_test_token'; // Set token in request body
-
+    
         await createGoogleUser(mockRequest, mockResponse);
-
+    
         expect(mockResponse.status).toHaveBeenCalledWith(201);
         expect(mockResponse.json).toHaveBeenCalledWith({ message: 'User created successfully', user: mockNewUser });
-    });
+    });    
 
     it('should handle errors on POST /users/google', async () => {
         User.findOne.mockRejectedValue(new Error('Database error')); // Simulate database error

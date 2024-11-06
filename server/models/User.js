@@ -19,12 +19,21 @@ const User = sequelize.define('user', {
     },
     lname: {
         type: DataTypes.STRING(50),
-        allowNull: false,
+        allowNull: true,
         validate: {
-            isAlpha: true,
-            len: [2, 50],
-        }
-    },
+            // Only validate isAlpha and len if lname is not null or empty
+            isAlpha(value) {
+                if (value && !/^[A-Za-z]+$/.test(value)) {
+                    throw new Error('Last name must contain only alphabetic characters');
+                }
+            },
+            len(value) {
+                if (value && value.length < 2) {
+                    throw new Error('Last name must be between 2 and 50 characters');
+                }
+            },
+        },
+    },    
     email: {
         type: DataTypes.STRING(100),
         unique: true,

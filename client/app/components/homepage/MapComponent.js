@@ -11,6 +11,7 @@ import Point from 'ol/geom/Point';
 import { fromLonLat } from 'ol/proj';
 import { boundingExtent } from 'ol/extent';
 import pinIcon from '../../img/redPin.png';
+import '../../css/singletrip.css'
 
 // Custom marker icon style
 const customDefaultMarker = new Style({
@@ -100,17 +101,16 @@ const MapComponent = ({ allTripLocations, toggleTripDetails }) => {
                 const feature = map.forEachFeatureAtPixel(event.pixel, (feat) => feat);
                 if (feature) {
                     const tripId = feature.get('trip_id');
-                    console.log('Clicked marker:', tripId);
 
                     // Scroll to the Recent Trips section and expand the clicked trip
                     const tripElement = document.getElementById(`trip-${tripId}`); // Use a unique ID to target the trip divider
                     if (tripElement) {
-                        tripElement.scrollIntoView({ behavior: 'smooth' });
+                        tripElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        tripElement.classList.add('trip-card-highlight');
+                        setTimeout(() => {
+                            tripElement.classList.remove('trip-card-highlight');
+                        }, 2000);
                     }
-                    // Delay the toggleTripDetails call
-                    setTimeout(() => {
-                        toggleTripDetails(tripId);
-                    }, 1000); // Delay before toggling
                 } else {
                     console.log('No marker found.');
                 }

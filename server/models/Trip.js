@@ -22,11 +22,11 @@ const Trip = sequelize.define("all_trips", {
         allowNull: false,
         validate: {
             isAfterStartDate(value) {
-                if (new Date(value) <= new Date(this.start_date)) {
-                    throw new Error('End date must be after start date');
+                if (new Date(value) < new Date(this.start_date)) {
+                    throw new Error('End date must be on or after the start date');
                 }
             }
-        }
+        }        
     },
     budget: {
         type: DataTypes.DOUBLE,
