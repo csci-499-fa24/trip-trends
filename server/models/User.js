@@ -21,7 +21,6 @@ const User = sequelize.define('user', {
         type: DataTypes.STRING(50),
         allowNull: true,
         validate: {
-            // Only validate isAlpha and len if lname is not null or empty
             isAlpha(value) {
                 if (value && !/^[A-Za-z]+$/.test(value)) {
                     throw new Error('Last name must contain only alphabetic characters');
