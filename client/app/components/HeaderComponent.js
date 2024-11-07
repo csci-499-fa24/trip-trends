@@ -29,7 +29,7 @@ const HeaderComponent = ({ headerTitle, setUserName, userId }) => {
                     <Image
                         src={logo}
                         alt="Logo"
-                        width={120} 
+                        width={140} 
                         height={120}
                         priority
                     />
