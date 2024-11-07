@@ -21,11 +21,13 @@
 }
 
 .close {
-    cursor: pointer;
-    font-size: 24px;
-    color: black;
     position: absolute;
-    right: 0px;
+    top: 2.5%;
+    left: -2.5%;
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
 }
 
 .share-trip-title {
