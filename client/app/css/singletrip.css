@@ -335,6 +335,13 @@
     margin-top: 0;
 }
 
+#expenseTitle {
+    margin-top: 10px;
+    font-weight: 600;
+    margin-bottom: 0;
+    text-align: center;
+}
+
 .filter-popup {
     position: fixed;
     left: 0;
@@ -736,6 +743,14 @@
     background-color: rgb(235, 5, 5);
 }
 
+.gallery-icon:hover {
+    color: green;
+}
+
+.gallery-icon .icon-text {
+    background-color: green;
+}
+
 .exchange-table-dropdown input,
 .exchange-table-dropdown select {
     width: 100%;
@@ -894,5 +909,21 @@
     .exchange-rate-table {
         max-width: 90%; 
         font-size: 0.8em; 
+    }
+}
+
+.trip-card-highlight {
+    animation: highlight 1.25s ease-out;
+}
+
+@keyframes highlight {
+    0% {
+        background-color: rgba(0, 255, 0, 0.3); /* Initial green highlight */
+    }
+    50% {
+        background-color: rgba(0, 255, 0, 0.6); /* Midpoint green color */
+    }
+    100% {
+        background-color: rgba(0, 255, 0, 0); /* Fade out */
     }
 }

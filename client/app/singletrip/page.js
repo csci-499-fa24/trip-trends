@@ -547,12 +547,6 @@ function Singletrip() {
                                 {/* <div className="spacer"></div>
                                 <div className="divider"></div> */}
 
-
-                                {/* Add Image Button */}
-                                {userRole == 'owner' || userRole == 'editor' ? (
-                                    <UploadTripImage tripId={tripId} />
-                                ) : null}
-
                                 {/* Applied filter popup */}
                                 {selectedFilter && (
                                     <div className="applied-filter">
@@ -650,20 +644,9 @@ function Singletrip() {
                             </div>
                         </div>
                     )}
-                </div>
-            <br></br>
-            <br></br>
-            <br></br>
-            <br></br>
-
-                
+                </div>          
             </div >
-
-
-
             <div>
-            {/* Call the ImagesComponent and pass the tripId */}
-            <TripImageComponent tripId={tripId} />
         </div>
         </div >
     );

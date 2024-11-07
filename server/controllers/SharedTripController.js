@@ -156,6 +156,6 @@ module.exports = {
     getSharedTrips,
     getSharedTripsByUserId,
     getSharedTripsByTripId,
-    updateSharedTrip,
-    deleteSharedTrip
+    deleteSharedTrip,
+    updateSharedTrip
 };

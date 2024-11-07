@@ -58,8 +58,8 @@ const ShareTripComponent = ({ tripId, isOwner }) => {
     const handleRoleChange = async (userId, newRole) => {
         try {
             await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/users/${userId}/trips/${tripId}`, { role: newRole });
-            setSharedUsers(prevUsers => 
-                prevUsers.map(user => 
+            setSharedUsers(prevUsers =>
+                prevUsers.map(user =>
                     user.user_id === userId ? { ...user, role: newRole } : user
                 )
             );

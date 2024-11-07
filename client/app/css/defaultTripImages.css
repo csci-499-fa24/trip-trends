@@ -1,11 +1,11 @@
 .image-wrapper {
-    width: 750px; 
+    width: 750px;
     height: 380px;
     overflow: hidden;
     border-radius: 15px;
     position: relative;
-    margin: 0 auto; 
-    padding: 0 20px; 
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
 .trip-img {
@@ -17,12 +17,33 @@
 
 @media (max-width: 768px) {
     .image-wrapper {
-        margin-bottom: 30px; 
+        margin-bottom: 30px;
     }
 }
 
 @media (max-width: 480px) {
     .image-wrapper {
-        margin-bottom: 40px; 
+        margin-bottom: 40px;
     }
+}
+
+.imgPopUp {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    cursor: pointer;
+}
+
+.imgBox {
+    position: relative;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
 }
