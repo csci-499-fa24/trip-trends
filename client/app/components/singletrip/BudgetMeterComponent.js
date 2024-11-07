@@ -4,7 +4,7 @@ import ReactSpeedometer, { Transition } from 'react-d3-speedometer';
 const BudgetMeterComponent = ({ tripData, expenseData, totalExpenses, homeCurrency}) => {
     return(
         <div>
-            <p id='budgetTitle'>Your Budget Meter:</p>
+            <p id='budgetTitle'> Budget Meter</p>
             {expenseData && expenseData.data && totalExpenses === 0 ? (
                 <p>Loading your budget data...</p>
             ) : totalExpenses > tripData.data.budget ? (

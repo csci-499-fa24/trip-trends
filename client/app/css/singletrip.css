@@ -335,6 +335,13 @@
     margin-top: 0;
 }
 
+#expenseTitle {
+    margin-top: 10px;
+    font-weight: 600;
+    margin-bottom: 0;
+    text-align: center;
+}
+
 .filter-popup {
     position: fixed;
     left: 0;
