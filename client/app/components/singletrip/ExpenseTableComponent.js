@@ -100,11 +100,11 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
         const words = name.split(' ');
         let initials = '';
     
-        if (words.length === 1) {
-            initials = words[0].substring(0, 2).toUpperCase();
-        } else if (words.length > 1) {
-            initials = words[0][0].toUpperCase() + words[1][0].toUpperCase();
-        }
+        // if (words.length === 1) {
+        //     initials = words[0].substring(0, 2).toUpperCase();
+        // } else if (words.length > 1) {
+        //     initials = words[0][0].toUpperCase() + words[1][0].toUpperCase();
+        // }
     
         return (
             <span className="name-icon" style={{ backgroundColor: getCategoryColor(category) }}>
