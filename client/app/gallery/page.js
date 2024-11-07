@@ -48,7 +48,18 @@ function Gallery() {
     }, []);
 
     if (!tripId || !userRole) {
-        return <p>Loading...</p>;
+        return (
+            <div>
+                <HeaderComponent
+                    headerTitle="Trip Gallery"
+                    setUserName={setUserName}
+                    userId={userId}
+                />
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
+                    <p>Loading your Gallery...</p>
+                </div>
+            </div>
+        );
     }
 
     return (
