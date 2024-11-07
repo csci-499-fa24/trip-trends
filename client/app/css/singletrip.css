@@ -743,6 +743,14 @@
     background-color: rgb(235, 5, 5);
 }
 
+.gallery-icon:hover {
+    color: green;
+}
+
+.gallery-icon .icon-text {
+    background-color: green;
+}
+
 .exchange-table-dropdown input,
 .exchange-table-dropdown select {
     width: 100%;
