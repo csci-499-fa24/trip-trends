@@ -4,7 +4,6 @@ const Image = require('../models/Image');
 const createImage = async (req, res) => {
     const tripId = req.params.tripId;
     const { image_url } = req.body;
-    console.log(image_url);
     try {
         // create a model instance 
         const newImage = await Image.create({ trip_id: tripId, image_url });

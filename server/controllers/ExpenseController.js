@@ -70,11 +70,11 @@ const getExpensesByTripId = async (req, res) => {
 // GET expense image using ExpenseID
 const getReceiptImageByExpenseId = async (req, res) => {
     const expenseId = req.params.expenseId;
+    if (!expenseId) {
+        return res.status(400).json({ message: "Expense ID is required" });
+    }
     try {
         const expense = await Expense.findByPk(expenseId);
-        if (!expenseId) {
-            return res.status(400).json({ message: "Expense ID is required" });
-        }
         if (!expense) {
             return res.status(404).json({ message: "Expense not found" });
         }
