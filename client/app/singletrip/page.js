@@ -456,12 +456,23 @@ function Singletrip() {
                             <GeneralTripInfoComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenses={expenseUSD} />
                         </div>
                         <br></br>
-                        <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Expenses in {homeCurrency}</h2>
-                        <SpendingCirclesComponent
-                            totalExpenses={totalExpenses}
-                            homeCurrency={homeCurrency}
-                            tripData={tripData}
-                        />
+                        <div className='container'>
+                            <div className='row'>
+                                <div className='col' style={{flexDirection: 'column'}}>
+                                    <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Exchange Rates</h2>
+                                    {/* Exchange Rate Table */}
+                                    <ExchangeRateTableComponent exchangeRates={exchangeRates} currencyCodes={currencyCodes} homeCurrency={homeCurrency} />
+                                </div>
+                                <div className='col' style={{flexDirection: 'column'}}>
+                                    <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Expenses in {homeCurrency}</h2>
+                                    <SpendingCirclesComponent
+                                        totalExpenses={totalExpenses}
+                                        homeCurrency={homeCurrency}
+                                        tripData={tripData}
+                                    />
+                                </div>
+                            </div>
+                        </div>
                         {/* Data Visualisations Toggle */}
                         <div className='toggle-container'>
                             <div className='row justify-content-center'>
@@ -554,17 +565,13 @@ function Singletrip() {
                             </header>
                         </div>
                         <div className='container'>
-                            <div className='row' style={{justifyContent: 'center', alignItems: 'center', display: 'flex', textAlign: 'center'}}>
+                            <div className='row' style={{ justifyContent: 'center', alignItems: 'center', display: 'flex', textAlign: 'center' }}>
                                 {/* Expense Table */}
                                 <ExpenseTableComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenseData={expenseData}
-                                    currencyCodes={currencyCodes} expenseCategories={expenseCategories} userRole={userRole} categoryData={categoryData}/>
+                                    currencyCodes={currencyCodes} expenseCategories={expenseCategories} userRole={userRole} categoryData={categoryData} />
                             </div>
                             <br></br>
-                            <div className='row' style={{justifyContent: 'center', alignItems: 'center', display: 'flex', textAlign: 'center', width:'50%', margin:'0 auto'}}>
-                                <h2>Exchange Rates</h2>
-                                {/* Exchange Rate Table */}
-                                <ExchangeRateTableComponent exchangeRates={exchangeRates} currencyCodes={currencyCodes} homeCurrency={homeCurrency} />
-                            </div>
+                            <br></br>
                             <br></br>
                         </div>
 
