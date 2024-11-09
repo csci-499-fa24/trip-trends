@@ -3,9 +3,7 @@ import axios from 'axios';
 import Table from 'react-bootstrap/Table';
 import '../../css/ExpenseTableComponent.css';
 
-import { Card, CardContent, Typography, Button, Grid, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
-
-const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, currencyCodes, expenseCategories, userRole}) => {
+const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expenseData, currencyCodes, expenseCategories, categoryData }) => {
     const [isEditPopupVisible, setEditPopupVisible] = useState(false);
     const [selectedExpense, setSelectedExpense] = useState(null);
     const handleEditChange = (e) => {
@@ -45,82 +43,35 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
     const getCategoryIcon = (category) => {
         switch (category) {
             case 'Flights':
-                return '✈️'; 
+                return '✈️';
             case 'Accommodations':
-                return '🏨'; 
+                return '🏨';
             case 'Food/Drink':
-                return '🍽️'; 
+                return '🍽️';
             case 'Transport':
-                return '🚗'; 
+                return '🚗';
             case 'Activities':
-                return '🎢'; 
+                return '🎢';
             case 'Shopping':
-                return '🛍️'; 
+                return '🛍️';
             case 'Phone/Internet':
-                return '📱'; 
+                return '📱';
             case 'Health/Safety':
                 return '🚑';
             case 'Other':
-                return '🌈'; 
+                return '🌈';
         }
     };
 
-    const getCategoryColor = (category) => {
-        switch (category) {
-            case 'Flights':
-                return '#4A90E2'; // Blue
-            case 'Accommodations':
-                return '#7B1FA2'; // Purple
-            case 'Food/Drink':
-                return '#FF5722'; // Orange
-            case 'Transport':
-                return '#2E7D32'; // Green
-            case 'Activities':
-                return '#FFEB3B'; // Yellow
-            case 'Shopping':
-                return '#FF4081'; // Pink
-            case 'Phone/Internet':
-                return '#3F51B5'; // Indigo
-            case 'Health/Safety':
-                return '#F44336'; // Red
-            case 'Other':
-                return '#9E9E9E'; // Grey
-            default:
-                return '#000000'; // Default color
-        }
-    };
+    // console.log(categoryData)
+    // console.log(categoryData.labels)
 
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        const options = { month: 'long', day: 'numeric' };
-        return date.toLocaleDateString('en-US', options);
-    };
-
-    const getNameIcon = (name, category) => {
-        const words = name.split(' ');
-        let initials = '';
-    
-        if (words.length === 1) {
-            initials = words[0].substring(0, 2).toUpperCase();
-        } else if (words.length > 1) {
-            initials = words[0][0].toUpperCase() + words[1][0].toUpperCase();
-        }
-    
-        return (
-            <span className="name-icon" style={{ backgroundColor: getCategoryColor(category) }}>
-                {initials}
-            </span>
-        );
-    };
-    
-    
-    
     return (
-        <div> 
-            {expenseData && expenseData.data ? (
+        <div>
+            {expenseData && expenseData.data && categoryData.datasets && categoryData.datasets.length > 0 ? (
                 <div>
                     <div className="expense-table-container">
-                        <Table  bordered hover size="sm" >
+                        <Table hover size="sm" responsive="sm" className="expense-table">
                             <thead>
                                 <tr>
                                     <th>Name</th>
@@ -129,159 +80,149 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
                                     <th>Category</th>
                                     <th>Date</th>
                                     <th>Notes</th>
-                                    {userRole == 'owner' || userRole == 'editor' ? <th>Edit</th> : null}
+                                    <th>Edit</th>
                                 </tr>
                             </thead>
                             <tbody>
-                            {/* Start of mapping through expenseData.data */}
-                            {expenseData.data.map((expense) => {
-                                // Define the color for the current expense category
-                                const categoryColor = getCategoryColor(expense.category);
-                                
-                                return (
-                                    // Start of a table row for each expense
-                                    <tr key={expense.expense_id}>
-                                        
-                                        {/* Name cell with color and icon */}
-                                        <td style={{ color: categoryColor }}>
-                                            {getNameIcon(expense.name, expense.category)} {expense.name}
-                                        </td>
-                                        
-                                        {/* Amount cell with color and "+" sign */}
-                                        <td style={{ color: categoryColor }} className="amount-cell">
-                                            {`+${expense.amount}`}
-                                        </td>
-                                        
-                                        {/* Currency cell with color */}
-                                        <td style={{ color: categoryColor }}>{expense.currency}</td>
-                                        
-                                        {/* Category cell with icon and color */}
-                                        <td style={{ color: categoryColor }}>
-                                            {getCategoryIcon(expense.category)} {expense.category}
-                                        </td>
-                                        
-                                        {/* Date cell with color */}
-                                        <td style={{ color: categoryColor }}>{formatDate(expense.posted)}</td>
-                                        
-                                        {/* Notes cell with color */}
-                                        <td style={{ color: categoryColor }}>{expense.notes}</td>
+                                {expenseData.data.map((expense) => {
+                                    const categoryIndex = categoryData.labels.indexOf(expense.category);
+                                    const tagColor = categoryData.datasets[0].backgroundColor[categoryIndex];
 
-                                        
-                                        {/* Edit button cell with color */}
-                                        {userRole == 'owner' || userRole == 'editor' ? (
-                                        <td style={{ color: categoryColor }}>
-                                            {/* <div onClick={() => { setEditPopupVisible(true); setSelectedExpense(expense) }} className='edit-expense'>Edit Expense</div> */}
-                                            <div className="icon-div" tooltip="Edit Trip" tabIndex="0">
-                                                <div className="icon-SVG">
-                                                    <svg
-                                                        onClick={() => {
-                                                            setEditPopupVisible(true);
-                                                            setSelectedExpense(expense);
-                                                        }}
-                                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke={categoryColor} className="size-6">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                                                    </svg>
-                                                    <span className="icon-text">Edit Expense</span>
+                                    return (
+                                        <tr key={expense.expense_id}>
+                                            <td>{expense.name}</td>
+                                            <td>{expense.amount}</td>
+                                            <td>{expense.currency}</td>
+                                            <td>
+                                                {/* Category with color tag */}
+                                                <span
+                                                    className="category-tag"
+                                                    style={{
+                                                        backgroundColor: tagColor,
+                                                        color: 'white',
+                                                        padding: '5px 10px',
+                                                        borderRadius: '20px',
+                                                        textTransform: 'capitalize',
+                                                        fontWeight: 'bold'
+                                                    }}
+                                                >
+                                                    {getCategoryIcon(expense.category)} {expense.category}
+                                                </span>
+                                            </td>
+                                            {/* <td>{getCategoryIcon(expense.category)} {expense.category}</td> */}
+                                            <td>{expense.posted.split('-')[1]}/{expense.posted.split('-')[2]}/{expense.posted.split('-')[0]} </td>
+                                            <td>{expense.notes}</td>
+                                            <td>
+                                                <div className="icon-div" tooltip="Edit Trip" tabIndex="0">
+                                                    <div className="icon-SVG">
+                                                        <svg
+                                                            onClick={() => {
+                                                                setEditPopupVisible(true);
+                                                                setSelectedExpense(expense);
+                                                            }}
+                                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                                        </svg>
+                                                        <span className="icon-text">Edit Expense</span>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div className="expense-form">
-                                                {isEditPopupVisible && selectedExpense && (
-                                                    <div className="modal">
-                                                        <div className="modal-content">
-                                                            <span className="close" onClick={() => setEditPopupVisible(false)}>&times;</span>
-                                                            <h2 className="edit-expense-title">Edit or Delete Expense</h2>
-                                                            <form onSubmit={(e) => {
-                                                                e.preventDefault();
-                                                                submitEditExpense(selectedExpense.expense_id);
-                                                            }}>
-                                                                <label className="edit-expense-field-label">
-                                                                    Expense Name:
-                                                                    <input
-                                                                        type="text"
-                                                                        name="name"
-                                                                        value={selectedExpense.name}
-                                                                        onChange={handleEditChange}
-                                                                        required
-                                                                    />
-                                                                </label>
-                                                                <div className="field-pair">
+                                                <div className="expense-form">
+                                                    {isEditPopupVisible && selectedExpense && (
+                                                        <div className="modal">
+                                                            <div className="modal-content">
+                                                                <span className="close" onClick={() => setEditPopupVisible(false)}>&times;</span>
+                                                                <h2 className="edit-expense-title">Edit or Delete Expense</h2>
+                                                                <form onSubmit={(e) => {
+                                                                    e.preventDefault();
+                                                                    submitEditExpense(selectedExpense.expense_id);
+                                                                }}>
                                                                     <label className="edit-expense-field-label">
-                                                                        Amount:
+                                                                        Expense Name:
                                                                         <input
-                                                                            type="number"
-                                                                            name="amount"
-                                                                            value={selectedExpense.amount}
+                                                                            type="text"
+                                                                            name="name"
+                                                                            value={selectedExpense.name}
                                                                             onChange={handleEditChange}
                                                                             required
                                                                         />
                                                                     </label>
+                                                                    <div className="field-pair">
+                                                                        <label className="edit-expense-field-label">
+                                                                            Amount:
+                                                                            <input
+                                                                                type="number"
+                                                                                name="amount"
+                                                                                value={selectedExpense.amount}
+                                                                                onChange={handleEditChange}
+                                                                                required
+                                                                            />
+                                                                        </label>
+                                                                        <label className="edit-expense-field-label">
+                                                                            Currency:
+                                                                            <select
+                                                                                name="currency"
+                                                                                value={selectedExpense.currency}
+                                                                                onChange={handleEditChange}
+                                                                                required
+                                                                            >
+                                                                                <option value="">Select Currency</option>
+                                                                                {currencyCodes.map((code) => (
+                                                                                    <option key={code} value={code}>{code}</option>
+                                                                                ))}
+                                                                            </select>
+                                                                        </label>
+                                                                    </div>
+                                                                    <div className="field-pair">
+                                                                        <label className="edit-expense-field-label">
+                                                                            Category:
+                                                                            <select
+                                                                                name="category"
+                                                                                value={selectedExpense.category}
+                                                                                onChange={handleEditChange}
+                                                                                required
+                                                                            >
+                                                                                <option value="">Select Category</option>
+                                                                                {expenseCategories.map((category) => (
+                                                                                    <option key={category} value={category}>{category}</option>
+                                                                                ))}
+                                                                            </select>
+                                                                        </label>
+                                                                        <label className="edit-expense-field-label">
+                                                                            Date:
+                                                                            <input
+                                                                                type="date"
+                                                                                name="posted"
+                                                                                value={selectedExpense.posted}
+                                                                                onChange={handleEditChange}
+                                                                                required
+                                                                            />
+                                                                        </label>
+                                                                    </div>
                                                                     <label className="edit-expense-field-label">
-                                                                        Currency:
-                                                                        <select
-                                                                            name="currency"
-                                                                            value={selectedExpense.currency}
-                                                                            onChange={handleEditChange}
-                                                                            required
-                                                                        >
-                                                                            <option value="">Select Currency</option>
-                                                                            {currencyCodes.map((code) => (
-                                                                                <option key={code} value={code}>{code}</option>
-                                                                            ))}
-                                                                        </select>
-                                                                    </label>
-                                                                </div>
-                                                                <div className="field-pair">
-                                                                    <label className="edit-expense-field-label">
-                                                                        Category:
-                                                                        <select
-                                                                            name="category"
-                                                                            value={selectedExpense.category}
-                                                                            onChange={handleEditChange}
-                                                                            required
-                                                                        >
-                                                                            <option value="">Select Category</option>
-                                                                            {expenseCategories.map((category) => (
-                                                                                <option key={category} value={category}>{category}</option>
-                                                                            ))}
-                                                                        </select>
-                                                                    </label>
-                                                                    <label className="edit-expense-field-label">
-                                                                        Date:
+                                                                        Notes:
                                                                         <input
-                                                                            type="date"
-                                                                            name="posted"
-                                                                            value={selectedExpense.posted}
+                                                                            type="text"
+                                                                            name="notes"
+                                                                            value={selectedExpense.notes}
                                                                             onChange={handleEditChange}
-                                                                            required
                                                                         />
                                                                     </label>
-                                                                </div>
-                                                                <label className="edit-expense-field-label">
-                                                                    Notes:
-                                                                    <input
-                                                                        type="text"
-                                                                        name="notes"
-                                                                        value={selectedExpense.notes}
-                                                                        onChange={handleEditChange}
-                                                                    />
-                                                                </label>
-                                                                <div className='container'>
-                                                                    <div className='row'>
-                                                                        <div className='col'>
-                                                                            <button type="submit" className="submit-edit-expense-button">Edit</button>
-                                                                        </div>
-                                                                        <div className='col'>
-                                                                            <button type="button" onClick={() => deleteExpense(selectedExpense.expense_id)} className="delete-expense-button">Delete</button>
+                                                                    <div className='container'>
+                                                                        <div className='row'>
+                                                                            <div className='col'>
+                                                                                <button type="submit" className="submit-edit-expense-button">Edit</button>
+                                                                            </div>
+                                                                            <div className='col'>
+                                                                                <button type="button" onClick={() => deleteExpense(selectedExpense.expense_id)} className="delete-expense-button">Delete</button>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
-                                                                </div>
-                                                            </form>
+                                                                </form>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                )}
-                                            </div>
+                                                    )}
+                                                </div>
                                             </td>
-                                        ) : null}
                                         </tr>
                                     );
                                 })}
@@ -295,6 +236,5 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations , expenseData, 
         </div>
     );
 };
-
 
 export default ExpenseTableComponent;

@@ -47,7 +47,7 @@ function Singletrip() {
     const [originalData, setOriginalData] = useState([]);
     const [selectedFilter, setSelectedFilter] = useState('');
     const [tripLocations, setTripLocations] = useState([]);
-    const [selectedCategory, setSelectedCategory]= useState('');
+    const [selectedCategory, setSelectedCategory] = useState('');
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
     const [newExpenseData, setNewExpenseData] = useState({
         trip_id: '',
@@ -82,7 +82,7 @@ function Singletrip() {
             }
         }
     }, []);
-    
+
     // Fetch home currency when userId changes
     useEffect(() => {
         const getHomeCurrency = async () => {
@@ -93,7 +93,7 @@ function Singletrip() {
                 }
             }
         };
-    
+
         getHomeCurrency(); // Fetch home currency when userId is available
     }, [userId]);
 
@@ -112,8 +112,8 @@ function Singletrip() {
     useEffect(() => {
         const savedFilter = localStorage.getItem('selectedFilter');
         if (savedFilter && expenseUSD.length > 0) {
-            console.log(expenseUSD); 
-            applyFilter(savedFilter, expenseUSD); 
+            console.log(expenseUSD);
+            applyFilter(savedFilter, expenseUSD);
         }
     }, [expenseUSD]);
 
@@ -193,8 +193,8 @@ function Singletrip() {
     };
 
     const handleAllCategoriesSelect = () => {
-        setSelectedCategory(""); 
-        setExpenseData({ data: expenseUSD }); 
+        setSelectedCategory("");
+        setExpenseData({ data: expenseUSD });
         setIsDropdownVisible(false);
     };
 
@@ -204,23 +204,21 @@ function Singletrip() {
     };
 
 
-    useEffect(()=>{
-        if(selectedCategory)
-        {
+    useEffect(() => {
+        if (selectedCategory) {
             applyCategoryFilter();
         }
 
-    },[selectedCategory]);
+    }, [selectedCategory]);
 
-    const applyCategoryFilter=()=>{
+    const applyCategoryFilter = () => {
 
-        let filteredData=[];
+        let filteredData = [];
 
-        if(selectedCategory){
-            expenseUSD.forEach(expense=>{
+        if (selectedCategory) {
+            expenseUSD.forEach(expense => {
 
-                if(expense.category===selectedCategory)
-                {
+                if (expense.category === selectedCategory) {
                     filteredData.push(expense);
                 }
             })
@@ -325,7 +323,7 @@ function Singletrip() {
             });
 
     }, [tripId]);
-    
+
     useEffect(() => {
         if (homeCurrency) {
             // Only call fetchCurrencyRates when homeCurrency is successfully fetched
@@ -385,28 +383,28 @@ function Singletrip() {
                     const targetCurrency = expense.currency;
                     return axios.get(`https://hexarate.paikama.co/api/rates/latest/${targetCurrency}?target=${homeCurrency}`);
                 });
-    
+
             if (currencyPromises.length > 0) {
                 const currencyResponses = await Promise.all(currencyPromises);
                 const currencyRates = currencyResponses.map((response, index) => ({
                     currency: expenses[index].currency,
                     rate: response.data.data.mid // Assuming correct response structure
                 }));
-    
+
                 // Convert expenses to homeCurrency and accumulate category data
                 const categoryTotals = {};
                 const convertedExpenses = expenses.map((expense, index) => {
                     const rate = currencyRates.find(rate => rate.currency === expense.currency)?.rate || 1;
                     const amountInHomeCurrency = (parseFloat(expense.amount) * rate).toFixed(2);
-    
+
                     // Accumulate totals by category
                     if (!categoryTotals[expense.category]) {
                         categoryTotals[expense.category] = 0;
                     }
                     categoryTotals[expense.category] += parseFloat(amountInHomeCurrency);
-    
+
                     setTotalExpenses(prevTotal => prevTotal + parseFloat(amountInHomeCurrency));
-    
+
                     return {
                         ...expense,
                         amountInHomeCurrency // Add converted amount to expense
@@ -415,11 +413,11 @@ function Singletrip() {
 
                 setconvertedHomeCurrencyExpenseData(convertedExpenses)
                 setExpenseUSD(convertedExpenses);
-    
+
                 // Prepare data for pie chart
                 const labels = Object.keys(categoryTotals);
                 const data = Object.values(categoryTotals);
-    
+
                 setCategoryData({
                     labels,
                     datasets: [{
@@ -438,7 +436,7 @@ function Singletrip() {
         } catch (error) {
             console.error('Error fetching currency rates:', error);
         }
-    };    
+    };
 
     const toggleVisibility = () => {
         setIsVisible(prevState => !prevState);
@@ -455,21 +453,32 @@ function Singletrip() {
                             {/* Icon Bar Above Trip Info */}
                             <TripIconBarComponent tripId={tripId} userId={userId} isOwner={isOwner} tripData={tripData} tripLocations={tripLocations} userRole={userRole} fetchTripData={fetchTripData} />
                             {/* General Trip Info*/}
-                            <GeneralTripInfoComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenses={expenseUSD}/>
+                            <GeneralTripInfoComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenses={expenseUSD} />
                         </div>
                         <br></br>
-                        <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Expenses in {homeCurrency}</h2>
-                        <SpendingCirclesComponent 
-                            totalExpenses={totalExpenses}
-                            homeCurrency={homeCurrency}
-                            tripData={tripData}
-                        />
+                        <div className='container'>
+                            <div className='row'>
+                                <div className='col' style={{flexDirection: 'column'}}>
+                                    <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Exchange Rates</h2>
+                                    {/* Exchange Rate Table */}
+                                    <ExchangeRateTableComponent exchangeRates={exchangeRates} currencyCodes={currencyCodes} homeCurrency={homeCurrency} />
+                                </div>
+                                <div className='col' style={{flexDirection: 'column'}}>
+                                    <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Expenses in {homeCurrency}</h2>
+                                    <SpendingCirclesComponent
+                                        totalExpenses={totalExpenses}
+                                        homeCurrency={homeCurrency}
+                                        tripData={tripData}
+                                    />
+                                </div>
+                            </div>
+                        </div>
                         {/* Data Visualisations Toggle */}
                         <div className='toggle-container'>
                             <div className='row justify-content-center'>
                                 <div className='col-auto'>
-                                    <div 
-                                        className='icon-div toggle-icon' 
+                                    <div
+                                        className='icon-div toggle-icon'
                                         tabIndex="0"
                                         onClick={toggleVisibility}
                                     >
@@ -489,33 +498,29 @@ function Singletrip() {
                                     </div>
                                 </div>
                             </div>
-                        
                             {isVisible && (
                                 <>
-                                <div className='row'>
-                                    {/* Budget Meter */}
-                                    <div className='col'>
-                                        <div className="meter-container"> 
-                                            <BudgetMeterComponent tripData={tripData} expenseData={expenseData} totalExpenses={totalExpenses} homeCurrency={homeCurrency}/>
+                                    <div className='row'>
+                                        {/* Budget Meter */}
+                                        <div className='col'>
+                                            <div className="meter-container">
+                                                <BudgetMeterComponent tripData={tripData} expenseData={expenseData} totalExpenses={totalExpenses} homeCurrency={homeCurrency} />
+                                            </div>
+                                        </div>
+                                        {/* Pie Chart */}
+                                        <div className='col'>
+                                            <div className="meter-container">
+                                                <CategoryDataComponent categoryData={categoryData} />
+                                            </div>
                                         </div>
                                     </div>
-                                    {/* Pie Chart */}
-                                    <div className='col'>
-                                        <div className="meter-container">
-                                            <CategoryDataComponent categoryData={categoryData} />
-                                        </div>
+                                    {/* Bar Graph */}
+                                    <div className="meter-container">
+                                        <BarGraphComponent tripData={tripData} expenseData={convertedHomeCurrencyExpenseData} categoryData={categoryData} />
                                     </div>
-                                </div>
-                                {/* Bar Graph */}
-                                <div className="meter-container">
-                                    <BarGraphComponent tripData={tripData} expenseData={convertedHomeCurrencyExpenseData} categoryData={categoryData} />
-                                </div>
-                             </>
+                                </>
                             )}
                         </div>
-                        
-                        
-                        <br></br>
                         {/* Icon Bar Above Expenses */}
                         <div>
                             <header className="icon-bar-header">
@@ -532,6 +537,7 @@ function Singletrip() {
                                         </div>
                                     </div>
                                 ) : null}
+                                <h2>Expense History</h2>
                                 {/* Filter Expenses Button */}
                                 <div className="icon-div" tooltip="Filter" tabIndex="0">
                                     <div className="icon-SVG">
@@ -547,12 +553,6 @@ function Singletrip() {
                                 {/* <div className="spacer"></div>
                                 <div className="divider"></div> */}
 
-
-                                {/* Add Image Button */}
-                                {userRole == 'owner' || userRole == 'editor' ? (
-                                    <UploadTripImage tripId={tripId} />
-                                ) : null}
-
                                 {/* Applied filter popup */}
                                 {selectedFilter && (
                                     <div className="applied-filter">
@@ -564,16 +564,16 @@ function Singletrip() {
                                 )}
                             </header>
                         </div>
-                        <div className='expense-container'>
-                            {/* Expense Table */}
-                            <ExpenseTableComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenseData={expenseData}
-                                currencyCodes={currencyCodes} expenseCategories={expenseCategories} userRole={userRole}/>
-                        
-                            <div>
-                            {/* Exchange Rate Table */}
-                            <ExchangeRateTableComponent exchangeRates={exchangeRates} currencyCodes={currencyCodes} homeCurrency={homeCurrency}/>
+                        <div className='container'>
+                            <div className='row' style={{ justifyContent: 'center', alignItems: 'center', display: 'flex', textAlign: 'center' }}>
+                                {/* Expense Table */}
+                                <ExpenseTableComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenseData={expenseData}
+                                    currencyCodes={currencyCodes} expenseCategories={expenseCategories} userRole={userRole} categoryData={categoryData} />
+                            </div>
+                            <br></br>
+                            <br></br>
+                            <br></br>
                         </div>
-                </div>
 
                     </div>
                 ) : (
@@ -628,22 +628,21 @@ function Singletrip() {
                                     >
                                         Oldest
                                     </button>
-                                    
                                     <div className="filter-option-button">
                                         <label htmlFor="category" onClick={toggleDropdown} style={{ cursor: 'pointer' }}>
                                             Select Category
                                         </label>
                                         {isDropdownVisible && (
                                             <div className="custom-dropdown">
-                                            <div className="dropdown-item" onClick={handleAllCategoriesSelect}>
-                                                All Categories
-                                            </div>
-                                            {expenseCategories.map((category) => (
-                                                <div key={category} className="dropdown-item" onClick={() => handleCategorySelect(category)}>
-                                                    {category}
+                                                <div className="dropdown-item" onClick={handleAllCategoriesSelect}>
+                                                    All Categories
                                                 </div>
-                                            ))}
-                                        </div>
+                                                {expenseCategories.map((category) => (
+                                                    <div key={category} className="dropdown-item" onClick={() => handleCategorySelect(category)}>
+                                                        {category}
+                                                    </div>
+                                                ))}
+                                            </div>
                                         )}
                                     </div>
                                 </div>
@@ -651,20 +650,9 @@ function Singletrip() {
                         </div>
                     )}
                 </div>
-            <br></br>
-            <br></br>
-            <br></br>
-            <br></br>
-
-                
             </div >
-
-
-
             <div>
-            {/* Call the ImagesComponent and pass the tripId */}
-            <TripImageComponent tripId={tripId} />
-        </div>
+            </div>
         </div >
     );
 }

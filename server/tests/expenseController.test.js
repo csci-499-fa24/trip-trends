@@ -5,6 +5,7 @@ const {
     getExpenses,
     getExpenseById,
     getExpensesByTripId,
+    getReceiptImageByExpenseId,
     updateExpense,
     deleteExpense
 } = require('../controllers/ExpenseController');
@@ -27,6 +28,7 @@ describe('Expense Controller', () => {
             status: jest.fn().mockReturnThis(),
             json: jest.fn(),
             send: jest.fn(),
+            type: jest.fn()
         };
         console.error = jest.fn(); // suppress error logs
     });
@@ -224,7 +226,60 @@ describe('Expense Controller', () => {
     
         // Check that the response contains the error message
         expect(mockResponse.json).toHaveBeenCalledWith({ message: "Internal Server Error", error: "Database error" });
-    });    
+    });   
+    
+    it('should return 400 if expense ID is missing', async () => {
+        await getReceiptImageByExpenseId(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(400);
+        expect(mockResponse.json).toHaveBeenCalledWith({
+            message: "Expense ID is required"
+        });
+    });
+
+    it('should return 404 if expense is not found', async () => {
+        const mockExpenseId = '1234';
+        mockRequest.params.expenseId = mockExpenseId;
+
+        Expense.findByPk = jest.fn().mockResolvedValue(null);
+
+        await getReceiptImageByExpenseId(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(404);
+        expect(mockResponse.json).toHaveBeenCalledWith({
+            message: "Expense not found"
+        });
+    });
+
+    it('should return 200 with a message if receipt image is not available', async () => {
+        const mockExpenseId = '1234';
+        mockRequest.params.expenseId = mockExpenseId;
+
+        const expense = { image: null };
+        Expense.findByPk = jest.fn().mockResolvedValue(expense);
+
+        await getReceiptImageByExpenseId(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(200);
+        expect(mockResponse.json).toHaveBeenCalledWith({
+            message: "Receipt image not added"
+        });
+    });
+
+    it('should return 200 with image data if receipt image is available', async () => {
+        const mockExpenseId = '1234';
+        const mockImageData = Buffer.from('image-data');
+        mockRequest.params.expenseId = mockExpenseId;
+
+        const expense = { image: mockImageData };
+        Expense.findByPk = jest.fn().mockResolvedValue(expense);
+
+        await getReceiptImageByExpenseId(mockRequest, mockResponse);
+
+        expect(mockResponse.type).toHaveBeenCalledWith("image/png");
+        expect(mockResponse.status).toHaveBeenCalledWith(200);
+        expect(mockResponse.send).toHaveBeenCalledWith(mockImageData);
+    });
 
     it('should update expense and return 200 status', async () => {
         const mockExpenseId = '4567';

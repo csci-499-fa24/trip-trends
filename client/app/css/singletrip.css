@@ -335,6 +335,13 @@
     margin-top: 0;
 }
 
+#expenseTitle {
+    margin-top: 10px;
+    font-weight: 600;
+    margin-bottom: 0;
+    text-align: center;
+}
+
 .filter-popup {
     position: fixed;
     left: 0;
@@ -345,6 +352,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 2;
 }
 
 .filter-popup-content {
@@ -387,6 +395,7 @@
     width: 100%;
     margin-bottom: 10px;
     transition: background-color 0.3s ease, color 0.3s ease;
+    text-align: center;
 }
 
 .filter-option-button:hover {
@@ -419,42 +428,6 @@
     display: flex;
     align-items: center;
     gap: 10px;
-}
-
-.expense-table-container {
-    width: 64.5%;
-    float: left;
-    padding: 10px;
-    background-color: #f5f5f5;
-    border-radius: 10px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    margin-left: 20px;
-    max-height: 400px; 
-    overflow-y: auto; 
-    overflow-x: hidden; 
-    margin-right: 20px;
-}
-
-.expense-table th {
-    text-align: center;
-    padding: auto;
-}
-
-.expense-table td {
-    text-align: left;
-    vertical-align: middle;
-    padding: 10px;
-}
-
-.expense-table td:nth-child(2) {
-    text-align: right;
-}
-
-.expense-table td:nth-child(3),
-.expense-table td:nth-child(4),
-.expense-table td:nth-child(5),
-.expense-table td:nth-child(7) {
-    text-align: center;
 }
 
 .edit-expense {
@@ -508,7 +481,7 @@
 
 
 .exchange-rates-container {
-    width:30%;
+    /* width:30%; */
     max-width: 600px;
     overflow: hidden;
     padding: 20px;
@@ -592,17 +565,14 @@
 }
 
 .icon-bar-header {
-    /* width: 490px;
-    padding: 0 14px;
-    display: flex;
+    width: 90%;
+    justify-content: space-between;
     align-items: center;
-    background-color: white;
-    margin-left: 5 px; */
     display: flex;
     align-items: center;
     padding: 20px; /* Adjust spacing as needed */
     background-color: white; /* Optional background color */
-    margin: 0; /* Center the icon bar */
+    margin: 0 auto; /* Center the icon bar */
 }
 
 .icon-div {
@@ -736,6 +706,14 @@
     background-color: rgb(235, 5, 5);
 }
 
+.gallery-icon:hover {
+    color: green;
+}
+
+.gallery-icon .icon-text {
+    background-color: green;
+}
+
 .exchange-table-dropdown input,
 .exchange-table-dropdown select {
     width: 100%;
@@ -790,10 +768,12 @@
 }
 
 .circle-card {
+    margin-top: -30px;
     background-color: #f5f5f5;
     text-align: center;
     border-radius: 50%;
     width: 100%; 
+    width: 200px;
     max-width: 200px; 
     aspect-ratio: 1; 
     display: flex;
@@ -894,5 +874,21 @@
     .exchange-rate-table {
         max-width: 90%; 
         font-size: 0.8em; 
+    }
+}
+
+.trip-card-highlight {
+    animation: highlight 1.25s ease-out;
+}
+
+@keyframes highlight {
+    0% {
+        background-color: rgba(0, 255, 0, 0.3); /* Initial green highlight */
+    }
+    50% {
+        background-color: rgba(0, 255, 0, 0.6); /* Midpoint green color */
+    }
+    100% {
+        background-color: rgba(0, 255, 0, 0); /* Fade out */
     }
 }
