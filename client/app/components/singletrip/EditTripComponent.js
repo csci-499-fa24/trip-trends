@@ -58,11 +58,13 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
         setTempLocation('');
     };
 
+
     const handleEdit = async (e) => {
         e.preventDefault();
         try {
-            const requestBody = { name, start_date: startDate, end_date: endDate, budget }; 
+            const requestBody = { name, start_date: startDate, end_date: endDate, budget, locations: tripLocationsState }; 
             await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`, requestBody);
+            await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/images/trips/${tripId}`)
             toast.success("Trip updated successfully!");
             setIsOpen(false);
             setTimeout(() => {

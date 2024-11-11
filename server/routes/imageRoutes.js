@@ -6,5 +6,6 @@ router.post("/trips/:tripId/", ImageController.createImage);
 router.get("/", ImageController.getImages);
 router.get("/:imageId", ImageController.getImageById);
 router.get("/trips/:tripId/", ImageController.getImagesByTripId);
+router.delete("/trips/:tripId/", ImageController.deleteTripImages);
 
 module.exports = router;

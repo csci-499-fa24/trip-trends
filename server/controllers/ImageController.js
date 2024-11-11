@@ -1,4 +1,5 @@
 const Image = require('../models/Image');
+const TripLocation = require('../models/TripLocation')
 
 // POST new image data
 const createImage = async (req, res) => {
@@ -58,9 +59,40 @@ const getImagesByTripId = async (req, res) => {
     }
 };
 
+// DELETE all image data with specified TripId
+const deleteTripImages = async (req, res) => {
+    const tripId = req.params.tripId;
+    try {
+        if (!tripId) {
+            return res.status(400).json({ message: "Trip ID is required" });
+        }
+        const tripLocations = await TripLocation.findAll({ where: { trip_id: tripId } });
+
+        if (!tripLocations || tripLocations.length === 0) {
+            return res.status(404).json({ message: "No location found for the specified tripId" });
+        }
+        
+        const deletedImagesCount = await Image.destroy({
+            where: {
+                trip_id: tripId,
+            },
+        });
+
+        if (deletedImagesCount === 0) {
+            return res.status(404).json({ message: "No images found for the specified tripId" });
+        }
+
+        res.status(200).json({ message: `${deletedImagesCount} images deleted successfully.` });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
+    }
+};
+
 module.exports = {
     createImage,
     getImages,
     getImageById,
-    getImagesByTripId
+    getImagesByTripId, 
+    deleteTripImages
 };
