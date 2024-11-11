@@ -3,6 +3,7 @@ const router = express.Router();
 const ExpenseController = require('../controllers/ExpenseController');
 
 router.post("/trips/:tripId/", ExpenseController.createExpense);
+router.post("/process-receipt", ExpenseController.getExtractedReceiptData);
 router.get("/", ExpenseController.getExpenses);
 router.get("/:expenseId", ExpenseController.getExpenseById);
 router.get("/trips/:tripId/", ExpenseController.getExpensesByTripId);
