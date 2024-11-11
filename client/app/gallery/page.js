@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import TripImageComponent from '../components/singletrip/TripImageComponent';
 import UploadTripImage from '../components/singletrip/UploadTripImage';
 import HeaderComponent from '../components/HeaderComponent';
+import axios from 'axios';
 
 function Gallery() {
     const [tripId, setTripId] = useState(null);
@@ -12,7 +13,6 @@ function Gallery() {
     const [userName, setUserName] = useState("");
 
     const getUserId = () => {
-        // Get user ID to create and get trip from onboarded user
         const user_id = localStorage.getItem("user_id");
         if (user_id) {
             setUserId(user_id);
