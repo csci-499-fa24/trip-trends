@@ -78,6 +78,41 @@ const updateTripLocation = async (req, res) => {
     }
 };
     
+// PUT request to update multiple trip locations (for editing purposes)
+const updateLocationsInEdit = async (req, res) => {
+    const { tripId, locations } = req.body; 
+
+    try {
+        // Get current locations for this trip
+        const existingLocations = await TripLocation.findAll({ where: { trip_id: tripId } });
+        
+        // Check if no locations are found
+        if (existingLocations.length === 0) {
+            return res.status(404).json({ message: "No locations found for this trip" });
+        }
+
+        const existingLocationNames = existingLocations.map(loc => loc.location);
+
+        // Determine which locations were removed and which are new
+        const removedLocations = existingLocationNames.filter(loc => !locations.includes(loc));
+        const newLocations = locations.filter(loc => !existingLocationNames.includes(loc));
+
+        // Remove the locations that are no longer in the list
+        if (removedLocations.length > 0) {
+            await TripLocation.destroy({ where: { trip_id: tripId, location: removedLocations } });
+        }
+
+        // Add new locations to TripLocation
+        const newLocationEntries = newLocations.map(location => ({ trip_id: tripId, location: location }));
+        await TripLocation.bulkCreate(newLocationEntries);
+        
+        res.status(200).json({ message: "Locations updated successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Error updating locations", error: err.message });
+    }
+};
+
 // DELETE trip location data
 const deleteTripLocation = async (req, res) => {
     const tripId = req.params.tripId;
