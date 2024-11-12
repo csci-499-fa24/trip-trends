@@ -110,6 +110,14 @@ const ReceiptImageComponent = ({ tripId, handleFormData, updateIsUploadHidden })
             "office equipment": "Shopping"
         };
 
+        useEffect(() => {
+            const loadProgressBar = async () => {
+                await import('progressbar.js');
+            };
+            loadProgressBar();
+            initializeProgressBar();
+        }, []);
+
         let best_category;
         const itemTypes = new Set(); // will remove duplicates
         const categoryCounts = {};
@@ -245,14 +253,6 @@ const ReceiptImageComponent = ({ tripId, handleFormData, updateIsUploadHidden })
             toast.error("Please choose a file to upload.");
         }
     };
-
-    useEffect(() => {
-        const loadProgressBar = async () => {
-            await import('progressbar.js');
-        };
-        loadProgressBar();
-        initializeProgressBar();
-    }, []);
 
     return (
         <div className="receipt-upload-container">
