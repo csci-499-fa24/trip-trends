@@ -459,12 +459,12 @@ function Singletrip() {
                         <div className='container'>
                             <div className='row'>
                                 <div className='col' style={{flexDirection: 'column'}}>
-                                    <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Exchange Rates</h2>
+                                    <h2 style={{ textAlign: 'center', marginBottom: '20px', marginTop: '15px'}}>Exchange Rates</h2>
                                     {/* Exchange Rate Table */}
                                     <ExchangeRateTableComponent exchangeRates={exchangeRates} currencyCodes={currencyCodes} homeCurrency={homeCurrency} />
                                 </div>
                                 <div className='col' style={{flexDirection: 'column'}}>
-                                    <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Expenses in {homeCurrency}</h2>
+                                    <h2 style={{ textAlign: 'center', marginTop: '30px', marginBottom: '20px' }}>Expenses in {homeCurrency}</h2>
                                     <SpendingCirclesComponent
                                         totalExpenses={totalExpenses}
                                         homeCurrency={homeCurrency}

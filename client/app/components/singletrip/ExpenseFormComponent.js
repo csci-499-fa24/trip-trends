@@ -24,15 +24,28 @@ const ExpenseFormComponent = ({
 
     const handleFormData = (formData) => {
         // set form data from receipt component
-        const file = formData.get('image')
-        setNewExpenseData((prevData) => ({ ...prevData, image: formData.get('image') }));
+        const name = formData.get('name');
+        const amount = formData.get('amount');
+        const category = formData.get('category');
+        const currency = formData.get('currency');
+        const posted = formData.get('posted'); // posted date
+        const image_file = formData.get('file')
+
+        setSelectedCurrency(currency);
+        setNewExpenseData((prevData) => ({ ...prevData, name: name, amount: amount, category: category, currency: currency, posted: posted, image: image_file }));
         // console.log("Received form data from child:", file);
+    };
+
+    const [isUploadHidden, setIsUploadHidden] = useState(false);
+
+    const updateIsUploadHidden = (newState) => {
+        setIsUploadHidden(newState);
     };
 
     return (
         <div className="expense-form">
             {isPopUpVisible && (
-                <div className="modal">
+                <div className={`modal ${isUploadHidden ? 'wide-form' : ''}`}>
                     <div className="modal-content">
                         <span className="close" onClick={() => setPopUpVisible(false)}>&times;</span>
                         <h2 className="new-expense-title">New Expense</h2>
@@ -148,7 +161,7 @@ const ExpenseFormComponent = ({
                                 <button type="submit" className="submit-new-expense-button">Create</button>
                             </form>
                             <div className="upload-section">
-                                <ReceiptImageComponent tripId={tripId} handleFormData={handleFormData} />
+                                <ReceiptImageComponent tripId={tripId} handleFormData={handleFormData} updateIsUploadHidden={updateIsUploadHidden} />
                             </div>
 
                         </div>

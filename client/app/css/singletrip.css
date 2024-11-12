@@ -587,6 +587,7 @@
     position: relative;
     cursor: pointer;
     transition: none;
+    z-index: 999;
 }
 
 .icon-div .icon-SVG {
@@ -891,4 +892,11 @@
     100% {
         background-color: rgba(0, 255, 0, 0); /* Fade out */
     }
+}   
+
+.modal.wide-form {
+    width: 145%;
+    height: 105%;
+    transform: translate(-15%, 0%);
+
 }
