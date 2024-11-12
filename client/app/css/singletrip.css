@@ -900,3 +900,23 @@
     transform: translate(-15%, 0%);
 
 }
+
+.favorite-icon {
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;  
+    height: 50px;  
+    padding: 5px;
+    border-radius: 10px;
+    background-color: rgba(123, 117, 117, 0.223);  
+    z-index: 3; 
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.favorite-icon:hover {
+    background-color: rgba(255, 255, 255, 0.8); 
+    border-color: rgba(0, 0, 0, 0.8); 
+}

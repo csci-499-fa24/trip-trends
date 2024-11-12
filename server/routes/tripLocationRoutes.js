@@ -9,5 +9,6 @@ router.get("/users/:userId", TripLocationController.getTripLocationByUserId);
 router.put("/trips/:tripId/:tripLocationId", TripLocationController.updateTripLocation);
 router.put("/update-locations", TripLocationController.updateLocationsInEdit);
 router.delete("/trips/:tripId/:tripLocationId", TripLocationController.deleteTripLocation);
+// router.delete("/trips/:tripId/", TripLocationController.deleteTripLocation);
 
 module.exports = router;

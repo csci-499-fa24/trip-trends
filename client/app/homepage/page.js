@@ -69,8 +69,22 @@ function homepage() {
             return;
         }
         try {
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/users/${userId}`);
-            setTrips(response.data.data);
+            const [tripsResponse, favoritesResponse] = await Promise.all([
+                axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/users/${userId}`), 
+                axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/users/${userId}`) 
+            ]);
+            const tripsData = tripsResponse.data.data;
+            const favoritesData = favoritesResponse.data.data;
+            const tripsWithFavorites = tripsData.map(trip => {
+                const favorite = favoritesData.find(fav => fav.trip_id === trip.trip_id);
+                return {
+                    ...trip,
+                    favorite: favorite ? favorite.favorite : false 
+                };
+            });
+            const sortedTrips = tripsWithFavorites.sort((a, b) => b.favorite - a.favorite); 
+            setTrips(sortedTrips);
+        
         } catch (err) {
             console.error(err);
             setTrips([]);
