@@ -13,15 +13,12 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses })
 
 
     const DateComponent = ({ dateStr }) => {
-        const dateObj = new Date(dateStr);
-        const options = { month: 'long', day: 'numeric' };
-        const formattedDate = dateObj.toLocaleDateString('en-US', options);
-
-        return (
-            <span>
-                {dateObj.toLocaleDateString('en-US', options)}
-            </span>
+        const [year, month, day] = dateStr.split('-');
+        const formattedDate = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' }).format(
+            new Date(year, month - 1, day)
         );
+    
+        return <span>{formattedDate}</span>;
     };
 
     const isDateInRange = (date) => {
@@ -100,6 +97,7 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses })
 
     return (
         <div>
+            <br/>
             <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Trip Info</h2>
             <div className="trip-overview">
                 <div className="trip-overview-div">
@@ -131,10 +129,10 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses })
 
             <br />
             <div className='row'>
-                <div className='col'>
+                <div className='col' style={{ marginBottom: "20px" }}>
                     <DefaultTripImagesComponent tripId={tripId} tripLocations={tripLocations} />
                 </div>
-                <div className='col' style={{ flexDirection: "column" }}>
+                <div className='col' style={{ flexDirection: "column" , marginBottom: "20px"}}>
                     <Calendar
                         tileClassName={({ date }) => {
                             if (isDateInRange(date)) {
