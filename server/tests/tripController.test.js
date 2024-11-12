@@ -102,7 +102,10 @@ describe('Trip Controller', () => {
 
         await getTripsByUserId(mockRequest, mockResponse);
 
-        expect(SharedTrip.findAll).toHaveBeenCalledWith({ where: { user_id: mockUserId } });
+        expect(SharedTrip.findAll).toHaveBeenCalledWith({
+            where: { user_id: mockUserId },
+            order: [['favorite', 'DESC']] 
+        });
         expect(Trip.findAll).toHaveBeenCalledWith({ where: { trip_id: ['1', '2'] } });
         expect(mockResponse.status).toHaveBeenCalledWith(200);
         expect(mockResponse.json).toHaveBeenCalledWith({ data: trips });
