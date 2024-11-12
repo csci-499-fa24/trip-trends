@@ -41,3 +41,25 @@
     object-fit: contain; /* Maintain aspect ratio and fit within the frame */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+.favorite-icon {
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;  
+    height: 30px;  
+    padding: 5px;
+    border-radius: 10px;
+    background-color: rgba(123, 117, 117, 0.488);  
+    z-index: 3; 
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.favorite-icon:hover {
+    background-color: rgba(255, 255, 255, 0.8); 
+    border-color: rgba(0, 0, 0, 0.8); 
+}

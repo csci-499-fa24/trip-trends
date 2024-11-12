@@ -3,12 +3,16 @@ import Calendar from 'react-calendar';
 import { parseISO, startOfDay, endOfDay } from 'date-fns';
 import LocationsDropdownComponent from '../singletrip/LocationsDropdownComponent';
 import DefaultTripImagesComponent from '../singletrip/DefaultTripImagesComponent';
+import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
+import '../../css/singletrip.css';
 
 const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses }) => {
     const [totalExpensesByDate, setTotalExpensesByDate] = useState({});
     const [selectedDate, setSelectedDate] = useState(null);
     const [showExpenseBox, setShowExpenseBox] = useState(false);
     const [boxPosition, setBoxPosition] = useState({ top: 0, left: 0 });
+    const [isFavorited, setIsFavorited] = useState(false);
     const expenseBoxRef = useRef(null);
 
 
@@ -89,6 +93,17 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses })
         }
     };
 
+    const handleFavoriteClick = async () => {
+        setIsFavorited(prevState => !prevState); 
+        try {
+            await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/users/${userId}/trips/${tripId}`, {
+                favorite: !isFavorited
+            });
+        } catch (error) {
+            console.error("Error favoriting trip", error);
+        }
+    };
+
     useEffect(() => {
         document.addEventListener('mousedown', handleOutsideClick);
         return () => document.removeEventListener('mousedown', handleOutsideClick);
@@ -98,7 +113,23 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses })
     return (
         <div>
             <br/>
-            <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Trip Info</h2>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+                <h2 style={{ marginRight: '10px' }}>Trip Info</h2>
+                {/* Favorite Star Icon */}
+                <div 
+                    className="favorite-icon" 
+                    onClick={(event) => {
+                        handleFavoriteClick();
+                    }}
+                    style={{ cursor: 'pointer' }}
+                >
+                    {isFavorited ? (
+                        <StarIcon sx={{ color: 'yellow', zIndex: 2, fontSize: 35 }} />
+                    ) : (
+                        <StarBorderIcon sx={{ color: 'gray', zIndex: 2, fontSize: 35  }} />
+                    )}
+                </div>
+            </div>
             <div className="trip-overview">
                 <div className="trip-overview-div">
                     <div className="trip-overview-circle">🗓️</div>
@@ -126,6 +157,7 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses })
                     </div>
                 </div>
             </div>
+            
 
             <br />
             <div className='row'>

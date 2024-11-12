@@ -47,14 +47,14 @@ const TripsDisplayComponent = ({ trips, userId }) => {
 
         try {
             const newFavoriteStatus = !currentFavoriteStatus;
-            await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/sharedtrips/users/${userId}/trips/${tripId}`, {
+            await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/users/${userId}/trips/${tripId}`, {
                 favorite: newFavoriteStatus
             });
 
-            setFavoritedTrips(prevState => ({
-                ...prevState,
-                [tripId]: newFavoriteStatus
-            }));
+            setFavoritedTrips(prevState => {
+                const updatedFavorites = { ...prevState, [tripId]: newFavoriteStatus };
+                return updatedFavorites;
+            });
         } catch (error) {
             console.error("Error favoriting trip.", error);
         }
@@ -148,20 +148,15 @@ const TripsDisplayComponent = ({ trips, userId }) => {
                                     {/* Favorite Star Icon */}
                                     <div 
                                         className="favorite-icon" 
-                                        onClick={() => handleFavoriteClick(trip.trip_id)}
-                                        style={{ 
-                                            cursor: 'pointer',
-                                            position: 'absolute', 
-                                            top: 10, 
-                                            right: 10, 
-                                            zIndex: 10
+                                        onClick={(event) => {
+                                            event.stopPropagation();  
+                                            handleFavoriteClick(trip.trip_id);
                                         }}
-                                        
                                     >
                                         {favoritedTrips[trip.trip_id] ? (
-                                            <StarIcon sx={{ color: 'yellow' }} />
+                                            <StarIcon sx={{ color: '#fdfd96', zIndex: 2 }} />
                                         ) : (
-                                            <StarBorderIcon sx={{ color: 'gray' }} />
+                                            <StarBorderIcon sx={{ color: 'gray', zIndex: 2 }} />
                                         )}
                                     </div>
                                     {/* Shared users */}
