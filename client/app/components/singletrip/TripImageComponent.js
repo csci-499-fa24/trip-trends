@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import '../../css/defaultTripImages.css';
+import '../../css/gallery.css';
 
 const TripImageComponent = ({ tripId }) => {
     const [images, setImages] = useState([]);
@@ -12,7 +12,7 @@ const TripImageComponent = ({ tripId }) => {
             try {
                 if (tripId) {
                     const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}/images`);
-                    setImages(response.data); // Assuming response.data contains an array of images
+                    setImages(response.data);
                 } else {
                     console.error("Trip ID is not defined");
                 }
@@ -37,13 +37,13 @@ const TripImageComponent = ({ tripId }) => {
     return (
         <div>
             {error && <p>{error}</p>}
-            <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+            <div className="gallery-grid">
                 {images.map(image => (
-                    <div key={image.image_id} style={{ margin: '10px' }}>
+                    <div key={image.image_id} className="gallery-item">
                         <img
                             src={`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/trip-images/${image.image_id}`}
                             alt={`Trip Image ${image.image_id}`}
-                            style={{ width: '200px', height: 'auto', cursor: 'pointer' }}
+                            className="gallery-image"
                             onClick={() => openPopUp(image.image_id)} 
                         />
                     </div>
@@ -55,7 +55,6 @@ const TripImageComponent = ({ tripId }) => {
                         <img
                             src={`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/trip-images/${selectedImage.image_id}`}
                             alt={`Selected Image ${selectedImage.image_id}`}
-                            style={{ width: '40vw', height: 'auto' }}
                         />
                     </div>
                 </div>
