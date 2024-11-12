@@ -91,13 +91,12 @@ const deleteTripImages = async (req, res) => {
 // DELETE image by location position within a trip
 const deleteImageByLocationPosition = async (req, res) => {
     const tripId = req.params.tripId;
-    const position = parseInt(req.params.position, 10); // Convert the position to an integer
+    const position = parseInt(req.params.position, 10);
 
     try {
-        // Fetch all locations for the given trip, ordered by `createdAt`
+        // Fetch all locations for the given trip
         const tripLocations = await TripLocation.findAll({
-            where: { trip_id: tripId }
-            
+            where: { trip_id: tripId },
         });
 
         // Check if the position is within the bounds of the locations array
@@ -105,7 +104,7 @@ const deleteImageByLocationPosition = async (req, res) => {
             return res.status(400).json({ message: "Invalid location position" });
         }
 
-        // Fetch all images for the given trip, ordered by `createdAt`
+        // Fetch all images for the given trip
         const tripImages = await Image.findAll({
             where: { trip_id: tripId }
         });
@@ -125,6 +124,7 @@ const deleteImageByLocationPosition = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error", error: err.message });
     }
 };
+
 
 module.exports = {
     createImage,

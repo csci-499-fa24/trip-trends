@@ -73,63 +73,24 @@ const getTripById = async (req, res) => {
     }
 };
 
-// // PUT request to update trip data
-// const updateTrip = async (req, res) => {
-//     const tripId = req.params.tripId;
-//     const { name, startDate, endDate, budget } = req.body;
-//     try {
-//         // find trip by tripId
-//         const trip = await Trip.findByPk(tripId);
-//         if (!trip) {
-//             return res.status(404).json();
-//         }
-//         // update trip data
-//         const updatedTrip = await trip.update({ name, startDate, endDate, budget });
-//         res.status(200).json({ data: updatedTrip });
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({ message: "Internal Server Error", error: err.message });
-//     }
-// };
-
-// PUT request to update trip data, locations, and delete images for removed locations
+// PUT request to update trip data
 const updateTrip = async (req, res) => {
     const tripId = req.params.tripId;
-    const { name, startDate, endDate, budget, locations } = req.body;
+    const { name, startDate, endDate, budget } = req.body;
     try {
-        // Find trip by tripId
+        // find trip by tripId
         const trip = await Trip.findByPk(tripId);
         if (!trip) {
-            return res.status(404).json({ message: "Trip not found" });
+            return res.status(404).json();
         }
-
-        // Update trip data
+        // update trip data
         const updatedTrip = await trip.update({ name, startDate, endDate, budget });
-
-        // Get current locations for this trip
-        const existingLocations = await TripLocation.findAll({ where: { trip_id: tripId } });
-        const existingLocationNames = existingLocations.map(loc => loc.location);
-
-        // Determines which locations were removed and which are new
-        const removedLocations = existingLocationNames.filter(loc => !locations.includes(loc));
-        const newLocations = locations.filter(loc => !existingLocationNames.includes(loc));
-
-        // Deletes images associated with removed locations and remove these locations from TripLocation
-        if (removedLocations.length > 0) {
-            await TripLocation.destroy({ where: { trip_id: tripId, location: removedLocations } });
-        }
-
-        // Add new locations to TripLocation
-        const newLocationEntries = newLocations.map(location => ({ trip_id: tripId, location: location }));
-        await TripLocation.bulkCreate(newLocationEntries);
-
-        res.status(200).json({ data: updatedTrip, message: "Trip and locations updated successfully" });
+        res.status(200).json({ data: updatedTrip });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error", error: err.message });
     }
 };
-
 
 // DELETE trip data
 const deleteTrip = async (req, res) => {

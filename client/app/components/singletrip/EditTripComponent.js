@@ -91,6 +91,7 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
         setTempLocation('');
     };
 
+    
 
     // const handleEdit = async (e) => {
     //     e.preventDefault();
@@ -113,37 +114,46 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
     const handleEdit = async (e) => {
         e.preventDefault();
         try {
-            const requestBody = { name, start_date: startDate, end_date: endDate, budget, locations: tripLocationsState }; 
-
+            const requestBody = { name, start_date: startDate, end_date: endDate, budget }; 
+            const requestLocations = { tripId, locations: tripLocationsState };
+    
             // Determine which locations were added
             const addedLocations = tripLocationsState.filter(location => !tripLocations.includes(location));
-            
+    
             // Generate images for new locations
             const imageURLs = await Promise.all(
                 addedLocations.map(async (location) => {
                     const imageURL = await getImageURL(location);
-                    await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/images/trips/${tripId}`, { image_url: imageURL }); // Post the image URL to the backend for storing it
+                    if (imageURL) {
+                        await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/images/trips/${tripId}`, { image_url: imageURL });
+                    }
                 })
             );
-
+    
+            //Determine which locations are deleted
             const deletedPositions = tripLocations
                 .map((location, index) => ({ location, index }))
                 .filter(({ location }) => !tripLocationsState.includes(location))
                 .map(({ index }) => index);
-
+    
+            //Delete the images based on the specified position
             for (const position of deletedPositions) {
                 await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/images/trips/${tripId}/${position}`);
             }
-
-            await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`, requestBody);
-
+    
+            await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`, requestBody); //Update the trip data
+            await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/update-locations`, requestLocations); //Update the location data
+    
             toast.success("Trip updated successfully!");
             setIsOpen(false);
             setTimeout(() => {
                 window.location.reload();
             }, 1500);
         } catch (error) {
-            console.error('Error updating trip:', error);
+            console.error('Error updating trip:', error.message);
+            if (error.response) {
+                console.error('Response error:', error.response.data);
+            }
             toast.error("Error updating trip. Please try again.");
         }
     };
