@@ -90,26 +90,6 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
         setSuggestions([]);
         setTempLocation('');
     };
-
-    
-
-    // const handleEdit = async (e) => {
-    //     e.preventDefault();
-    //     try {
-    //         const requestBody = { name, start_date: startDate, end_date: endDate, budget, locations: tripLocationsState }; 
-    //         await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`, requestBody);
-    //         // await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/images/trips/${tripId}`)
-    //         toast.success("Trip updated successfully!");
-    //         setIsOpen(false);
-    //         setTimeout(() => {
-    //             window.location.reload();
-    //         }, 1500);
-    //     } catch (error) {
-    //         console.error('Error updating trip:', error);
-    //         toast.error("Error updating trip. Please try again.");
-    //     }
-
-    // };
     
     const handleEdit = async (e) => {
         e.preventDefault();

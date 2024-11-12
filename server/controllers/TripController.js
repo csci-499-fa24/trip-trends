@@ -2,7 +2,6 @@ const Trip = require('../models/Trip');
 const SharedTrip = require('../models/SharedTrip');
 const Expense = require('../models/Expense');
 const TripImages = require('../models/TripImages'); 
-const TripLocation = require('../models/TripLocation');
 const { parse } = require('json2csv');
 const PDFDocument = require('pdfkit'); 
 const xml2js = require('xml2js'); 

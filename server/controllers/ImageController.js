@@ -66,11 +66,6 @@ const deleteTripImages = async (req, res) => {
         if (!tripId) {
             return res.status(400).json({ message: "Trip ID is required" });
         }
-        const tripLocations = await TripLocation.findAll({ where: { trip_id: tripId } });
-
-        if (!tripLocations || tripLocations.length === 0) {
-            return res.status(404).json({ message: "No location found for the specified tripId" });
-        }
         
         const deletedImagesCount = await Image.destroy({
             where: {

@@ -85,6 +85,12 @@ const updateLocationsInEdit = async (req, res) => {
     try {
         // Get current locations for this trip
         const existingLocations = await TripLocation.findAll({ where: { trip_id: tripId } });
+        
+        // Check if no locations are found
+        if (existingLocations.length === 0) {
+            return res.status(404).json({ message: "No locations found for this trip" });
+        }
+
         const existingLocationNames = existingLocations.map(loc => loc.location);
 
         // Determine which locations were removed and which are new
