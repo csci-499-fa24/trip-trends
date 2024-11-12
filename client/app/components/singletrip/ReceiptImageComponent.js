@@ -1,15 +1,66 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import ProgressBar from 'progressbar.js';
 import stringSimilarity from 'string-similarity';
 import '../../css/receiptImage.css';
 
-const ReceiptImageComponent = ({ tripId, handleFormData}) => {
+const ReceiptImageComponent = ({ tripId, handleFormData, updateIsUploadHidden }) => {
     // const [uploadedExpenseId, setUploadedExpenseId] = useState(null); // for receipt img retrieval
     const fileInput = useRef(null);
     const [imageSrc, setImageSrc] = useState(null);
-    const [isHidden, setIsHidden] = useState(true);
+    const [isHidden, setIsHidden] = useState(true); // for image upload section
+    const progressBarRef = useRef(null);
 
+    const handleHidingImgUploadUpdate = () => {
+        // call the parent's function and pass the new state
+        updateIsUploadHidden(isHidden);
+    };
+
+    // progress bar from 
+    const initializeProgressBar = () => {
+        if (!progressBarRef.current) {
+            progressBarRef.current = new ProgressBar.Line('#progress-container', {
+                strokeWidth: 5, 
+                easing: 'easeInOut',
+                duration: 1400,
+                color: '#4CAF50',
+                trailColor: '#eee',
+                trailWidth: 1,
+                svgStyle: { 
+                    width: '100%', 
+                    height: '100%',
+                    'stroke-linecap': 'round',
+                },
+                containerStyle: { 
+                    borderRadius: '2px',
+                    overflow: 'hidden',
+                },
+    
+                text: {
+                    style: {
+                        color: '#555',
+                        position: 'relative',
+                        bottom: '-3px', 
+                        textAlign: 'center',
+                        fontSize: '14px',
+                        padding: 0,
+                        margin: 0,
+                        transform: null,
+                        width: '100%',
+                    },
+                    autoStyleContainer: false,
+                },
+    
+                from: { color: '#81C784' }, 
+                to: { color: '#388E3C' },
+    
+                step: (state, bar) => {
+                    bar.setText(`${Math.round(bar.value() * 100)} %`);
+                },
+            });
+        }
+    };
 
     const saveExpenseDetails = async (responseData, formData) => {
         const expense_name = responseData.data?.vendor?.name || responseData.data?.vendor?.raw_name;
@@ -132,6 +183,12 @@ const ReceiptImageComponent = ({ tripId, handleFormData}) => {
             formData.append('file', imageFile); // 'file' key
     
             try {
+                initializeProgressBar();
+                setIsHidden(false);
+                handleHidingImgUploadUpdate();
+
+                progressBarRef.current.animate(0.5); // start progress at 50%
+
                 // process receipt image to extract expense data
                 const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/process-receipt`, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
@@ -139,11 +196,18 @@ const ReceiptImageComponent = ({ tripId, handleFormData}) => {
     
                 console.log("Extracted receipt data:", response.data);
                 saveExpenseDetails(response.data, formData);
-        
+
+                progressBarRef.current.animate(1.0, () => {
+                    setTimeout(() => {
+                        setIsHidden(true); 
+                        handleHidingImgUploadUpdate();
+                    }, 500);
+                });
                 // toast.success("Receipt processed successfully!");
 
             } catch (error) {
                 console.error("Error uploading receipt to backend: ", error);
+                progressBarRef.current.set(0); // reset progress bar
                 // toast.error("Failed to process the receipt.");
             }
         }
@@ -155,6 +219,7 @@ const ReceiptImageComponent = ({ tripId, handleFormData}) => {
 
     const toggleHideBar = () => {
         setIsHidden(!isHidden);
+        handleHidingImgUploadUpdate()
     }
 
     const handleReceiptUpload = async (event) => {
@@ -181,6 +246,10 @@ const ReceiptImageComponent = ({ tripId, handleFormData}) => {
             toast.error("Please choose a file to upload.");
         }
     };
+
+    useEffect(() => {
+        initializeProgressBar();
+    }, []);
 
     return (
         <div className="receipt-upload-container">
@@ -209,7 +278,7 @@ const ReceiptImageComponent = ({ tripId, handleFormData}) => {
                             type="button"
                             onClick={handleReceiptUpload}
                             className="icon-button"
-                            aria-label="Preview Receipt">
+                            aria-label="Preview receipt">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                             </svg>
@@ -238,6 +307,8 @@ const ReceiptImageComponent = ({ tripId, handleFormData}) => {
                         <p>No receipt preview available.</p>
                     )}
                 </div>
+                {/* Progress Bar */}
+                <div id="progress-container" className="progress-bar-container"></div>
             </div>
         </div>
     
