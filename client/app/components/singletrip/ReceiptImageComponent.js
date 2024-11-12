@@ -11,54 +11,59 @@ const ReceiptImageComponent = ({ tripId, handleFormData, updateIsUploadHidden })
     const [isHidden, setIsHidden] = useState(true); // for image upload section
     const progressBarRef = useRef(null);
 
+    if (typeof window !== 'undefined') {
+        useEffect(() => {
+            if (typeof window !== 'undefined') {
+              import('progressbar.js').then((ProgressBar) => {
+                if (!progressBarRef.current) {
+                    progressBarRef.current = new ProgressBar.Line('#progress-container', {
+                        strokeWidth: 5, 
+                        easing: 'easeInOut',
+                        duration: 1400,
+                        color: '#4CAF50',
+                        trailColor: '#eee',
+                        trailWidth: 1,
+                        svgStyle: { 
+                            width: '100%', 
+                            height: '100%',
+                            'stroke-linecap': 'round',
+                        },
+                        containerStyle: { 
+                            borderRadius: '2px',
+                            overflow: 'hidden',
+                        },
+            
+                        text: {
+                            style: {
+                                color: '#555',
+                                position: 'relative',
+                                bottom: '-3px', 
+                                textAlign: 'center',
+                                fontSize: '14px',
+                                padding: 0,
+                                margin: 0,
+                                transform: null,
+                                width: '100%',
+                            },
+                            autoStyleContainer: false,
+                        },
+            
+                        from: { color: '#81C784' }, 
+                        to: { color: '#388E3C' },
+            
+                        step: (state, bar) => {
+                            bar.setText(`${Math.round(bar.value() * 100)} %`);
+                        },
+                    });
+                }
+              });
+            }
+        }, []);
+    }
+
     const handleHidingImgUploadUpdate = () => {
         // call the parent's function and pass the new state
         updateIsUploadHidden(isHidden);
-    };
-
-    // progress bar
-    const initializeProgressBar = () => {
-        if (!progressBarRef.current) {
-            progressBarRef.current = new ProgressBar.Line('#progress-container', {
-                strokeWidth: 5, 
-                easing: 'easeInOut',
-                duration: 1400,
-                color: '#4CAF50',
-                trailColor: '#eee',
-                trailWidth: 1,
-                svgStyle: { 
-                    width: '100%', 
-                    height: '100%',
-                    'stroke-linecap': 'round',
-                },
-                containerStyle: { 
-                    borderRadius: '2px',
-                    overflow: 'hidden',
-                },
-    
-                text: {
-                    style: {
-                        color: '#555',
-                        position: 'relative',
-                        bottom: '-3px', 
-                        textAlign: 'center',
-                        fontSize: '14px',
-                        padding: 0,
-                        margin: 0,
-                        transform: null,
-                        width: '100%',
-                    },
-                    autoStyleContainer: false,
-                },
-    
-                from: { color: '#81C784' }, 
-                to: { color: '#388E3C' },
-    
-                step: (state, bar) => {
-                    bar.setText(`${Math.round(bar.value() * 100)} %`);
-                },
-            });
-        }
     };
 
     const saveExpenseDetails = async (responseData, formData) => {
@@ -109,14 +114,6 @@ const ReceiptImageComponent = ({ tripId, handleFormData, updateIsUploadHidden })
             "building supplies": "Shopping",
             "office equipment": "Shopping"
         };
-
-        useEffect(() => {
-            const loadProgressBar = async () => {
-                await import('progressbar.js');
-            };
-            loadProgressBar();
-            initializeProgressBar();
-        }, []);
 
         let best_category;
         const itemTypes = new Set(); // will remove duplicates
@@ -190,7 +187,7 @@ const ReceiptImageComponent = ({ tripId, handleFormData, updateIsUploadHidden })
             formData.append('file', imageFile); // 'file' key
     
             try {
-                initializeProgressBar();
+                // initializeProgressBar();
                 setIsHidden(false);
                 handleHidingImgUploadUpdate();
 
