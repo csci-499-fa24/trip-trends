@@ -1,6 +1,6 @@
 require('dotenv').config({ path: 'server/.env' });
 const Image = require('../models/Image');
-const { createImage, getImages, getImageById, getImagesByTripId } = require('../controllers/ImageController');
+const { createImage, getImages, getImageById, getImagesByTripId, deleteTripImages, deleteImageByLocationPosition } = require('../controllers/ImageController');
 
 jest.mock('../models/Image');
 
@@ -155,6 +155,60 @@ describe('Image Controller', () => {
             expect(mockResponse.json).toHaveBeenCalledWith({
                 message: 'Internal Server Error',
                 error: 'Database error'
+            });
+        });
+    });
+
+
+    describe('deleteTripImages', () => {
+        it('should delete images by trip ID and return 200 status with a success message', async () => {
+            const mockTripId = '1';
+            mockRequest.params.tripId = mockTripId;
+    
+            // Mock Image.destroy behavior (success case)
+            Image.destroy.mockResolvedValue(3); // Mock that 3 images are deleted
+    
+            await deleteTripImages(mockRequest, mockResponse);
+    
+            expect(mockResponse.status).toHaveBeenCalledWith(200);
+            expect(mockResponse.json).toHaveBeenCalledWith({ message: '3 images deleted successfully.' });
+        });
+    
+        it('should return 400 if trip ID is missing', async () => {
+            mockRequest.params.tripId = undefined;
+    
+            await deleteTripImages(mockRequest, mockResponse);
+    
+            expect(mockResponse.status).toHaveBeenCalledWith(400);
+            expect(mockResponse.json).toHaveBeenCalledWith({ message: 'Trip ID is required' });
+        });
+    
+        it('should return 404 if no images are found for the specified trip ID', async () => {
+            const mockTripId = '1';
+            mockRequest.params.tripId = mockTripId;
+    
+            // Mock that no images are deleted
+            Image.destroy.mockResolvedValue(0); // Simulate no images found
+    
+            await deleteTripImages(mockRequest, mockResponse);
+    
+            expect(mockResponse.status).toHaveBeenCalledWith(404);
+            expect(mockResponse.json).toHaveBeenCalledWith({ message: 'No images found for the specified tripId' });
+        });
+    
+        it('should return 500 if there is an error', async () => {
+            const mockTripId = '1';
+            mockRequest.params.tripId = mockTripId;
+    
+            // Mock Image.destroy to throw an error (simulate database error)
+            Image.destroy.mockRejectedValue(new Error('Database error'));
+    
+            await deleteTripImages(mockRequest, mockResponse);
+    
+            expect(mockResponse.status).toHaveBeenCalledWith(500);
+            expect(mockResponse.json).toHaveBeenCalledWith({
+                message: 'Internal Server Error',
+                error: 'Database error',
             });
         });
     });
