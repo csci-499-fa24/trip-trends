@@ -1,26 +1,26 @@
 .gallery-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 4 columns */
-    gap: 16px; /* Further increased gap between images */
-    padding: 20px; /* Increased padding around the grid */
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    padding: 20px;
 }
 
 .gallery-item {
     position: relative;
     overflow: hidden;
-    border-radius: 12px; /* Slightly larger rounded corners */
+    border-radius: 12px;
     width: 100%;
-    aspect-ratio: 4 / 3; /* Default aspect ratio to avoid stretching */
+    aspect-ratio: 4 / 3;
     cursor: pointer;
 }
 
 .gallery-item:nth-child(1) {
-    grid-column: span 2; /* Span two columns for a wider image */
-    aspect-ratio: 8 / 3; /* Wide rectangle */
+    grid-column: span 2;
+    aspect-ratio: 8 / 3;
 }
 
 .gallery-item:nth-child(5) {
-    grid-column: span 2; /* Span two columns */
+    grid-column: span 2;
     aspect-ratio: 8 / 3;
 }
 
@@ -32,7 +32,7 @@
     border-radius: 12px; 
 }
 
-/* Popup styling */
+/* Updated Popup styling */
 .imgPopUp {
     position: fixed;
     top: 0;
@@ -47,16 +47,29 @@
 }
 
 .imgBox {
-    max-width: 90vw;
-    max-height: 90vh;
-    overflow: hidden;
-    background: white;
-    padding: 10px;
+    position: relative;
+    background-color: white;
     border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    min-width: 200px; /* Smaller minimum to accommodate scaling */
+    min-height: 150px; /* Smaller minimum to accommodate scaling */
 }
 
 .imgBox img {
-    width: 100%;
+    max-width: 95vw;
+    max-height: 90vh;
+    min-width: 600px; /* Significantly increased for small images */
+    min-height: 450px; /* Significantly increased for small images */
+    width: auto;
     height: auto;
     object-fit: contain;
+    display: block;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    transform: scale(1);
+    transition: transform 0.3s ease;
 }
