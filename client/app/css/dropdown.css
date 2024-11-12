@@ -1,6 +1,7 @@
 .dropdown-container {
     margin: 0;
     padding: 0;
+    outline: none;
 }
 
 .dropdown-button {
@@ -31,6 +32,16 @@
 }
 
 .dropdown-item:hover {
-    background-color: #f8f9fa !important;
+    background-color: #7cb37b !important;
     color: black !important;
+}
+
+.close {
+    position: absolute;
+    top: 2.5%;
+    left: -2.5%;
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
 }

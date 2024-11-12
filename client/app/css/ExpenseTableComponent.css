@@ -1,19 +1,36 @@
 .expense-table-container {
-    background-color: transparent; /* Remove any background color */
-    box-shadow: none; /* Remove any shadow if present */
-    border: none; /* Remove any borders if there are any */
+    width: 90%;
+    margin: 0 auto;
+    max-height: 400px; 
+    overflow-y: auto; 
+    overflow-x: hidden;
 }
 
-.name-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px; /* Adjust size as needed */
-    height: 32px; /* Make height equal to width for a perfect circle */
-    border-radius: 50%; /* This makes it a circle */
-    background-color: inherit; /* The color will be inherited from the inline style */
-    color: white; /* Ensure text is visible against background */
-    font-weight: bold;
-    font-size: 0.9rem;
-    margin-right: 8px; /* Space between icon and name text */
+.expense-table th {
+    text-align: center;
+    padding: auto;
+    position: sticky;
+    top: 0;
+    background-color: #134a09 !important;
+    color: white !important;
+    z-index: 1;
+    font-size: 18px;
+}
+
+.expense-table td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 10px;
+    border-color: #134a09;
+}
+
+.expense-table td:nth-child(2) {
+    text-align: center;
+}
+
+.expense-table td:nth-child(3),
+.expense-table td:nth-child(4),
+.expense-table td:nth-child(5),
+.expense-table td:nth-child(7) {
+    text-align: center;
 }

@@ -105,14 +105,24 @@ function homepage() {
         let locations_response = null;
         try {
             locations_response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/users/${userId}`);
-
         } catch (error) {
             console.error("Error getting all trip locations from user:", error);
+            return;
         }
-        const loc_data = locations_response.data.data;
-        const locations = loc_data.map(location => { return { "trip_id": location.trip_id, "location": location.location, "latitude": location.latitude, "longitude": location.longitude }; });
-        setAllTripLocations(locations);
-    };
+    
+        const loc_data = locations_response?.data?.data;
+        if (loc_data && loc_data.length > 0) {
+            const locations = loc_data.map(location => ({
+                "trip_id": location.trip_id,
+                "location": location.location,
+                "latitude": location.latitude,
+                "longitude": location.longitude
+            }));
+            setAllTripLocations(locations);
+        } else {
+            console.log("No locations available for this user.");
+        }
+    };    
 
     useEffect(() => {
         handleToken();

@@ -1,6 +1,6 @@
 require('dotenv').config({ path: 'server/.env' });
 const User = require('../models/User');
-const { getUsers, getUserById, updateUser, deleteUser, createGoogleUser } = require('../controllers/UserController');
+const { getUsers, getUserById, updateUser, deleteUser, createGoogleUser, getUserHomeCurrency } = require('../controllers/UserController');
 const jwt = require('jsonwebtoken');
 
 // Mock User model
@@ -144,23 +144,29 @@ describe('User Controller', () => {
     it('should create a new user if not present on POST /users/google', async () => {
         const mockDecodedToken = {
             email: 'mrs.claus@example.com',
-            name: 'Mrs Claus',
+            name: 'Mrs',
             picture: 'http://example.com/mrsclaus-pic.jpg',
         };
-
+    
         jest.spyOn(jwt, 'decode').mockReturnValue(mockDecodedToken);
-        User.findOne.mockResolvedValue(null); // Simulating no existing user
-
-        const mockNewUser = { user_id: 2, fname: 'Mrs', lname: 'Claus', email: 'mrs.claus@example.com', image: mockDecodedToken.picture };
-        User.create.mockResolvedValue(mockNewUser); // Simulating a new user being created
-
-        mockRequest.body.token = 'your_test_token'; // Set token in request body
-
+        User.findOne.mockResolvedValue(null);
+    
+        const mockNewUser = { 
+            user_id: 2, 
+            fname: 'Mrs', 
+            lname: null,
+            email: 'mrs.claus@example.com', 
+            image: mockDecodedToken.picture 
+        };
+        User.create.mockResolvedValue(mockNewUser); 
+    
+        mockRequest.body.token = 'your_test_token';
+    
         await createGoogleUser(mockRequest, mockResponse);
-
+    
         expect(mockResponse.status).toHaveBeenCalledWith(201);
         expect(mockResponse.json).toHaveBeenCalledWith({ message: 'User created successfully', user: mockNewUser });
-    });
+    });    
 
     it('should handle errors on POST /users/google', async () => {
         User.findOne.mockRejectedValue(new Error('Database error')); // Simulate database error
@@ -171,5 +177,39 @@ describe('User Controller', () => {
 
         expect(mockResponse.status).toHaveBeenCalledWith(500);
         expect(mockResponse.json).toHaveBeenCalledWith({ message: 'Error processing request' });
+    });
+
+    it('should return 200 and user home currency if user is found', async () => {
+        mockRequest.params.userId = '1';
+        const mockUser = { id: '1', home_currency: 'CNY' };
+        User.findByPk.mockResolvedValue(mockUser);
+
+        await getUserHomeCurrency(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(200);
+        expect(mockResponse.json).toHaveBeenCalledWith({ home_currency: 'CNY' });
+    });
+
+    it('should return 404 if user is not found', async () => {
+        mockRequest.params.userId = '1';
+        User.findByPk.mockResolvedValue(null);
+
+        await getUserHomeCurrency(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(404);
+        expect(mockResponse.json).toHaveBeenCalledWith({ message: 'User not found' });
+    });
+
+    it('should return 500 if there is an internal server error', async () => {
+        mockRequest.params.userId = '1';
+        User.findByPk.mockRejectedValue(new Error('Database error'));
+
+        await getUserHomeCurrency(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(500);
+        expect(mockResponse.json).toHaveBeenCalledWith({
+            message: 'Internal Server Error',
+            error: 'Database error'
+        });
     });
 });
