@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
-import ProgressBar from 'progressbar.js';
 import stringSimilarity from 'string-similarity';
 import '../../css/receiptImage.css';
 
@@ -17,7 +16,7 @@ const ReceiptImageComponent = ({ tripId, handleFormData, updateIsUploadHidden })
         updateIsUploadHidden(isHidden);
     };
 
-    // progress bar from 
+    // progress bar
     const initializeProgressBar = () => {
         if (!progressBarRef.current) {
             progressBarRef.current = new ProgressBar.Line('#progress-container', {
@@ -248,6 +247,10 @@ const ReceiptImageComponent = ({ tripId, handleFormData, updateIsUploadHidden })
     };
 
     useEffect(() => {
+        const loadProgressBar = async () => {
+            await import('progressbar.js');
+        };
+        loadProgressBar();
         initializeProgressBar();
     }, []);
 
