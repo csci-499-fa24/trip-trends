@@ -136,5 +136,6 @@ module.exports = {
     getTripLocationByTripId,
     getTripLocationByUserId,
     updateTripLocation,
+    updateLocationsInEdit,
     deleteTripLocation
 };
