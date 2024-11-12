@@ -4,7 +4,8 @@ const { createTripLocation,
         getTripLocationByTripId,
         getTripLocationByUserId,
         updateTripLocation,
-        deleteTripLocation } = require('../controllers/TripLocationController');
+        deleteTripLocation,
+        updateLocationsInEdit } = require('../controllers/TripLocationController');
 const TripLocation = require('../models/TripLocation');
 const SharedTrip = require('../models/SharedTrip');
 
@@ -204,4 +205,73 @@ describe('TripLocation Controller', () => {
         expect(mockResponse.status).toHaveBeenCalledWith(500);
         expect(mockResponse.json).toHaveBeenCalledWith({ message: "Internal Server Error", error: 'Database error' });
     });
+
+    it('should update multiple trip locations and return 200 status', async () => {
+        const mockRequest = {
+            body: {
+                tripId: '1',
+                locations: ['Paris', 'Berlin'] // specify test locations
+            }
+        };
+        
+        const mockResponse = {
+            status: jest.fn(() => mockResponse),
+            json: jest.fn()
+        };
+
+        TripLocation.findAll.mockResolvedValue([
+            { trip_id: '1', location: 'Paris' },
+            { trip_id: '1', location: 'London' }
+        ]);
+
+        TripLocation.destroy.mockResolvedValue(1); // simulates successful delete
+        TripLocation.bulkCreate.mockResolvedValue([{ trip_id: '1', location: 'Berlin' }]);
+
+        await updateLocationsInEdit(mockRequest, mockResponse);
+
+        // console.log('TripLocation.findAll was called with:', TripLocation.findAll.mock.calls);
+
+        expect(TripLocation.findAll).toHaveBeenCalledWith({
+            where: { trip_id: '1' }
+        });
+
+        expect(TripLocation.destroy).toHaveBeenCalledWith({
+            where: { trip_id: '1', location: ['London'] }
+        });
+
+        expect(TripLocation.bulkCreate).toHaveBeenCalledWith([
+            { trip_id: '1', location: 'Berlin' }
+        ]);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(200);
+        expect(mockResponse.json).toHaveBeenCalledWith({ message: "Locations updated successfully" });
+    });
+    
+    it('should return 404 if no locations found for the trip during update', async () => {
+        // Simulate no locations found for the given tripId
+        TripLocation.findAll.mockResolvedValue([]);
+
+        await updateLocationsInEdit(mockRequest, mockResponse);
+
+        // Assert the 404 status and error message
+        expect(mockResponse.status).toHaveBeenCalledWith(404);
+        expect(mockResponse.json).toHaveBeenCalledWith({
+            message: "No locations found for this trip",
+        });
+    });
+
+    it('should return 500 if there is an error while updating locations', async () => {
+        // Simulate an error during database operation
+        TripLocation.findAll.mockRejectedValue(new Error('Database error'));
+
+        await updateLocationsInEdit(mockRequest, mockResponse);
+
+        // Assert the 500 status and error message
+        expect(mockResponse.status).toHaveBeenCalledWith(500);
+        expect(mockResponse.json).toHaveBeenCalledWith({
+            message: "Error updating locations",
+            error: 'Database error',
+        });
+    });
 });
+

@@ -1,0 +1,75 @@
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    padding: 20px;
+}
+
+.gallery-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    cursor: pointer;
+}
+
+.gallery-item:nth-child(1) {
+    grid-column: span 2;
+    aspect-ratio: 8 / 3;
+}
+
+.gallery-item:nth-child(5) {
+    grid-column: span 2;
+    aspect-ratio: 8 / 3;
+}
+
+.gallery-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 12px; 
+}
+
+/* Updated Popup styling */
+.imgPopUp {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.imgBox {
+    position: relative;
+    background-color: white;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    min-width: 200px; /* Smaller minimum to accommodate scaling */
+    min-height: 150px; /* Smaller minimum to accommodate scaling */
+}
+
+.imgBox img {
+    max-width: 95vw;
+    max-height: 90vh;
+    min-width: 600px; /* Significantly increased for small images */
+    min-height: 450px; /* Significantly increased for small images */
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    transform: scale(1);
+    transition: transform 0.3s ease;
+}

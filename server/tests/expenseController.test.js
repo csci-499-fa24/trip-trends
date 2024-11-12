@@ -37,27 +37,46 @@ describe('Expense Controller', () => {
         jest.clearAllMocks();
     });
 
-    it('should create new expense with image and return 201 status', async () => {
+    it('should create a new expense with an image and return 201 status', async () => {
         const mockTripId = '1234';
-        const inputExpense = { name: 'Brunch', amount: 50, category: 'Food' };
-        const createdExpense = { expense_id: '3', trip_id: mockTripId, ...inputExpense, image: Buffer.from('test-image-data') };
+        const inputExpense = { 
+            expenseId: '3', 
+            name: 'Brunch', 
+            amount: 50, 
+            category: 'Food', 
+            currency: 'USD', 
+            posted: '2024-11-11', 
+            notes: 'Team outing' 
+        };
+        const createdExpense = { 
+            expense_id: inputExpense.expenseId, 
+            trip_id: mockTripId, 
+            ...inputExpense, 
+            image: Buffer.from('test-image-data') 
+        };
 
         mockRequest.params.tripId = mockTripId;
         mockRequest.body = inputExpense;
-        mockRequest.files.image = { data: Buffer.from('test-image-data') };
+        mockRequest.files.image = { data: Buffer.from('test-image-data'), mimetype: 'image/png' };
     
-        Expense.create.mockResolvedValue(createdExpense);
-    
+        Expense.create = jest.fn().mockResolvedValue(createdExpense);
+        
         await createExpense(mockRequest, mockResponse);
-    
+
         expect(Expense.create).toHaveBeenCalledWith({
+            expense_id: inputExpense.expenseId,
             trip_id: mockTripId,
-            ...inputExpense,
+            name: inputExpense.name,
+            amount: inputExpense.amount,
+            category: inputExpense.category,
+            currency: inputExpense.currency,
+            posted: inputExpense.posted,
+            notes: inputExpense.notes,
             image: mockRequest.files.image.data
         });
         expect(mockResponse.status).toHaveBeenCalledWith(201);
         expect(mockResponse.json).toHaveBeenCalledWith({ data: createdExpense });
-    });      
+    });    
 
     it('should create a new expense without image and return 201 status', async () => {
         const mockTripId = '1234';

@@ -99,7 +99,7 @@ a {
   background-color: var(--lightgreen);
   border: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); 
-  z-index: 1000;
+  z-index: 10000;
   display: flex;
   flex-direction: column; 
   border-radius: 12px;
@@ -165,7 +165,7 @@ button {
   z-index: 1000; 
   left: 0;
   top: 0;
-  width: 100% !important;;
+  width: 100%;
   height: 100%;
   backdrop-filter: blur(2px);
 }
