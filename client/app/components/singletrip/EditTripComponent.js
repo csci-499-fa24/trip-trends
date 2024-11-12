@@ -95,37 +95,6 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
         e.preventDefault();
         try {
             const requestBody = { name, start_date: startDate, end_date: endDate, budget }; 
-            const requestLocations = { tripId, locations: tripLocationsState };
-    
-            // Determine which locations were added
-            const addedLocations = tripLocationsState.filter(location => !tripLocations.includes(location));
-    
-            // Generate images for new locations
-            const imageURLs = await Promise.all(
-                addedLocations.map(async (location) => {
-                    const imageURL = await getImageURL(location);
-                    if (imageURL) {
-                        await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/images/trips/${tripId}`, { image_url: imageURL });
-                    }
-                })
-            );
-    
-            //Determine which locations are deleted
-            const deletedPositions = tripLocations
-                .map((location, index) => ({ location, index }))
-                .filter(({ location }) => !tripLocationsState.includes(location))
-                .map(({ index }) => index);
-    
-            //Delete the images based on the specified position
-            for (const position of deletedPositions) {
-                await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/images/trips/${tripId}/${position}`);
-            }
-    
-            await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`, requestBody); //Update the trip data
-            await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/update-locations`, requestLocations); //Update the location data
-    
-            toast.success("Trip updated successfully!");
-            setIsOpen(false);
             setTimeout(() => {
                 window.location.reload();
             }, 1500);

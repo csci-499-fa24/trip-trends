@@ -75,7 +75,10 @@ const getSharedTrips = async (req, res) => {
 const getSharedTripsByUserId = async (req, res) => {
     const userId = req.params.userId;
     try {
-        const sharedTrips = await SharedTrip.findAll({ where: { user_id: userId } });
+        const sharedTrips = await SharedTrip.findAll({ 
+            where: { user_id: userId },
+            order: [['favorite', 'DESC']]
+        });
         if (sharedTrips.length === 0) {
             return res.status(404).json({ message: "Shared Trip not found" });
         }

@@ -3,11 +3,10 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-// import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
-// import Button from "@mui/material/Button";
 import CardActionArea from "@mui/material/CardActionArea";
-// import CardActions from "@mui/material/CardActions";
+import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
 import TripFormComponent from "./TripFormComponent";
 import DefaultTripImagesComponent from "../singletrip/DefaultTripImagesComponent";
 // import ShareTripComponent from "../singletrip/ShareTripComponent";
@@ -18,6 +17,8 @@ import SharedUsersComponent from "../singletrip/SharedUsersComponent";
 const TripsDisplayComponent = ({ trips, userId }) => {
     const [tripLocations, setTripLocations] = useState({});
     const [isPopUpVisible, setPopUpVisible] = useState(false);
+
+    const [favoritedTrips, setFavoritedTrips] = useState({});
 
     const fetchAllTripLocations = async () => {
         const locations = await Promise.all(
@@ -39,6 +40,24 @@ const TripsDisplayComponent = ({ trips, userId }) => {
             return acc;
         }, {});
         setTripLocations(locationsByTripId);
+    };
+
+    const handleFavoriteClick = async (tripId) => {
+        const currentFavoriteStatus = favoritedTrips[tripId] || false;
+
+        try {
+            const newFavoriteStatus = !currentFavoriteStatus;
+            await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/sharedtrips/users/${userId}/trips/${tripId}`, {
+                favorite: newFavoriteStatus
+            });
+
+            setFavoritedTrips(prevState => ({
+                ...prevState,
+                [tripId]: newFavoriteStatus
+            }));
+        } catch (error) {
+            console.error("Error favoriting trip.", error);
+        }
     };
 
     const formatTripDates = (startDate, endDate) => {
@@ -64,6 +83,11 @@ const TripsDisplayComponent = ({ trips, userId }) => {
     useEffect(() => {
         if (trips.length > 0) {
             fetchAllTripLocations();
+            const initialFavorites = {};
+            trips.forEach(trip => {
+                initialFavorites[trip.trip_id] = trip.favorite || false; 
+            });
+            setFavoritedTrips(initialFavorites);
         }
     }, [trips]);
 
@@ -121,6 +145,25 @@ const TripsDisplayComponent = ({ trips, userId }) => {
                                     <Typography variant="body2" sx={{ color: "text.secondary" }}>
                                         {formatTripDates(trip.start_date, trip.end_date)}
                                     </Typography>
+                                    {/* Favorite Star Icon */}
+                                    <div 
+                                        className="favorite-icon" 
+                                        onClick={() => handleFavoriteClick(trip.trip_id)}
+                                        style={{ 
+                                            cursor: 'pointer',
+                                            position: 'absolute', 
+                                            top: 10, 
+                                            right: 10, 
+                                            zIndex: 10
+                                        }}
+                                        
+                                    >
+                                        {favoritedTrips[trip.trip_id] ? (
+                                            <StarIcon sx={{ color: 'yellow' }} />
+                                        ) : (
+                                            <StarBorderIcon sx={{ color: 'gray' }} />
+                                        )}
+                                    </div>
                                     {/* Shared users */}
                                     {/* <SharedUsersComponent tripId={trip.trip_id} userId={userId} /> */}
                                 </CardContent>

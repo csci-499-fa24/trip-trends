@@ -117,10 +117,13 @@ const updateLocationsInEdit = async (req, res) => {
 // DELETE trip location data
 const deleteTripLocation = async (req, res) => {
     const tripId = req.params.tripId;
-    const tripLocationId = req.params.tripLocationId;
+    const { tripLocation } = req.body;
+    console.log("tripId:", tripId);
+console.log("tripLocation:", tripLocation);
+
     try {
         // delete trip location by tripId
-        const deletedCount = await TripLocation.destroy({ where: { trip_id: tripId, location: tripLocationId} });
+        const deletedCount = await TripLocation.destroy({ where: { trip_id: tripId, location: tripLocation} });
         if (deletedCount === 0) {
             return res.status(404).json({ message: "Trip Location not found" });
         }
