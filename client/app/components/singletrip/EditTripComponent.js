@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
+import { createApi } from 'unsplash-js';
 import 'react-toastify/dist/ReactToastify.css';
 import '../../css/singletrip.css';
 import '../../css/modifyTrip.css';
@@ -18,6 +19,38 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
     const [tempLocation, setTempLocation] = useState('');
     const [suggestions, setSuggestions] = useState([]);
  
+
+    const unsplash = createApi({
+        accessKey: process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY
+      });
+    
+      // Uses the Unsplash API to fetch one pgoto based on a single trip location
+      const getImageURL = async (trip_location) => {
+        try {
+          const response = await unsplash.search.getPhotos({
+            query: trip_location,
+            page: 1,
+            perPage: 10,
+            orientation: 'landscape'
+          });
+          if (response.response && response.response.results.length > 0) {
+            const images = response.response.results.map(image => image.urls.regular); // array of 10 images
+    
+            const random_index = Math.floor(Math.random() * response.response.results.length); // random index img to set as image url
+            const imageURL = images[random_index]
+            return imageURL;
+            } 
+            else {
+              return null;
+            }
+          } catch (error) {
+            console.error('Error finding images:', error.message, error.response?.data);
+    
+          }
+      };
+
+      
+
     useEffect(() => {
         if (isOpen) {
             setTripLocationsState(tripLocations || []);
@@ -57,22 +90,52 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
         setSuggestions([]);
         setTempLocation('');
     };
-
+    
     const handleEdit = async (e) => {
         e.preventDefault();
         try {
             const requestBody = { name, start_date: startDate, end_date: endDate, budget }; 
-            await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`, requestBody);
+            const requestLocations = { tripId, locations: tripLocationsState };
+    
+            // Determine which locations were added
+            const addedLocations = tripLocationsState.filter(location => !tripLocations.includes(location));
+    
+            // Generate images for new locations
+            const imageURLs = await Promise.all(
+                addedLocations.map(async (location) => {
+                    const imageURL = await getImageURL(location);
+                    if (imageURL) {
+                        await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/images/trips/${tripId}`, { image_url: imageURL });
+                    }
+                })
+            );
+    
+            //Determine which locations are deleted
+            const deletedPositions = tripLocations
+                .map((location, index) => ({ location, index }))
+                .filter(({ location }) => !tripLocationsState.includes(location))
+                .map(({ index }) => index);
+    
+            //Delete the images based on the specified position
+            for (const position of deletedPositions) {
+                await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/images/trips/${tripId}/${position}`);
+            }
+    
+            await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`, requestBody); //Update the trip data
+            await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/update-locations`, requestLocations); //Update the location data
+    
             toast.success("Trip updated successfully!");
             setIsOpen(false);
             setTimeout(() => {
                 window.location.reload();
             }, 1500);
         } catch (error) {
-            console.error('Error updating trip:', error);
+            console.error('Error updating trip:', error.message);
+            if (error.response) {
+                console.error('Response error:', error.response.data);
+            }
             toast.error("Error updating trip. Please try again.");
         }
-
     };
     // console.log(tripLocationsState)
     return (
