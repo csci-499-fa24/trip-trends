@@ -3,8 +3,8 @@ const List = require('../models/List');
 
 // Function to create a new list item
 const createListItem = async (req, res) => {
-    const { tripId } = req.params; 
-    const { name, list_type, is_completed } = req.body; 
+    const { tripId } = req.params;
+    const { name, list_type, is_completed } = req.body;
 
     try {
         // Create the new list item
@@ -12,7 +12,7 @@ const createListItem = async (req, res) => {
             trip_id: tripId,
             name,
             list_type,
-            is_completed: is_completed || false, 
+            is_completed: is_completed || false,
         });
 
         return res.status(201).json({
@@ -34,7 +34,7 @@ const createListItem = async (req, res) => {
 //Update list item completion state
 const updateListCompletion = async (req, res) => {
     const { tripId, listId } = req.params;
-    const { isCompleted } = req.body; 
+    const { isCompleted } = req.body;
 
     try {
         const listItem = await List.findOne({
@@ -72,7 +72,7 @@ const updateListCompletion = async (req, res) => {
 
 //Update list item name
 const updateListName = async (req, res) => {
-    const { tripId, listId } = req.params; 
+    const { tripId, listId } = req.params;
     const { name } = req.body;
     try {
         const listItem = await List.findOne({
@@ -110,7 +110,7 @@ const updateListName = async (req, res) => {
 
 //Delete list item
 const deleteListItem = async (req, res) => {
-    const { tripId, listId } = req.params; 
+    const { tripId, listId } = req.params;
 
     try {
         const listItem = await List.findOne({
@@ -145,7 +145,7 @@ const deleteListItem = async (req, res) => {
 
 //Get all purchase item based on tip id
 const getPurchaseListsByTripId = async (req, res) => {
-    const { tripId } = req.params; 
+    const { tripId } = req.params;
 
     try {
         const purchaseLists = await List.findAll({

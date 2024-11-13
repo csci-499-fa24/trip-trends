@@ -11,17 +11,17 @@ const List = sequelize.define('List', {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'all_trips', 
+            model: 'all_trips',
             key: 'trip_id',
         },
-        onDelete: 'CASCADE', 
+        onDelete: 'CASCADE',
     },
     name: {
         type: DataTypes.STRING,
         allowNull: false,
     },
     list_type: {
-        type: DataTypes.ENUM('purchase list', 'sightseeing list'), 
+        type: DataTypes.ENUM('purchase list', 'sightseeing list'),
         allowNull: false,
     },
     is_completed: {
@@ -30,7 +30,7 @@ const List = sequelize.define('List', {
     },
 }, {
     tableName: 'lists',
-    timestamps: false, 
+    timestamps: false,
 });
 
 module.exports = List;
