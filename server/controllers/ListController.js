@@ -3,8 +3,8 @@ const List = require('../models/List');
 
 // Function to create a new list item
 const createListItem = async (req, res) => {
-    const { tripId } = req.params; // Get tripId from URL parameters
-    const { name, list_type, is_completed } = req.body; // Get fields from the request body
+    const { tripId } = req.params; 
+    const { name, list_type, is_completed } = req.body; 
 
     try {
         // Create the new list item
@@ -12,7 +12,7 @@ const createListItem = async (req, res) => {
             trip_id: tripId,
             name,
             list_type,
-            is_completed: is_completed || false, // Default to false if not provided
+            is_completed: is_completed || false, 
         });
 
         return res.status(201).json({
@@ -30,12 +30,13 @@ const createListItem = async (req, res) => {
     }
 };
 
+
+//Update list item completion state
 const updateListCompletion = async (req, res) => {
-    const { tripId, listId } = req.params; // Get tripId and listId from URL parameters
-    const { isCompleted } = req.body; // Get isCompleted from the request body
+    const { tripId, listId } = req.params;
+    const { isCompleted } = req.body; 
 
     try {
-        // Find the list item by tripId and listId
         const listItem = await List.findOne({
             where: {
                 trip_id: tripId,
@@ -50,10 +51,8 @@ const updateListCompletion = async (req, res) => {
             });
         }
 
-        // Update the isCompleted field
         listItem.is_completed = isCompleted;
 
-        // Save the changes
         await listItem.save();
 
         return res.status(200).json({
@@ -71,7 +70,83 @@ const updateListCompletion = async (req, res) => {
     }
 };
 
+//Update list item name
+const updateListName = async (req, res) => {
+    const { tripId, listId } = req.params; 
+    const { name } = req.body;
+    try {
+        const listItem = await List.findOne({
+            where: {
+                trip_id: tripId,
+                list_id: listId
+            }
+        });
+
+        if (!listItem) {
+            return res.status(404).json({
+                success: false,
+                message: 'List item not found.'
+            });
+        }
+
+        listItem.name = name;
+
+        await listItem.save();
+
+        return res.status(200).json({
+            success: true,
+            message: 'List item name updated successfully.',
+            data: listItem
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error: error.message
+        });
+    }
+};
+
+//Delete list item
+const deleteListItem = async (req, res) => {
+    const { tripId, listId } = req.params; 
+
+    try {
+        const listItem = await List.findOne({
+            where: {
+                trip_id: tripId,
+                list_id: listId
+            }
+        });
+
+        if (!listItem) {
+            return res.status(404).json({
+                success: false,
+                message: 'List item not found.'
+            });
+        }
+
+        await listItem.destroy();
+
+        return res.status(200).json({
+            success: true,
+            message: 'List item deleted successfully.'
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error: error.message
+        });
+    }
+};
+
+
 module.exports = {
     createListItem,
-    updateListCompletion
+    updateListCompletion,
+    updateListName,
+    deleteListItem
 };
