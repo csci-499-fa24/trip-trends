@@ -27,6 +27,7 @@ const sharedTripRoutes = require('./routes/sharedTripRoutes');
 const expenseRoutes = require('./routes/expenseRoutes');
 const tripLocationRoutes = require('./routes/tripLocationRoutes');
 const imageRoutes = require('./routes/imageRoutes');
+const listRoutes = require('./routes/listRoutes');
 
 // check if server is running
 app.get("/api/home", (req, res) => {
@@ -40,6 +41,7 @@ app.use("/api/shared-trips", sharedTripRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/trip-locations", tripLocationRoutes);
 app.use("/api/images", imageRoutes);
+app.use("/api/lists", listRoutes);
 
 // start server
 const port = process.env.PORT || 8080;
