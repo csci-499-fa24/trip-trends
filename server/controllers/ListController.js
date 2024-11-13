@@ -143,10 +143,79 @@ const deleteListItem = async (req, res) => {
     }
 };
 
+//Get all purchase item based on tip id
+const getPurchaseListsByTripId = async (req, res) => {
+    const { tripId } = req.params; 
+
+    try {
+        const purchaseLists = await List.findAll({
+            where: {
+                trip_id: tripId,
+                list_type: 'purchase',
+            },
+        });
+
+        if (!purchaseLists || purchaseLists.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: `No purchase lists found for trip ID ${tripId}`,
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Purchase lists fetched successfully.',
+            data: purchaseLists,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error: error.message,
+        });
+    }
+};
+
+//get all sightseeing item based on trip id
+const getSightseeingListsByTripId = async (req, res) => {
+    const { tripId } = req.params;
+
+    try {
+        const sightseeingLists = await List.findAll({
+            where: {
+                trip_id: tripId,
+                list_type: 'sightseeing',
+            },
+        });
+
+        if (!sightseeingLists || sightseeingLists.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: `No sightseeing lists found for trip ID ${tripId}`,
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Sightseeing lists fetched successfully.',
+            data: sightseeingLists,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error: error.message,
+        });
+    }
+};
 
 module.exports = {
     createListItem,
     updateListCompletion,
     updateListName,
-    deleteListItem
+    deleteListItem,
+    getPurchaseListsByTripId,
+    getSightseeingListsByTripId
 };
