@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import heic2any from 'heic2any';
 
 const TripImageComponent = ({ tripId }) => {
     const [error, setError] = useState(null);
@@ -19,18 +20,35 @@ const TripImageComponent = ({ tripId }) => {
             const formData = new FormData();
             let validFiles = true;
 
-            // Validate file types
-            Array.from(files).forEach((file) => {
+            // Process each file
+            for (const file of Array.from(files)) {
                 const fileType = file.type;
-                if (fileType !== 'image/png' && fileType !== 'image/jpeg') {
-                    validFiles = false;
-                    toast.error(`Invalid file type: ${file.name}. Only PNG and JPEG formats are allowed.`, {
-                        autoClose: 3000, // Toast will disappear after 3 seconds
-                    });
-                } else {
+
+                // Handle HEIC files
+                if (fileType === 'image/heic' || file.name.toLowerCase().endsWith('.heic')) {
+                    try {
+                        // Convert HEIC to JPEG using heic2any
+                        const heicImage = await heic2any({ blob: file, toType: 'image/jpeg' });
+
+                        // Append the converted image to formData
+                        formData.append('images', heicImage, `${file.name.replace(/\.heic$/i, '.jpg')}`);
+                    } catch (error) {
+                        validFiles = false;
+                        toast.error(`Failed to convert HEIC image: ${file.name}.`, {
+                            autoClose: 3000,
+                        });
+                    }
+                } else if (fileType === 'image/png' || fileType === 'image/jpeg') {
+                    // If the file is PNG or JPEG, directly append it
                     formData.append('images', file);
+                } else {
+                    // For unsupported file types
+                    validFiles = false;
+                    toast.error(`Invalid file type: ${file.name}. Only PNG, JPEG, and HEIC formats are allowed.`, {
+                        autoClose: 3000,
+                    });
                 }
-            });
+            }
 
             if (!validFiles) {
                 return;
