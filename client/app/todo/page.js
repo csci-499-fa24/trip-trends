@@ -178,7 +178,7 @@ function TodoList() {
 
             <div className='list-container'>
                 <div className="row" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <div className="col" style={{ flex: 1, marginRight: '20px' }}>
+                    <div className="col list-display" style={{ flex: 1 }}>
                         {/* Add Purchase Item */}
                         <div className='add-list-item' style={{ display: 'flex', alignItems: 'center' }}>
                             <Box
@@ -232,7 +232,7 @@ function TodoList() {
                         </List>
                     </div>
 
-                    <div className="col" style={{ flex: 1 }}>
+                    <div className="col list-display" style={{ flex: 1 }}>
                         {/* Add Sight Seeing Item */}
                         <div className='add-list-item' style={{ display: 'flex', alignItems: 'center' }}>
                             <Box
