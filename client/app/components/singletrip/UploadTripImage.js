@@ -2,12 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import '../../css/uploadImage.css';
 
 const TripImageComponent = ({ tripId }) => {
     const [error, setError] = useState(null);
     const fileInputRef = useRef();
-    const [uploading, setUploading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleAddImageClick = () => {
         fileInputRef.current.click();
@@ -20,6 +20,8 @@ const TripImageComponent = ({ tripId }) => {
             const formData = new FormData();
             let allValidFiles = true;
 
+            setIsLoading(true); // Show loader
+
             for (const file of files) {
                 const isValid = await processFile(file, formData);
                 if (!isValid) {
@@ -30,8 +32,11 @@ const TripImageComponent = ({ tripId }) => {
             if (allValidFiles) {
                 await uploadImages(tripId, formData);
             }
+
+            setIsLoading(false); // Hide loader after upload
         }
     };
+
 
     const isValidFileType = (fileType) => {
         return fileType === 'image/png' || fileType === 'image/jpeg' || fileType === 'image/heic' || fileType === 'image/webp';
@@ -117,6 +122,13 @@ const TripImageComponent = ({ tripId }) => {
             </div>
             {/* Toast Container */}
             <ToastContainer />
+
+            {isLoading && (
+                <div className="loader">
+                    <p>Uploading images...</p>
+                    <div className="spinner"></div> {/* Add spinner animation here */}
+                </div>
+            )}
 
         </div>
     );
