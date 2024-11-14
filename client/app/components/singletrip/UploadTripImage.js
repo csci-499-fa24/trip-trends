@@ -3,6 +3,7 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+
 const TripImageComponent = ({ tripId }) => {
     const [error, setError] = useState(null);
     const fileInputRef = useRef();
@@ -17,54 +18,80 @@ const TripImageComponent = ({ tripId }) => {
 
         if (files.length > 0) {
             const formData = new FormData();
-            let validFiles = true;
+            let allValidFiles = true;
 
-            // Validate file types
-            Array.from(files).forEach((file) => {
-                const fileType = file.type;
-                if (fileType !== 'image/png' && fileType !== 'image/jpeg') {
-                    validFiles = false;
-                    toast.error(`Invalid file type: ${file.name}. Only PNG and JPEG formats are allowed.`, {
-                        autoClose: 3000, // Toast will disappear after 3 seconds
-                    });
-                } else {
-                    formData.append('images', file);
+            for (const file of files) {
+                const isValid = await processFile(file, formData);
+                if (!isValid) {
+                    allValidFiles = false;
                 }
-            });
-
-            if (!validFiles) {
-                return;
             }
 
-            try {
-                setUploading(true);
-
-                const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}/images`, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-
-                // Show success toast
-                toast.success('Images uploaded successfully!', {
-                    autoClose: 3000, // Toast will disappear after 3 seconds
-                });
-                console.log('Images uploaded successfully:', response.data);
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1500);
-            } catch (error) {
-                console.error('Error uploading images:', error);
-                // Show error toast
-                toast.error('Failed to upload images. Please try again.', {
-                    autoClose: 3000, // Toast will disappear after 3 seconds
-                });
-            } finally {
-                setUploading(false); // Reset uploading state
+            if (allValidFiles) {
+                await uploadImages(tripId, formData);
             }
         }
     };
-    
+
+    const isValidFileType = (fileType) => {
+        return fileType === 'image/png' || fileType === 'image/jpeg' || fileType === 'image/heic' || fileType === 'image/webp';
+    };
+
+    const convertHeicToJpeg = async (file) => {
+        const heic2any = (await import('heic2any')).default;
+        return await heic2any({
+            blob: file,
+            toType: 'image/jpeg',
+        });
+    };
+
+
+    const processFile = async (file, formData) => {
+        const fileType = file.type;
+
+        if (!isValidFileType(fileType)) {
+            toast.error(`Invalid file type: ${file.name}. Only PNG, JPEG, and HEIC formats are allowed.`, {
+                autoClose: 3000,
+            });
+            return false;
+        }
+
+        if (fileType === 'image/heic') {
+            try {
+                const convertedBlob = await convertHeicToJpeg(file);
+                formData.append('images', convertedBlob, `${file.name}.jpeg`);
+            } catch (error) {
+                toast.error(`Failed to convert HEIC file: ${file.name}.`, { autoClose: 3000 });
+                return false;
+            }
+        } else {
+            formData.append('images', file);
+        }
+        return true;
+    };
+
+
+    const uploadImages = async (tripId, formData) => {
+        try {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}/images`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            toast.success('Images uploaded successfully!', { autoClose: 3000 });
+            console.log('Images uploaded successfully:', response.data);
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } catch (error) {
+            console.error('Error uploading images:', error);
+            toast.error('Failed to upload images. Please try again.', { autoClose: 3000 });
+        }
+    };
+
+
+
 
     return (
         <div>
