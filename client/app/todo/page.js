@@ -34,6 +34,17 @@ function TodoList() {
         }
 
         setChecked(newChecked);
+
+        const completion = {
+            isCompleted: (currentIndex === -1)
+        }
+        axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/lists/update-completion/${tripId}/${list_id}`, completion)
+            .then(response => {
+                console.log(response.data)
+            })
+            .catch(error => {
+                console.error('Error updating item completion:', error);
+            });
     };
 
     const getUserId = () => {
