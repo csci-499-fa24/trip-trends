@@ -10,6 +10,8 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
 import '../css/todolist.css';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
 
 function TodoList() {
     const [tripId, setTripId] = useState(null);
@@ -18,6 +20,8 @@ function TodoList() {
     const [checked, setChecked] = React.useState([]);
     const [purchaseList, setPurchaseList] = useState([]);
     const [sightseeingList, setSightseeingList] = useState([]);
+    const [newPurchaseItem, setNewPurchaseItem] = useState("");
+    const [newSightItem, setNewSightItem] = useState("")
 
     const handleToggle = (list_id) => () => {
         const currentIndex = checked.indexOf(list_id);
@@ -51,6 +55,60 @@ function TodoList() {
             }
         } catch (error) {
             console.error("Error fetching user details:", error);
+        }
+    };
+
+    const handlePurchaseInputChange = (event) => {
+        setNewPurchaseItem(event.target.value);
+    };
+
+    const handleSightInputChange = (event) => {
+        setNewSightItem(event.target.value);
+    };
+
+    const handleAddPurchaseItemClick = () => {
+        if (newPurchaseItem === "") {
+            // replace this with a toast
+            console.log("The purchase text box is empty");
+        } else {
+            console.log("Calling Purchase API with ", newPurchaseItem);
+            const itemBody = {
+                name: newPurchaseItem,
+                list_type: "purchase",
+                is_completed: false
+            }
+
+            axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/lists/create-item/${tripId}`, itemBody)
+                .then(response => {
+                    console.log(response.data)
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.error('Error posting new purchase item:', error);
+                });
+        }
+    };
+
+    const handleAddSightItemClick = () => {
+        if (newSightItem === "") {
+            // replace this with a toast
+            console.log("The sight text box is empty");
+        } else {
+            console.log("Calling Sight API with ", newSightItem);
+            const itemBody = {
+                name: newSightItem,
+                list_type: "sightseeing",
+                is_completed: false
+            }
+
+            axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/lists/create-item/${tripId}`, itemBody)
+                .then(response => {
+                    console.log(response.data)
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.error('Error posting new sight item:', error);
+                });
         }
     };
 
@@ -106,10 +164,39 @@ function TodoList() {
                 </div>
                 <span className="icon-text">Back</span>
             </div>
-            
+
             <div className='list-container'>
                 <div className="row" style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <div className="col" style={{ flex: 1, marginRight: '20px' }}>
+                        {/* Add Purchase Item */}
+                        <div className='add-list-item' style={{ display: 'flex', alignItems: 'center' }}>
+                            <Box
+                                component="form"
+                                sx={{ '& .MuiTextField-root': { m: 1, width: '25ch' } }}
+                                noValidate
+                                autoComplete="off"
+                            >
+                                <div>
+                                    <TextField
+                                        id="outlined-required"
+                                        label="New Purchase Item"
+                                        value={newPurchaseItem}
+                                        onChange={handlePurchaseInputChange}
+                                    />
+                                </div>
+                            </Box>
+                            <div className="icon-div" tooltip="Add Item" tabIndex="0" onClick={handleAddPurchaseItemClick}>
+                                <div className="icon-SVG">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                    </svg>
+                                    <span className="icon-text">Add Item</span>
+                                </div>
+                            </div>
+                        </div>
+                        <br></br>
+                        {/* Purchase List */}
                         <h3>Your Purchase List</h3>
                         <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
                             {purchaseList.map((item) => {
@@ -135,6 +222,35 @@ function TodoList() {
                     </div>
 
                     <div className="col" style={{ flex: 1 }}>
+                        {/* Add Sight Seeing Item */}
+                        <div className='add-list-item' style={{ display: 'flex', alignItems: 'center' }}>
+                            <Box
+                                component="form"
+                                sx={{ '& .MuiTextField-root': { m: 1, width: '25ch' } }}
+                                noValidate
+                                autoComplete="off"
+                            >
+                                <div>
+                                    <TextField
+                                        id="outlined-required"
+                                        label="New Sightsee Item"
+                                        value={newSightItem}
+                                        onChange={handleSightInputChange}
+                                    />
+                                </div>
+                            </Box>
+                            <div className="icon-div" tooltip="Add Item" tabIndex="0" onClick={handleAddSightItemClick}>
+                                <div className="icon-SVG">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                    </svg>
+                                    <span className="icon-text">Add Item</span>
+                                </div>
+                            </div>
+                        </div>
+                        <br></br>
+                        {/* Sightseeing List */}
                         <h3>Your Sightseeing List</h3>
                         <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
                             {sightseeingList.map((item) => {
