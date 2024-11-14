@@ -12,6 +12,8 @@ import Checkbox from '@mui/material/Checkbox';
 import '../css/todolist.css';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function TodoList() {
     const [tripId, setTripId] = useState(null);
@@ -23,12 +25,12 @@ function TodoList() {
     const [newPurchaseItem, setNewPurchaseItem] = useState("");
     const [newSightItem, setNewSightItem] = useState("")
 
-    const handleToggle = (list_id) => () => {
-        const currentIndex = checked.indexOf(list_id);
+    const handleToggle = (item) => () => {
+        const currentIndex = checked.indexOf(item.list_id);
         const newChecked = [...checked];
 
         if (currentIndex === -1) {
-            newChecked.push(list_id);
+            newChecked.push(item.list_id);
         } else {
             newChecked.splice(currentIndex, 1);
         }
@@ -38,7 +40,7 @@ function TodoList() {
         const completion = {
             isCompleted: (currentIndex === -1)
         }
-        axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/lists/update-completion/${tripId}/${list_id}`, completion)
+        axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/lists/update-completion/${tripId}/${item.list_id}`, completion)
             .then(response => {
                 console.log(response.data)
             })
@@ -79,8 +81,7 @@ function TodoList() {
 
     const handleAddPurchaseItemClick = () => {
         if (newPurchaseItem === "") {
-            // replace this with a toast
-            console.log("The purchase text box is empty");
+            toast.error("Please enter what you'd like to add to your list.")
         } else {
             console.log("Calling Purchase API with ", newPurchaseItem);
             const itemBody = {
@@ -92,7 +93,10 @@ function TodoList() {
             axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/lists/create-item/${tripId}`, itemBody)
                 .then(response => {
                     console.log(response.data)
-                    window.location.reload();
+                    toast.success("Successful added a new item to your list!");
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
                 })
                 .catch(error => {
                     console.error('Error posting new purchase item:', error);
@@ -102,8 +106,7 @@ function TodoList() {
 
     const handleAddSightItemClick = () => {
         if (newSightItem === "") {
-            // replace this with a toast
-            console.log("The sight text box is empty");
+            toast.error("Please enter what you'd like to add to your list.")
         } else {
             console.log("Calling Sight API with ", newSightItem);
             const itemBody = {
@@ -115,7 +118,10 @@ function TodoList() {
             axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/lists/create-item/${tripId}`, itemBody)
                 .then(response => {
                     console.log(response.data)
-                    window.location.reload();
+                    toast.success("Successful added a new item to your list!");
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
                 })
                 .catch(error => {
                     console.error('Error posting new sight item:', error);
@@ -162,6 +168,7 @@ function TodoList() {
 
     return (
         <div className='container'>
+            <ToastContainer hideProgressBar={true} />
             <HeaderComponent
                 headerTitle="To-Do List"
                 setUserName={setUserName}
@@ -210,25 +217,31 @@ function TodoList() {
                         {/* Purchase List */}
                         <h3>Your Purchase List</h3>
                         <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-                            {purchaseList.map((item) => {
-                                const labelId = `checkbox-list-label-${item.list_id}`;
-                                return (
-                                    <ListItem key={item.list_id} disablePadding>
-                                        <ListItemButton role={undefined} onClick={handleToggle(item.list_id)} dense>
-                                            <ListItemIcon>
-                                                <Checkbox
-                                                    edge="start"
-                                                    checked={checked.includes(item.list_id)}
-                                                    tabIndex={-1}
-                                                    disableRipple
-                                                    inputProps={{ 'aria-labelledby': labelId }}
-                                                />
-                                            </ListItemIcon>
-                                            <ListItemText id={labelId} primary={item.name} />
-                                        </ListItemButton>
-                                    </ListItem>
-                                );
-                            })}
+                            {purchaseList.length === 0 ? (
+                                <ListItem>
+                                    <ListItemText sx={{ textAlign: 'center' }} primary="Add some items to your list!" />
+                                </ListItem>
+                            ) : (
+                                purchaseList.map((item) => {
+                                    const labelId = `checkbox-list-label-${item.list_id}`;
+                                    return (
+                                        <ListItem key={item.list_id} disablePadding>
+                                            <ListItemButton role={undefined} onClick={handleToggle(item)} dense>
+                                                <ListItemIcon>
+                                                    <Checkbox
+                                                        edge="start"
+                                                        checked={checked.includes(item.list_id)}
+                                                        tabIndex={-1}
+                                                        disableRipple
+                                                        inputProps={{ 'aria-labelledby': labelId }}
+                                                    />
+                                                </ListItemIcon>
+                                                <ListItemText id={labelId} primary={item.name} />
+                                            </ListItemButton>
+                                        </ListItem>
+                                    );
+                                })
+                            )}
                         </List>
                     </div>
 
@@ -264,25 +277,32 @@ function TodoList() {
                         {/* Sightseeing List */}
                         <h3>Your Sightseeing List</h3>
                         <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-                            {sightseeingList.map((item) => {
-                                const labelId = `checkbox-list-label-${item.list_id}`;
-                                return (
-                                    <ListItem key={item.list_id} disablePadding>
-                                        <ListItemButton role={undefined} onClick={handleToggle(item.list_id)} dense>
-                                            <ListItemIcon>
-                                                <Checkbox
-                                                    edge="start"
-                                                    checked={checked.includes(item.list_id)}
-                                                    tabIndex={-1}
-                                                    disableRipple
-                                                    inputProps={{ 'aria-labelledby': labelId }}
-                                                />
-                                            </ListItemIcon>
-                                            <ListItemText id={labelId} primary={item.name} />
-                                        </ListItemButton>
+                            {
+                                sightseeingList.length === 0 ? (
+                                    <ListItem>
+                                        <ListItemText sx={{ textAlign: 'center' }} primary="Add some items to your list!" />
                                     </ListItem>
-                                );
-                            })}
+                                ) : (
+                                    sightseeingList.map((item) => {
+                                        const labelId = `checkbox-list-label-${item.list_id}`;
+                                        return (
+                                            <ListItem key={item.list_id} disablePadding>
+                                                <ListItemButton role={undefined} onClick={handleToggle(item)} dense>
+                                                    <ListItemIcon>
+                                                        <Checkbox
+                                                            edge="start"
+                                                            checked={checked.includes(item.list_id)}
+                                                            tabIndex={-1}
+                                                            disableRipple
+                                                            inputProps={{ 'aria-labelledby': labelId }}
+                                                        />
+                                                    </ListItemIcon>
+                                                    <ListItemText id={labelId} primary={item.name} />
+                                                </ListItemButton>
+                                            </ListItem>
+                                        );
+                                    })
+                                )}
                         </List>
                     </div>
                 </div>
