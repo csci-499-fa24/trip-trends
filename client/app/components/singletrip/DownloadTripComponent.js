@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import '../../css/downloadExpenses.css';
 
 const DownloadTripComponent = ({ tripData, tripId }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -15,7 +16,7 @@ const DownloadTripComponent = ({ tripData, tripId }) => {
                 responseType: 'blob'
             });
 
-            let filename = `${tripData.data.name}.${format}`; 
+            let filename = `${tripData.data.name}.${format}`;
             const contentDisposition = response.headers['content-disposition'];
             if (contentDisposition && contentDisposition.includes('filename=')) {
                 const filenamePart = contentDisposition.split('filename=')[1];
@@ -59,12 +60,15 @@ const DownloadTripComponent = ({ tripData, tripId }) => {
 
             {/* Modal for Format Selection */}
             {isModalOpen && (
-                <div className="modal-overlay">
-                    <div className="modal">
+                <div className="modal-pdf">
+                    <div className="modal-files">
                         <h3>Select Download Format</h3>
                         <button onClick={() => downloadFile('csv')}>TSV</button>
+                        <br></br>
                         <button onClick={() => downloadFile('pdf')}>PDF</button>
+                        <br></br>
                         <button onClick={() => downloadFile('xml')}>XML</button>
+                        <br></br>
                         <button onClick={() => setIsModalOpen(false)} className="close-btn">Cancel</button>
                     </div>
                 </div>
