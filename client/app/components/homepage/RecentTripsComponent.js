@@ -79,7 +79,7 @@ const RecentTripsComponent = ({ trips }) => {
 
     return (
         <div className="recent-trips-container">
-            <h2>Recent & Upcoming</h2>
+            <h2>Recent & Upcoming Trips</h2>
             {recentTrips.map(trip => (
                 <div 
                     key={trip.trip_id} 

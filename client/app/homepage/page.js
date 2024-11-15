@@ -70,8 +70,8 @@ function homepage() {
         }
         try {
             const [tripsResponse, favoritesResponse] = await Promise.all([
-                axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/users/${userId}`), 
-                axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/users/${userId}`) 
+                axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/users/${userId}`),
+                axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/users/${userId}`)
             ]);
             const tripsData = tripsResponse.data.data;
             const favoritesData = favoritesResponse.data.data;
@@ -79,12 +79,12 @@ function homepage() {
                 const favorite = favoritesData.find(fav => fav.trip_id === trip.trip_id);
                 return {
                     ...trip,
-                    favorite: favorite ? favorite.favorite : false 
+                    favorite: favorite ? favorite.favorite : false
                 };
             });
-            const sortedTrips = tripsWithFavorites.sort((a, b) => b.favorite - a.favorite); 
+            const sortedTrips = tripsWithFavorites.sort((a, b) => b.favorite - a.favorite);
             setTrips(sortedTrips);
-        
+
         } catch (err) {
             console.error(err);
             setTrips([]);
@@ -123,7 +123,7 @@ function homepage() {
             console.error("Error getting all trip locations from user:", error);
             return;
         }
-    
+
         const loc_data = locations_response?.data?.data;
         if (loc_data && loc_data.length > 0) {
             const locations = loc_data.map(location => ({
@@ -136,7 +136,7 @@ function homepage() {
         } else {
             console.log("No locations available for this user.");
         }
-    };    
+    };
 
     useEffect(() => {
         handleToken();
@@ -151,35 +151,37 @@ function homepage() {
 
     return (
         <GoogleOAuthProvider clientId={googleID}>
-        <ToastContainer />
+            <ToastContainer />
             {/* Header section */}
-            <HeaderComponent 
-                headerTitle="Trip Trends" 
-                setUserName={setUserName} 
+            <HeaderComponent
+                headerTitle="Trip Trends"
+                setUserName={setUserName}
                 userId={userId}
             />
             <div className='main-container'>
                 {/* Welcome section */}
                 <div className="welcome-section">
-                    <h1>Welcome, {userName}!</h1>
-                    
-                    <br /><br />
-                    <p>See your trip history:</p>
+                    {userName ?
+                        (
+                            <h1 style={{ textAlign: "center" }}>Welcome, {userName}!</h1>
+                        ) :
+                        (
+                            <h1 style={{ textAlign: "center" }}>Welcome!</h1>
+                        )}
+                    <p>See where you've been:</p>
                 </div>
-        
+
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    
+
                     {/* Map section */}
                     <MapComponent allTripLocations={allTripLocations} toggleTripDetails={toggleTripDetails} />
-                    
+
                     {/* Recent Trips section */}
                     <div style={{ width: '35%', marginLeft: '10px' }}>
                         <RecentTripsComponent trips={trips} />
                     </div>
-                    
-                </div>
 
-                <br /><br />
+                </div>
 
                 {/* All Trips Section */}
                 <TripsDisplayComponent trips={trips} userId={userId} />
