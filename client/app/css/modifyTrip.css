@@ -1,16 +1,3 @@
-.modal {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    backdrop-filter: blur(2px);
-}
-
 .modal-content {
     max-width: 400px;
     width: 90%;

@@ -11,7 +11,9 @@
     z-index: 1000; /* Ensure modal is on top */
 }
 
+/* styling profile's home currency*/
 .modal-content {
+    /* position: relative; */
     max-width: 40% !important;
     max-height: 300vh;
     overflow-x: auto;
@@ -24,6 +26,14 @@
     margin: 10px;
     width: 100%;
     text-align: center;
+}
+
+.close {
+    left: -48%;
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
 }
 
 .field-label {

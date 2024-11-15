@@ -68,8 +68,8 @@
     transform: translate(50%, -50%);
 }
 
-/* model and form are in global */
-.modal-content {
+/* styling for homepage create new trip */
+.form-style {
     max-height: 80vh;
     overflow-y: auto; 
     padding: 20px; 
