@@ -22,6 +22,7 @@ import BarGraphComponent from '../components/singletrip/BarGraphComponent';
 import SpendingCirclesComponent from '../components/singletrip/SpendingCirclesComponent';
 import TripImageComponent from '../components/singletrip/TripImageComponent';
 import UploadTripImage from '../components/singletrip/UploadTripImage';
+import CurrencyToggleComponent from '../components/singletrip/CurrencyToggleComponent'
 
 
 Chart.register(ArcElement, Tooltip, Legend);
@@ -140,13 +141,15 @@ function Singletrip() {
     const fetchTripLocations = () => {
         axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${tripId}`)
             .then(response => {
-                setSelectedCurrency(response.data.data[0].currency_code)
+                setSelectedCurrency(response.data.data[0].currency_code);
                 const locations = response.data.data;
                 setTripLocations(locations.map(location => location.location));
-
-                const currencyCodes = locations.map(location => location.currency_code);
+    
+                // get unique currency codes
+                const currencyCodes = [...new Set(locations.map(location => location.currency_code))];
+    
                 setOtherCurrencies(currencyCodes);
-
+    
             })
             .catch(error => {
                 console.error('Error fetching trip data:', error);
@@ -444,6 +447,7 @@ function Singletrip() {
                         <div className='container'>
                             {/* Icon Bar Above Trip Info */}
                             <TripIconBarComponent tripId={tripId} userId={userId} isOwner={isOwner} tripData={tripData} tripLocations={tripLocations} userRole={userRole} fetchTripData={fetchTripData} />
+                            <CurrencyToggleComponent homeCurrency={homeCurrency} otherCurrencies={otherCurrencies} />
                             {/* General Trip Info*/}
                             <GeneralTripInfoComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenses={expenseUSD} />
                         </div>
