@@ -67,28 +67,18 @@
     transform: translate(50%, -50%);
 }
 
-
-/* styling for homepage create new trip */
-.form-style {
-    max-height: 80vh;
-    overflow-y: auto; 
-    padding: 20px; 
-    background-color: white;
-    border-radius: 8px; 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    width: 500px; 
-}
-
 .new-trip-title {
     font-size: 24px;
     color: black;
     text-align: center;
     font-weight: bold;
-    margin-bottom: 15px;
+    margin-bottom: 30px;
+    margin-top: -20px;
 }
 
 /* container holding each label and field */
 .new-trip-field-label {
+    width: 100%;
     display: block;
     font-size: 1rem;
     margin-bottom: 10px;
