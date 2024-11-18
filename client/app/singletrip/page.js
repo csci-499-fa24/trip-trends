@@ -83,6 +83,8 @@ function Singletrip() {
 
     const [expensesToDisplay, setExpensesToDisplay] = useState([]); // expenses based on toggle currency, either original expenses or converted expenses
     const [totalExpensesInToggleCurrency, setTotalExpensesInToggleCurrency] = useState(0);
+    // const [convertedTripData, setConvertedTripData] = useState(null);
+    const [convertedBudget, setConvertedBudget] = useState("");
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -122,7 +124,7 @@ function Singletrip() {
     useEffect(() => {
         const savedFilter = localStorage.getItem('selectedFilter');
         if (savedFilter && expensesToDisplay.length > 0) {
-            console.log(expensesToDisplay);
+            // console.log(expensesToDisplay);
             applyFilter(savedFilter, expensesToDisplay);
         }
     }, [expensesToDisplay]);
@@ -138,7 +140,7 @@ function Singletrip() {
 
                 const savedFilter = localStorage.getItem('selectedFilter');
                 if (savedFilter) {
-                    console.log(expensesToDisplay);
+                    // console.log(expensesToDisplay);
                     applyFilter(savedFilter, expensesToDisplay);
                 }
             })
@@ -386,6 +388,25 @@ function Singletrip() {
             setIsVisible(prevState => !prevState);
         };
 
+    const convertBudget = async (budget) => {
+        if (selectedToggleCurrency !== "") {
+            try {
+                // Fetch conversion rate for the budget
+                const response = await axios.get(`https://hexarate.paikama.co/api/rates/latest/${homeCurrency}?target=${selectedToggleCurrency}`);
+                const conversionRate = response.data.data.mid; // assuming correct response structure
+        
+                const convertedBudget = (parseFloat(budget) * conversionRate).toFixed(2);
+        
+                setConvertedBudget(convertedBudget);
+        
+            } catch (error) {
+                console.error('Error fetching conversion rates:', error);
+            }
+        } else {
+            setConvertedBudget(budget);
+        }
+    };
+
     const convertExpenses = async (expenses, targetCurrency, setConvertedExpenses, setTotalExpenses, setCategoryData) => {
         if (!targetCurrency) {
             return;
@@ -464,7 +485,15 @@ function Singletrip() {
     };
 
     useEffect(() => {
-        convertExpensesToToggleCurrency(); // when currency toggle changes
+        if (tripData) {
+            convertBudget(tripData.data.budget);
+        }
+    }, [selectedToggleCurrency, tripData]);
+
+    useEffect(() => {
+        if (expenseData) {
+            convertExpensesToToggleCurrency();
+        }
     }, [selectedToggleCurrency, expenseData]);
 
     return (
@@ -490,7 +519,8 @@ function Singletrip() {
                                 toggleChange={handleCurrencyToggleChange} />
                             {/* General Trip Info*/}
                             <GeneralTripInfoComponent 
-                                tripData={tripData} 
+                                tripData={tripData} // handles budget currency
+                                convertedBudget={convertedBudget}
                                 tripId={tripId} 
                                 tripLocations={tripLocations} 
                                 expenses={expensesToDisplay} 
@@ -515,6 +545,7 @@ function Singletrip() {
                                     <SpendingCirclesComponent
                                         totalExpenses={selectedToggleCurrency !== "" ? totalExpensesInToggleCurrency : totalExpenses}
                                         tripData={tripData}
+                                        convertedBudget={convertedBudget}
                                         currency={selectedToggleCurrency !== "" ? selectedToggleCurrency : homeCurrency}
                                     />
                                 </div>
@@ -553,6 +584,7 @@ function Singletrip() {
                                             <div className="meter-container">
                                                 <BudgetMeterComponent 
                                                     tripData={tripData} 
+                                                    convertedBudget={convertedBudget}
                                                     expensesToDisplay={expensesToDisplay} 
                                                     totalExpenses={selectedToggleCurrency !== "" ? totalExpensesInToggleCurrency : totalExpenses}
                                                     currency={selectedToggleCurrency !== "" ? selectedToggleCurrency : homeCurrency} />
