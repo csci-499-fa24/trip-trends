@@ -5,6 +5,7 @@
   --darkgreen: #344E41;
   --lightergreen: #A3B18A;
   --lightgreen: #588157;
+  --mediumgreen: #60945fc9;
   --offwhite: #DAD7CD;
 }
 
@@ -185,6 +186,36 @@ button {
   width: 100%;
   text-align: center;
   padding-bottom: 30px;
+}
+
+@media (max-width: 805px) {
+  .modal-content {
+    max-width: 70% !important;
+  }
+}
+
+@media (max-width: 1150px) {
+  .modal-content {
+    max-width: 50% !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .modal-content {
+    max-width: 73% !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .modal-content {
+    max-width: 80% !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .modal-content {
+    max-width: 87% !important;
+  }
 }
 
 form {
