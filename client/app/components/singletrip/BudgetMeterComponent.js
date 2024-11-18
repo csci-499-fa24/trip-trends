@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactSpeedometer, { Transition } from 'react-d3-speedometer';
 
-const BudgetMeterComponent = ({ tripData, expenseData, totalExpenses, homeCurrency}) => {
+const BudgetMeterComponent = ({ tripData, expensesToDisplay, totalExpenses, currency}) => {
     return(
         <div>
             <p id='budgetTitle'> Budget Meter</p>
-            {expenseData && expenseData.data && totalExpenses === 0 ? (
+            {expensesToDisplay && totalExpenses === 0 ? (
                 <p>Loading your budget data...</p>
             ) : totalExpenses > tripData.data.budget ? (
                 <div style={{
@@ -46,21 +46,48 @@ const BudgetMeterComponent = ({ tripData, expenseData, totalExpenses, homeCurren
                     />
                 </div>
             )}
-            <p id='budgetTitle'>Your Budget Data:</p>
-            {expenseData && expenseData.data && totalExpenses === 0 ? (
+            {expensesToDisplay && totalExpenses === 0 ? (
                 <p>Loading your budget data...</p>
             ) : (
-                <div style={{ textAlign: 'center' }}>
-                    <p style={{ textDecoration: "underline", display: "inline" }}>
-                        Total Expenses in {homeCurrency}:
-                    </p>
-                    <span>  {totalExpenses.toFixed(2)}</span>
+                <div style={{ textAlign: 'center', margin: '20px 0' }}>
                     {totalExpenses > tripData.data.budget ? (
-                        <p id='budget-text'>You are <strong>${(totalExpenses - tripData.data.budget).toFixed(2)}</strong> over your budget.</p>
+                        <p 
+                            id='budget-text' 
+                            style={{
+                                color: '#e63946', 
+                                fontSize: '0.9em', 
+                                fontWeight: 'bold', 
+                                animation: 'fadeIn 0.5s ease-in-out',
+                                border: '2px solid #e63946',
+                                borderRadius: '8px',
+                                padding: '5px',
+                                display: 'inline-block',
+                                backgroundColor: '#ffe6e6',
+                                boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+                            }}
+                        >
+                            <strong>${(totalExpenses - tripData.data.budget).toFixed(2)}</strong> over budget!
+                        </p>
                     ) : (
-                        <p>You are within your budget.</p>
+                        <p 
+                            style={{
+                                color: '#2a9d8f', 
+                                fontSize: '0.9em', 
+                                fontWeight: 'bold', 
+                                animation: 'fadeIn 0.5s ease-in-out',
+                                border: '2px solid #2a9d8f',
+                                borderRadius: '8px',
+                                padding: '5px',
+                                display: 'inline-block',
+                                backgroundColor: '#e6f7f1',
+                                boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+                            }}
+                        >
+                            Within budget!
+                        </p>
                     )}
                 </div>
+
             )}
         </div>
     );

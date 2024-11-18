@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Table from 'react-bootstrap/Table';
 import '../../css/ExpenseTableComponent.css';
 
-const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expenseData, currencyCodes, expenseCategories, categoryData }) => {
+const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisplay, currencyCodes, expenseCategories, categoryData }) => {
     const [isEditPopupVisible, setEditPopupVisible] = useState(false);
     const [selectedExpense, setSelectedExpense] = useState(null);
+
     const handleEditChange = (e) => {
         const { name, value } = e.target;
         setSelectedExpense((prev) => ({
@@ -68,7 +69,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expenseData, c
 
     return (
         <div>
-            {expenseData && expenseData.data && categoryData.datasets && categoryData.datasets.length > 0 ? (
+            {expensesToDisplay && categoryData.datasets && categoryData.datasets.length > 0 ? (
                 <div>
                     <div className="expense-table-container">
                         <Table hover size="sm" responsive="sm" className="expense-table">
@@ -83,8 +84,8 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expenseData, c
                                     <th>Edit</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {expenseData.data.map((expense) => {
+                            <tbody> 
+                                {expensesToDisplay.map((expense) => {
                                     const categoryIndex = categoryData.labels.indexOf(expense.category);
                                     const tagColor = categoryData.datasets[0].backgroundColor[categoryIndex];
 

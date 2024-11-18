@@ -22,6 +22,7 @@ import BarGraphComponent from '../components/singletrip/BarGraphComponent';
 import SpendingCirclesComponent from '../components/singletrip/SpendingCirclesComponent';
 import TripImageComponent from '../components/singletrip/TripImageComponent';
 import UploadTripImage from '../components/singletrip/UploadTripImage';
+import CurrencyToggleComponent from '../components/singletrip/CurrencyToggleComponent'
 
 
 Chart.register(ArcElement, Tooltip, Legend);
@@ -35,9 +36,8 @@ function Singletrip() {
     const [userName, setUserName] = useState('');
     const [expenseData, setExpenseData] = useState([]);
     const [fetchedExpenseData, setFetchedExpenseData] = useState([]);
-    const [convertedHomeCurrencyExpenseData, setconvertedHomeCurrencyExpenseData] = useState([])
+    const [convertedHomeCurrencyExpenseData, setConvertedHomeCurrencyExpenseData] = useState([])
     const [totalExpenses, setTotalExpenses] = useState(0);
-    const [expenseUSD, setExpenseUSD] = useState([]);
     const [currencyCodes, setCurrencyCodes] = useState([]);
     const [selectedCurrency, setSelectedCurrency] = useState('');
     const [otherCurrencies, setOtherCurrencies] = useState([]);
@@ -73,6 +73,16 @@ function Singletrip() {
     // const [userId, setUserId] = useState(null);
     const [homeCurrency, setHomeCurrency] = useState(null);
     const [isVisible, setIsVisible] = useState(false);
+
+    // currency toggle related states
+    const [selectedToggleCurrency, setSelectedToggleCurrency] = useState(""); // from currency toggle component
+    // callback function to update currency from toggle switch
+    const handleCurrencyToggleChange = (currency) => {
+        setSelectedToggleCurrency(currency);
+    };
+
+    const [expensesToDisplay, setExpensesToDisplay] = useState([]); // expenses based on toggle currency, either original expenses or converted expenses
+    const [totalExpensesInToggleCurrency, setTotalExpensesInToggleCurrency] = useState(0);
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -111,11 +121,11 @@ function Singletrip() {
 
     useEffect(() => {
         const savedFilter = localStorage.getItem('selectedFilter');
-        if (savedFilter && expenseUSD.length > 0) {
-            console.log(expenseUSD);
-            applyFilter(savedFilter, expenseUSD);
+        if (savedFilter && expensesToDisplay.length > 0) {
+            console.log(expensesToDisplay);
+            applyFilter(savedFilter, expensesToDisplay);
         }
-    }, [expenseUSD]);
+    }, [expensesToDisplay]);
 
     const fetchExpenseData = () => {
         axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/trips/${tripId}`)
@@ -128,8 +138,8 @@ function Singletrip() {
 
                 const savedFilter = localStorage.getItem('selectedFilter');
                 if (savedFilter) {
-                    console.log(expenseUSD);
-                    applyFilter(savedFilter, expenseUSD);
+                    console.log(expensesToDisplay);
+                    applyFilter(savedFilter, expensesToDisplay);
                 }
             })
             .catch(error => {
@@ -140,13 +150,15 @@ function Singletrip() {
     const fetchTripLocations = () => {
         axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${tripId}`)
             .then(response => {
-                setSelectedCurrency(response.data.data[0].currency_code)
+                setSelectedCurrency(response.data.data[0].currency_code);
                 const locations = response.data.data;
                 setTripLocations(locations.map(location => location.location));
-
-                const currencyCodes = locations.map(location => location.currency_code);
+    
+                // get unique currency codes
+                const currencyCodes = [...new Set(locations.map(location => location.currency_code))];
+    
                 setOtherCurrencies(currencyCodes);
-
+    
             })
             .catch(error => {
                 console.error('Error fetching trip data:', error);
@@ -194,7 +206,7 @@ function Singletrip() {
 
     const handleAllCategoriesSelect = () => {
         setSelectedCategory("");
-        setExpenseData({ data: expenseUSD });
+        setExpenseData({ data: expensesToDisplay });
         setIsDropdownVisible(false);
     };
 
@@ -216,7 +228,7 @@ function Singletrip() {
         let filteredData = [];
 
         if (selectedCategory) {
-            expenseUSD.forEach(expense => {
+            expensesToDisplay.forEach(expense => {
 
                 if (expense.category === selectedCategory) {
                     filteredData.push(expense);
@@ -232,16 +244,16 @@ function Singletrip() {
     };
 
 
-    const applyFilter = (filterOption, data = expenseUSD) => {
+    const applyFilter = (filterOption, data = expensesToDisplay) => {
         if (!Array.isArray(data)) {
             console.error('Data is not an array:', data);
             return;
         }
         let sortedExpenses;
         if (filterOption === 'highest') {
-            sortedExpenses = [...data].sort((a, b) => parseFloat(b.amountInHomeCurrency) - parseFloat(a.amountInHomeCurrency));
+            sortedExpenses = [...data].sort((a, b) => parseFloat(b.amount) - parseFloat(a.amount));
         } else if (filterOption === 'lowest') {
-            sortedExpenses = [...data].sort((a, b) => parseFloat(a.amountInHomeCurrency) - parseFloat(b.amountInHomeCurrency));
+            sortedExpenses = [...data].sort((a, b) => parseFloat(a.amount) - parseFloat(b.amount));
         } else if (filterOption === 'recent') {
             sortedExpenses = [...data].sort((a, b) => new Date(b.posted) - new Date(a.posted));
         } else if (filterOption === 'oldest') {
@@ -370,53 +382,56 @@ function Singletrip() {
         getExchangeRates();
     }, [selectedCurrency]);
 
+    const toggleVisibility = () => {
+            setIsVisible(prevState => !prevState);
+        };
 
-    // useEffect(() => {
-    //     console.log(expenseUSD);
-    // },[expenseUSD])
-
-    const fetchCurrencyRates = async (expenses) => {
+    const convertExpenses = async (expenses, targetCurrency, setConvertedExpenses, setTotalExpenses, setCategoryData) => {
+        if (!targetCurrency) {
+            return;
+        }
+    
         try {
             const uniqueCurrencies = [...new Set(expenses.map(exp => exp.currency))].filter(Boolean);
-            
+    
+            // conversion rates for each currency
             const currencyPromises = uniqueCurrencies.map(currency => 
-                axios.get(`https://hexarate.paikama.co/api/rates/latest/${currency}?target=${homeCurrency}`)
+                axios.get(`https://hexarate.paikama.co/api/rates/latest/${currency}?target=${targetCurrency}`)
             );
     
             const currencyResponses = await Promise.all(currencyPromises);
     
             const currencyRates = currencyResponses.reduce((acc, response, index) => {
-                acc[uniqueCurrencies[index]] = response.data.data.mid; // Assuming correct response structure
+                acc[uniqueCurrencies[index]] = response.data.data.mid; // assuming correct response structure
                 return acc;
             }, {});
     
-            let totalExpensesInHomeCurrency = 0;
+            let totalExpensesInTargetCurrency = 0;
             const categoryTotals = {};
     
-            const convertedExpenses = expenses.map(expense => {
-                const rate = currencyRates[expense.currency] || 1; // Use rate or fallback to 1
-                const amountInHomeCurrency = (parseFloat(expense.amount) * rate).toFixed(2);
-    
-                categoryTotals[expense.category] = 
-                    (categoryTotals[expense.category] || 0) + parseFloat(amountInHomeCurrency);
-    
-                totalExpensesInHomeCurrency += parseFloat(amountInHomeCurrency);
+            // convert expenses and calculate totals
+            const convertedData = expenses.map(expense => {
+                const rate = currencyRates[expense.currency] || 1; // fallback to 1 if no rate is available
+                const convertedAmount = (parseFloat(expense.amount) * rate).toFixed(2);
+
+                categoryTotals[expense.category] = (categoryTotals[expense.category] || 0) + parseFloat(convertedAmount);
+                totalExpensesInTargetCurrency += parseFloat(convertedAmount);
     
                 return {
                     ...expense,
-                    amountInHomeCurrency
+                    amount: convertedAmount,
+                    currency: targetCurrency
                 };
             });
     
-            setconvertedHomeCurrencyExpenseData(convertedExpenses);
-            setExpenseUSD(convertedExpenses);
-            setTotalExpenses(totalExpensesInHomeCurrency);
+            setConvertedExpenses(convertedData);
+            setTotalExpenses(totalExpensesInTargetCurrency);
     
-            // Prepare data for pie chart
+            // prepare data for pie chart
             setCategoryData({
                 labels: Object.keys(categoryTotals),
                 datasets: [{
-                    label: `Expenses by Category in ${homeCurrency}`,
+                    label: `Expenses by Category in ${targetCurrency}`,
                     data: Object.values(categoryTotals),
                     backgroundColor: [
                         '#2A9D8F', '#e76f51', '#E9C46A', '#F4A261', '#c476bf', '#264653', '#e5989b', '#9d0208', '#e4c1f9',
@@ -426,13 +441,29 @@ function Singletrip() {
                 }]
             });
         } catch (error) {
-            console.error('Error fetching currency rates:', error);
+            console.error('Error fetching conversion rates:', error);
         }
     };
-
-    const toggleVisibility = () => {
-        setIsVisible(prevState => !prevState);
+    
+    // for home currency
+    const fetchCurrencyRates = async () => {
+        convertExpenses(expenseData.data, homeCurrency, setConvertedHomeCurrencyExpenseData, setTotalExpenses, setCategoryData);
     };
+    
+    // for toggle currency (including home currency)
+    const convertExpensesToToggleCurrency = async () => {
+        if (selectedToggleCurrency) {
+            convertExpenses(expenseData.data, selectedToggleCurrency, setExpensesToDisplay, setTotalExpensesInToggleCurrency, setCategoryData);
+        } else {
+            fetchCurrencyRates();
+            setExpensesToDisplay(expenseData.data); // if no currency selected, just display the original data
+        }
+
+    };
+
+    useEffect(() => {
+        convertExpensesToToggleCurrency(); // when currency toggle changes
+    }, [selectedToggleCurrency, expenseData]);
 
     return (
         <div>
@@ -444,8 +475,9 @@ function Singletrip() {
                         <div className='container'>
                             {/* Icon Bar Above Trip Info */}
                             <TripIconBarComponent tripId={tripId} userId={userId} isOwner={isOwner} tripData={tripData} tripLocations={tripLocations} userRole={userRole} fetchTripData={fetchTripData} />
+                            <CurrencyToggleComponent homeCurrency={homeCurrency} otherCurrencies={otherCurrencies} toggleChange={handleCurrencyToggleChange} />
                             {/* General Trip Info*/}
-                            <GeneralTripInfoComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenses={expenseUSD} />
+                            <GeneralTripInfoComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenses={expensesToDisplay} />
                         </div>
                         <br></br>
                         <div className='container'>
@@ -456,10 +488,11 @@ function Singletrip() {
                                     <ExchangeRateTableComponent exchangeRates={exchangeRates} currencyCodes={currencyCodes} homeCurrency={homeCurrency} />
                                 </div>
                                 <div className='col' style={{flexDirection: 'column'}}>
-                                    <h2 style={{ textAlign: 'center', marginTop: '30px', marginBottom: '20px' }}>Expenses in {homeCurrency}</h2>
+                                <h2 style={{ textAlign: 'center', marginTop: '30px', marginBottom: '20px' }}>
+                                    Expenses in {selectedToggleCurrency !== "" ? selectedToggleCurrency : homeCurrency}
+                                </h2>
                                     <SpendingCirclesComponent
-                                        totalExpenses={totalExpenses}
-                                        homeCurrency={homeCurrency}
+                                        totalExpenses={selectedToggleCurrency !== "" ? totalExpensesInToggleCurrency : totalExpenses}
                                         tripData={tripData}
                                     />
                                 </div>
@@ -496,19 +529,27 @@ function Singletrip() {
                                         {/* Budget Meter */}
                                         <div className='col'>
                                             <div className="meter-container">
-                                                <BudgetMeterComponent tripData={tripData} expenseData={expenseData} totalExpenses={totalExpenses} homeCurrency={homeCurrency} />
+                                                <BudgetMeterComponent 
+                                                    tripData={tripData} 
+                                                    expensesToDisplay={expensesToDisplay} 
+                                                    totalExpenses={selectedToggleCurrency !== "" ? totalExpensesInToggleCurrency : totalExpenses}
+                                                    currency={selectedToggleCurrency !== "" ? selectedToggleCurrency : homeCurrency} />
                                             </div>
                                         </div>
                                         {/* Pie Chart */}
                                         <div className='col'>
                                             <div className="meter-container">
-                                                <CategoryDataComponent categoryData={categoryData} />
+                                                <CategoryDataComponent 
+                                                    categoryData={categoryData} />
                                             </div>
                                         </div>
                                     </div>
                                     {/* Bar Graph */}
                                     <div className="meter-container">
-                                        <BarGraphComponent tripData={tripData} expenseData={convertedHomeCurrencyExpenseData} categoryData={categoryData} />
+                                        <BarGraphComponent 
+                                            tripData={tripData} 
+                                            expensesToDisplay={selectedToggleCurrency !== "" ? expensesToDisplay : convertedHomeCurrencyExpenseData}
+                                            categoryData={categoryData} />
                                     </div>
                                 </>
                             )}
@@ -559,7 +600,7 @@ function Singletrip() {
                         <div className='container'>
                             <div className='row' style={{ justifyContent: 'center', alignItems: 'center', display: 'flex', textAlign: 'center' }}>
                                 {/* Expense Table */}
-                                <ExpenseTableComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenseData={expenseData}
+                                <ExpenseTableComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expensesToDisplay={expensesToDisplay}
                                     currencyCodes={currencyCodes} expenseCategories={expenseCategories} userRole={userRole} categoryData={categoryData} />
                             </div>
                             <br></br>

@@ -86,7 +86,9 @@ const ExpenseFormComponent = ({
                                             }}
                                             required
                                         >
-                                            <option value="">Select Currency</option>
+                                            <option value="" disabled>
+                                                Select Currency
+                                            </option>
 
                                             {/* Display the selected currency at the top if it exists and it's not USD */}
                                             {selectedCurrency && selectedCurrency !== "USD" && (
