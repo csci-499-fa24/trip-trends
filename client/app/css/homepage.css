@@ -86,16 +86,15 @@
 }
 
 .new-trip-field-label input {
+    width: 100%;
     padding: 8px; 
     margin-top: 5px; 
     border-radius: 10px;
     border: 1px solid #ccc;
-    background-color: black; 
+    background-color: white; 
     font-size: 15px; 
-    transition: border-color 0.3s ease;
-    width: 100%; 
-    color: white;
-    filter: invert(1);
+    transition: border-color 0.3s ease; 
+    color: black;
 }
 
 /* the date input fields */
