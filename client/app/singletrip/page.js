@@ -36,9 +36,8 @@ function Singletrip() {
     const [userName, setUserName] = useState('');
     const [expenseData, setExpenseData] = useState([]);
     const [fetchedExpenseData, setFetchedExpenseData] = useState([]);
-    const [convertedHomeCurrencyExpenseData, setconvertedHomeCurrencyExpenseData] = useState([])
+    const [convertedHomeCurrencyExpenseData, setConvertedHomeCurrencyExpenseData] = useState([])
     const [totalExpenses, setTotalExpenses] = useState(0);
-    const [expenseUSD, setExpenseUSD] = useState([]);
     const [currencyCodes, setCurrencyCodes] = useState([]);
     const [selectedCurrency, setSelectedCurrency] = useState('');
     const [otherCurrencies, setOtherCurrencies] = useState([]);
@@ -122,11 +121,11 @@ function Singletrip() {
 
     useEffect(() => {
         const savedFilter = localStorage.getItem('selectedFilter');
-        if (savedFilter && expenseUSD.length > 0) {
-            console.log(expenseUSD);
-            applyFilter(savedFilter, expenseUSD);
+        if (savedFilter && expensesToDisplay.length > 0) {
+            console.log(expensesToDisplay);
+            applyFilter(savedFilter, expensesToDisplay);
         }
-    }, [expenseUSD]);
+    }, [expensesToDisplay]);
 
     const fetchExpenseData = () => {
         axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/trips/${tripId}`)
@@ -139,8 +138,8 @@ function Singletrip() {
 
                 const savedFilter = localStorage.getItem('selectedFilter');
                 if (savedFilter) {
-                    console.log(expenseUSD);
-                    applyFilter(savedFilter, expenseUSD);
+                    console.log(expensesToDisplay);
+                    applyFilter(savedFilter, expensesToDisplay);
                 }
             })
             .catch(error => {
@@ -207,7 +206,7 @@ function Singletrip() {
 
     const handleAllCategoriesSelect = () => {
         setSelectedCategory("");
-        setExpenseData({ data: expenseUSD });
+        setExpenseData({ data: expensesToDisplay });
         setIsDropdownVisible(false);
     };
 
@@ -229,7 +228,7 @@ function Singletrip() {
         let filteredData = [];
 
         if (selectedCategory) {
-            expenseUSD.forEach(expense => {
+            expensesToDisplay.forEach(expense => {
 
                 if (expense.category === selectedCategory) {
                     filteredData.push(expense);
@@ -245,16 +244,16 @@ function Singletrip() {
     };
 
 
-    const applyFilter = (filterOption, data = expenseUSD) => {
+    const applyFilter = (filterOption, data = expensesToDisplay) => {
         if (!Array.isArray(data)) {
             console.error('Data is not an array:', data);
             return;
         }
         let sortedExpenses;
         if (filterOption === 'highest') {
-            sortedExpenses = [...data].sort((a, b) => parseFloat(b.amountInHomeCurrency) - parseFloat(a.amountInHomeCurrency));
+            sortedExpenses = [...data].sort((a, b) => parseFloat(b.amount) - parseFloat(a.amount));
         } else if (filterOption === 'lowest') {
-            sortedExpenses = [...data].sort((a, b) => parseFloat(a.amountInHomeCurrency) - parseFloat(b.amountInHomeCurrency));
+            sortedExpenses = [...data].sort((a, b) => parseFloat(a.amount) - parseFloat(b.amount));
         } else if (filterOption === 'recent') {
             sortedExpenses = [...data].sort((a, b) => new Date(b.posted) - new Date(a.posted));
         } else if (filterOption === 'oldest') {
@@ -387,11 +386,6 @@ function Singletrip() {
             setIsVisible(prevState => !prevState);
         };
 
-
-    // useEffect(() => {
-    //     console.log(expenseUSD);
-    // },[expenseUSD])
-
     const convertExpenses = async (expenses, targetCurrency, setConvertedExpenses, setTotalExpenses, setCategoryData) => {
         if (!targetCurrency) {
             return;
@@ -453,7 +447,7 @@ function Singletrip() {
     
     // for home currency
     const fetchCurrencyRates = async () => {
-        convertExpenses(expenseData.data, homeCurrency, setconvertedHomeCurrencyExpenseData, setTotalExpenses, setCategoryData);
+        convertExpenses(expenseData.data, homeCurrency, setConvertedHomeCurrencyExpenseData, setTotalExpenses, setCategoryData);
     };
     
     // for toggle currency (including home currency)
@@ -483,7 +477,7 @@ function Singletrip() {
                             <TripIconBarComponent tripId={tripId} userId={userId} isOwner={isOwner} tripData={tripData} tripLocations={tripLocations} userRole={userRole} fetchTripData={fetchTripData} />
                             <CurrencyToggleComponent homeCurrency={homeCurrency} otherCurrencies={otherCurrencies} toggleChange={handleCurrencyToggleChange} />
                             {/* General Trip Info*/}
-                            <GeneralTripInfoComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenses={expenseUSD} />
+                            <GeneralTripInfoComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenses={expensesToDisplay} />
                         </div>
                         <br></br>
                         <div className='container'>
@@ -554,7 +548,7 @@ function Singletrip() {
                                     <div className="meter-container">
                                         <BarGraphComponent 
                                             tripData={tripData} 
-                                            expensesToDisplay={expensesToDisplay} 
+                                            expensesToDisplay={selectedToggleCurrency !== "" ? convertedHomeCurrencyExpenseData : expensesToDisplay}
                                             categoryData={categoryData} />
                                     </div>
                                 </>
