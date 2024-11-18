@@ -11,9 +11,8 @@
     z-index: 1000; /* Ensure modal is on top */
 }
 
-/* styling profile's home currency*/
+/* styling sringle trip forms*/
 .modal-content {
-    /* position: relative; */
     max-width: 40% !important;
     max-height: 300vh;
     overflow-x: auto;
