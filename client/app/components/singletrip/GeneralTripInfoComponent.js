@@ -18,7 +18,7 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses })
 
     const DateComponent = ({ dateStr }) => {
         const [year, month, day] = dateStr.split('-');
-        const formattedDate = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' }).format(
+        const formattedDate = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric'}).format(
             new Date(year, month - 1, day)
         );
     
