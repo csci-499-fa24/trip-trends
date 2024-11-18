@@ -49,8 +49,6 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
           }
       };
 
-      
-
     useEffect(() => {
         if (isOpen) {
             setTripLocationsState(tripLocations || []);
