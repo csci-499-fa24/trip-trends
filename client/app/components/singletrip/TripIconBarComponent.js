@@ -45,7 +45,7 @@ const TripIconBarComponent = ({ tripId, userId, isOwner, tripData, tripLocations
             {/* Edit Trip Button */}
             <EditTripComponent tripId={tripId} tripData={tripData} tripLocations={tripLocations} userRole={userRole} onUpdate={fetchTripData} />
             {/* Download Trip Button */}
-            <DownloadTripComponent tripData={tripData} tripId={tripId} />
+            {/* <DownloadTripComponent tripData={tripData} tripId={tripId} /> */}
             {/* Delete Trip Button */}
             <DeleteTripComponent tripId={tripId} userRole={userRole} />
             {/* Gallery Button */}
