@@ -33,15 +33,6 @@
     color: white; /* Change text color on hover for contrast */
 }
 
-.close {
-    position: absolute;
-    top: 140px;
-    left: 475px;
-    color: #aaa;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-}
 
 .selected-location {
     display: flex;
