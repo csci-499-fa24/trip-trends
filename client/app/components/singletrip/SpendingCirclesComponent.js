@@ -1,7 +1,7 @@
 import React from 'react';
 import currencySymbolMap from 'currency-symbol-map';
 
-const SpendingCirclesComponent = ({ totalExpenses, tripData, currency }) => {
+const SpendingCirclesComponent = ({ totalExpenses, tripData, convertedBudget, currency }) => {
     const startDate = new Date(tripData.data.start_date);
     const endDate = new Date(tripData.data.end_date);
     const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
@@ -9,7 +9,7 @@ const SpendingCirclesComponent = ({ totalExpenses, tripData, currency }) => {
     const totalSpending = totalExpenses.toFixed(2);
     const remainingDays = Math.ceil((endDate - new Date()) / (1000 * 60 * 60 * 24));
     const forecastedSpending = remainingDays > 0 ? (avgDailySpending * remainingDays).toFixed(2) : 0;
-    const exceedsBudget = totalExpenses > tripData.data.budget;
+    const exceedsBudget = totalExpenses > convertedBudget;
     const currencySymbol = currencySymbolMap(currency);
 
     return (

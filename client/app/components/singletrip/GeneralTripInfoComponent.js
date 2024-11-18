@@ -9,7 +9,7 @@ import StarBorderIcon from '@mui/icons-material/StarBorder';
 import currencySymbolMap from 'currency-symbol-map';
 import '../../css/singletrip.css';
 
-const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses, totalExpenses, currency }) => {
+const GeneralTripInfoComponent = ({ tripData, convertedBudget, tripId, tripLocations, expenses, totalExpenses, currency }) => {
     const [totalExpensesByDate, setTotalExpensesByDate] = useState({});
     const [selectedDate, setSelectedDate] = useState(null);
     const [showExpenseBox, setShowExpenseBox] = useState(false);
@@ -17,7 +17,8 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses, t
     const [isFavorited, setIsFavorited] = useState(false);
     const expenseBoxRef = useRef(null);
     const currencySymbol = currencySymbolMap(currency);
-    const exceedsBudget = totalExpenses > tripData.data.budget;
+    const exceedsBudget = totalExpenses > convertedBudget;
+    console.log(convertedBudget);
 
     const DateComponent = ({ dateStr, showYear }) => {
         const [year, month, day] = dateStr.split('-');
@@ -154,9 +155,9 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses, t
                 </div>
 
                 <div className="trip-overview-div">
-                    <div className="trip-overview-circle">💰</div>
+                    <div className="trip-overview-circle" style={{marginLeft: '-30px'}}>💰</div>
                     <div className="trip-overview-content">
-                        <p>{currencySymbol}{tripData.data.budget}</p>
+                        <p style={{marginLeft: '-30px'}}>{currencySymbol}{convertedBudget}</p>
                     </div>
                 </div>
 
