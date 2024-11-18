@@ -1,13 +1,16 @@
 import React from 'react';
 import ReactSpeedometer, { Transition } from 'react-d3-speedometer';
+import currencySymbolMap from 'currency-symbol-map';
 
-const BudgetMeterComponent = ({ tripData, expensesToDisplay, totalExpenses, currency}) => {
+const BudgetMeterComponent = ({ tripData, convertedBudget, expensesToDisplay, totalExpenses, currency}) => {
+    const currencySymbol = currencySymbolMap(currency);
+
     return(
         <div>
             <p id='budgetTitle'> Budget Meter</p>
             {expensesToDisplay && totalExpenses === 0 ? (
                 <p>Loading your budget data...</p>
-            ) : totalExpenses > tripData.data.budget ? (
+            ) : totalExpenses > convertedBudget ? (
                 <div style={{
                     marginTop: "10px",
                     width: "350px",
@@ -17,8 +20,8 @@ const BudgetMeterComponent = ({ tripData, expensesToDisplay, totalExpenses, curr
                     <ReactSpeedometer
                         width={300}
                         minValue={0}
-                        maxValue={tripData.data.budget}
-                        value={tripData.data.budget}
+                        maxValue={convertedBudget}
+                        value={convertedBudget.toFixed(2)}
                         needleColor="steelblue"
                         needleTransitionDuration={2500}
                         needleTransition={Transition.easeBounceOut}
@@ -36,7 +39,7 @@ const BudgetMeterComponent = ({ tripData, expensesToDisplay, totalExpenses, curr
                     <ReactSpeedometer
                         width={300}
                         minValue={0}
-                        maxValue={tripData.data.budget}
+                        maxValue={convertedBudget}
                         value={totalExpenses.toFixed(2)}
                         needleColor="steelblue"
                         needleTransitionDuration={2500}
@@ -50,7 +53,7 @@ const BudgetMeterComponent = ({ tripData, expensesToDisplay, totalExpenses, curr
                 <p>Loading your budget data...</p>
             ) : (
                 <div style={{ textAlign: 'center', margin: '20px 0' }}>
-                    {totalExpenses > tripData.data.budget ? (
+                    {totalExpenses > convertedBudget ? (
                         <p 
                             id='budget-text' 
                             style={{
@@ -66,7 +69,7 @@ const BudgetMeterComponent = ({ tripData, expensesToDisplay, totalExpenses, curr
                                 boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
                             }}
                         >
-                            <strong>${(totalExpenses - tripData.data.budget).toFixed(2)}</strong> over budget!
+                            <strong>{currencySymbol}{(totalExpenses - convertedBudget).toFixed(2)}</strong> over budget!
                         </p>
                     ) : (
                         <p 

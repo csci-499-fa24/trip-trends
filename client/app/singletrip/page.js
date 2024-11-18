@@ -83,6 +83,8 @@ function Singletrip() {
 
     const [expensesToDisplay, setExpensesToDisplay] = useState([]); // expenses based on toggle currency, either original expenses or converted expenses
     const [totalExpensesInToggleCurrency, setTotalExpensesInToggleCurrency] = useState(0);
+    // const [convertedTripData, setConvertedTripData] = useState(null);
+    const [convertedBudget, setConvertedBudget] = useState("");
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -122,7 +124,7 @@ function Singletrip() {
     useEffect(() => {
         const savedFilter = localStorage.getItem('selectedFilter');
         if (savedFilter && expensesToDisplay.length > 0) {
-            console.log(expensesToDisplay);
+            // console.log(expensesToDisplay);
             applyFilter(savedFilter, expensesToDisplay);
         }
     }, [expensesToDisplay]);
@@ -138,7 +140,7 @@ function Singletrip() {
 
                 const savedFilter = localStorage.getItem('selectedFilter');
                 if (savedFilter) {
-                    console.log(expensesToDisplay);
+                    // console.log(expensesToDisplay);
                     applyFilter(savedFilter, expensesToDisplay);
                 }
             })
@@ -386,6 +388,25 @@ function Singletrip() {
             setIsVisible(prevState => !prevState);
         };
 
+    const convertBudget = async (budget) => {
+        if (selectedToggleCurrency !== "") {
+            try {
+                // Fetch conversion rate for the budget
+                const response = await axios.get(`https://hexarate.paikama.co/api/rates/latest/${homeCurrency}?target=${selectedToggleCurrency}`);
+                const conversionRate = response.data.data.mid; // assuming correct response structure
+        
+                const convertedBudget = (parseFloat(budget) * conversionRate).toFixed(2);
+        
+                setConvertedBudget(convertedBudget);
+        
+            } catch (error) {
+                console.error('Error fetching conversion rates:', error);
+            }
+        } else {
+            setConvertedBudget(budget);
+        }
+    };
+
     const convertExpenses = async (expenses, targetCurrency, setConvertedExpenses, setTotalExpenses, setCategoryData) => {
         if (!targetCurrency) {
             return;
@@ -426,12 +447,14 @@ function Singletrip() {
     
             setConvertedExpenses(convertedData);
             setTotalExpenses(totalExpensesInTargetCurrency);
-    
+
+            let currency = selectedToggleCurrency !== "" ? selectedToggleCurrency : homeCurrency;
+
             // prepare data for pie chart
             setCategoryData({
                 labels: Object.keys(categoryTotals),
                 datasets: [{
-                    label: `Expenses by Category in ${targetCurrency}`,
+                    label: ` Total in ${currency}`,
                     data: Object.values(categoryTotals),
                     backgroundColor: [
                         '#2A9D8F', '#e76f51', '#E9C46A', '#F4A261', '#c476bf', '#264653', '#e5989b', '#9d0208', '#e4c1f9',
@@ -462,7 +485,15 @@ function Singletrip() {
     };
 
     useEffect(() => {
-        convertExpensesToToggleCurrency(); // when currency toggle changes
+        if (tripData) {
+            convertBudget(tripData.data.budget);
+        }
+    }, [selectedToggleCurrency, tripData]);
+
+    useEffect(() => {
+        if (expenseData) {
+            convertExpensesToToggleCurrency();
+        }
     }, [selectedToggleCurrency, expenseData]);
 
     return (
@@ -474,10 +505,27 @@ function Singletrip() {
                     <div>
                         <div className='container'>
                             {/* Icon Bar Above Trip Info */}
-                            <TripIconBarComponent tripId={tripId} userId={userId} isOwner={isOwner} tripData={tripData} tripLocations={tripLocations} userRole={userRole} fetchTripData={fetchTripData} />
-                            <CurrencyToggleComponent homeCurrency={homeCurrency} otherCurrencies={otherCurrencies} toggleChange={handleCurrencyToggleChange} />
+                            <TripIconBarComponent 
+                                tripId={tripId} 
+                                userId={userId} 
+                                isOwner={isOwner} 
+                                tripData={tripData} 
+                                tripLocations={tripLocations} 
+                                userRole={userRole} 
+                                fetchTripData={fetchTripData} />
+                            <CurrencyToggleComponent 
+                                homeCurrency={homeCurrency} 
+                                otherCurrencies={otherCurrencies} 
+                                toggleChange={handleCurrencyToggleChange} />
                             {/* General Trip Info*/}
-                            <GeneralTripInfoComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expenses={expensesToDisplay} />
+                            <GeneralTripInfoComponent 
+                                tripData={tripData} // handles budget currency
+                                convertedBudget={convertedBudget}
+                                tripId={tripId} 
+                                tripLocations={tripLocations} 
+                                expenses={expensesToDisplay} 
+                                totalExpenses={selectedToggleCurrency !== "" ? totalExpensesInToggleCurrency : totalExpenses}
+                                currency={selectedToggleCurrency !== "" ? selectedToggleCurrency : homeCurrency} />
                         </div>
                         <br></br>
                         <div className='container'>
@@ -485,7 +533,10 @@ function Singletrip() {
                                 <div className='col' style={{flexDirection: 'column'}}>
                                     <h2 style={{ textAlign: 'center', marginBottom: '20px', marginTop: '15px'}}>Exchange Rates</h2>
                                     {/* Exchange Rate Table */}
-                                    <ExchangeRateTableComponent exchangeRates={exchangeRates} currencyCodes={currencyCodes} homeCurrency={homeCurrency} />
+                                    <ExchangeRateTableComponent 
+                                        exchangeRates={exchangeRates} 
+                                        currencyCodes={currencyCodes} 
+                                        homeCurrency={homeCurrency} />
                                 </div>
                                 <div className='col' style={{flexDirection: 'column'}}>
                                 <h2 style={{ textAlign: 'center', marginTop: '30px', marginBottom: '20px' }}>
@@ -494,6 +545,8 @@ function Singletrip() {
                                     <SpendingCirclesComponent
                                         totalExpenses={selectedToggleCurrency !== "" ? totalExpensesInToggleCurrency : totalExpenses}
                                         tripData={tripData}
+                                        convertedBudget={convertedBudget}
+                                        currency={selectedToggleCurrency !== "" ? selectedToggleCurrency : homeCurrency}
                                     />
                                 </div>
                             </div>
@@ -531,6 +584,7 @@ function Singletrip() {
                                             <div className="meter-container">
                                                 <BudgetMeterComponent 
                                                     tripData={tripData} 
+                                                    convertedBudget={convertedBudget}
                                                     expensesToDisplay={expensesToDisplay} 
                                                     totalExpenses={selectedToggleCurrency !== "" ? totalExpensesInToggleCurrency : totalExpenses}
                                                     currency={selectedToggleCurrency !== "" ? selectedToggleCurrency : homeCurrency} />
@@ -540,7 +594,8 @@ function Singletrip() {
                                         <div className='col'>
                                             <div className="meter-container">
                                                 <CategoryDataComponent 
-                                                    categoryData={categoryData} />
+                                                    categoryData={categoryData} 
+                                                    currency={selectedToggleCurrency !== "" ? selectedToggleCurrency : homeCurrency} />
                                             </div>
                                         </div>
                                     </div>
@@ -549,7 +604,8 @@ function Singletrip() {
                                         <BarGraphComponent 
                                             tripData={tripData} 
                                             expensesToDisplay={selectedToggleCurrency !== "" ? expensesToDisplay : convertedHomeCurrencyExpenseData}
-                                            categoryData={categoryData} />
+                                            categoryData={categoryData}
+                                            currency={selectedToggleCurrency !== "" ? selectedToggleCurrency : homeCurrency} />
                                     </div>
                                 </>
                             )}

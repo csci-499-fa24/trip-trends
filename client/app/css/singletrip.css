@@ -281,7 +281,15 @@
 
 .expense-amount {
     font-size: 0.9em; 
-    color: rgb(243, 133, 133); 
+    /* color: rgb(243, 133, 133);  */
+}
+
+.cal-below-budget {
+    color: var(--lightergreen);
+}
+
+.cal-above-budget {
+    color: rgb(243, 133, 133);
 }
 
 #tripName {
@@ -339,7 +347,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 2;
+    z-index: 1000;
 }
 
 .filter-popup-content {
@@ -905,7 +913,6 @@
 
 .favorite-icon {
     cursor: pointer;
-
     display: flex;
     align-items: center;
     justify-content: center;
@@ -916,6 +923,7 @@
     background-color: rgba(123, 117, 117, 0.223);  
     z-index: 3; 
     transition: background-color 0.3s ease, border-color 0.3s ease;
+    margin-top: 9px;
 }
 
 .favorite-icon:hover {

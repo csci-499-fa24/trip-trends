@@ -1,11 +1,15 @@
+// BarGraph
 import React from 'react';
 import { BarChart } from '@mui/x-charts/BarChart';
 import dayjs from 'dayjs';
+import currencySymbolMap from 'currency-symbol-map';
 
-const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData }) => {
+const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData, currency }) => {
     if (!tripData || !expensesToDisplay || !categoryData || expensesToDisplay.length === 0 || categoryData.labels.length === 0) {
         return <div>No expense data available to display....</div>;
     }
+
+    const currencySymbol = currencySymbolMap(currency);
 
     const formatDate = (dateStr) => {
         const [year, month, day] = dateStr.split('-');
@@ -74,7 +78,8 @@ const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData }) => {
 
         sortedDates.forEach(date => {
             const amount = expensesByCategory[date]?.[category] || 0;
-            categoryDataPoints.push(amount);
+            // categoryDataPoints.push(`${currencySymbol}${amount.toFixed(2)}`);
+            categoryDataPoints.push(amount.toFixed(2));
         });
 
         return {
@@ -84,10 +89,7 @@ const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData }) => {
             stack: categoryStackMap[category],
         };
     });
-
-    // console.log("EBC: ", expensesByCategory)
-    // console.log("Series: ", series)
-
+    
     return (
         <div>
             <h3 style={{ textAlign: "center" }}>Daily Expenses by Category</h3>
