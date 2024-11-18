@@ -548,7 +548,7 @@ function Singletrip() {
                                     <div className="meter-container">
                                         <BarGraphComponent 
                                             tripData={tripData} 
-                                            expensesToDisplay={selectedToggleCurrency !== "" ? convertedHomeCurrencyExpenseData : expensesToDisplay}
+                                            expensesToDisplay={selectedToggleCurrency !== "" ? expensesToDisplay : convertedHomeCurrencyExpenseData}
                                             categoryData={categoryData} />
                                     </div>
                                 </>
