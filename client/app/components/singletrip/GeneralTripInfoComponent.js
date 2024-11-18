@@ -18,7 +18,7 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses })
 
     const DateComponent = ({ dateStr }) => {
         const [year, month, day] = dateStr.split('-');
-        const formattedDate = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' }).format(
+        const formattedDate = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric'}).format(
             new Date(year, month - 1, day)
         );
     
@@ -45,26 +45,28 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses })
 
     const { startDate, endDate } = getTripDates();
 
-
-
-
     useEffect(() => {
+        if (!expenses || !Array.isArray(expenses)) return; // to handle expenses undefined during runtime
+    
         const totals = {};
         expenses.forEach(expense => {
+            if (!expense.posted || !expense.amount) return; // Skip invalid data.
+            
             const [year, month, day] = expense.posted.split('-').map(Number);
             const date = new Date(year, month - 1, day);
-
             date.setHours(0, 0, 0, 0);
             const dateKey = date.toDateString();
-
-            const amount = parseFloat(expense.amountInHomeCurrency);
+    
+            const amount = parseFloat(expense.amount);
             if (!totals[dateKey]) {
                 totals[dateKey] = 0;
             }
             totals[dateKey] += amount;
         });
+    
         setTotalExpensesByDate(totals);
     }, [expenses]);
+    
 
 
     const handleDateClick = (date, event) => {
@@ -209,7 +211,7 @@ const GeneralTripInfoComponent = ({ tripData, tripId, tripLocations, expenses })
                                 {selectedDate.expenses.map((expense, index) => (
                                     <li key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
                                         <span style={{ flex: 1 }}>{expense.name}</span>
-                                        <span style={{ width: '80px', textAlign: 'right' }}>{expense.amountInHomeCurrency}</span> {/* Fixed width for amount */}
+                                        <span style={{ width: '80px', textAlign: 'right' }}>{expense.amount}</span> {/* Fixed width for amount */}
                                     </li>
                                 ))}
                             </ul>

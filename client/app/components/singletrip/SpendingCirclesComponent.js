@@ -1,6 +1,6 @@
 import React from 'react';
 
-const SpendingCirclesComponent = ({ totalExpenses, homeCurrency, tripData }) => {
+const SpendingCirclesComponent = ({ totalExpenses, tripData }) => {
     const startDate = new Date(tripData.data.start_date);
     const endDate = new Date(tripData.data.end_date);
     const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
