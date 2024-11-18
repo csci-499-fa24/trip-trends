@@ -1,7 +1,10 @@
 import React from 'react';
 import ReactSpeedometer, { Transition } from 'react-d3-speedometer';
+import currencySymbolMap from 'currency-symbol-map';
 
 const BudgetMeterComponent = ({ tripData, expensesToDisplay, totalExpenses, currency}) => {
+    const currencySymbol = currencySymbolMap(currency);
+
     return(
         <div>
             <p id='budgetTitle'> Budget Meter</p>
@@ -66,7 +69,7 @@ const BudgetMeterComponent = ({ tripData, expensesToDisplay, totalExpenses, curr
                                 boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
                             }}
                         >
-                            <strong>${(totalExpenses - tripData.data.budget).toFixed(2)}</strong> over budget!
+                            <strong>{currencySymbol}{(totalExpenses - tripData.data.budget).toFixed(2)}</strong> over budget!
                         </p>
                     ) : (
                         <p 
