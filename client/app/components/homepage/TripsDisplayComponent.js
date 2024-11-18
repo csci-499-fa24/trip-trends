@@ -65,10 +65,10 @@ const TripsDisplayComponent = ({ trips, userId }) => {
 
         const start = new Date(startDate);
         const end = new Date(endDate);
-        
+
         const startMonthYear = start.toLocaleDateString('en-US', options);
         const endMonthYear = end.toLocaleDateString('en-US', options);
-        
+
         if (start.getFullYear() === end.getFullYear()) {
             if (start.getMonth() === end.getMonth()) {
                 return `${startMonthYear}`; // same month
@@ -78,8 +78,8 @@ const TripsDisplayComponent = ({ trips, userId }) => {
         } else {
             return `${startMonthYear} ~ ${endMonthYear}`; // diff years
         }
-    };   
-    
+    };
+
     const handleTripClick = (tripId) => {
         window.location.href = `/singletrip?tripId=${tripId}`;
     };
@@ -100,7 +100,7 @@ const TripsDisplayComponent = ({ trips, userId }) => {
             fetchAllTripLocations();
             const initialFavorites = {};
             trips.forEach(trip => {
-                initialFavorites[trip.trip_id] = trip.favorite || false; 
+                initialFavorites[trip.trip_id] = trip.favorite || false;
             });
             setFavoritedTrips(initialFavorites);
         }
@@ -108,28 +108,33 @@ const TripsDisplayComponent = ({ trips, userId }) => {
 
     return (
         <div className="trips-display">
-            <br />
-            <h2>All Trips</h2>
-            <div className="button-container">
-                <div className="button" onClick={() => setPopUpVisible(true)}>
-                    New Trip
+            <div className="row" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginTop:"-30px" }}>
+                <div className="col">
+                    <h1>View Your Trips:</h1>
+                </div>
+                <div className="col">
+                    <div className="button-container">
+                        <div className="button" onClick={() => setPopUpVisible(true)}>
+                            New Trip
+                        </div>
+                    </div>
                 </div>
             </div>
             <div className="search-bar">
-                <input 
-                    type="text" 
-                    placeholder="Search for a trip..." 
-                    value={searchTerm} 
-                    onChange={handleSearch} 
+                <input
+                    type="text"
+                    placeholder="Search for a trip..."
+                    value={searchTerm}
+                    onChange={handleSearch}
                     className="search-input"
                 />
             </div>
-            
+
             {isPopUpVisible && (
                 <TripFormComponent
-                    isPopUpVisible={isPopUpVisible} 
-                    setPopUpVisible={setPopUpVisible} 
-                    userId={userId} 
+                    isPopUpVisible={isPopUpVisible}
+                    setPopUpVisible={setPopUpVisible}
+                    userId={userId}
                 />
             )}
             {filteredTrips.length === 0 ? (
@@ -137,18 +142,18 @@ const TripsDisplayComponent = ({ trips, userId }) => {
             ) : (
                 <div className="trip-cards">
                     {filteredTrips.map(trip => (
-                        <Card 
-                            id={`trip-${trip.trip_id}`} 
-                            className="trips-display-card" 
-                            onClick={() => handleTripClick(trip.trip_id)} 
-                            key={trip.trip_id} 
+                        <Card
+                            id={`trip-${trip.trip_id}`}
+                            className="trips-display-card"
+                            onClick={() => handleTripClick(trip.trip_id)}
+                            key={trip.trip_id}
                             sx={{ width: 300, backgroundColor: 'var(--offwhite)' }}
                         >
                             <CardActionArea>
                                 <div className="trips-display-image-wrapper">
-                                    <DefaultTripImagesComponent 
-                                        tripId={trip.trip_id} 
-                                        tripLocations={tripLocations[trip.trip_id] || []} 
+                                    <DefaultTripImagesComponent
+                                        tripId={trip.trip_id}
+                                        tripLocations={tripLocations[trip.trip_id] || []}
                                     />
                                 </div>
                                 <CardContent>
@@ -160,15 +165,15 @@ const TripsDisplayComponent = ({ trips, userId }) => {
                                             <span key={index}>
                                                 {location}{index < tripLocations[trip.trip_id].slice(0, 3).length - 1 ? ', ' : ''}
                                             </span>
-                                        ))} 
+                                        ))}
                                     </Typography>
                                     <Typography variant="body2" sx={{ color: "text.secondary" }}>
                                         {formatTripDates(trip.start_date, trip.end_date)}
                                     </Typography>
-                                    <div 
-                                        className="favorite-icon" 
+                                    <div
+                                        className="favorite-icon"
                                         onClick={(event) => {
-                                            event.stopPropagation();  
+                                            event.stopPropagation();
                                             handleFavoriteClick(trip.trip_id);
                                         }}
                                     >
@@ -184,7 +189,7 @@ const TripsDisplayComponent = ({ trips, userId }) => {
                     ))}
                 </div>
             )}
-        </div>       
+        </div>
     );
 };
 

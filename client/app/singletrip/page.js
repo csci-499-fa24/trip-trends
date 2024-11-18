@@ -377,62 +377,54 @@ function Singletrip() {
 
     const fetchCurrencyRates = async (expenses) => {
         try {
-            const currencyPromises = expenses
-                .filter(expense => expense.currency) // Filter out expenses with invalid currencies
-                .map(expense => {
-                    const targetCurrency = expense.currency;
-                    return axios.get(`https://hexarate.paikama.co/api/rates/latest/${targetCurrency}?target=${homeCurrency}`);
-                });
-
-            if (currencyPromises.length > 0) {
-                const currencyResponses = await Promise.all(currencyPromises);
-                const currencyRates = currencyResponses.map((response, index) => ({
-                    currency: expenses[index].currency,
-                    rate: response.data.data.mid // Assuming correct response structure
-                }));
-
-                // Convert expenses to homeCurrency and accumulate category data
-                const categoryTotals = {};
-                const convertedExpenses = expenses.map((expense, index) => {
-                    const rate = currencyRates.find(rate => rate.currency === expense.currency)?.rate || 1;
-                    const amountInHomeCurrency = (parseFloat(expense.amount) * rate).toFixed(2);
-
-                    // Accumulate totals by category
-                    if (!categoryTotals[expense.category]) {
-                        categoryTotals[expense.category] = 0;
-                    }
-                    categoryTotals[expense.category] += parseFloat(amountInHomeCurrency);
-
-                    setTotalExpenses(prevTotal => prevTotal + parseFloat(amountInHomeCurrency));
-
-                    return {
-                        ...expense,
-                        amountInHomeCurrency // Add converted amount to expense
-                    };
-                });
-
-                setconvertedHomeCurrencyExpenseData(convertedExpenses)
-                setExpenseUSD(convertedExpenses);
-
-                // Prepare data for pie chart
-                const labels = Object.keys(categoryTotals);
-                const data = Object.values(categoryTotals);
-
-                setCategoryData({
-                    labels,
-                    datasets: [{
-                        label: `Expenses by Category in ${homeCurrency}`,
-                        data,
-                        backgroundColor: [
-                            '#2A9D8F', '#e76f51', '#E9C46A', '#F4A261', '#c476bf', '#264653', '#e5989b', '#9d0208', '#e4c1f9',
-                            '#bc6c25', '#fca311', '#d62828', '#003049', '#00a896', '#f77f00', '#8338ec', '#fb5607'
-                        ],
-                        hoverOffset: 4
-                    }]
-                });
-            } else {
-                console.warn('No valid currencies found for conversion.');
-            }
+            const uniqueCurrencies = [...new Set(expenses.map(exp => exp.currency))].filter(Boolean);
+            
+            const currencyPromises = uniqueCurrencies.map(currency => 
+                axios.get(`https://hexarate.paikama.co/api/rates/latest/${currency}?target=${homeCurrency}`)
+            );
+    
+            const currencyResponses = await Promise.all(currencyPromises);
+    
+            const currencyRates = currencyResponses.reduce((acc, response, index) => {
+                acc[uniqueCurrencies[index]] = response.data.data.mid; // Assuming correct response structure
+                return acc;
+            }, {});
+    
+            let totalExpensesInHomeCurrency = 0;
+            const categoryTotals = {};
+    
+            const convertedExpenses = expenses.map(expense => {
+                const rate = currencyRates[expense.currency] || 1; // Use rate or fallback to 1
+                const amountInHomeCurrency = (parseFloat(expense.amount) * rate).toFixed(2);
+    
+                categoryTotals[expense.category] = 
+                    (categoryTotals[expense.category] || 0) + parseFloat(amountInHomeCurrency);
+    
+                totalExpensesInHomeCurrency += parseFloat(amountInHomeCurrency);
+    
+                return {
+                    ...expense,
+                    amountInHomeCurrency
+                };
+            });
+    
+            setconvertedHomeCurrencyExpenseData(convertedExpenses);
+            setExpenseUSD(convertedExpenses);
+            setTotalExpenses(totalExpensesInHomeCurrency);
+    
+            // Prepare data for pie chart
+            setCategoryData({
+                labels: Object.keys(categoryTotals),
+                datasets: [{
+                    label: `Expenses by Category in ${homeCurrency}`,
+                    data: Object.values(categoryTotals),
+                    backgroundColor: [
+                        '#2A9D8F', '#e76f51', '#E9C46A', '#F4A261', '#c476bf', '#264653', '#e5989b', '#9d0208', '#e4c1f9',
+                        '#bc6c25', '#fca311', '#d62828', '#003049', '#00a896', '#f77f00', '#8338ec', '#fb5607'
+                    ],
+                    hoverOffset: 4
+                }]
+            });
         } catch (error) {
             console.error('Error fetching currency rates:', error);
         }
