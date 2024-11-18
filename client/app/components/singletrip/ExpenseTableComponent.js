@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Table from 'react-bootstrap/Table';
 import '../../css/ExpenseTableComponent.css';
+import currencySymbolMap from 'currency-symbol-map';
 
 const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisplay, currencyCodes, expenseCategories, categoryData }) => {
     const [isEditPopupVisible, setEditPopupVisible] = useState(false);
@@ -88,11 +89,11 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                                 {expensesToDisplay.map((expense) => {
                                     const categoryIndex = categoryData.labels.indexOf(expense.category);
                                     const tagColor = categoryData.datasets[0].backgroundColor[categoryIndex];
-
+                                    const currencySymbol = currencySymbolMap(expense.currency);
                                     return (
                                         <tr key={expense.expense_id}>
                                             <td>{expense.name}</td>
-                                            <td>{expense.amount}</td>
+                                            <td>{currencySymbol}{expense.amount}</td>
                                             <td>{expense.currency}</td>
                                             <td>
                                                 {/* Category with color tag */}
@@ -156,7 +157,25 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                                                                                 value={selectedExpense.amount}
                                                                                 onChange={handleEditChange}
                                                                                 required
+                                                                                style={{
+                                                                                    paddingLeft: '35px',
+                                                                                    paddingRight: '10px',
+                                                                                    width: '100%',
+                                                                                    textAlign: 'left',
+                                                                                }}
                                                                             />
+                                                                            {/* currency symbol */}
+                                                                            <span
+                                                                                style={{
+                                                                                    position: 'absolute',
+                                                                                    left: '35px',
+                                                                                    top: '41.2%',
+                                                                                    transform: 'translateY(-50%)',
+                                                                                    pointerEvents: 'none',
+                                                                                }}
+                                                                            >
+                                                                                {currencySymbol}
+                                                                            </span>
                                                                         </label>
                                                                         <label className="edit-expense-field-label">
                                                                             Currency:

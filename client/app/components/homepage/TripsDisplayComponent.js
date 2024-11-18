@@ -14,7 +14,7 @@ import DefaultTripImagesComponent from "../singletrip/DefaultTripImagesComponent
 import "../../css/tripsDisplay.css";
 import SharedUsersComponent from "../singletrip/SharedUsersComponent";
 
-const TripsDisplayComponent = ({ trips, userId }) => {
+const TripsDisplayComponent = ({ trips, userId, homeCurrency }) => {
     const [tripLocations, setTripLocations] = useState({});
     const [isPopUpVisible, setPopUpVisible] = useState(false);
     const [favoritedTrips, setFavoritedTrips] = useState({});
@@ -135,6 +135,7 @@ const TripsDisplayComponent = ({ trips, userId }) => {
                     isPopUpVisible={isPopUpVisible}
                     setPopUpVisible={setPopUpVisible}
                     userId={userId}
+                    homeCurrency={homeCurrency}
                 />
             )}
             {filteredTrips.length === 0 ? (

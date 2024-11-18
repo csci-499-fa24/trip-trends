@@ -21,6 +21,7 @@ function homepage() {
     const [trips, setTrips] = useState([]);
     const [allTripLocations, setAllTripLocations] = useState([]);
     const [userId, setUserId] = useState(null);
+    const [homeCurrency, setHomeCurrency] = useState(null);
 
     // Used to display user's name
     const fetchUserName = async () => {
@@ -56,6 +57,30 @@ function homepage() {
             console.error("User ID not found.");
         }
     }
+
+    const fetchHomeCurrency = async (userId) => {
+        try {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/${userId}/home-currency`);
+            return response.data.home_currency;
+        } catch (error) {
+            console.error('Error fetching home currency:', error);
+            return null; // Handle error as needed
+        }
+    };
+
+    // Fetch home currency when userId changes
+    useEffect(() => {
+        const getHomeCurrency = async () => {
+            if (userId) {
+                const currency = await fetchHomeCurrency(userId);
+                if (currency) {
+                    setHomeCurrency(currency);  // Only set if currency is valid
+                }
+            }
+        };
+
+        getHomeCurrency(); // Fetch home currency when userId is available
+    }, [userId]);
 
     useEffect(() => {
         fetchUserName();
@@ -184,7 +209,7 @@ function homepage() {
                 </div>
 
                 {/* All Trips Section */}
-                <TripsDisplayComponent trips={trips} userId={userId} />
+                <TripsDisplayComponent trips={trips} userId={userId} homeCurrency={homeCurrency}/>
 
             </div>
         </GoogleOAuthProvider>

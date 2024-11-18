@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ReceiptImageComponent from './ReceiptImageComponent';
+import currencySymbolMap from 'currency-symbol-map';
 
 const ExpenseFormComponent = ({ 
     tripId, 
@@ -42,6 +43,8 @@ const ExpenseFormComponent = ({
         setIsUploadHidden(newState);
     };
 
+    const currencySymbol = currencySymbolMap(selectedCurrency);
+
     return (
         <div className="expense-form">
             {isPopUpVisible && (
@@ -65,16 +68,35 @@ const ExpenseFormComponent = ({
                                 </label>
 
                                 <div className="field-pair">
-                                    <label className="new-expense-field-label half-width">
-                                        Amount:
-                                        <input
-                                            type="number"
-                                            name="amount"
-                                            value={newExpenseData.amount}
-                                            onChange={newExpenseInputChange}
-                                            required
-                                        />
+                                <label className="new-expense-field-label half-width" style={{ position: 'relative' }}>
+                                    Amount:
+                                    <input
+                                        type="number"
+                                        name="amount"
+                                        value={newExpenseData.amount}
+                                        onChange={newExpenseInputChange}
+                                        required
+                                        style={{
+                                            paddingLeft: '35px',
+                                            paddingRight: '10px',
+                                            width: '100%',
+                                            textAlign: 'left',
+                                        }}
+                                    />
+                                    {/* currency symbol */}
+                                    <span
+                                        style={{
+                                            position: 'absolute',
+                                            left: '15px',
+                                            top: '70%',
+                                            transform: 'translateY(-50%)',
+                                            pointerEvents: 'none',
+                                        }}
+                                    >
+                                        {currencySymbol}
+                                    </span>
                                     </label>
+
                                     <label className="new-expense-field-label half-width">
                                         Currency:
                                         <select
