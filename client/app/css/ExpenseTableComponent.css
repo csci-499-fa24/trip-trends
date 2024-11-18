@@ -6,31 +6,6 @@
     overflow-x: hidden;
 }
 
-.edit-form-style{
-    max-width: 32% !important;
-    max-height: 300vh;
-    overflow-x: auto;
-    overflow-y: auto;
-    padding: 20px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    margin: 10px;
-    width: 100%;
-    color: black;
-    text-align: center;
-}
-
-.edit-form-close {
-    position: relative;
-    left: -46%;
-    color: #aaa;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-    
-}
-
 .expense-table th {
     text-align: center;
     padding: auto;
