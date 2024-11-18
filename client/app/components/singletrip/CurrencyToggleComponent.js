@@ -1,3 +1,4 @@
+// CurrencyToggle
 import React, { useState, useEffect } from "react";
 import Switch from "react-switch";
 
@@ -24,14 +25,15 @@ const CurrencyToggleComponent = ({ homeCurrency, otherCurrencies, toggleChange }
 
   return (
     <div
-      style={{
+    style={{
+        position: "absolute",
+        right: "45px",
         display: "flex",
-        justifyContent: "flex-end",
-        alignItems: "flex-start",
-        padding: "10px",
-        width: "100%",
-        marginRight: "20px"
-      }}
+        gap: "5px",
+        padding: "0px", 
+        flexWrap: "wrap",
+        marginTop: "15px",
+    }}
     >
       {allCurrencies.map((currency) => (
         <div
