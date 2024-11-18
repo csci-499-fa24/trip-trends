@@ -17,11 +17,10 @@
     margin-top: 5px;
     border-radius: 10px;
     border: 1px solid #ccc;
-    background-color: black;
-    color: white;
+    background-color: white;
+    color: black;
     font-size: 15px;
     transition: border-color 0.3s ease;
-    filter: invert(1);
 }
 
 .new-expense-field-label input,
@@ -144,11 +143,10 @@
     margin-top: 5px;
     border-radius: 10px;
     border: 1px solid #ccc;
-    background-color: black;
-    color: white;
+    background-color: white;
+    color: black;
     font-size: 15px;
     transition: border-color 0.3s ease;
-    filter: invert(1);
 }
 
 .field-pair label {
@@ -726,11 +724,10 @@
     margin-top: 5px;
     border-radius: 10px;
     border: 1px solid #ccc;
-    background-color: black;
-    color: white;
+    background-color: white;
+    color: black;
     font-size: 15px;
     transition: border-color 0.3s ease;
-    filter: invert(1);
     text-align: center;
 }
 
