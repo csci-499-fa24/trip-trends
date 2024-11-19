@@ -224,7 +224,7 @@ function homepage() {
                 {/* All Trips Section */}
                 <TripsDisplayComponent trips={trips} userId={userId} homeCurrency={homeCurrency}/>
                         {/* All Trips Section */}
-                        <TripsDisplayComponent trips={trips} userId={userId} />
+                        {/* <TripsDisplayComponent trips={trips} userId={userId} /> */}
 
                 </div>
             </div>
