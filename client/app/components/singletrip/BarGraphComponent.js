@@ -9,8 +9,13 @@ import { load } from 'ol/Image';
 
 const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData, currency }) => {
     const [loading, setLoading] = React.useState(true);
+    const [empty, setEmpty] = React.useState(false);
 
     useEffect(() => {
+        if (categoryData.datasets.length == 0) {
+            setLoading(false);
+            setEmpty(true);
+        }
         if (expensesToDisplay && categoryData && categoryData.datasets.length > 0) {
             setLoading(false); 
         }
@@ -99,6 +104,10 @@ const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData, currency
     
     if (loading) {
         return <LoadingPageComponent />;
+    }
+
+    if (empty) {
+        return <p>No expense data available to display.</p>
     }
 
     return (

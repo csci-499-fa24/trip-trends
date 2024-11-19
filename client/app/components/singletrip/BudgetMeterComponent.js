@@ -9,6 +9,9 @@ const BudgetMeterComponent = ({ tripData, convertedBudget, expensesToDisplay, to
     const [loading, setLoading] = React.useState(true);
 
     useEffect(() => {
+        if (!expensesToDisplay) {
+            setLoading(false);
+        }
         if (expensesToDisplay && convertedBudget && totalExpenses) {
             setLoading(false); 
         }

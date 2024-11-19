@@ -13,6 +13,9 @@ const CategoryDataComponent = ({ categoryData, currency }) => {
     const [loading, setLoading] = React.useState(true);
 
     useEffect(() => {
+        if (categoryData.datasets.length == 0) {
+            setLoading(false);
+        }
         if (categoryData && categoryData.datasets.length > 0) {
             setLoading(false); 
         }
