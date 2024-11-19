@@ -161,7 +161,7 @@ const TripsDisplayComponent = ({ trips, userId, homeCurrency }) => {
                                     <Typography gutterBottom variant="h5" component="div" sx={{ fontWeight: 'bold' }}>
                                         {trip.name}
                                     </Typography>
-                                    <Typography variant="body2" sx={{ color: "text.secondary", marginTop: "8px" }}>
+                                    <Typography variant="body2" sx={{ color: "text.secondary", marginTop: "8px", fontStyle: "italic" }}>
                                         {tripLocations[trip.trip_id]?.slice(0, 3).map((location, index) => (
                                             <span key={index}>
                                                 {location}{index < tripLocations[trip.trip_id].slice(0, 3).length - 1 ? ', ' : ''}

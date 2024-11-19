@@ -9,7 +9,17 @@ import { load } from 'ol/Image';
 
 const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData, currency }) => {
     const [loading, setLoading] = React.useState(true);
-    const [empty, setEmpty] = React.useState(false);
+    const [loadingTimedOut, setLoadingTimedOut] = useState(false);
+
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            if (loading) {
+                setLoadingTimedOut(true); 
+            }
+        }, 5000); // 5 seconds
+
+        return () => clearTimeout(timeoutId);
+    }, [loading]);
 
     useEffect(() => {
         if (categoryData.datasets.length == 0) {
@@ -102,24 +112,43 @@ const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData, currency
         };
     });
     
-    if (loading) {
+    if (loading && !loadingTimedOut) {
         return <LoadingPageComponent />;
     }
 
-    if (empty) {
-        return <p>No expense data available to display.</p>
+    if (loadingTimedOut && (expensesToDisplay && expensesToDisplay.length === 0)) {
+        return <div>
+            <p id="budgetTitle">Daily Expenses by Category</p>
+            <p>No expense data available to display.</p>
+        </div>;
     }
 
     return (
-        <div>
-            <h3 style={{ textAlign: "center" }}>Daily Expenses by Category</h3>
+        <div style={{ padding: '20px', width: '100%', height: '100%' }}> 
+            <p id="expenseTitle">Daily Expenses by Category</p>
+            <div style={{ overflow: 'hidden', width: '100%', padding: '10px 0' }}>
             <BarChart
                 xAxis={[{ scaleType: 'band', data: Array.from(allExpenseDates).sort() }]}
                 series={series}
-                width={1050}
+                min-width={1000}
                 height={300}
                 colors={categoryData.datasets[0].backgroundColor}
+                slotProps={{
+                    legend: {
+                        label: {
+                            style: {
+                                fontSize: '10px',
+                                fontWeight: 'normal',
+                            }
+                        }
+                    }
+                }}
+                style={{
+                    maxWidth: '100%', 
+                    display: 'block',
+                }}
             />
+            </div>
         </div>
     );
 };

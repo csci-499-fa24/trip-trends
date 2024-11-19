@@ -11,7 +11,18 @@ ChartJS.register(Tooltip, Legend, ArcElement);
 const CategoryDataComponent = ({ categoryData, currency }) => {
     const currencySymbol = currencySymbolMap(currency);
     const [loading, setLoading] = React.useState(true);
+    const [loadingTimedOut, setLoadingTimedOut] = useState(false);
 
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            if (loading) {
+                setLoadingTimedOut(true); 
+            }
+        }, 5000); // 5 seconds
+
+        return () => clearTimeout(timeoutId);
+    }, [loading]);
+    
     useEffect(() => {
         if (categoryData.datasets.length == 0) {
             setLoading(false);
@@ -35,8 +46,15 @@ const CategoryDataComponent = ({ categoryData, currency }) => {
         },
     };
 
-    if (loading) {
+    if (loading && !loadingTimedOut) {
         return <LoadingPageComponent />;
+    }
+
+    if (loadingTimedOut && (categoryData.datasets && categoryData.datasets.length == 0)) {
+        return <div>
+            <p id="expenseTitle">Expenses by Category</p>
+            <p>No expense data available to display.</p>
+        </div>;
     }
 
     return (
