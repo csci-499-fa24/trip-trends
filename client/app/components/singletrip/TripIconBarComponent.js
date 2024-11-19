@@ -43,7 +43,7 @@ const TripIconBarComponent = ({ tripId, userId, isOwner, tripData, tripLocations
             {/* Share Trip Button */}
             <ShareTripComponent tripId={tripId} isOwner={isOwner} />
             {/* Edit Trip Button */}
-            <EditTripComponent tripId={tripId} tripData={tripData} tripLocations={tripLocations} userRole={userRole} onUpdate={fetchTripData, homeCurrency={homeCurrency}} />
+            <EditTripComponent tripId={tripId} tripData={tripData} tripLocations={tripLocations} userRole={userRole} onUpdate={fetchTripData} homeCurrency={homeCurrency} />
             {/* Download Trip Button */}
             {/* <DownloadTripComponent tripData={tripData} tripId={tripId} /> */}
             {/* Delete Trip Button */}

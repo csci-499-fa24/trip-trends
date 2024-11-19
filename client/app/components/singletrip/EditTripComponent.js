@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import '../../css/singletrip.css';
 import '../../css/modifyTrip.css';
 import currencySymbolMap from 'currency-symbol-map';
+import { Black_And_White_Picture } from "next/font/google";
 
 const EditTripComponent = ({ tripId, tripData, tripLocations, userRole, homeCurrency }) => {
     // hide button if user is not trip owner
@@ -209,8 +210,8 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole, homeCurr
                                 <span
                                     style={{
                                         position: 'absolute',
-                                        left: '10px',
-                                        top: '40%',
+                                        left: '15px',
+                                        top: '70%',
                                         transform: 'translateY(-50%)',
                                         pointerEvents: 'none',
                                     }}
