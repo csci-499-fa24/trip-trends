@@ -154,10 +154,11 @@ const downloadTripData = async (req, res) => {
         } else if (format === 'pdf') {
             // Generate PDF
             const doc = new PDFDocument();
-            res.setHeader('Content-Disposition', `attachment; filename=${tripData.name}.pdf`);
+            filename = tripData.name.replace(/[^a-zA-Z0-9.]/g, '');
+            res.setHeader('Content-Disposition', `attachment; filename=${filename}.pdf`);
             res.setHeader('Content-Type', 'application/pdf');
             doc.pipe(res);
-            doc.fontSize(18).font('Helvetica-Bold').text(`${tripData.name}`, { align: 'center', underline: true });
+            doc.fontSize(18).font('Helvetica-Bold').text(`${filename}`, { align: 'center', underline: true });
             doc.fontSize(16).font('Helvetica').text(`Trip Duration: ${(tripData.start_date)} to ${(tripData.end_date)}`, { align: 'center' });
             doc.text(`Budget: ${tripData.budget}`, { align: 'center' });
             doc.moveDown().text('Your Expenses:', { align: 'center', underline: true });
