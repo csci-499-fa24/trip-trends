@@ -17,8 +17,13 @@ const RecentTripsComponent = ({ trips }) => {
             new Date(year, month - 1, day)
         );
     
-        return <span>{formattedDate}</span>;
+        const parts = formattedDate.split(' ');
+        const abbreviatedMonth = parts[0].slice(0, 3);
+        const restOfDate = parts.slice(1).join(' ');
+    
+        return <span>{`${abbreviatedMonth} ${restOfDate}`}</span>;
     };
+    
 
     useEffect(() => {
         // Function to find the three most recent trips
