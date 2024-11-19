@@ -1,13 +1,24 @@
+// BarGraph
 import React from 'react';
 import { BarChart } from '@mui/x-charts/BarChart';
 import dayjs from 'dayjs';
+import currencySymbolMap from 'currency-symbol-map';
 
-const BarGraphComponent = ({ tripData, expenseData, categoryData }) => {
-    if (!tripData || !expenseData || !categoryData || expenseData.length === 0 || categoryData.labels.length === 0) {
+const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData, currency }) => {
+    if (!tripData || !expensesToDisplay || !categoryData || expensesToDisplay.length === 0 || categoryData.labels.length === 0) {
         return <div>No expense data available to display....</div>;
     }
 
-    // console.log(expenseData)
+    const currencySymbol = currencySymbolMap(currency);
+
+    const formatDate = (dateStr) => {
+        const [year, month, day] = dateStr.split('-');
+        const formattedDate = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' }).format(
+            new Date(year, month - 1, day)
+        );
+        
+        return formattedDate;
+    }
 
     const generateDateArray = (startDate, endDate) => {
         const start = dayjs(startDate);
@@ -16,7 +27,7 @@ const BarGraphComponent = ({ tripData, expenseData, categoryData }) => {
 
         // loop through the dates from the start to the end date and add each date in between (inclusive)
         for (let date = start; date.isBefore(end.add(1, 'day')); date = date.add(1, 'day')) {
-            datesArray.push(date.format('YYYY-MM-DD'));
+            datesArray.push(formatDate(date.format('YYYY-MM-DD')));
         }
 
         return datesArray;
@@ -39,10 +50,10 @@ const BarGraphComponent = ({ tripData, expenseData, categoryData }) => {
         'Shopping': 'leisure',
         'Other': 'leisure',
     };
-    expenseData.forEach(expense => {
-        const date = dayjs(expense.posted).format('YYYY-MM-DD');
+    expensesToDisplay.forEach(expense => {
+        const date = formatDate(dayjs(expense.posted).format('YYYY-MM-DD'));
         const category = expense.category;
-        const amount = parseFloat(expense.amountInHomeCurrency);
+        const amount = parseFloat(expense.amount);
 
         // Initialize if the date doesn't exist
         if (!expensesByCategory[date]) {
@@ -67,7 +78,8 @@ const BarGraphComponent = ({ tripData, expenseData, categoryData }) => {
 
         sortedDates.forEach(date => {
             const amount = expensesByCategory[date]?.[category] || 0;
-            categoryDataPoints.push(amount);
+            // categoryDataPoints.push(`${currencySymbol}${amount.toFixed(2)}`);
+            categoryDataPoints.push(amount.toFixed(2));
         });
 
         return {
@@ -77,10 +89,7 @@ const BarGraphComponent = ({ tripData, expenseData, categoryData }) => {
             stack: categoryStackMap[category],
         };
     });
-
-    // console.log("EBC: ", expensesByCategory)
-    // console.log("Series: ", series)
-
+    
     return (
         <div>
             <h3 style={{ textAlign: "center" }}>Daily Expenses by Category</h3>

@@ -5,8 +5,9 @@ import { debounce } from 'lodash';
 import '../../css/homepage.css';
 import '../../css/tripForm.css';
 import { toast } from 'react-toastify';
+import currencySymbolMap from 'currency-symbol-map';
 
-const TripFormComponent = ( {isPopUpVisible, setPopUpVisible, userId} ) => {
+const TripFormComponent = ({ isPopUpVisible, setPopUpVisible, userId, homeCurrency }) => {
     // const router = useRouter();
     const today = new Date().toISOString().split('T')[0];
     const [newTripData, setNewTripData] = useState({
@@ -32,6 +33,8 @@ const TripFormComponent = ( {isPopUpVisible, setPopUpVisible, userId} ) => {
         setTempLocation(value);
         fetchLocationSuggestions(value);
     };
+
+    const currencySymbol = currencySymbolMap(homeCurrency);
 
     const fetchLocationSuggestions = useCallback(debounce(async (query) => {
         if (query) {
@@ -182,10 +185,35 @@ const TripFormComponent = ( {isPopUpVisible, setPopUpVisible, userId} ) => {
                             </label>
                         </div>
 
-                        <label className="new-trip-field-label">
+                        <label className="new-trip-field-label" style={{ position: 'relative' }}>
                             Budget:
-                            <input type="number" name="budget" value={newTripData.budget} onChange={newTripInputChange} required />
+                            <input
+                                type="number"
+                                name="budget"
+                                value={newTripData.budget}
+                                onChange={newTripInputChange}
+                                required
+                                style={{
+                                    paddingLeft: '35px',
+                                    textAlign: 'left',
+                                }}
+                            />
+                            {/* currency symbol */}
+                            <span
+                                style={{
+                                    position: 'absolute',
+                                    left: '10px',
+                                    right: '0px',
+                                    display: 'flex',
+                                    flexWrap: 'wrap',
+                                    top: '70%',
+                                    transform: 'translateY(-50%)',
+                                }}
+                            >
+                                {currencySymbol}
+                            </span>
                         </label>
+
 
                         <label className="new-trip-field-label">
                             Locations:

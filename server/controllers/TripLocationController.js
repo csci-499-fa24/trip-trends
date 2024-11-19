@@ -77,7 +77,7 @@ const updateTripLocation = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error", error: err.message });
     }
 };
-
+    
 // PUT request to update multiple trip locations (for editing purposes)
 const updateLocationsInEdit = async (req, res) => {
     const { tripId, locations } = req.body; 
@@ -113,7 +113,6 @@ const updateLocationsInEdit = async (req, res) => {
     }
 };
 
-    
 // DELETE trip location data
 const deleteTripLocation = async (req, res) => {
     const tripId = req.params.tripId;

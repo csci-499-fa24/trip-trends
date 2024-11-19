@@ -1,14 +1,14 @@
 const Trip = require('../models/Trip');
 const SharedTrip = require('../models/SharedTrip');
 const Expense = require('../models/Expense');
-const TripImages = require('../models/TripImages'); 
+const TripImages = require('../models/TripImages');
 const { parse } = require('json2csv');
-const PDFDocument = require('pdfkit'); 
-const xml2js = require('xml2js'); 
+const PDFDocument = require('pdfkit');
+const xml2js = require('xml2js');
 
 // POST new trip data
 const createTrip = async (req, res) => {
-    const userId = req.params['userId']; 
+    const userId = req.params['userId'];
     const { name, start_date, end_date, budget } = req.body;
     try {
         // create new model isntance
@@ -44,7 +44,10 @@ const getTripsByUserId = async (req, res) => {
         if (!userId) {
             return res.status(400).json({ message: "User ID is required" });
         }
-        const sharedTrips = await SharedTrip.findAll({ where: { user_id: userId } });
+        const sharedTrips = await SharedTrip.findAll({
+            where: { user_id: userId },
+            order: [['favorite', 'DESC']]
+        });
         if (!sharedTrips || sharedTrips.length === 0) {
             return res.status(404).json({ message: "Trip not found" });
         }
@@ -102,7 +105,7 @@ const deleteTrip = async (req, res) => {
         res.status(204).send();
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: "Internal Server Error"});
+        res.status(500).json({ message: "Internal Server Error" });
     }
 };
 
@@ -151,17 +154,20 @@ const downloadTripData = async (req, res) => {
         } else if (format === 'pdf') {
             // Generate PDF
             const doc = new PDFDocument();
-            res.setHeader('Content-Disposition', `attachment; filename=trip_${tripId}.pdf`);
+            res.setHeader('Content-Disposition', `attachment; filename=${tripData.name}.pdf`);
             res.setHeader('Content-Type', 'application/pdf');
             doc.pipe(res);
-            doc.fontSize(16).text(`Trip: ${tripData.name}`);
-            doc.fontSize(12).text(`Start Date: ${tripData.start_date}`);
-            doc.text(`End Date: ${tripData.end_date}`);
-            doc.text(`Budget: ${tripData.budget}`);
-            doc.moveDown().text('Expenses:', { underline: true });
+            doc.fontSize(18).font('Helvetica-Bold').text(`${tripData.name}`, { align: 'center', underline: true });
+            doc.fontSize(16).font('Helvetica').text(`Trip Duration: ${(tripData.start_date)} to ${(tripData.end_date)}`, { align: 'center' });
+            doc.text(`Budget: ${tripData.budget}`, { align: 'center' });
+            doc.moveDown().text('Your Expenses:', { align: 'center', underline: true });
 
-            expenseData.forEach(expense => {
-                doc.text(`- ${expense.name} (${expense.category}): ${expense.amount} ${expense.currency}`);
+            expenseData.forEach((expense, index) => {
+                doc.fontSize(14).text(`${index + 1}) ${expense.name}`);
+                doc.text(`     Category: ${expense.category}`);
+                doc.text(`     Price: ${expense.amount} ${expense.currency}`);
+                doc.text(`     Date: ${expense.posted}`);
+                doc.moveDown();
             });
 
             doc.end();
@@ -220,18 +226,18 @@ const createTripImage = async (req, res) => {
             newTripImages.push(newTripImage);
         }
 
-        res.status(201).json({ 
+        res.status(201).json({
             success: true,
             message: 'Images uploaded successfully',
-            data: newTripImages 
+            data: newTripImages
         });
 
     } catch (err) {
         console.error(err);
-        res.status(500).json({ 
+        res.status(500).json({
             success: false,
-            message: "Internal Server Error", 
-            error: err.message 
+            message: "Internal Server Error",
+            error: err.message
         });
     }
 };

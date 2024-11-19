@@ -3,11 +3,10 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-// import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
-// import Button from "@mui/material/Button";
 import CardActionArea from "@mui/material/CardActionArea";
-// import CardActions from "@mui/material/CardActions";
+import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
 import TripFormComponent from "./TripFormComponent";
 import DefaultTripImagesComponent from "../singletrip/DefaultTripImagesComponent";
 // import ShareTripComponent from "../singletrip/ShareTripComponent";
@@ -15,9 +14,11 @@ import DefaultTripImagesComponent from "../singletrip/DefaultTripImagesComponent
 import "../../css/tripsDisplay.css";
 import SharedUsersComponent from "../singletrip/SharedUsersComponent";
 
-const TripsDisplayComponent = ({ trips, userId }) => {
+const TripsDisplayComponent = ({ trips, userId, homeCurrency }) => {
     const [tripLocations, setTripLocations] = useState({});
     const [isPopUpVisible, setPopUpVisible] = useState(false);
+    const [favoritedTrips, setFavoritedTrips] = useState({});
+    const [searchTerm, setSearchTerm] = useState("");
 
     const fetchAllTripLocations = async () => {
         const locations = await Promise.all(
@@ -41,15 +42,33 @@ const TripsDisplayComponent = ({ trips, userId }) => {
         setTripLocations(locationsByTripId);
     };
 
+    const handleFavoriteClick = async (tripId) => {
+        const currentFavoriteStatus = favoritedTrips[tripId] || false;
+
+        try {
+            const newFavoriteStatus = !currentFavoriteStatus;
+            await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/users/${userId}/trips/${tripId}`, {
+                favorite: newFavoriteStatus
+            });
+
+            setFavoritedTrips(prevState => {
+                const updatedFavorites = { ...prevState, [tripId]: newFavoriteStatus };
+                return updatedFavorites;
+            });
+        } catch (error) {
+            console.error("Error favoriting trip.", error);
+        }
+    };
+
     const formatTripDates = (startDate, endDate) => {
         const options = { month: 'short', year: 'numeric' };
 
         const start = new Date(startDate);
         const end = new Date(endDate);
-        
+
         const startMonthYear = start.toLocaleDateString('en-US', options);
         const endMonthYear = end.toLocaleDateString('en-US', options);
-        
+
         if (start.getFullYear() === end.getFullYear()) {
             if (start.getMonth() === end.getMonth()) {
                 return `${startMonthYear}`; // same month
@@ -59,54 +78,85 @@ const TripsDisplayComponent = ({ trips, userId }) => {
         } else {
             return `${startMonthYear} ~ ${endMonthYear}`; // diff years
         }
-    };    
-
-    useEffect(() => {
-        if (trips.length > 0) {
-            fetchAllTripLocations();
-        }
-    }, [trips]);
+    };
 
     const handleTripClick = (tripId) => {
         window.location.href = `/singletrip?tripId=${tripId}`;
     };
 
+    const handleSearch = (event) => {
+        setSearchTerm(event.target.value);
+    };
+
+    const filteredTrips = trips.filter((trip) =>
+        trip.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (tripLocations[trip.trip_id] && tripLocations[trip.trip_id].some(location =>
+            location.toLowerCase().includes(searchTerm.toLowerCase())
+        ))
+    );
+
+    useEffect(() => {
+        if (trips.length > 0) {
+            fetchAllTripLocations();
+            const initialFavorites = {};
+            trips.forEach(trip => {
+                initialFavorites[trip.trip_id] = trip.favorite || false;
+            });
+            setFavoritedTrips(initialFavorites);
+        }
+    }, [trips]);
+
     return (
         <div className="trips-display">
-            <br />
-            <h2>All Trips</h2>
-            <div className="button-container">
-                <div className="button" onClick={() => setPopUpVisible(true)}>
-                    New Trip
+            <div className="row" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginTop:"-30px" }}>
+                <div className="col">
+                    <h1>View Your Trips:</h1>
+                </div>
+                <div className="col">
+                    <div className="button-container">
+                        <div className="button" onClick={() => setPopUpVisible(true)}>
+                            New Trip
+                        </div>
+                    </div>
                 </div>
             </div>
-            
+            <div className="search-bar">
+                <input
+                    type="text"
+                    placeholder="Search for a trip..."
+                    value={searchTerm}
+                    onChange={handleSearch}
+                    className="search-input"
+                />
+            </div>
+
             {isPopUpVisible && (
                 <TripFormComponent
-                    isPopUpVisible={isPopUpVisible} 
-                    setPopUpVisible={setPopUpVisible} 
-                    userId={userId} 
+                    isPopUpVisible={isPopUpVisible}
+                    setPopUpVisible={setPopUpVisible}
+                    userId={userId}
+                    homeCurrency={homeCurrency}
                 />
             )}
-            {trips.length === 0 ? (
-                <p>No trips created.</p>
+            {filteredTrips.length === 0 ? (
+                <p>No trips found.</p>
             ) : (
                 <div className="trip-cards">
-                    {trips.map(trip => (
-                        <Card 
-                            id={`trip-${trip.trip_id}`}  // Add the id here
-                            className="trips-display-card" 
-                            onClick={() => handleTripClick(trip.trip_id)} 
-                            key={trip.trip_id} 
+                    {filteredTrips.map(trip => (
+                        <Card
+                            id={`trip-${trip.trip_id}`}
+                            className="trips-display-card"
+                            onClick={() => handleTripClick(trip.trip_id)}
+                            key={trip.trip_id}
                             sx={{ width: 300, backgroundColor: 'var(--offwhite)' }}
                         >
                             <CardActionArea>
-                            <div className="trips-display-image-wrapper">
-                                <DefaultTripImagesComponent 
-                                    tripId={trip.trip_id} 
-                                    tripLocations={tripLocations[trip.trip_id] || []} 
-                                />
-                            </div>
+                                <div className="trips-display-image-wrapper">
+                                    <DefaultTripImagesComponent
+                                        tripId={trip.trip_id}
+                                        tripLocations={tripLocations[trip.trip_id] || []}
+                                    />
+                                </div>
                                 <CardContent>
                                     <Typography gutterBottom variant="h5" component="div" sx={{ fontWeight: 'bold' }}>
                                         {trip.name}
@@ -116,24 +166,31 @@ const TripsDisplayComponent = ({ trips, userId }) => {
                                             <span key={index}>
                                                 {location}{index < tripLocations[trip.trip_id].slice(0, 3).length - 1 ? ', ' : ''}
                                             </span>
-                                        ))} 
+                                        ))}
                                     </Typography>
                                     <Typography variant="body2" sx={{ color: "text.secondary" }}>
                                         {formatTripDates(trip.start_date, trip.end_date)}
                                     </Typography>
-                                    {/* Shared users */}
-                                    {/* <SharedUsersComponent tripId={trip.trip_id} userId={userId} /> */}
+                                    <div
+                                        className="favorite-icon"
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            handleFavoriteClick(trip.trip_id);
+                                        }}
+                                    >
+                                        {favoritedTrips[trip.trip_id] ? (
+                                            <StarIcon sx={{ color: '#fdfd96', zIndex: 2 }} />
+                                        ) : (
+                                            <StarBorderIcon sx={{ color: 'gray', zIndex: 2 }} />
+                                        )}
+                                    </div>
                                 </CardContent>
                             </CardActionArea>
-                            {/* <CardActions>
-                                <ShareTripComponent tripId={trip.trip_id} />
-                                <DeleteTripComponent tripId={trip.trip_id} />
-                            </CardActions> */}
                         </Card>
                     ))}
                 </div>
             )}
-        </div>       
+        </div>
     );
 };
 

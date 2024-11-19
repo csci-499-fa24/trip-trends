@@ -106,14 +106,20 @@ describe('SharedTrip Controller', () => {
 
     it('should get shared trips by userId', async () => {
         const userId = '1';
-        const mockSharedTrips = [{ user_id: userId, trip_id: '2' }];
+        const mockSharedTrips = [
+            { user_id: userId, trip_id: '2', favorite: true },
+            { user_id: userId, trip_id: '3', favorite: false },
+        ];
         mockRequest.params.userId = userId;
 
         SharedTrip.findAll.mockResolvedValue(mockSharedTrips);
 
         await getSharedTripsByUserId(mockRequest, mockResponse);
 
-        expect(SharedTrip.findAll).toHaveBeenCalledWith({ where: { user_id: userId } });
+        expect(SharedTrip.findAll).toHaveBeenCalledWith({
+            where: { user_id: userId },
+            order: [['favorite', 'DESC']]  
+        });
         expect(mockResponse.json).toHaveBeenCalledWith({ data: mockSharedTrips });
     });
 
