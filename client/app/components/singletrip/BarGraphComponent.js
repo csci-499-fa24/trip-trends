@@ -24,7 +24,6 @@ const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData, currency
     useEffect(() => {
         if (categoryData.datasets.length == 0) {
             setLoading(false);
-            setEmpty(true);
         }
         if (expensesToDisplay && categoryData && categoryData.datasets.length > 0) {
             setLoading(false); 
