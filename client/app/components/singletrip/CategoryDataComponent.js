@@ -27,7 +27,7 @@ const CategoryDataComponent = ({ categoryData, currency }) => {
                 callbacks: {
                     label: (context) => {
                         const label = ` Total in ${currency}` || '';
-                        const value = context.raw || '';
+                        const value = context.raw.toFixed(2) || '';
                         return `${label}: ${currencySymbol}${value}`;
                     },
                 },

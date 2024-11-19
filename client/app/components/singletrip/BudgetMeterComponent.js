@@ -3,10 +3,9 @@ import ReactSpeedometer, { Transition } from 'react-d3-speedometer';
 import currencySymbolMap from 'currency-symbol-map';
 import LoadingPageComponent from '../LoadingPageComponent';
 
-
-const BudgetMeterComponent = ({ tripData, convertedBudget, expensesToDisplay, totalExpenses, currency}) => {
+const BudgetMeterComponent = ({ tripData, convertedBudget, expensesToDisplay, totalExpenses, currency }) => {
     const currencySymbol = currencySymbolMap(currency);
-    const [loading, setLoading] = React.useState(true);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (!expensesToDisplay) {
@@ -21,30 +20,11 @@ const BudgetMeterComponent = ({ tripData, convertedBudget, expensesToDisplay, to
         return <LoadingPageComponent />;
     }
 
-    return(
+    return (
         <div>
             <p id='budgetTitle'> Budget Meter</p>
             {expensesToDisplay && totalExpenses === 0 ? (
                 <p>Loading your budget data...</p>
-            ) : totalExpenses > convertedBudget ? (
-                <div style={{
-                    marginTop: "10px",
-                    width: "350px",
-                    height: "200px",
-                    marginLeft: "50px"
-                }}>
-                    <ReactSpeedometer
-                        width={300}
-                        minValue={0}
-                        maxValue={convertedBudget}
-                        value={convertedBudget}
-                        needleColor="steelblue"
-                        needleTransitionDuration={2500}
-                        needleTransition={Transition.easeBounceOut}
-                        segments={4}
-                        segmentColors={["#a3be8c", "#ebcb8b", "#d08770", "#bf616a"]}
-                    />
-                </div>
             ) : (
                 <div style={{
                     marginTop: "10px",
@@ -53,10 +33,11 @@ const BudgetMeterComponent = ({ tripData, convertedBudget, expensesToDisplay, to
                     marginLeft: "50px",
                 }}>
                     <ReactSpeedometer
+                        key={`${convertedBudget}-${totalExpenses}`} // to force rerender
                         width={300}
                         minValue={0}
                         maxValue={convertedBudget}
-                        value={totalExpenses}
+                        value={Math.min(totalExpenses, convertedBudget)} 
                         needleColor="steelblue"
                         needleTransitionDuration={2500}
                         needleTransition={Transition.easeBounceOut}
@@ -106,7 +87,6 @@ const BudgetMeterComponent = ({ tripData, convertedBudget, expensesToDisplay, to
                         </p>
                     )}
                 </div>
-
             )}
         </div>
     );
