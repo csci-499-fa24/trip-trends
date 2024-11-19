@@ -58,7 +58,7 @@ const HomeCurrencyPopupComponent = ({ isOpen, onClose, userId }) => {
             {isOpen && (
                 <div className="modal-overlay">
                     <div className="modal-content">
-                    <span className="close" onClick={onClose}>&times;</span>
+                    <span className="homepage-close" onClick={onClose}>&times;</span>
                     <div className="currency-title">Choose Home Currency</div>
                         <form onSubmit={handleSubmit}>
                             <div className="field-label">

@@ -85,6 +85,7 @@ a {
   transform: translateY(-50%); 
   font-weight: normal; 
   letter-spacing: normal;
+  z-index: 9999;
 }
 
 .profile-icon {
@@ -180,7 +181,6 @@ form {
 /* the container holding the dates */
 .date-fields {
   display: flex;
-  justify-content: space-between;
   gap: 10px;
 }
 

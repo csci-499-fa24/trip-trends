@@ -5,8 +5,10 @@ import { createApi } from 'unsplash-js';
 import 'react-toastify/dist/ReactToastify.css';
 import '../../css/singletrip.css';
 import '../../css/modifyTrip.css';
+import currencySymbolMap from 'currency-symbol-map';
+import { Black_And_White_Picture } from "next/font/google";
 
-const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
+const EditTripComponent = ({ tripId, tripData, tripLocations, userRole, homeCurrency }) => {
     // hide button if user is not trip owner
     if (userRole == 'viewer') return null;
 
@@ -136,6 +138,9 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
         }
     };
     // console.log(tripLocationsState)
+
+    const currencySymbol = currencySymbolMap(homeCurrency);
+
     return (
         <>
             <div className="icon-div" tooltip="Edit Trip" tabIndex="0">
@@ -154,9 +159,9 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
                 <div className="modal">
                     <div className="modal-content">
                         <span className="close" onClick={() => setIsOpen(false)}>&times;</span>
-                        <h2 className="share-trip-title">Edit Trip</h2>
+                        <h2 className="edit-trip-title">Edit Trip</h2>
                         <form onSubmit={handleEdit}>
-                            <label className="share-trip-field-label">
+                            <label className="edit-trip-field-label">
                                 Name:
                                 <input
                                     type="text"
@@ -166,7 +171,7 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
                                 />
                             </label>
 
-                            <label className="share-trip-field-label">
+                            <label className="edit-trip-field-label">
                                 Start Date:
                                 <input
                                     type="date"
@@ -176,7 +181,7 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
                                 />
                             </label>
 
-                            <label className="share-trip-field-label">
+                            <label className="edit-trip-field-label">
                                 End Date:
                                 <input
                                     type="date"
@@ -186,17 +191,35 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
                                 />
                             </label>
 
-                            <label className="share-trip-field-label">
+                            <label className="edit-trip-field-label">
                                 Budget:
                                 <input
                                     type="number"
+                                    name="budget"
                                     value={budget}
                                     onChange={(e) => setBudget(e.target.value)}
                                     required
+                                    style={{
+                                        paddingLeft: '35px',
+                                        paddingRight: '10px',
+                                        width: '100%',
+                                        textAlign: 'left',
+                                    }}
                                 />
-                            </label>
-                            
-                            <label className="share-trip-field-label">
+                                {/* currency symbol */}
+                                <span
+                                    style={{
+                                        position: 'absolute',
+                                        left: '15px',
+                                        top: '70%',
+                                        transform: 'translateY(-50%)',
+                                        pointerEvents: 'none',
+                                    }}
+                                >
+                                    {currencySymbol}
+                                </span>
+                                </label>
+                            <label className="edit-trip-field-label">
                                 Locations:
                                 <input
                                     type="text"
@@ -245,7 +268,7 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole }) => {
                                 </div>
                             )}
 
-                            <button type="submit" className="share-trip-button">Submit</button>
+                            <button type="submit" className="edit-trip-button">Submit</button>
                         </form>
                     </div>
                 </div>

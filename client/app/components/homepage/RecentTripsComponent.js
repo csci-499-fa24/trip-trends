@@ -7,6 +7,19 @@ const RecentTripsComponent = ({ trips }) => {
     const [tripLocations, setTripLocations] = useState({});
     const [recentTrips, setRecentTrips] = useState([]);
 
+    const DateComponent = ({ dateStr, showYear }) => {
+        const [year, month, day] = dateStr.split('-');
+        const options = showYear
+            ? { month: 'long', day: 'numeric', year: 'numeric' }
+            : { month: 'long', day: 'numeric' };
+    
+        const formattedDate = new Intl.DateTimeFormat('en-US', options).format(
+            new Date(year, month - 1, day)
+        );
+    
+        return <span>{formattedDate}</span>;
+    };
+
     useEffect(() => {
         // Function to find the three most recent trips
         const findRecentTrips = () => {
@@ -85,14 +98,24 @@ const RecentTripsComponent = ({ trips }) => {
                     key={trip.trip_id} 
                     className="trip-card" 
                     onClick={() => handleTripClick(trip.trip_id)}
-                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', margin: '10px 0' }} 
+                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', margin: '10px 0', marginRight: '-5px'}} 
                 >
                     <div className="trip-image-wrapper">
                         <DefaultTripImagesComponent tripId={trip.trip_id} tripLocations={tripLocations[trip.trip_id] || []} />
                     </div>
                     <div className="trip-info">
                         <h3>{trip.name}</h3>
-                        <p>{trip.start_date} ~ {trip.end_date}</p>
+                        <p className="recent-trip-dates">
+                            <DateComponent 
+                                dateStr={trip.start_date} 
+                                showYear={trip.start_date.split('-')[0] !== trip.end_date.split('-')[0]} 
+                            /> 
+                            ~
+                            <DateComponent 
+                                dateStr={trip.end_date} 
+                                showYear={trip.start_date.split('-')[0] !== trip.end_date.split('-')[0]} 
+                            />
+                        </p>
                     </div>
                 </div>
             ))}

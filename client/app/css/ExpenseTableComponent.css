@@ -13,7 +13,7 @@
     top: 0;
     background-color: #134a09 !important;
     color: white !important;
-    z-index: 1;
+    z-index: 1000;
     font-size: 18px;
 }
 

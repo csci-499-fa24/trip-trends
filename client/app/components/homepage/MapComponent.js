@@ -153,7 +153,7 @@ const MapComponent = ({ allTripLocations, toggleTripDetails }) => {
         }
     }, [allTripLocations, toggleTripDetails]); // rerenders when trip locations are updated
 
-    return <div ref={mapRef} style={{ height: '537px', width: '65%' }}></div>;
+    return <div ref={mapRef} style={{ height: '537px', width: '70%' }}></div>;
 };
 
 export default MapComponent;

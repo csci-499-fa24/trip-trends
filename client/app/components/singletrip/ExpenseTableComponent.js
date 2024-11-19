@@ -180,8 +180,8 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                                                                             <span
                                                                                 style={{
                                                                                     position: 'absolute',
-                                                                                    left: '35px',
-                                                                                    top: '41.2%',
+                                                                                    left: '43px',
+                                                                                    top: '41%',
                                                                                     transform: 'translateY(-50%)',
                                                                                     pointerEvents: 'none',
                                                                                 }}

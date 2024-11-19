@@ -57,6 +57,8 @@
     background-color: rgba(123, 117, 117, 0.488);  
     z-index: 3; 
     transition: background-color 0.3s ease, border-color 0.3s ease;
+    margin-top: 0px;
+
 }
 
 .favorite-icon:hover {
@@ -66,7 +68,7 @@
 
 .search-bar {
     width: 100%;
-    margin-top: -20px;
+    margin-top: 20px;
     margin-bottom: 20px;
 }
 
