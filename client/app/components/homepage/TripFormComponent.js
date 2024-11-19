@@ -165,8 +165,8 @@ const TripFormComponent = ({ isPopUpVisible, setPopUpVisible, userId, homeCurren
         <div className="trip-form">
         {isPopUpVisible && (
             <div className="modal">
-                <div className="modal-content">
-                    <span className="close" onClick={() => setPopUpVisible(false)}>&times;</span>
+                <div className="homepage-modal-content">
+                    <span className="homepage-close" onClick={() => setPopUpVisible(false)}>&times;</span>
                     <h2 className="new-trip-title">New Trip</h2>
                     <form onSubmit={submitNewTrip}>
                         <label className="new-trip-field-label">
