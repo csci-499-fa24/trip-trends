@@ -12,6 +12,7 @@ import HeaderComponent from '../components/HeaderComponent';
 import MapComponent from '../components/homepage/MapComponent';
 import RecentTripsComponent from '../components/homepage/RecentTripsComponent';
 import TripsDisplayComponent from '../components/homepage/TripsDisplayComponent';
+import LoadingPageComponent from '../components/LoadingPageComponent';
 
 const googleID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
@@ -21,6 +22,7 @@ function homepage() {
     const [trips, setTrips] = useState([]);
     const [allTripLocations, setAllTripLocations] = useState([]);
     const [userId, setUserId] = useState(null);
+    const [loading, setLoading] = useState(true);
     const [homeCurrency, setHomeCurrency] = useState(null);
 
     // Used to display user's name
@@ -174,44 +176,60 @@ function homepage() {
         }
     }, [userId]);
 
+
+    useEffect(() => {
+        if (userId && trips.length > 0 && allTripLocations.length > 0) {
+            setLoading(false); 
+        }
+    }, [userId, trips, allTripLocations]);
+
     return (
         <GoogleOAuthProvider clientId={googleID}>
             <ToastContainer />
-            {/* Header section */}
-            <HeaderComponent
-                headerTitle="Trip Trends"
-                setUserName={setUserName}
-                userId={userId}
-            />
-            <div className='main-container'>
-                {/* Welcome section */}
-                <div className="welcome-section">
-                    {userName ?
-                        (
-                            <h1 style={{ textAlign: "center" }}>Welcome, {userName}!</h1>
-                        ) :
-                        (
-                            <h1 style={{ textAlign: "center" }}>Welcome!</h1>
-                        )}
-                    <p>See where you've been:</p>
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-
-                    {/* Map section */}
-                    <MapComponent allTripLocations={allTripLocations} toggleTripDetails={toggleTripDetails} />
-
-                    {/* Recent Trips section */}
-                    <div style={{ width: '35%', marginLeft: '10px' }}>
-                        <RecentTripsComponent trips={trips} />
+            {loading ? (
+                <LoadingPageComponent /> 
+            ) : (
+            <div>
+                {/* Header section */}
+                <HeaderComponent
+                    headerTitle="Trip Trends"
+                    setUserName={setUserName}
+                    userId={userId}
+                />
+                <div className='main-container'>
+                    {/* Welcome section */}
+                    <div className="welcome-section">
+                        {userName ?
+                            (
+                                <h1 style={{ textAlign: "center" }}>Welcome, {userName}!</h1>
+                            ) :
+                            (
+                                <h1 style={{ textAlign: "center" }}>Welcome!</h1>
+                            )}
+                        <p>See where you've been:</p>
                     </div>
 
-                </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+
+                        {/* Map section */}
+                        <MapComponent allTripLocations={allTripLocations} toggleTripDetails={toggleTripDetails} />
+
+                        {/* Recent Trips section */}
+                        <div style={{ width: '35%', marginLeft: '10px' }}>
+                            <RecentTripsComponent trips={trips} />
+                        </div>
+
+                    </div>
 
                 {/* All Trips Section */}
                 <TripsDisplayComponent trips={trips} userId={userId} homeCurrency={homeCurrency}/>
+                        {/* All Trips Section */}
+                        <TripsDisplayComponent trips={trips} userId={userId} />
 
+                </div>
             </div>
+        )}
+        
         </GoogleOAuthProvider>
     );
 }
