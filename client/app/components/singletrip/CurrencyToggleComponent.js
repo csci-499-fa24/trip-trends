@@ -4,7 +4,7 @@ import Switch from "react-switch";
 
 const CurrencyToggleComponent = ({ homeCurrency, otherCurrencies, toggleChange }) => {
   const [selectedToggleCurrency, setSelectedToggleCurrency] = useState("");
-  const allCurrencies = [homeCurrency, ...otherCurrencies];
+  const allCurrencies = [...new Set([homeCurrency, ...otherCurrencies].filter(Boolean))]; // unique currencies that removes undefined values
 
   const handleToggle = (currency) => {
     const newCurrency = selectedToggleCurrency === currency ? "" : currency; // if currency is already selected, allow unchecking it to reset
