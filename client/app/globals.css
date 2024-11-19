@@ -85,6 +85,7 @@ a {
   transform: translateY(-50%); 
   font-weight: normal; 
   letter-spacing: normal;
+  z-index: 9999;
 }
 
 .profile-icon {

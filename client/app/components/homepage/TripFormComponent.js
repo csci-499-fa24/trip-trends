@@ -202,7 +202,7 @@ const TripFormComponent = ({ isPopUpVisible, setPopUpVisible, userId, homeCurren
                             <span
                                 style={{
                                     position: 'absolute',
-                                    left: '10px',
+                                    left: '15px',
                                     right: '0px',
                                     display: 'flex',
                                     flexWrap: 'wrap',
