@@ -111,15 +111,19 @@ const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData, currency
         };
     });
     
+    const chartColors = categoryData?.datasets?.[0]?.backgroundColor || ['#000'];
+
     if (loading && !loadingTimedOut) {
         return <LoadingPageComponent />;
     }
 
-    if (loadingTimedOut && (expensesToDisplay && expensesToDisplay.length === 0)) {
-        return <div>
-            <p id="budgetTitle">Daily Expenses by Category</p>
-            <p>No expense data available to display.</p>
-        </div>;
+    if (loadingTimedOut && (expensesToDisplay?.length === 0 || !categoryData?.datasets?.length)) {
+        return (
+            <div>
+                <p id="budgetTitle">Daily Expenses by Category</p>
+                <p>No expense data available to display.</p>
+            </div>
+        );
     }
 
     return (
@@ -129,9 +133,9 @@ const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData, currency
             <BarChart
                 xAxis={[{ scaleType: 'band', data: Array.from(allExpenseDates).sort() }]}
                 series={series}
-                min-width={1000}
+                // minWidth={1000}
                 height={300}
-                colors={categoryData.datasets[0].backgroundColor}
+                colors={chartColors}
                 slotProps={{
                     legend: {
                         label: {
