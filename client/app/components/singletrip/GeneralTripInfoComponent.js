@@ -18,7 +18,7 @@ const GeneralTripInfoComponent = ({ tripData, convertedBudget, tripId, tripLocat
     const expenseBoxRef = useRef(null);
     const currencySymbol = currencySymbolMap(currency);
     const exceedsBudget = totalExpenses > convertedBudget;
-    console.log(convertedBudget);
+    // console.log(convertedBudget);
 
     const DateComponent = ({ dateStr, showYear }) => {
         const [year, month, day] = dateStr.split('-');
