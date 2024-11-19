@@ -23,11 +23,13 @@ import SpendingCirclesComponent from '../components/singletrip/SpendingCirclesCo
 import TripImageComponent from '../components/singletrip/TripImageComponent';
 import UploadTripImage from '../components/singletrip/UploadTripImage';
 import CurrencyToggleComponent from '../components/singletrip/CurrencyToggleComponent'
+import LoadingPageComponent from '../components/LoadingPageComponent';
 
 
 Chart.register(ArcElement, Tooltip, Legend);
 
 function Singletrip() {
+    const [loading, setLoading] = useState(true);
     const [categoryData, setCategoryData] = useState({ labels: [], datasets: [] });
     const [tripId, setTripId] = useState(null);
     const [tripData, setTripData] = useState(null);
@@ -87,6 +89,14 @@ function Singletrip() {
     const [convertedBudget, setConvertedBudget] = useState("");
 
     useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false); 
+        }, 1000); 
+
+        return () => clearTimeout(timer); 
+    }, []);
+
+    useEffect(() => {
         if (typeof window !== 'undefined') {
             const storedUserId = localStorage.getItem("user_id");
             if (storedUserId) {
@@ -110,6 +120,7 @@ function Singletrip() {
     }, [userId]);
 
     const fetchTripData = () => {
+        setLoading(true);
         if (tripId) {
             axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`)
                 .then(response => {
@@ -117,6 +128,9 @@ function Singletrip() {
                 })
                 .catch(error => {
                     console.error('Error fetching trip data:', error);
+                })
+                .finally(() => {
+                    setLoading(false); 
                 });
         }
     };
@@ -130,6 +144,7 @@ function Singletrip() {
     }, [expensesToDisplay]);
 
     const fetchExpenseData = () => {
+        setLoading(true);
         axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/trips/${tripId}`)
             .then(response => {
                 setExpenseData(response.data);
@@ -146,6 +161,9 @@ function Singletrip() {
             })
             .catch(error => {
                 console.error('Error fetching trip data:', error);
+            })
+            .finally(() => {
+                setLoading(false); 
             });
     };
 
@@ -465,6 +483,8 @@ function Singletrip() {
             });
         } catch (error) {
             console.error('Error fetching conversion rates:', error);
+        } finally {
+            setLoading(false);
         }
     };
     
@@ -495,6 +515,10 @@ function Singletrip() {
             convertExpensesToToggleCurrency();
         }
     }, [selectedToggleCurrency, expenseData]);
+
+    if (loading) {
+        return <LoadingPageComponent />; 
+    }
 
     return (
         <div>
@@ -673,9 +697,7 @@ function Singletrip() {
 
                     </div>
                 ) : (
-                    <div className="center-container">
-                        <p>No Trip Data Found.</p>
-                    </div>
+                    <LoadingPageComponent />
                 )}
 
                 {/* Create a expense popup form */}
