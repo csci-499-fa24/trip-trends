@@ -17,11 +17,10 @@
     margin-top: 5px;
     border-radius: 10px;
     border: 1px solid #ccc;
-    background-color: black;
-    color: white;
+    background-color: white;
+    color: black;
     font-size: 15px;
     transition: border-color 0.3s ease;
-    filter: invert(1);
 }
 
 .new-expense-field-label input,
@@ -89,7 +88,7 @@
     color: black;
     text-align: center;
     font-weight: bold;
-    margin-bottom: 15px;
+    margin-bottom: 0px;
 }
 
 .new-expense-field-label {
@@ -154,16 +153,19 @@
     margin-top: 5px;
     border-radius: 10px;
     border: 1px solid #ccc;
-    background-color: black;
-    color: white;
+    background-color: white;
+    color: black;
     font-size: 15px;
     transition: border-color 0.3s ease;
-    filter: invert(1);
+    height: 40px;
 }
 
 .edit-expense-field-label input[type="date"] {
-    box-sizing: border-box;
-    height: 40px;
+    box-sizing: border-box; 
+}
+
+.field-pair label {
+    flex: 1;
 }
 
 .submit-edit-expense-button {
@@ -575,6 +577,22 @@
     margin: 0 auto; /* Center the icon bar */
 }
 
+
+.icon-bar-left {
+    display: flex;
+    gap: 10px;
+}
+
+.icon-bar-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.icon-bar-right {
+    margin-left: auto;
+}
+
 .icon-div {
     height: 56px;
     width: 56px;
@@ -722,11 +740,10 @@
     margin-top: 5px;
     border-radius: 10px;
     border: 1px solid #ccc;
-    background-color: black;
-    color: white;
+    background-color: white;
+    color: black;
     font-size: 15px;
     transition: border-color 0.3s ease;
-    filter: invert(1);
     text-align: center;
 }
 
@@ -744,7 +761,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px;
+    
+    padding: 5px;
+    padding-right: 0px;
 }
 
 .upload-section {

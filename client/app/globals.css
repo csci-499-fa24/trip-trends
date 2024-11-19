@@ -180,7 +180,6 @@ form {
 /* the container holding the dates */
 .date-fields {
   display: flex;
-  justify-content: space-between;
   gap: 10px;
 }
 
