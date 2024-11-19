@@ -1,0 +1,39 @@
+/* Ensure loading-container takes up the full height of the viewport */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: height;
+    text-align: center;
+    background-color: #f0f0f0;
+    min-height: 100vh;
+    max-height: 300vh;
+  }
+  
+  .loading-logo {
+    width: 150px; 
+    height: auto;
+    margin-bottom: 20px; 
+  }
+  
+  .loading-spinner {
+    border: 4px solid var(--lightgreen);
+    border-top: 4px solid var(--lightergreen);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    margin-bottom: 20px;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  p {
+    font-size: 18px;
+    color: var(--lightgreen);
+  }
+  

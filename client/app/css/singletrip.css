@@ -927,6 +927,6 @@
 }
 
 .favorite-icon:hover {
-    background-color: rgba(255, 255, 255, 0.8); 
+    background-color: rgba(123, 117, 117, 0.123);  
     border-color: rgba(0, 0, 0, 0.8); 
 }

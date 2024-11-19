@@ -1,13 +1,20 @@
 // BarGraph
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BarChart } from '@mui/x-charts/BarChart';
 import dayjs from 'dayjs';
 import currencySymbolMap from 'currency-symbol-map';
+import LoadingPageComponent from '../LoadingPageComponent';
+import { load } from 'ol/Image';
+
 
 const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData, currency }) => {
-    if (!tripData || !expensesToDisplay || !categoryData || expensesToDisplay.length === 0 || categoryData.labels.length === 0) {
-        return <div>No expense data available to display....</div>;
-    }
+    const [loading, setLoading] = React.useState(true);
+
+    useEffect(() => {
+        if (expensesToDisplay && categoryData && categoryData.datasets.length > 0) {
+            setLoading(false); 
+        }
+    }, [expensesToDisplay, categoryData]);
 
     const currencySymbol = currencySymbolMap(currency);
 
@@ -90,6 +97,10 @@ const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData, currency
         };
     });
     
+    if (loading) {
+        return <LoadingPageComponent />;
+    }
+
     return (
         <div>
             <h3 style={{ textAlign: "center" }}>Daily Expenses by Category</h3>

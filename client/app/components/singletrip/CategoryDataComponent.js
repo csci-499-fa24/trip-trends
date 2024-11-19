@@ -1,13 +1,22 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, Tooltip, Legend, ArcElement } from 'chart.js';
 import currencySymbolMap from 'currency-symbol-map';
+import LoadingPageComponent from '../LoadingPageComponent';
+
 
 // Register Chart.js components
 ChartJS.register(Tooltip, Legend, ArcElement);
 
 const CategoryDataComponent = ({ categoryData, currency }) => {
     const currencySymbol = currencySymbolMap(currency);
+    const [loading, setLoading] = React.useState(true);
+
+    useEffect(() => {
+        if (categoryData && categoryData.datasets.length > 0) {
+            setLoading(false); 
+        }
+    }, [categoryData]);
 
     const options = {
         plugins: {
@@ -22,6 +31,10 @@ const CategoryDataComponent = ({ categoryData, currency }) => {
             },
         },
     };
+
+    if (loading) {
+        return <LoadingPageComponent />;
+    }
 
     return (
         <div>

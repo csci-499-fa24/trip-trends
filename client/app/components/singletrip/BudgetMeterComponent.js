@@ -1,9 +1,22 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactSpeedometer, { Transition } from 'react-d3-speedometer';
 import currencySymbolMap from 'currency-symbol-map';
+import LoadingPageComponent from '../LoadingPageComponent';
+
 
 const BudgetMeterComponent = ({ tripData, convertedBudget, expensesToDisplay, totalExpenses, currency}) => {
     const currencySymbol = currencySymbolMap(currency);
+    const [loading, setLoading] = React.useState(true);
+
+    useEffect(() => {
+        if (expensesToDisplay && convertedBudget && totalExpenses) {
+            setLoading(false); 
+        }
+    }, [expensesToDisplay, convertedBudget, totalExpenses]);
+
+    if (loading) {
+        return <LoadingPageComponent />;
+    }
 
     return(
         <div>
