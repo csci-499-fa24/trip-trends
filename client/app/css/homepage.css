@@ -68,6 +68,17 @@
 }
 
 /* model and form are in global */
+.modal-content {
+    max-height: 80vh;
+    overflow-y: auto; 
+    padding: 20px; 
+    background-color: white;
+    border-radius: 8px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 500px; 
+}
+
+/* model and form are in global */
 .homepage-modal-content {
     max-width: 40% !important;
     max-height: 300vh;
