@@ -3,10 +3,18 @@ import axios from 'axios';
 import Table from 'react-bootstrap/Table';
 import '../../css/ExpenseTableComponent.css';
 import currencySymbolMap from 'currency-symbol-map';
+import LoadingPageComponent from '../LoadingPageComponent';
 
 const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisplay, currencyCodes, expenseCategories, categoryData }) => {
     const [isEditPopupVisible, setEditPopupVisible] = useState(false);
     const [selectedExpense, setSelectedExpense] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (expensesToDisplay && categoryData && categoryData.datasets.length > 0) {
+            setLoading(false); 
+        }
+    }, [expensesToDisplay, categoryData]);
 
     const handleEditChange = (e) => {
         const { name, value } = e.target;
@@ -67,6 +75,10 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
 
     // console.log(categoryData)
     // console.log(categoryData.labels)
+
+    if (loading) {
+        return <LoadingPageComponent />;
+    }
 
     return (
         <div>
