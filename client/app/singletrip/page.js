@@ -536,7 +536,9 @@ function Singletrip() {
                                 tripData={tripData} 
                                 tripLocations={tripLocations} 
                                 userRole={userRole} 
-                                fetchTripData={fetchTripData} />
+                                fetchTripData={fetchTripData}
+                                homeCurrency={homeCurrency} // budget is always set as home
+                            />
                             <CurrencyToggleComponent 
                                 homeCurrency={homeCurrency} 
                                 otherCurrencies={otherCurrencies} 

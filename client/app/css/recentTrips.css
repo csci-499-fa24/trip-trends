@@ -40,4 +40,6 @@
     object-fit: contain; 
 }
 
-
+.recent-trip-dates {
+    font-size: 17px;
+}

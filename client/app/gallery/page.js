@@ -70,11 +70,11 @@ function Gallery() {
             <header className="top-icon-bar-header" style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                 <div className="icon-div" onClick={() => window.location.href = `/singletrip?tripId=${tripId}`} tooltip="Back" tabIndex="0" style={{ display: 'flex', cursor: 'pointer', alignItems: 'center' }}>
                     <div className="icon-SVG">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6" style={{ width: '24px', height: '24px' }}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6" style={{ width: '24px', height: '24px' }}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
                         </svg>
+                        <span className="icon-text">Back</span>
                     </div>
-                    <span className="icon-text">Back</span>
                 </div>
                 <div className="icon-div" tooltip="Gallery" tabIndex="0" style={{ display: 'flex', cursor: 'pointer' }}>
                     {userRole === 'owner' || userRole === 'editor' ? (

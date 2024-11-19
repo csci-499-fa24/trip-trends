@@ -83,6 +83,36 @@
     width: 100%;
 }
 
+@media (max-width: 805px) {
+    .modal-content {
+      max-width: 70% !important;
+    }
+  }
+  
+  @media (max-width: 1150px) {
+    .modal-content {
+      max-width: 50% !important;
+    }
+  }
+  
+  @media (max-width: 700px) {
+    .modal-content {
+      max-width: 73% !important;
+    }
+  }
+  
+  @media (max-width: 420px) {
+    .modal-content {
+      max-width: 80% !important;
+    }
+  }
+  
+  @media (max-width: 390px) {
+    .modal-content {
+      max-width: 87% !important;
+    }
+  }
+
 .new-expense-title {
     font-size: 24px;
     color: black;
@@ -132,7 +162,7 @@
     color: black;
     text-align: center;
     font-weight: bold;
-    margin-bottom: 15px;
+    margin-bottom: 30px;
 }
 
 .edit-expense-field-label {
@@ -149,6 +179,7 @@
 .edit-expense-field-label input,
 .edit-expense-field-label select {
     width: 100%;
+    height: 40px;
     padding: 8px;
     margin-top: 5px;
     border-radius: 10px;
@@ -162,6 +193,10 @@
 
 .edit-expense-field-label input[type="date"] {
     box-sizing: border-box; 
+}
+
+.field-pair label {
+    flex: 1;
 }
 
 .field-pair label {
@@ -296,7 +331,15 @@
 
 .expense-amount {
     font-size: 0.9em; 
-    color: rgb(243, 133, 133); 
+    /* color: rgb(243, 133, 133);  */
+}
+
+.cal-below-budget {
+    color: var(--lightergreen);
+}
+
+.cal-above-budget {
+    color: rgb(243, 133, 133);
 }
 
 #tripName {
@@ -354,7 +397,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 2;
+    z-index: 1000;
 }
 
 .filter-popup-content {
@@ -612,10 +655,12 @@
     height: 26px;
     aspect-ratio: 1 / 1;
     transition: transform 300ms ease;
+    z-index: 999;
 }
 
 .icon-SVG svg {
     color: black; 
+    z-index: 999;
 }
 
 .icon-text {
@@ -646,6 +691,7 @@
 .icon-div:hover,
 .icon-div:focus-visible {
     background-color: rgb(228, 228, 228);
+    z-index: 1500;
 }
 
 .icon-div:active {
@@ -922,7 +968,6 @@
 
 .favorite-icon {
     cursor: pointer;
-
     display: flex;
     align-items: center;
     justify-content: center;
@@ -933,9 +978,10 @@
     background-color: rgba(123, 117, 117, 0.223);  
     z-index: 3; 
     transition: background-color 0.3s ease, border-color 0.3s ease;
+    margin-top: 28px;
 }
 
 .favorite-icon:hover {
-    background-color: rgba(255, 255, 255, 0.8); 
+    background-color: rgba(123, 117, 117, 0.123);
     border-color: rgba(0, 0, 0, 0.8); 
 }

@@ -32,7 +32,8 @@ const CurrencyToggleComponent = ({ homeCurrency, otherCurrencies, toggleChange }
         gap: "5px",
         padding: "0px", 
         flexWrap: "wrap",
-        marginTop: "15px",
+        marginBottom: "10px",
+        marginTop: "15px"
     }}
     >
       {allCurrencies.map((currency) => (

@@ -1,4 +1,3 @@
-//GeneralTripInfo
 import React, { useEffect, useState, useRef } from 'react';
 import Calendar from 'react-calendar';
 import { parseISO, startOfDay, endOfDay } from 'date-fns';
@@ -127,7 +126,7 @@ const GeneralTripInfoComponent = ({ tripData, convertedBudget, tripId, tripLocat
         <div>
             <br/>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
-                <h2 style={{ marginRight: '10px', marginTop: '20px'}}>Trip Info</h2>
+                <h2 style={{ marginRight: '10px', marginTop: '40px'}}>Trip Info</h2>
                 {/* Favorite Star Icon */}
                 <div 
                     className="favorite-icon" 
