@@ -21,6 +21,7 @@
     background-color: var(--lightergreen);
     color: black;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 450px; 
 }
 
 .trip-image-wrapper {
@@ -38,8 +39,29 @@
     max-width: 100%; 
     max-height: 100%; 
     object-fit: contain; 
+    flex-shrink: 0;
 }
 
 .recent-trip-dates {
     font-size: 17px;
+}
+
+.trip-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+    text-align: left;
+}
+
+.trip-info h3 {
+    margin: 0 0 5px 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.trip-info .recent-trip-dates {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #666;
 }

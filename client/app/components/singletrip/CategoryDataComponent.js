@@ -13,6 +13,9 @@ const CategoryDataComponent = ({ categoryData, currency }) => {
     const [loading, setLoading] = React.useState(true);
 
     useEffect(() => {
+        if (categoryData.datasets.length == 0) {
+            setLoading(false);
+        }
         if (categoryData && categoryData.datasets.length > 0) {
             setLoading(false); 
         }
@@ -24,7 +27,7 @@ const CategoryDataComponent = ({ categoryData, currency }) => {
                 callbacks: {
                     label: (context) => {
                         const label = ` Total in ${currency}` || '';
-                        const value = context.raw || '';
+                        const value = context.raw.toFixed(2) || '';
                         return `${label}: ${currencySymbol}${value}`;
                     },
                 },

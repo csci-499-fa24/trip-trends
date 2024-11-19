@@ -11,6 +11,9 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        if (!expensesToDisplay) {
+            setLoading(false);
+        }
         if (expensesToDisplay && categoryData && categoryData.datasets.length > 0) {
             setLoading(false); 
         }

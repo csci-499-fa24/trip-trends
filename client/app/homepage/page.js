@@ -206,7 +206,7 @@ function homepage() {
                             (
                                 <h1 style={{ textAlign: "center" }}>Welcome!</h1>
                             )}
-                        <p>See where you've been:</p>
+                        <p style={{marginLeft: '-15px'}}>See where you've been:</p>
                     </div>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
