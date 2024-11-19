@@ -655,10 +655,12 @@
     height: 26px;
     aspect-ratio: 1 / 1;
     transition: transform 300ms ease;
+    z-index: 999;
 }
 
 .icon-SVG svg {
     color: black; 
+    z-index: 999;
 }
 
 .icon-text {
@@ -689,6 +691,7 @@
 .icon-div:hover,
 .icon-div:focus-visible {
     background-color: rgb(228, 228, 228);
+    z-index: 1500;
 }
 
 .icon-div:active {
