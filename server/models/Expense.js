@@ -48,7 +48,7 @@ const Expense = sequelize.define('expense', {
     },
     type: {
         type: DataTypes.STRING(50),
-        allowNull: false,
+        allowNull: true,
     },
     
 }, {
