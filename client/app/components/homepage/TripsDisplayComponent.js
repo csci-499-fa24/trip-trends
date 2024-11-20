@@ -8,11 +8,12 @@ import CardActionArea from "@mui/material/CardActionArea";
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import TripFormComponent from "./TripFormComponent";
-import DefaultTripImagesComponent from "../singletrip/DefaultTripImagesComponent";
 // import ShareTripComponent from "../singletrip/ShareTripComponent";
 // import DeleteTripComponent from "../singletrip/DeleteTripComponent";
 import "../../css/tripsDisplay.css";
 import SharedUsersComponent from "../singletrip/SharedUsersComponent";
+import DisplayOneImageComponent from './DisplayOneImageComponent';
+
 
 const TripsDisplayComponent = ({ trips, userId, homeCurrency }) => {
     const [tripLocations, setTripLocations] = useState({});
@@ -151,12 +152,7 @@ const TripsDisplayComponent = ({ trips, userId, homeCurrency }) => {
                             sx={{ width: 300, backgroundColor: 'var(--offwhite)' }}
                         >
                             <CardActionArea>
-                                <div className="trips-display-image-wrapper">
-                                    <DefaultTripImagesComponent
-                                        tripId={trip.trip_id}
-                                        tripLocations={tripLocations[trip.trip_id] || []}
-                                    />
-                                </div>
+                                <DisplayOneImageComponent tripId={trip.trip_id} size="large"/>
                                 <CardContent>
                                     <Typography gutterBottom variant="h5" component="div" sx={{ fontWeight: 'bold' }}>
                                         {trip.name}
