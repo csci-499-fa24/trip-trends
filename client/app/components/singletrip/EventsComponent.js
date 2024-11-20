@@ -25,8 +25,8 @@ const EventComponent = ({ tripId }) => {
     useEffect(() => {
         if (tripData?.data?.start_date && tripData?.data?.end_date && locationsData?.length > 0) {
             locationsData.forEach((location) => {
-                console.log("Location Data:", location);
-                console.log("Trip Data:", tripData.data);
+                //console.log("Location Data:", location);
+                // console.log("Trip Data:", tripData.data);
                 const { latitude, longitude } = location;
                 const { start_date, end_date } = tripData.data;
 
@@ -40,7 +40,7 @@ const EventComponent = ({ tripId }) => {
     const getTripLocation = () => {
         axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${tripId}`)
             .then(response => {
-                console.log(response.data);
+                // console.log(response.data);
                 const data = response.data.data;
 
                 const locationsWithLatLong = data.map(item => ({
@@ -60,7 +60,7 @@ const EventComponent = ({ tripId }) => {
     const getTripInfo = () => {
         axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`)
             .then(response => {
-                console.log(response.data);
+                // console.log(response.data);
                 setTripData(response.data);
             })
             .catch(error => {
@@ -102,44 +102,47 @@ const EventComponent = ({ tripId }) => {
     };
 
     return (
-        <div>
-            <h2>Events</h2>
-            <div className="event-container">
-                {eventsData.length > 0 ? (
-                    eventsData.map((event, index) => (
-                        <div key={index} className="event-card">
-                            {event.images && event.images.length > 0 ? (
-                                <img
-                                    src={event.images[0].url}
-                                    alt={event.name}
-                                    className="event-image"
-                                />
-                            ) : (
-                                <div className="event-placeholder">No Image Available</div>
-                            )}
-                            <div className="event-content">
-                                <p className="event-date">
-                                    {new Date(event.dates?.start?.localDate).toDateString()} at{' '}
-                                    {event.dates?.start?.localTime || 'TBA'}
-                                </p>
-                                <h3 className="event-title">{event.name}</h3>
-                                <div className="event-location">
-                                    <p className="event-loc-name">{event._embedded?.venues[0]?.name}</p>
-                                    <p className="event-loc">{event._embedded?.venues[0]?.city?.name}</p>
+        <div className="event-widget-container">
+            <div className="event-widget">
+                <h2 className='EvenHeader'>Events</h2>
+                <div className="event-container">
+                    {eventsData.length > 0 ? (
+                        eventsData.map((event, index) => (
+                            <div key={index} className="event-card">
+                                {event.images && event.images.length > 0 ? (
+                                    <img
+                                        src={event.images[0].url}
+                                        alt={event.name}
+                                        className="event-image"
+                                    />
+                                ) : (
+                                    <div className="event-placeholder">No Image Available</div>
+                                )}
+                                <div className="event-content">
+                                    <p className="event-date">
+                                        {new Date(event.dates?.start?.localDate).toDateString()} at{' '}
+                                        {event.dates?.start?.localTime || 'TBA'}
+                                    </p>
+                                    <h3 className="event-title">{event.name}</h3>
+                                    <div className="event-location">
+                                        <p className="event-loc-name">{event._embedded?.venues[0]?.name}</p>
+                                        <p className="event-loc">{event._embedded?.venues[0]?.city?.name}</p>
+                                    </div>
+                                    <p>
+                                        <a href={event.url} target="_blank" rel="noopener noreferrer" className="event-detail">
+                                            View Event Details
+                                        </a>
+                                    </p>
                                 </div>
-                                <p>
-                                    <a href={event.url} target="_blank" rel="noopener noreferrer" className="event-location">
-                                        View Event Details
-                                    </a>
-                                </p>
                             </div>
-                        </div>
-                    ))
-                ) : (
-                    <p className="no-events">No Events Found</p>
-                )}
+                        ))
+                    ) : (
+                        <p className="no-events">No Events Found</p>
+                    )}
+                </div>
             </div>
         </div>
+
     );
 };
 
