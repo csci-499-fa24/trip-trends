@@ -8,6 +8,8 @@ const EventComponent = ({ tripId }) => {
     const [storedTripId, setStoredTripId] = useState(tripId);
     const [locationsData, setLocationsData] = useState([]);
     const [tripData, setTripData] = useState([]);
+    const [eventsData, setEventsData] = useState([]);
+
 
     useEffect(() => {
         setStoredTripId(tripId);
@@ -28,8 +30,7 @@ const EventComponent = ({ tripId }) => {
                 const { latitude, longitude } = location;
                 const { start_date, end_date } = tripData.data;
 
-                // Call the getEvents function for each location
-                // getEvents(latitude, longitude, start_date, end_date);
+               // getEvents(latitude, longitude, start_date, end_date);
             });
         } else {
             console.log("Problem with locationsData:", locationsData);
@@ -42,14 +43,12 @@ const EventComponent = ({ tripId }) => {
                 console.log(response.data);
                 const data = response.data.data;
 
-                // Map the data to an array of objects containing both latitude and longitude
                 const locationsWithLatLong = data.map(item => ({
                     location: item.location,
                     latitude: item.latitude,
                     longitude: item.longitude,
                 }));
 
-                // Store the data in the state
                 setLocationsData(locationsWithLatLong);
 
             })
@@ -92,6 +91,10 @@ const EventComponent = ({ tripId }) => {
         axios.request(config)
             .then((response) => {
                 console.log(response.data);
+                setEventsData((prevData) => [
+                    ...prevData,
+                    ...response.data._embedded?.events || []
+                ]);
             })
             .catch((error) => {
                 console.log(error);
@@ -100,18 +103,32 @@ const EventComponent = ({ tripId }) => {
 
     return (
         <div>
-            <h1>Trip Locations</h1>
-            <div>
-                <h2>Locations with Latitude and Longitude:</h2>
-                <ul>
-                    {locationsData.map((data, index) => (
-                        <li key={index}>
-                            {data.location} - Latitude: {data.latitude}, Longitude: {data.longitude}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        </div>
+        <h2>Events</h2>
+        {eventsData.length > 0 ? (
+            eventsData.map((event, index) => (
+                <div key={index}>
+                    <h3>{event.name}</h3>
+                    <p>{event.dates?.start?.localDate}</p>
+                    <p>{event._embedded?.venues[0]?.name}</p>
+                    <p>{event._embedded?.venues[0]?.city?.name}</p>
+                    {event.images && event.images.length > 0 && (
+                            <img
+                                src={event.images[0].url}
+                                alt={event.name}
+                                style={{ width: '100%', maxWidth: '300px', height: 'auto' }}
+                            />
+                        )}
+                    <p>
+                            <a href={event.url} target="_blank" rel="noopener noreferrer">
+                                View Event Details
+                            </a>
+                        </p>
+                </div>
+            ))
+        ) : (
+            <p>No events found</p>
+        )}
+    </div>
     );
 };
 
