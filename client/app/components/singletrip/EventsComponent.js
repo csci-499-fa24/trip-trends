@@ -30,7 +30,7 @@ const EventComponent = ({ tripId }) => {
                 const { latitude, longitude } = location;
                 const { start_date, end_date } = tripData.data;
 
-               // getEvents(latitude, longitude, start_date, end_date);
+                getEvents(latitude, longitude, start_date, end_date);
             });
         } else {
             console.log("Problem with locationsData:", locationsData);
@@ -103,32 +103,43 @@ const EventComponent = ({ tripId }) => {
 
     return (
         <div>
-        <h2>Events</h2>
-        {eventsData.length > 0 ? (
-            eventsData.map((event, index) => (
-                <div key={index}>
-                    <h3>{event.name}</h3>
-                    <p>{event.dates?.start?.localDate}</p>
-                    <p>{event._embedded?.venues[0]?.name}</p>
-                    <p>{event._embedded?.venues[0]?.city?.name}</p>
-                    {event.images && event.images.length > 0 && (
-                            <img
-                                src={event.images[0].url}
-                                alt={event.name}
-                                style={{ width: '100%', maxWidth: '300px', height: 'auto' }}
-                            />
-                        )}
-                    <p>
-                            <a href={event.url} target="_blank" rel="noopener noreferrer">
-                                View Event Details
-                            </a>
-                        </p>
-                </div>
-            ))
-        ) : (
-            <p>No events found</p>
-        )}
-    </div>
+            <h2>Events</h2>
+            <div className="event-container">
+                {eventsData.length > 0 ? (
+                    eventsData.map((event, index) => (
+                        <div key={index} className="event-card">
+                            {event.images && event.images.length > 0 ? (
+                                <img
+                                    src={event.images[0].url}
+                                    alt={event.name}
+                                    className="event-image"
+                                />
+                            ) : (
+                                <div className="event-placeholder">No Image Available</div>
+                            )}
+                            <div className="event-content">
+                                <p className="event-date">
+                                    {new Date(event.dates?.start?.localDate).toDateString()} at{' '}
+                                    {event.dates?.start?.localTime || 'TBA'}
+                                </p>
+                                <h3 className="event-title">{event.name}</h3>
+                                <div className="event-location">
+                                    <p className="event-loc-name">{event._embedded?.venues[0]?.name}</p>
+                                    <p className="event-loc">{event._embedded?.venues[0]?.city?.name}</p>
+                                </div>
+                                <p>
+                                    <a href={event.url} target="_blank" rel="noopener noreferrer" className="event-location">
+                                        View Event Details
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <p className="no-events">No Events Found</p>
+                )}
+            </div>
+        </div>
     );
 };
 
