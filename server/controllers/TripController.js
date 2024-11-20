@@ -193,9 +193,6 @@ const downloadTripData = async (req, res) => {
             res.setHeader('Content-Type', 'application/xml');
             return res.status(200).send(xml);
         }
-
-        // Invalid format
-        res.status(400).json({ message: "Invalid format requested" });
     } catch (err) {
         console.error('Error generating download:', err);
         res.status(500).json({ message: 'Server error', error: err.message });
