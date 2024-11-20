@@ -46,27 +46,33 @@ function Signup() {
     return (
         <GoogleOAuthProvider clientId={googleID}>
             <ToastContainer hideProgressBar={true} />
-            <div className={`container text-center ${inriaSans.className}`}>
-                <div className='row'>
-                    <div className='col-md-6 logo'>
-                        <Image src={logo} alt="Logo" width={"15vw"} height={"15vw"} priority/>
+            <div className={`container ${inriaSans.className}`}>
+                <div className="passport-wrapper">
+                    <div className="passport">
+                        <div className="passport-cover">
+                            <div className="passport-spine"></div>
+                            <Image src={logo} alt="Trip Trends Logo" className="passport-logo" />
+                            <p className="passport-title">Trip Trends</p>
+                        </div>
                     </div>
-                    <div className='col-md-6 signIn'>
-                        <div>
-                            <h1 className='signInGoogle'>Sign In With Google</h1>
+                </div>
+                <div className="signIn">
+                    <div>
+                        <h1 className='signInGoogle'>Sign In With Google</h1>
                             <GoogleLogin
                                 onSuccess={handleLoginSuccess}
                                 onError={handleLoginFailure}
                             />
-                            <h2 className='welcome'>Welcome to Trip Trends!</h2>
-                            <p className='description'>We hope you enjoy your adventure with our easily accessible and modernized app. Here’s to a great time!</p>
-                        </div>
+                        <h2 className='welcome'>Welcome to Trip Trends!</h2>
+                        <p className='description'>We hope you enjoy your adventure with our easily accessible and modernized app. Here’s to a great time!</p>
                     </div>
                 </div>
             </div>
         </GoogleOAuthProvider>
-
     );
+    
+    
+    
 }
 
 export default Signup;
