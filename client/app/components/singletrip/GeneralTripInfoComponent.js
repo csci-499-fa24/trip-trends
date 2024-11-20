@@ -169,7 +169,7 @@ const GeneralTripInfoComponent = ({ tripData, convertedBudget, tripId, tripLocat
                     </div>
                 </div>
 
-                <div className="trip-overview-div"  onClick={() => window.location.href = `/discover?tripId=${tripId}&tripLocations=${tripLocations}`}>
+                <div className="trip-overview-div"  onClick={() => window.location.href = `/discover?tripId=${tripId}`}>
                     <div id="trip-locations-circle">✈️</div>
                     <div className="trip-overview-content">
                             <p>Discover Page</p>                   

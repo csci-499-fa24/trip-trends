@@ -17,11 +17,7 @@ function DiscoverPage() {
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const tripId = queryParams.get('tripId');
-    const tripLocations = queryParams.get('tripLocations');
-
-    // Set state for tripId and tripLocations
     setTripId(tripId);
-    setTripLocation(tripLocations ? tripLocations.split(',') : []);
 
     getUserId();
     fetchUserName();
@@ -70,7 +66,7 @@ function DiscoverPage() {
         </div>
       </div>
 
-      <EventsComponent tripId={tripId} tripLocations={tripLocation}/>
+      <EventsComponent tripId={tripId}/>
     </div>
   );
 }
