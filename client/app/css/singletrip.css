@@ -159,18 +159,34 @@
     align-self: center;
 }
 
-/* .edit-expense-container {
+.edit-expense-modal {
     display: flex;
     justify-content: center;
     align-items: center;
     position: fixed;
-    z-index: 0;
+    z-index: 1000;
     left: 0;
     top: 0;
-    width: 180%;
+    width: 100%;
     height: 100%;
-    backdrop-filter: blur(2px);
-} */
+    backdrop-filter: blur(0.4px);
+}
+
+.edit-expense-modal-content{
+    position: relative; 
+    max-width: 40% !important;
+    max-height: 80vh;
+    width: 90%;
+    background-color: white;
+    color: black;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(159, 154, 154, 0.1);
+    overflow-x: auto;
+    overflow-y: auto;
+    margin: 10px;
+    text-align: center;
+}
 
 .edit-expense-title {
     font-size: 24px;
