@@ -146,16 +146,31 @@
 }
 
 .submit-new-expense-button {
-    padding: 8px;
+    /* padding: 8px;
+    width: 40%; */
+    padding: 15px 30px; 
     background-color:var(--lightgreen);
     color: white;
     border: none;
-    width: 40%;
+    width: fit-content;
     border-radius: 10px;
-    font-size: 15px;
+    font-size: 15px; 
     cursor: pointer;
     align-self: center;
 }
+
+/* .edit-expense-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    z-index: 0;
+    left: 0;
+    top: 0;
+    width: 180%;
+    height: 100%;
+    backdrop-filter: blur(2px);
+} */
 
 .edit-expense-title {
     font-size: 24px;
@@ -199,30 +214,30 @@
     flex: 1;
 }
 
-.field-pair label {
-    flex: 1;
-}
-
 .submit-edit-expense-button {
-    padding: 8px;
-    background-color: var(--lightgreen);
+    /* padding: 8px;
+    width: 90%; */
+    padding: 15px 30px; 
+    background-color:var(--lightgreen);
     color: white;
     border: none;
-    width: 90%;
+    width: 50%;
     border-radius: 10px;
-    font-size: 15px;
+    font-size: 15px; 
     cursor: pointer;
     align-self: center;
 }
 
 .delete-expense-button {
-    padding: 8px;
+    /* padding: 8px;
+    width: 90%; */
+    padding: 15px 30px; 
     background-color: #8B0000;
     color: white;
     border: none;
-    width: 90%;
+    width: 50%;
     border-radius: 10px;
-    font-size: 15px;
+    font-size: 15px; 
     cursor: pointer;
     align-self: center;
 }
