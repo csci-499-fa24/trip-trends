@@ -187,10 +187,10 @@ function TodoList() {
                 <div className="row" style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <div className="col list-display" style={{ flex: 1 }}>
                         {/* Add Purchase Item */}
-                        <div className='add-list-item' style={{ display: 'flex', alignItems: 'center' }}>
+                        <div className='add-list-item' style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <Box
                                 component="form"
-                                sx={{ '& .MuiTextField-root': { m: 1, width: '25ch' } }}
+                                sx={{ '& .MuiTextField-root': { m: 1, width: '29ch' } }}
                                 noValidate
                                 autoComplete="off"
                             >
@@ -216,41 +216,65 @@ function TodoList() {
                         <br></br>
                         {/* Purchase List */}
                         <h3>Your Purchase List</h3>
-                        <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-                            {purchaseList.length === 0 ? (
-                                <ListItem>
-                                    <ListItemText sx={{ textAlign: 'center' }} primary="Add some items to your list!" />
-                                </ListItem>
-                            ) : (
-                                purchaseList.map((item) => {
-                                    const labelId = `checkbox-list-label-${item.list_id}`;
-                                    return (
-                                        <ListItem key={item.list_id} disablePadding>
-                                            <ListItemButton role={undefined} onClick={handleToggle(item)} dense>
-                                                <ListItemIcon>
-                                                    <Checkbox
-                                                        edge="start"
-                                                        checked={checked.includes(item.list_id)}
-                                                        tabIndex={-1}
-                                                        disableRipple
-                                                        inputProps={{ 'aria-labelledby': labelId }}
-                                                    />
-                                                </ListItemIcon>
-                                                <ListItemText id={labelId} primary={item.name} />
-                                            </ListItemButton>
-                                        </ListItem>
-                                    );
-                                })
-                            )}
-                        </List>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+                                {purchaseList.length === 0 ? (
+                                    <ListItem>
+                                        <ListItemText sx={{ textAlign: 'center' }} primary="Add some items to your list!" />
+                                    </ListItem>
+                                ) : (
+                                    purchaseList.map((item) => {
+                                        const labelId = `checkbox-list-label-${item.list_id}`;
+                                        return (
+                                            <ListItem key={item.list_id}
+                                                secondaryAction={
+                                                    <div className="icon-div" tooltip="Edit Item" tabIndex="0">
+                                                        <div className="icon-SVG">
+                                                            <div onClick={() => window.location.href = '/homepage'}>
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                                                                </svg>
+                                                                <span className="icon-text">Edit Item</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                                disablePadding>
+                                                <div className="icon-div" tooltip="Delete Item" tabIndex="0">
+                                                    <div className="icon-SVG">
+                                                        <div onClick={() => window.location.href = '/homepage'}>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                            </svg>
+                                                            <span className="icon-text">Delete Item</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <ListItemButton role={undefined} onClick={handleToggle(item)} dense>
+                                                    <ListItemIcon>
+                                                        <Checkbox
+                                                            edge="start"
+                                                            checked={checked.includes(item.list_id)}
+                                                            tabIndex={-1}
+                                                            disableRipple
+                                                            inputProps={{ 'aria-labelledby': labelId }}
+                                                        />
+                                                    </ListItemIcon>
+                                                    <ListItemText id={labelId} primary={item.name} />
+                                                </ListItemButton>
+                                            </ListItem>
+                                        );
+                                    })
+                                )}
+                            </List>
+                        </div>
                     </div>
-
                     <div className="col list-display" style={{ flex: 1 }}>
                         {/* Add Sight Seeing Item */}
-                        <div className='add-list-item' style={{ display: 'flex', alignItems: 'center' }}>
+                        <div className='add-list-item' style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <Box
                                 component="form"
-                                sx={{ '& .MuiTextField-root': { m: 1, width: '25ch' } }}
+                                sx={{ '& .MuiTextField-root': { m: 1, width: '29ch' } }}
                                 noValidate
                                 autoComplete="off"
                             >
@@ -276,37 +300,64 @@ function TodoList() {
                         <br></br>
                         {/* Sightseeing List */}
                         <h3>Your Sightseeing List</h3>
-                        <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-                            {
-                                sightseeingList.length === 0 ? (
-                                    <ListItem>
-                                        <ListItemText sx={{ textAlign: 'center' }} primary="Add some items to your list!" />
-                                    </ListItem>
-                                ) : (
-                                    sightseeingList.map((item) => {
-                                        const labelId = `checkbox-list-label-${item.list_id}`;
-                                        return (
-                                            <ListItem key={item.list_id} disablePadding>
-                                                <ListItemButton role={undefined} onClick={handleToggle(item)} dense>
-                                                    <ListItemIcon>
-                                                        <Checkbox
-                                                            edge="start"
-                                                            checked={checked.includes(item.list_id)}
-                                                            tabIndex={-1}
-                                                            disableRipple
-                                                            inputProps={{ 'aria-labelledby': labelId }}
-                                                        />
-                                                    </ListItemIcon>
-                                                    <ListItemText id={labelId} primary={item.name} />
-                                                </ListItemButton>
-                                            </ListItem>
-                                        );
-                                    })
-                                )}
-                        </List>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+                                {
+                                    sightseeingList.length === 0 ? (
+                                        <ListItem>
+                                            <ListItemText sx={{ textAlign: 'center' }} primary="Add some items to your list!" />
+                                        </ListItem>
+                                    ) : (
+                                        sightseeingList.map((item) => {
+                                            const labelId = `checkbox-list-label-${item.list_id}`;
+                                            return (
+                                                <ListItem key={item.list_id}
+                                                    secondaryAction={
+                                                        <div className="icon-div" tooltip="Edit Item" tabIndex="0">
+                                                            <div className="icon-SVG">
+                                                                <div onClick={() => window.location.href = '/homepage'}>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                                                                    </svg>
+                                                                    <span className="icon-text">Edit Item</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    disablePadding sx={{ width: "28vw", alignItems: 'center', justifyContent: 'center' }}>
+                                                    <div className="icon-div" tooltip="Delete Item" tabIndex="0">
+                                                        <div className="icon-SVG">
+                                                            <div onClick={() => window.location.href = '/homepage'}>
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                                </svg>
+                                                                <span className="icon-text">Delete Item</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <ListItemButton role={undefined} onClick={handleToggle(item)} dense>
+                                                        <ListItemIcon>
+                                                            <Checkbox
+                                                                edge="start"
+                                                                checked={checked.includes(item.list_id)}
+                                                                tabIndex={-1}
+                                                                disableRipple
+                                                                inputProps={{ 'aria-labelledby': labelId }}
+                                                            />
+                                                        </ListItemIcon>
+                                                        <ListItemText id={labelId} primary={item.name} />
+                                                    </ListItemButton>
+                                                </ListItem>
+                                            );
+                                        })
+                                    )}
+                            </List>
+                        </div>
                     </div>
                 </div>
             </div>
+            <br></br>
+            <br></br>
         </div>
     )
 }
