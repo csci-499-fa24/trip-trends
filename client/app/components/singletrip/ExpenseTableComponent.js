@@ -184,7 +184,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                                                                                 style={{
                                                                                     position: 'absolute',
                                                                                     left: '43px',
-                                                                                    top: '41%',
+                                                                                    top: '40%',
                                                                                     transform: 'translateY(-50%)',
                                                                                     pointerEvents: 'none',
                                                                                 }}
