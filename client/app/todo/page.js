@@ -103,9 +103,8 @@ function TodoList() {
                 .then(response => {
                     console.log(response.data)
                     toast.success("Successful added a new item to your list!");
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1500);
+                    setPurchaseList(prevList => [...prevList, response.data.data]);
+                    setNewPurchaseItem("");
                 })
                 .catch(error => {
                     console.error('Error posting new purchase item:', error);
@@ -128,9 +127,8 @@ function TodoList() {
                 .then(response => {
                     console.log(response.data)
                     toast.success("Successful added a new item to your list!");
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1500);
+                    setSightseeingList(prevList => [...prevList, response.data.data]);
+                    setNewSightItem("");
                 })
                 .catch(error => {
                     console.error('Error posting new sight item:', error);
@@ -146,9 +144,12 @@ function TodoList() {
             .then(response => {
                 console.log(response.data)
                 toast.success("Successful removed an item from your list!");
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1500);
+                if (item.list_type === "sightseeing") {
+                    setSightseeingList(prevList => prevList.filter(sightItem => sightItem.list_id !== item.list_id));
+                }
+                else {
+                    setPurchaseList(prevList => prevList.filter(purchaseItem => purchaseItem.list_id !== item.list_id));
+                }
             })
             .catch(error => {
                 console.error('Error posting new sight item:', error);
@@ -183,9 +184,16 @@ function TodoList() {
                 .then(response => {
                     console.log(response);
                     toast.success("Item name updated successfully!");
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1500);
+                    if (updatedItem.list_type === "sightseeing") {
+                        setSightseeingList(prevList => prevList.map(item =>
+                            item.list_id === updatedItem.list_id ? { ...item, name: updatedName } : item
+                        ));
+                    }
+                    else {
+                        setPurchaseList(prevList => prevList.map(item =>
+                            item.list_id === updatedItem.list_id ? { ...item, name: updatedName } : item
+                        ));
+                    }
                     closeEditModal();
                 })
                 .catch(error => {
@@ -230,6 +238,9 @@ function TodoList() {
         getUserId();
         fetchUserName();
     }, []);
+
+    // console.log("PLIST: ", purchaseList);
+    // console.log("SLIST: ", sightseeingList);
 
     return (
         <div className='container'>
