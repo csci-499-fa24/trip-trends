@@ -810,6 +810,14 @@
     background-color: green;
 }
 
+.todo-icon:hover {
+    color: rgb(60, 60, 247);
+}
+
+.todo-icon .icon-text {
+    background-color: rgb(60, 60, 247);
+}
+
 .exchange-table-dropdown input,
 .exchange-table-dropdown select {
     width: 100%;
