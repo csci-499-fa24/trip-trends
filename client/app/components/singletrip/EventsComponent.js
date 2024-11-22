@@ -86,7 +86,7 @@ const EventComponent = ({ tripId }) => {
                 `&startDateTime=${start_date}T00:00:00Z` +
                 `&endDateTime=${end_date}T23:59:59Z` +
                 `&apikey=${process.env.NEXT_PUBLIC_EVENTS_API_KEY}` +
-                `&size=30`,
+                `&size=50`,
             headers: {}
         };
 

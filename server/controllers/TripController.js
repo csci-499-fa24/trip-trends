@@ -78,7 +78,7 @@ const getTripById = async (req, res) => {
 // PUT request to update trip data
 const updateTrip = async (req, res) => {
     const tripId = req.params.tripId;
-    const { name, startDate, endDate, budget } = req.body;
+    const { name, start_date, end_date, budget } = req.body;
     try {
         // find trip by tripId
         const trip = await Trip.findByPk(tripId);
@@ -86,7 +86,7 @@ const updateTrip = async (req, res) => {
             return res.status(404).json();
         }
         // update trip data
-        const updatedTrip = await trip.update({ name, startDate, endDate, budget });
+        const updatedTrip = await trip.update({ name, start_date, end_date, budget });
         res.status(200).json({ data: updatedTrip });
     } catch (err) {
         console.error(err);
