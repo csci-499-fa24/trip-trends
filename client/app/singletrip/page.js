@@ -271,9 +271,9 @@ function Singletrip() {
         }
         let sortedExpenses;
         if (filterOption === 'highest') {
-            sortedExpenses = [...data].sort((a, b) => parseFloat(b.amount) - parseFloat(a.amount));
+            sortedExpenses = [...data].sort((a, b) => parseFloat(b.convertedAmount) - parseFloat(a.convertedAmount));
         } else if (filterOption === 'lowest') {
-            sortedExpenses = [...data].sort((a, b) => parseFloat(a.amount) - parseFloat(b.amount));
+            sortedExpenses = [...data].sort((a, b) => parseFloat(a.convertedAmount) - parseFloat(b.convertedAmount));
         } else if (filterOption === 'recent') {
             sortedExpenses = [...data].sort((a, b) => new Date(b.posted) - new Date(a.posted));
         } else if (filterOption === 'oldest') {
@@ -425,7 +425,7 @@ function Singletrip() {
         }
     };
 
-    const convertExpenses = async (expenses, targetCurrency, setConvertedExpenses, setTotalExpenses, setCategoryData) => {
+    const convertExpenses = async (expenses, targetCurrency, setHomeConvertedExpenses, setExpenseDisplay, setTotalExpenses, setCategoryData) => {
         if (!targetCurrency) {
             return;
         }
@@ -458,12 +458,13 @@ function Singletrip() {
     
                 return {
                     ...expense,
-                    amount: convertedAmount,
-                    currency: targetCurrency
+                    convertedAmount,
+                    targetCurrency
                 };
             });
     
-            setConvertedExpenses(convertedData);
+            setHomeConvertedExpenses(convertedData);
+            setExpenseDisplay(convertedData);
             setTotalExpenses(totalExpensesInTargetCurrency);
 
             let currency = selectedToggleCurrency !== "" ? selectedToggleCurrency : homeCurrency;
@@ -490,16 +491,15 @@ function Singletrip() {
     
     // for home currency
     const fetchCurrencyRates = async () => {
-        convertExpenses(expenseData.data, homeCurrency, setConvertedHomeCurrencyExpenseData, setTotalExpenses, setCategoryData);
+        convertExpenses(expenseData.data, homeCurrency, setConvertedHomeCurrencyExpenseData, setExpensesToDisplay, setTotalExpenses, setCategoryData);
     };
     
     // for toggle currency (including home currency)
     const convertExpensesToToggleCurrency = async () => {
         if (selectedToggleCurrency) {
-            convertExpenses(expenseData.data, selectedToggleCurrency, setExpensesToDisplay, setTotalExpensesInToggleCurrency, setCategoryData);
+            convertExpenses(expenseData.data, selectedToggleCurrency, setConvertedHomeCurrencyExpenseData, setExpensesToDisplay, setTotalExpensesInToggleCurrency, setCategoryData);
         } else {
             fetchCurrencyRates();
-            setExpensesToDisplay(expenseData.data); // if no currency selected, just display the original data
         }
 
     };
