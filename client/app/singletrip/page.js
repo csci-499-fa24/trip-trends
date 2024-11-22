@@ -7,6 +7,8 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-calendar/dist/Calendar.css';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Import components
 import DownloadTripComponent from '../components/singletrip/DownloadTripComponent';
