@@ -145,8 +145,8 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                                                 </div>
                                                 <div className="expense-form">
                                                     {isEditPopupVisible && selectedExpense && (
-                                                        <div className="modal">
-                                                            <div className="modal-content">
+                                                        <div className="edit-expense-modal">
+                                                            <div className="edit-expense-modal-content">
                                                                 <span className="close" onClick={() => setEditPopupVisible(false)}>&times;</span>
                                                                 <h2 className="edit-expense-title">Edit or Delete Expense</h2>
                                                                 <form onSubmit={(e) => {
@@ -184,7 +184,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                                                                                 style={{
                                                                                     position: 'absolute',
                                                                                     left: '43px',
-                                                                                    top: '41%',
+                                                                                    top: '40%',
                                                                                     transform: 'translateY(-50%)',
                                                                                     pointerEvents: 'none',
                                                                                 }}

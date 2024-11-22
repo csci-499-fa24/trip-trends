@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import '../../css/discover.css';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 const EventComponent = ({ tripId }) => {
@@ -101,14 +103,57 @@ const EventComponent = ({ tripId }) => {
             });
     };
 
+    const handleAddEvent = (event) => {
+        console.log('Event added:', event);
+        if (!event.name) {
+            toast.error("Event name is missing. Please provide a valid event.");
+            setTimeout(() => {
+            }, 500);
+        } else {
+            const newEvent = {
+                name: event.name,
+                list_type: "sightseeing",
+                is_completed: false
+            };
+
+            console.log("ADDING EVENT: ", newEvent);
+
+            const eventBody = {
+                name: newEvent.name,
+                list_type: "sightseeing",
+                is_completed: false
+            };
+
+            axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/lists/create-item/${tripId}`, eventBody)
+                .then((response) => {
+                    console.log(response);
+                    toast.success("Event added successfully!");
+                    setTimeout(() => {
+                    }, 500);
+                })
+                .catch((error) => {
+                    console.error("Error adding event:", error);
+                    toast.error("Failed to add the event.");
+                    setTimeout(() => {
+                    }, 500);
+                });
+        }
+    };
+
     return (
         <div className="event-widget-container">
             <div className="event-widget">
-                <h2 className='EvenHeader'>Events</h2>
+                <h2 className="EvenHeader">Events</h2>
                 <div className="event-container">
                     {eventsData.length > 0 ? (
                         eventsData.map((event, index) => (
                             <div key={index} className="event-card">
+                                <button
+                                    className="add-button"
+                                    onClick={() => handleAddEvent(event)}
+                                >
+                                    +
+                                </button>
                                 {event.images && event.images.length > 0 ? (
                                     <img
                                         src={event.images[0].url}
@@ -129,7 +174,12 @@ const EventComponent = ({ tripId }) => {
                                         <p className="event-loc">{event._embedded?.venues[0]?.city?.name}</p>
                                     </div>
                                     <p>
-                                        <a href={event.url} target="_blank" rel="noopener noreferrer" className="event-detail">
+                                        <a
+                                            href={event.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="event-detail"
+                                        >
                                             View Event Details
                                         </a>
                                     </p>
