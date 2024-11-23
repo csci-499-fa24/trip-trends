@@ -49,6 +49,8 @@ function Singletrip() {
     const [originalData, setOriginalData] = useState([]);
     const [selectedFilter, setSelectedFilter] = useState('');
     const [tripLocations, setTripLocations] = useState([]);
+    const [expenseUSD, setExpenseUSD] = useState([]);
+
     const [selectedCategory, setSelectedCategory] = useState('');
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
     const [newExpenseData, setNewExpenseData] = useState({
@@ -90,10 +92,10 @@ function Singletrip() {
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            setLoading(false); 
-        }, 1000); 
+            setLoading(false);
+        }, 1000);
 
-        return () => clearTimeout(timer); 
+        return () => clearTimeout(timer);
     }, []);
 
     useEffect(() => {
@@ -130,18 +132,19 @@ function Singletrip() {
                     console.error('Error fetching trip data:', error);
                 })
                 .finally(() => {
-                    setLoading(false); 
+                    setLoading(false);
                 });
         }
     };
 
     useEffect(() => {
         const savedFilter = localStorage.getItem('selectedFilter');
-        if (savedFilter && expensesToDisplay.length > 0) {
-            // console.log(expensesToDisplay);
-            applyFilter(savedFilter, expensesToDisplay);
+
+        if (savedFilter && expenseUSD.length > 0) {
+            //console.log(expenseData)
+            applyFilter(savedFilter);
         }
-    }, [expensesToDisplay]);
+    }, [expenseUSD, selectedFilter]);
 
     const fetchExpenseData = () => {
         setLoading(true);
@@ -156,14 +159,14 @@ function Singletrip() {
                 const savedFilter = localStorage.getItem('selectedFilter');
                 if (savedFilter) {
                     // console.log(expensesToDisplay);
-                    applyFilter(savedFilter, expensesToDisplay);
+                    applyFilter(savedFilter);
                 }
             })
             .catch(error => {
                 console.error('Error fetching trip data:', error);
             })
             .finally(() => {
-                setLoading(false); 
+                setLoading(false);
             });
     };
 
@@ -173,12 +176,12 @@ function Singletrip() {
                 setSelectedCurrency(response.data.data[0].currency_code);
                 const locations = response.data.data;
                 setTripLocations(locations.map(location => location.location));
-    
+
                 // get unique currency codes
                 const currencyCodes = [...new Set(locations.map(location => location.currency_code))];
-    
+
                 setOtherCurrencies(currencyCodes);
-    
+
             })
             .catch(error => {
                 console.error('Error fetching trip data:', error);
@@ -255,7 +258,6 @@ function Singletrip() {
                 }
             })
         }
-
         setExpenseData({ data: filteredData });
     }
 
@@ -264,11 +266,13 @@ function Singletrip() {
     };
 
 
-    const applyFilter = (filterOption, data = expensesToDisplay) => {
+    const applyFilter = (filterOption, data = expenseUSD) => {
+        console.log('hi');
         if (!Array.isArray(data)) {
             console.error('Data is not an array:', data);
             return;
         }
+    
         let sortedExpenses;
         if (filterOption === 'highest') {
             sortedExpenses = [...data].sort((a, b) => parseFloat(b.amount) - parseFloat(a.amount));
@@ -279,9 +283,22 @@ function Singletrip() {
         } else if (filterOption === 'oldest') {
             sortedExpenses = [...data].sort((a, b) => new Date(a.posted) - new Date(b.posted));
         }
-        setExpenseData({ data: sortedExpenses });
-        setSelectedFilter(filterOption);
-        localStorage.setItem('selectedFilter', filterOption);
+    
+        // Find corresponding expenses in expensesToDisplay
+        const sortedWithDisplay = sortedExpenses.map(sortedExpense => {
+            return expensesToDisplay.find(exp => exp.expense_id === sortedExpense.expense_id);
+        });
+    
+        // Only update if the sorted data has actually changed
+        if (JSON.stringify(sortedWithDisplay) !== JSON.stringify(expenseData.data)) {
+            setExpenseData({ data: sortedWithDisplay });
+        }
+    
+        // Update filter and store in localStorage only if changed
+        if (filterOption !== selectedFilter) {
+            setSelectedFilter(filterOption);
+            localStorage.setItem('selectedFilter', filterOption);
+        }
     };
 
     const clearFilter = () => {
@@ -403,8 +420,8 @@ function Singletrip() {
     }, [selectedCurrency]);
 
     const toggleVisibility = () => {
-            setIsVisible(prevState => !prevState);
-        };
+        setIsVisible(prevState => !prevState);
+    };
 
     const convertBudget = async (budget) => {
         if (selectedToggleCurrency !== "") {
@@ -412,11 +429,11 @@ function Singletrip() {
                 // Fetch conversion rate for the budget
                 const response = await axios.get(`https://hexarate.paikama.co/api/rates/latest/${homeCurrency}?target=${selectedToggleCurrency}`);
                 const conversionRate = response.data.data.mid; // assuming correct response structure
-        
+
                 const convertedBudget = (parseFloat(budget) * conversionRate).toFixed(2);
-        
+
                 setConvertedBudget(convertedBudget);
-        
+
             } catch (error) {
                 console.error('Error fetching conversion rates:', error);
             }
@@ -429,25 +446,25 @@ function Singletrip() {
         if (!targetCurrency) {
             return;
         }
-    
+
         try {
             const uniqueCurrencies = [...new Set(expenses.map(exp => exp.currency))].filter(Boolean);
-    
+
             // conversion rates for each currency
-            const currencyPromises = uniqueCurrencies.map(currency => 
+            const currencyPromises = uniqueCurrencies.map(currency =>
                 axios.get(`https://hexarate.paikama.co/api/rates/latest/${currency}?target=${targetCurrency}`)
             );
-    
+
             const currencyResponses = await Promise.all(currencyPromises);
-    
+
             const currencyRates = currencyResponses.reduce((acc, response, index) => {
                 acc[uniqueCurrencies[index]] = response.data.data.mid; // assuming correct response structure
                 return acc;
             }, {});
-    
+
             let totalExpensesInTargetCurrency = 0;
             const categoryTotals = {};
-    
+
             // convert expenses and calculate totals
             const convertedData = expenses.map(expense => {
                 const rate = currencyRates[expense.currency] || 1; // fallback to 1 if no rate is available
@@ -455,16 +472,17 @@ function Singletrip() {
 
                 categoryTotals[expense.category] = (categoryTotals[expense.category] || 0) + parseFloat(convertedAmount);
                 totalExpensesInTargetCurrency += parseFloat(convertedAmount);
-    
+
                 return {
                     ...expense,
                     amount: convertedAmount,
                     currency: targetCurrency
                 };
             });
-    
+
             setConvertedExpenses(convertedData);
             setTotalExpenses(totalExpensesInTargetCurrency);
+            setExpenseUSD(convertedData);
 
             let currency = selectedToggleCurrency !== "" ? selectedToggleCurrency : homeCurrency;
 
@@ -487,12 +505,12 @@ function Singletrip() {
             setLoading(false);
         }
     };
-    
+
     // for home currency
     const fetchCurrencyRates = async () => {
         convertExpenses(expenseData.data, homeCurrency, setConvertedHomeCurrencyExpenseData, setTotalExpenses, setCategoryData);
     };
-    
+
     // for toggle currency (including home currency)
     const convertExpensesToToggleCurrency = async () => {
         if (selectedToggleCurrency) {
@@ -517,7 +535,7 @@ function Singletrip() {
     }, [selectedToggleCurrency, expenseData]);
 
     if (loading) {
-        return <LoadingPageComponent />; 
+        return <LoadingPageComponent />;
     }
 
     return (
@@ -529,45 +547,45 @@ function Singletrip() {
                     <div>
                         <div className='container'>
                             {/* Icon Bar Above Trip Info */}
-                            <TripIconBarComponent 
-                                tripId={tripId} 
-                                userId={userId} 
-                                isOwner={isOwner} 
-                                tripData={tripData} 
-                                tripLocations={tripLocations} 
-                                userRole={userRole} 
+                            <TripIconBarComponent
+                                tripId={tripId}
+                                userId={userId}
+                                isOwner={isOwner}
+                                tripData={tripData}
+                                tripLocations={tripLocations}
+                                userRole={userRole}
                                 fetchTripData={fetchTripData}
                                 homeCurrency={homeCurrency} // budget is always set as home
                             />
-                            <CurrencyToggleComponent 
-                                homeCurrency={homeCurrency} 
-                                otherCurrencies={otherCurrencies} 
+                            <CurrencyToggleComponent
+                                homeCurrency={homeCurrency}
+                                otherCurrencies={otherCurrencies}
                                 toggleChange={handleCurrencyToggleChange} />
                             {/* General Trip Info*/}
-                            <GeneralTripInfoComponent 
+                            <GeneralTripInfoComponent
                                 tripData={tripData} // handles budget currency
                                 convertedBudget={convertedBudget}
-                                tripId={tripId} 
-                                tripLocations={tripLocations} 
-                                expenses={expensesToDisplay} 
+                                tripId={tripId}
+                                tripLocations={tripLocations}
+                                expenses={expenseUSD}
                                 totalExpenses={selectedToggleCurrency !== "" ? totalExpensesInToggleCurrency : totalExpenses}
                                 currency={selectedToggleCurrency !== "" ? selectedToggleCurrency : homeCurrency} />
                         </div>
                         <br></br>
                         <div className='container'>
                             <div className='row'>
-                                <div className='col' style={{flexDirection: 'column'}}>
-                                    <h2 style={{ textAlign: 'center', marginBottom: '20px', marginTop: '15px'}}>Exchange Rates</h2>
+                                <div className='col' style={{ flexDirection: 'column' }}>
+                                    <h2 style={{ textAlign: 'center', marginBottom: '20px', marginTop: '15px' }}>Exchange Rates</h2>
                                     {/* Exchange Rate Table */}
-                                    <ExchangeRateTableComponent 
-                                        exchangeRates={exchangeRates} 
-                                        currencyCodes={currencyCodes} 
+                                    <ExchangeRateTableComponent
+                                        exchangeRates={exchangeRates}
+                                        currencyCodes={currencyCodes}
                                         homeCurrency={homeCurrency} />
                                 </div>
-                                <div className='col' style={{flexDirection: 'column'}}>
-                                <h2 style={{ textAlign: 'center', marginTop: '30px', marginBottom: '20px' }}>
-                                    Expenses in {selectedToggleCurrency !== "" ? selectedToggleCurrency : homeCurrency}
-                                </h2>
+                                <div className='col' style={{ flexDirection: 'column' }}>
+                                    <h2 style={{ textAlign: 'center', marginTop: '30px', marginBottom: '20px' }}>
+                                        Expenses in {selectedToggleCurrency !== "" ? selectedToggleCurrency : homeCurrency}
+                                    </h2>
                                     <SpendingCirclesComponent
                                         totalExpenses={selectedToggleCurrency !== "" ? totalExpensesInToggleCurrency : totalExpenses}
                                         tripData={tripData}
@@ -608,10 +626,10 @@ function Singletrip() {
                                         {/* Budget Meter */}
                                         <div className='col'>
                                             <div className="meter-container">
-                                                <BudgetMeterComponent 
-                                                    tripData={tripData} 
+                                                <BudgetMeterComponent
+                                                    tripData={tripData}
                                                     convertedBudget={convertedBudget}
-                                                    expensesToDisplay={expensesToDisplay} 
+                                                    expensesToDisplay={expensesToDisplay}
                                                     totalExpenses={selectedToggleCurrency !== "" ? totalExpensesInToggleCurrency : totalExpenses}
                                                     currency={selectedToggleCurrency !== "" ? selectedToggleCurrency : homeCurrency} />
                                             </div>
@@ -619,16 +637,16 @@ function Singletrip() {
                                         {/* Pie Chart */}
                                         <div className='col'>
                                             <div className="meter-container">
-                                                <CategoryDataComponent 
-                                                    categoryData={categoryData} 
+                                                <CategoryDataComponent
+                                                    categoryData={categoryData}
                                                     currency={selectedToggleCurrency !== "" ? selectedToggleCurrency : homeCurrency} />
                                             </div>
                                         </div>
                                     </div>
                                     {/* Bar Graph */}
                                     <div className="meter-container">
-                                        <BarGraphComponent 
-                                            tripData={tripData} 
+                                        <BarGraphComponent
+                                            tripData={tripData}
                                             expensesToDisplay={selectedToggleCurrency !== "" ? expensesToDisplay : convertedHomeCurrencyExpenseData}
                                             categoryData={categoryData}
                                             currency={selectedToggleCurrency !== "" ? selectedToggleCurrency : homeCurrency} />
@@ -639,36 +657,36 @@ function Singletrip() {
                         {/* Icon Bar Above Expenses */}
                         <div>
                             <header className="icon-bar-header">
-                            <div class="icon-bar-left">
-                                {userRole == 'owner' || userRole == 'editor' ? (
-                                    // {/* Add Expense Button */}
-                                    <div className="icon-div" tooltip="Add Expense" tabIndex="0">
-                                        <div className="icon-SVG">
-                                            <svg
-                                                onClick={() => setPopUpVisible(true)}
-                                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                            </svg>
-                                            <span className="icon-text">Add Expense</span>
+                                <div className="icon-bar-left">
+                                    {userRole == 'owner' || userRole == 'editor' ? (
+                                        // {/* Add Expense Button */}
+                                        <div className="icon-div" tooltip="Add Expense" tabIndex="0">
+                                            <div className="icon-SVG">
+                                                <svg
+                                                    onClick={() => setPopUpVisible(true)}
+                                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                </svg>
+                                                <span className="icon-text">Add Expense</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                ) : null}
-                                {/* Download Trip Button */}
+                                    ) : null}
+                                    {/* Download Trip Button */}
                                     <DownloadTripComponent tripData={tripData} tripId={tripId} />
                                 </div>
-                                <div class="icon-bar-center">
+                                <div className="icon-bar-center">
                                     <h2>Expense History</h2>
                                 </div>
-                                <div class="icon-bar-right">
-                                {/* Filter Expenses Button */}
-                                <div className="icon-div" tooltip="Filter" tabIndex="0">
-                                    <div className="icon-SVG">
-                                        <svg
-                                            onClick={() => setFilterPopupVisible(true)}
-                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6" >
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
-                                        </svg>
-                                        <span className="icon-text">Filter</span>
+                                <div className="icon-bar-right">
+                                    {/* Filter Expenses Button */}
+                                    <div className="icon-div" tooltip="Filter" tabIndex="0">
+                                        <div className="icon-SVG">
+                                            <svg
+                                                onClick={() => setFilterPopupVisible(true)}
+                                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6" >
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+                                            </svg>
+                                            <span className="icon-text">Filter</span>
                                         </div>
                                     </div>
                                 </div>
