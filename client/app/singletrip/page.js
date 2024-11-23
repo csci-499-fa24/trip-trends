@@ -508,7 +508,6 @@ function Singletrip() {
 
     // for home currency
     const fetchCurrencyRates = async () => {
-        console.log('hi2');
         convertExpenses(expenseData.data, homeCurrency, setConvertedHomeCurrencyExpenseData, setTotalExpenses, setCategoryData);
     };
 
@@ -517,7 +516,6 @@ function Singletrip() {
         if (selectedToggleCurrency) {
             convertExpenses(expenseData.data, selectedToggleCurrency, setExpensesToDisplay, setTotalExpensesInToggleCurrency, setCategoryData);
         } else {
-            console.log('hi3');
             fetchCurrencyRates();
             setExpensesToDisplay(expenseData.data); // if no currency selected, just display the original data
         }
@@ -532,7 +530,6 @@ function Singletrip() {
 
     useEffect(() => {
         if (expenseData) {
-            console.log('hi4');
             convertExpensesToToggleCurrency();
         }
     }, [selectedToggleCurrency, expenseData]);
