@@ -258,7 +258,6 @@ function Singletrip() {
                 }
             })
         }
-
         setExpenseData({ data: filteredData });
     }
 
@@ -273,6 +272,7 @@ function Singletrip() {
             console.error('Data is not an array:', data);
             return;
         }
+    
         let sortedExpenses;
         if (filterOption === 'highest') {
             sortedExpenses = [...data].sort((a, b) => parseFloat(b.amount) - parseFloat(a.amount));
@@ -283,15 +283,22 @@ function Singletrip() {
         } else if (filterOption === 'oldest') {
             sortedExpenses = [...data].sort((a, b) => new Date(a.posted) - new Date(b.posted));
         }
-
+    
+        // Find corresponding expenses in expensesToDisplay
         const sortedWithDisplay = sortedExpenses.map(sortedExpense => {
-            // Find the corresponding expense in expensesToDisplay (the UI data)
             return expensesToDisplay.find(exp => exp.expense_id === sortedExpense.expense_id);
         });
-
-        setExpenseData({ data: sortedWithDisplay });
-        setSelectedFilter(filterOption);
-        localStorage.setItem('selectedFilter', filterOption);
+    
+        // Only update if the sorted data has actually changed
+        if (JSON.stringify(sortedWithDisplay) !== JSON.stringify(expenseData.data)) {
+            setExpenseData({ data: sortedWithDisplay });
+        }
+    
+        // Update filter and store in localStorage only if changed
+        if (filterOption !== selectedFilter) {
+            setSelectedFilter(filterOption);
+            localStorage.setItem('selectedFilter', filterOption);
+        }
     };
 
     const clearFilter = () => {
@@ -501,6 +508,7 @@ function Singletrip() {
 
     // for home currency
     const fetchCurrencyRates = async () => {
+        console.log('hi2');
         convertExpenses(expenseData.data, homeCurrency, setConvertedHomeCurrencyExpenseData, setTotalExpenses, setCategoryData);
     };
 
@@ -509,6 +517,7 @@ function Singletrip() {
         if (selectedToggleCurrency) {
             convertExpenses(expenseData.data, selectedToggleCurrency, setExpensesToDisplay, setTotalExpensesInToggleCurrency, setCategoryData);
         } else {
+            console.log('hi3');
             fetchCurrencyRates();
             setExpensesToDisplay(expenseData.data); // if no currency selected, just display the original data
         }
@@ -523,6 +532,7 @@ function Singletrip() {
 
     useEffect(() => {
         if (expenseData) {
+            console.log('hi4');
             convertExpensesToToggleCurrency();
         }
     }, [selectedToggleCurrency, expenseData]);
