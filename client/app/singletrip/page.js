@@ -7,8 +7,6 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-calendar/dist/Calendar.css';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 // Import components
 import DownloadTripComponent from '../components/singletrip/DownloadTripComponent';
@@ -273,9 +271,9 @@ function Singletrip() {
         }
         let sortedExpenses;
         if (filterOption === 'highest') {
-            sortedExpenses = [...data].sort((a, b) => parseFloat(b.convertedAmount) - parseFloat(a.convertedAmount));
+            sortedExpenses = [...data].sort((a, b) => parseFloat(b.amount) - parseFloat(a.amount));
         } else if (filterOption === 'lowest') {
-            sortedExpenses = [...data].sort((a, b) => parseFloat(a.convertedAmount) - parseFloat(b.convertedAmount));
+            sortedExpenses = [...data].sort((a, b) => parseFloat(a.amount) - parseFloat(b.amount));
         } else if (filterOption === 'recent') {
             sortedExpenses = [...data].sort((a, b) => new Date(b.posted) - new Date(a.posted));
         } else if (filterOption === 'oldest') {
@@ -427,7 +425,7 @@ function Singletrip() {
         }
     };
 
-    const convertExpenses = async (expenses, targetCurrency, setHomeConvertedExpenses, setExpenseDisplay, setTotalExpenses, setCategoryData) => {
+    const convertExpenses = async (expenses, targetCurrency, setConvertedExpenses, setTotalExpenses, setCategoryData) => {
         if (!targetCurrency) {
             return;
         }
@@ -460,13 +458,12 @@ function Singletrip() {
     
                 return {
                     ...expense,
-                    convertedAmount,
-                    targetCurrency
+                    amount: convertedAmount,
+                    currency: targetCurrency
                 };
             });
     
-            setHomeConvertedExpenses(convertedData);
-            setExpenseDisplay(convertedData);
+            setConvertedExpenses(convertedData);
             setTotalExpenses(totalExpensesInTargetCurrency);
 
             let currency = selectedToggleCurrency !== "" ? selectedToggleCurrency : homeCurrency;
@@ -493,15 +490,16 @@ function Singletrip() {
     
     // for home currency
     const fetchCurrencyRates = async () => {
-        convertExpenses(expenseData.data, homeCurrency, setConvertedHomeCurrencyExpenseData, setExpensesToDisplay, setTotalExpenses, setCategoryData);
+        convertExpenses(expenseData.data, homeCurrency, setConvertedHomeCurrencyExpenseData, setTotalExpenses, setCategoryData);
     };
     
     // for toggle currency (including home currency)
     const convertExpensesToToggleCurrency = async () => {
         if (selectedToggleCurrency) {
-            convertExpenses(expenseData.data, selectedToggleCurrency, setConvertedHomeCurrencyExpenseData, setExpensesToDisplay, setTotalExpensesInToggleCurrency, setCategoryData);
+            convertExpenses(expenseData.data, selectedToggleCurrency, setExpensesToDisplay, setTotalExpensesInToggleCurrency, setCategoryData);
         } else {
             fetchCurrencyRates();
+            setExpensesToDisplay(expenseData.data); // if no currency selected, just display the original data
         }
 
     };
