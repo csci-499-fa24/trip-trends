@@ -567,7 +567,7 @@ function Singletrip() {
                                 convertedBudget={convertedBudget}
                                 tripId={tripId}
                                 tripLocations={tripLocations}
-                                expenses={expensesToDisplay}
+                                expenses={expenseUSD}
                                 totalExpenses={selectedToggleCurrency !== "" ? totalExpensesInToggleCurrency : totalExpenses}
                                 currency={selectedToggleCurrency !== "" ? selectedToggleCurrency : homeCurrency} />
                         </div>
