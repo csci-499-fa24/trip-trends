@@ -26,7 +26,7 @@ const ReceiptImageComponent = ({ tripId, handleFormData, updateIsUploadHidden })
                         svgStyle: { 
                             width: '100%', 
                             height: '100%',
-                            'stroke-linecap': 'round',
+                            'strokeLinecap': 'round',
                         },
                         containerStyle: { 
                             borderRadius: '2px',

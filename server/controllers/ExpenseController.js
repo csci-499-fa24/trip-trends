@@ -113,7 +113,10 @@ const getExpensesByTripId = async (req, res) => {
         if (!tripId) {
             return res.status(400).json({ message: "Trip ID is required" });
         }
-        const expense = await Expense.findAll({ where: { trip_id: tripId } });
+        const expense = await Expense.findAll({
+            where: { trip_id: tripId },
+            attributes: { exclude: ['image'] }, // Exclude the 'image' column
+        });
         if (!expense || expense.length === 0) {
             return res.status(404).json({ message: "Expense not found" });
         }
