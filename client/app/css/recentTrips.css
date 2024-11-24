@@ -47,3 +47,30 @@
     font-size: 0.9rem;
     color: #666;
 }
+
+@media(max-width: 600px){
+    
+    .recent-trips-container {
+        float: left;
+        margin-left: -20%;
+        margin-top: 10%;
+        width: 20%;
+    }
+    
+    .recent-trips-container h2 {
+        
+    }
+    
+    .trip-card {
+        margin-bottom: 15px;
+        padding: 10px;
+        border-radius: 10px;
+        background-color: var(--lightergreen);
+        color: black;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        width: 450px; 
+    }
+    
+    
+   
+}

@@ -223,9 +223,9 @@ form {
   } */
   
    /* green header */
-  .header {
+  /* .header {
     height: 100px; 
-  }
+  } */
   
   /* "Trip Trends" title */
   .header-title {
@@ -235,29 +235,29 @@ form {
   
   /* logo positon */
   .logo-container {
-    left: -10px; 
+    left: 0%; 
   }
 
   /* logo size */
   .logo-container img {
-    width: 50%;
+    width: 60%;
     height: 50%;
   }
 
   /* profile postion */
   .profile-container {
-    right: 10px; 
+    right: 15px; 
   }
   
   /* profile size */
   .profile-icon {
-    width: 80%;
+    width: 90%;
     height: 70%;
   }
   
   /* dropdown position */
   .dropdown {
-    right: 10px;
+    right: 7%;
   }
   
   /* side gaps */
