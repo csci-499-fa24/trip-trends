@@ -29,6 +29,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -54,6 +55,7 @@ a {
   position: relative;
   background-color: var(--darkgreen);
   position: relative;
+  transition: all 0.3s ease;
 }
 
 .header-title {
@@ -65,6 +67,7 @@ a {
   text-align: center;
   padding: 10px;
   letter-spacing: 6px;
+  transition: all 0.3s ease;
 }
 
 .logo-container {
@@ -74,6 +77,7 @@ a {
   left: 30px; 
   transform: translateY(-50%);
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .profile-container {
@@ -84,20 +88,15 @@ a {
   font-weight: normal; 
   letter-spacing: normal;
   z-index: 9999;
+  transition: all 0.3s ease;
 }
 
 .profile-icon {
   cursor: pointer;
   border-radius: 50%;
   border: 3px solid white;
+  transition: all 0.3s ease;
 } 
-
-@media(max-width: 600px){
-  .profile-icon {
-    width: 100%;
-    height: 100%;
-  } 
-}
 
 .dropdown {
   position: absolute; 
@@ -111,6 +110,7 @@ a {
   border-radius: 12px;
   overflow: hidden; 
   min-width: 150px;
+  transition: all 0.3s ease;
 }
 
 .dropdown-item {
@@ -210,4 +210,59 @@ form {
   width: 90%;
   display: flex;
   flex-direction: column;
+}
+
+
+@media(max-width: 600px){
+  
+  /* side gaps */
+  /* * { 
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+  } */
+  
+   /* green header */
+  .header {
+    height: 100px; 
+  }
+  
+  /* "Trip Trends" title */
+  .header-title {
+    margin-left: 5%;
+    font-size: 250%;
+  }
+  
+  /* logo positon */
+  .logo-container {
+    left: -10px; 
+  }
+
+  /* logo size */
+  .logo-container img {
+    width: 50%;
+    height: 50%;
+  }
+
+  /* profile postion */
+  .profile-container {
+    right: 10px; 
+  }
+  
+  /* profile size */
+  .profile-icon {
+    width: 80%;
+    height: 70%;
+  }
+  
+  /* dropdown position */
+  .dropdown {
+    right: 10px;
+  }
+  
+  /* side gaps */
+  /* .main-container {
+    margin: 10px 10px;
+    width: 95%;
+  } */
 }
