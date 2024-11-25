@@ -7,12 +7,16 @@ import '../css/discover.css';
 import axios from 'axios';
 
 import EventsComponent from '../components/singletrip/EventsComponent';
+import NavBarComponent from '../components/singletrip/NavBarComponent';
 
 function DiscoverPage() {
   const [tripId, setTripId] = useState(null);
   const [userId, setUserId] = useState(null);
   const [userName, setUserName] = useState("");
   const [tripLocation, setTripLocation] = useState([]);
+  const [userRole, setUserRole] = useState(null);
+  const isOwner = userRole === 'owner';
+  const [tripName, setTripName] = useState('');
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -46,6 +50,41 @@ function DiscoverPage() {
   };
 
 
+  useEffect(() => {
+    const fetchUserRole = async () => {
+        if (tripId && userId) {
+            try {
+                const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/trips/${tripId}`);
+                const sharedTrips = response.data.data;
+                const userRole = sharedTrips.find(trip => trip.user_id === userId)?.role;
+                if (userRole) {
+                    setUserRole(userRole);
+                } else {
+                    console.log("User does not have a role for this trip.");
+                }
+            } catch (error) {
+                console.error('Error fetching user role:', error);
+                // setError('Error fetching user role. Please try again later.');
+            }
+        } else {
+            console.log("tripId or userId is missing.");
+        }
+    };
+    const fetchTripName = () => {
+      if (tripId) {
+          axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`)
+              .then(response => {
+                setTripName(`${response.data.data.name}`);
+              })
+              .catch(error => {
+                  console.error('Error fetching trip data:', error);
+              })
+      }
+    };
+    fetchUserRole();
+    fetchTripName();
+
+  }, [tripId]);
 
   return (
     <div className='container'>
@@ -56,16 +95,7 @@ function DiscoverPage() {
         setUserName={setUserName}
         userId={userId}
       />
-
-      <div className="icon-div" onClick={() => window.location.href = `/singletrip?tripId=${tripId}`} tooltip="Back" tabIndex="0" style={{ display: 'flex', cursor: 'pointer', alignItems: 'center' }}>
-        <div className="icon-SVG">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6" style={{ width: '24px', height: '24px' }}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
-          </svg>
-          <span className="icon-text">Back</span>
-        </div>
-      </div>
-
+      <NavBarComponent tripId={tripId} userRole={userRole} tripName={tripName} pointerDisabled={true}/>
       <EventsComponent tripId={tripId}/>
     </div>
   );
