@@ -77,10 +77,22 @@
 }
 
 @media(max-width: 600px){
-    
-    
+    /* Homepg: trip cards position */
     .trips-display-card {
-    
        margin-left: 10%;
     }
+}
+
+@media(max-width: 430px){
+    /* Homepg: trip cards position */
+    .trips-display {
+        font-size: small;
+        margin: 0px;
+    }
+
+    /* Homepg: search bar position */
+    .search-bar {
+        margin-top: 0px;
+        margin-bottom: 30px;
+    }    
 }

@@ -308,3 +308,32 @@
         width: 0%;
     }
 }
+
+
+@media (max-width: 600px) {
+    /* seperates map and recent trips to different rows*/
+    .responsive-container {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .responsive-container > div {
+        width: 100%;
+        margin: 0;
+    }
+    
+    /* adding space between welcome and see trips message */
+    .welcome-section h1 {
+        margin-bottom: 20px;
+    }
+
+    /* New Trip form size */
+    .homepage-modal-content {
+        max-width: 90% !important;
+    }
+
+    /* Trip pg: top icon bar size */
+    .icon-div  {
+        width: 0%;
+    }
+}

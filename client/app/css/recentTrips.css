@@ -53,12 +53,23 @@
     .recent-trips-container {
         float: left;
         margin-top: 20%;
-        margin-left: -20%;
+        margin-left: -10%;
     }
 
     /* Home pg: Recent trips cards size */
     .trip-card {
-        width: 435px; 
+        width: 400px; 
     }
-   
+}
+
+@media(max-width: 430px){
+    /* Home pg: Recent trips title postion */
+    .recent-trips-container {
+        margin-top: 8%;
+    }
+    
+    /* Home pg: Recent trips cards size */
+    .trip-card {
+        width: 350px; 
+    } 
 }

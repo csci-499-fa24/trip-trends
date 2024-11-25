@@ -213,23 +213,12 @@ form {
 }
 
 
+
+
 @media(max-width: 600px){
-  
-  /* side gaps */
-  /* * { 
-    box-sizing: border-box;
-    padding: 0;
-    margin: 0;
-  } */
-  
-   /* green header */
-  /* .header {
-    height: 100px; 
-  } */
-  
   /* "Trip Trends" title */
   .header-title {
-    margin-left: 5%;
+    margin-left: 7%;
     font-size: 250%;
   }
   
@@ -259,10 +248,33 @@ form {
   .dropdown {
     right: 7%;
   }
+}
+
+
+@media(max-width: 430px){
+  /* "Trip Trends" title */
+  .header-title {
+    font-size: 240%;
+  }
+
+  /* logo size */
+  .logo-container img {
+    width: 40%;
+    height: 50%;
+  }
+
+  /* profile postion */
+  .profile-container {
+    right: 1px; 
+  }
   
-  /* side gaps */
-  /* .main-container {
-    margin: 10px 10px;
-    width: 95%;
-  } */
+  /* profile size */
+  .profile-icon {
+    width: 60%;
+  }
+  
+  /* dropdown position */
+  .dropdown {
+    right: 30%;
+  }
 }
