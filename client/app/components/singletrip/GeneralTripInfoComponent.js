@@ -168,13 +168,6 @@ const GeneralTripInfoComponent = ({ tripData, convertedBudget, tripId, tripLocat
                         </div>
                     </div>
                 </div>
-
-                <div className="trip-overview-div"  style={{cursor: "pointer"}} onClick={() => window.location.href = `/discover?tripId=${tripId}`}>
-                    <div id="trip-locations-circle">✈️</div>
-                    <div className="trip-overview-content">
-                            <p>Discover Page</p>                   
-                    </div>
-                </div>
             </div>
 
 

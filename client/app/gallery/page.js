@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import TripImageComponent from '../components/singletrip/TripImageComponent';
 import UploadTripImage from '../components/singletrip/UploadTripImage';
 import HeaderComponent from '../components/HeaderComponent';
+import NavBarComponent from '../components/singletrip/NavBarComponent';
+import LoadingPageComponent from '../components/LoadingPageComponent';
 import axios from 'axios';
 
 function Gallery() {
@@ -11,6 +13,7 @@ function Gallery() {
     const [userRole, setUserRole] = useState(null);
     const [userId, setUserId] = useState(null);
     const [userName, setUserName] = useState("");
+    const [tripName, setTripName] = useState('');
 
     const getUserId = () => {
         const user_id = localStorage.getItem("user_id");
@@ -41,8 +44,21 @@ function Gallery() {
         setTripId(tripId);
         setUserRole(userRole);
 
+        const fetchTripName = () => {
+            if (tripId) {
+                axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`)
+                    .then(response => {
+                        setTripName(`${response.data.data.name}`);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching trip data:', error);
+                    })
+            }
+        };
+
         getUserId();
         fetchUserName();
+        fetchTripName();
     }, []);
 
     if (!tripId || !userRole) {
@@ -53,9 +69,7 @@ function Gallery() {
                     setUserName={setUserName}
                     userId={userId}
                 />
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
-                    <p>Loading your Gallery...</p>
-                </div>
+                <LoadingPageComponent />
             </div>
         );
     }
@@ -67,15 +81,9 @@ function Gallery() {
                 setUserName={setUserName}
                 userId={userId}
             />
+            <NavBarComponent tripId={tripId} userRole={userRole} tripName={tripName} pointerDisabled={true}/>
             <header className="top-icon-bar-header" style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <div className="icon-div" onClick={() => window.location.href = `/singletrip?tripId=${tripId}`} tooltip="Back" tabIndex="0" style={{ display: 'flex', cursor: 'pointer', alignItems: 'center' }}>
-                    <div className="icon-SVG">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6" style={{ width: '24px', height: '24px' }}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
-                        </svg>
-                        <span className="icon-text">Back</span>
-                    </div>
-                </div>
+                
                 <div className="icon-div" tooltip="Gallery" tabIndex="0" style={{ display: 'flex', cursor: 'pointer' }}>
                     {userRole === 'owner' || userRole === 'editor' ? (
                         <UploadTripImage tripId={tripId} />

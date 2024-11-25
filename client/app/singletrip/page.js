@@ -24,6 +24,7 @@ import TripImageComponent from '../components/singletrip/TripImageComponent';
 import UploadTripImage from '../components/singletrip/UploadTripImage';
 import CurrencyToggleComponent from '../components/singletrip/CurrencyToggleComponent'
 import LoadingPageComponent from '../components/LoadingPageComponent';
+import NavBarComponent from '../components/singletrip/NavBarComponent';
 
 
 Chart.register(ArcElement, Tooltip, Legend);
@@ -50,6 +51,7 @@ function Singletrip() {
     const [selectedFilter, setSelectedFilter] = useState('');
     const [tripLocations, setTripLocations] = useState([]);
     const [expenseUSD, setExpenseUSD] = useState([]);
+    const [tripName, setTripName] = useState('');
 
     const [selectedCategory, setSelectedCategory] = useState('');
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
@@ -525,6 +527,7 @@ function Singletrip() {
     useEffect(() => {
         if (tripData) {
             convertBudget(tripData.data.budget);
+            setTripName(tripData.data.name);
         }
     }, [selectedToggleCurrency, tripData]);
 
@@ -545,6 +548,7 @@ function Singletrip() {
             <div className="main-container">
                 {tripData ? (
                     <div>
+                        <NavBarComponent tripId={tripId} userRole={userRole} tripName={tripName}/>
                         <div className='container'>
                             {/* Icon Bar Above Trip Info */}
                             <TripIconBarComponent
@@ -708,7 +712,8 @@ function Singletrip() {
                             <div className='row' style={{ justifyContent: 'center', alignItems: 'center', display: 'flex', textAlign: 'center' }}>
                                 {/* Expense Table */}
                                 <ExpenseTableComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expensesToDisplay={expensesToDisplay}
-                                    currencyCodes={currencyCodes} expenseCategories={expenseCategories} userRole={userRole} categoryData={categoryData} />
+                                    currencyCodes={currencyCodes} expenseCategories={expenseCategories} userRole={userRole} categoryData={categoryData} 
+                                    selectedCurrency={selectedCurrency} setSelectedCurrency={setSelectedCurrency} otherCurrencies={otherCurrencies} />
                             </div>
                             <br></br>
                             <br></br>

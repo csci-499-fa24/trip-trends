@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import HeaderComponent from '../components/HeaderComponent';
+import NavBarComponent from '../components/singletrip/NavBarComponent';
 import axios from 'axios';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -24,6 +25,9 @@ function TodoList() {
     const [tripId, setTripId] = useState(null);
     const [userId, setUserId] = useState(null);
     const [userName, setUserName] = useState("");
+    const [userRole, setUserRole] = useState(null);
+    const [tripName, setTripName] = useState('');
+    const isOwner = userRole === 'owner';
     const [checked, setChecked] = React.useState([]);
     const [purchaseList, setPurchaseList] = useState([]);
     const [sightseeingList, setSightseeingList] = useState([]);
@@ -235,9 +239,46 @@ function TodoList() {
                 });
         }
 
+        const fetchTripName = () => {
+            if (tripId) {
+                axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`)
+                    .then(response => {
+                        setTripName(`${response.data.data.name}`);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching trip data:', error);
+                    })
+            }
+          };
+
         getUserId();
         fetchUserName();
+        fetchTripName()
     }, []);
+
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            if (tripId && userId) {
+                try {
+                    const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/trips/${tripId}`);
+                    const sharedTrips = response.data.data;
+                    const userRole = sharedTrips.find(trip => trip.user_id === userId)?.role;
+                    if (userRole) {
+                        setUserRole(userRole);
+                    } else {
+                        console.log("User does not have a role for this trip.");
+                    }
+                } catch (error) {
+                    console.error('Error fetching user role:', error);
+                    // setError('Error fetching user role. Please try again later.');
+                }
+            } else {
+                console.log("tripId or userId is missing.");
+            }
+        };
+        fetchUserRole();
+    
+    }, [tripId]);
 
     // console.log("PLIST: ", purchaseList);
     // console.log("SLIST: ", sightseeingList);
@@ -249,16 +290,9 @@ function TodoList() {
                 setUserName={setUserName}
                 userId={userId}
             />
-            <div className="icon-div" onClick={() => window.location.href = `/singletrip?tripId=${tripId}`} tooltip="Back" tabIndex="0" style={{ display: 'flex', cursor: 'pointer', alignItems: 'center' }}>
-                <div className="icon-SVG">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6" style={{ width: '24px', height: '24px' }}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
-                    </svg>
-                    <span className="icon-text">Back</span>
-                </div>
-            </div>
+            <NavBarComponent tripId={tripId} userRole={userRole} tripName={tripName} pointerDisabled={true}/>
 
-            <div className='list-container'>
+            <div className='list-container' style ={{marginTop: '25px'}}>
                 <div className="row" style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <div className="col list-display" style={{ flex: 1 }}>
                         {/* Add Purchase Item */}
