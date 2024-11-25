@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { PlaidLink } from "react-plaid-link";
 import axios from "axios";
 import dayjs from "dayjs";
+import Fuse from "fuse.js";
 import LoadingPageComponent from "../LoadingPageComponent";
 import "../../css/plaid.css";
 
@@ -44,7 +45,6 @@ const PlaidLinkComponent = ({ onSuccess }) => {
 
             if (data.access_token) {
                 setAccessToken(data.access_token);
-                // fetch transactions using access token
                 await fetchTransactions(data.access_token);
             }
         } catch (err) {
@@ -64,7 +64,7 @@ const PlaidLinkComponent = ({ onSuccess }) => {
                             .subtract(90, "days")
                             .format("YYYY-MM-DD"),
                         end_date: dayjs().format("YYYY-MM-DD"),
-                        count: 100,
+                        count: 10,
                         offset: 0,
                     }
                 );
@@ -82,20 +82,81 @@ const PlaidLinkComponent = ({ onSuccess }) => {
         [onSuccess]
     );
 
+    const expenseCategories = [
+        "Flights",
+        "Accommodations",
+        "Food/Drink",
+        "Transport",
+        "Activities",
+        "Shopping",
+        "Phone/Internet",
+        "Health/Safety",
+        "Other" 
+    ];
+
     const saveTransactionsAsExpenses = async (transactions) => {
         try {
             for (let transaction of transactions) {
-                await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/`, {
-                    name: transaction.name,
-                    amount: transaction.amount,
-                    category: transaction.category.join(", "), 
-                    currency: transaction.iso_currency_code,
-                    posted: transaction.date,
-                });
+                const matchedCategory = transaction.category 
+                ? getMatchedCategory(transaction.category, expenseCategories)
+                : "Other";
+                const expenseData = {
+                    name: transaction.name?.trim() || "Untitled Transaction",
+                    amount: Math.abs(Number(transaction.amount) || 0),
+                    category: matchedCategory || "Other",
+                    currency: transaction.iso_currency_code || "USD",
+                    posted: transaction.date || dayjs().format("YYYY-MM-DD"),
+                    notes: transaction.merchant_name || 
+                           transaction.payment_channel || 
+                           "No additional notes",
+                    
+                };
+                if (expenseData.amount > 0) {
+                    try {
+                        const response = await axios.post(
+                            `${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/trips/-1`, 
+                            expenseData
+                        );
+    
+                        console.log("Expense saved:", {
+                            name: expenseData.name,
+                            amount: expenseData.amount,
+                            category: expenseData.category
+                        });
+                    } catch (postError) {
+                        console.error("Failed to save individual expense:", {
+                            transaction: expenseData,
+                            error: postError.response?.data || postError.message
+                        });
+                    }
+                }
             }
         } catch (err) {
-            console.error("Error saving transactions as expenses:", err);
+            console.error("Error processing transactions:", {
+                error: err.message,
+                stack: err.stack
+            });
         }
+    };
+
+    const getMatchedCategory = (transactionCategories, expenseCategories) => {
+        const options = {
+            includeScore: true,   
+            threshold: 0.3,       
+            keys: ["category"],  
+        };
+     
+        const fuse = new Fuse(expenseCategories, options);
+    
+        for (let category of transactionCategories) {
+            let matchedCategory = fuse.search(category);
+    
+            if (matchedCategory.length > 0) {
+                return matchedCategory[0].item; 
+            }
+        }
+    
+        return "Other";
     };
 
     const handleOnExit = (error, metadata) => {

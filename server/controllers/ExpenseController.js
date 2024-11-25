@@ -15,7 +15,7 @@ const createExpense = async (req, res) => {
         req.body;
     const existingExpense = await Expense.findOne({
         where: {
-            name, amount, category, currency, posted, notes
+            trip_id: tripId,name, amount, category, currency, posted, notes
         },
     });
     if (existingExpense) {
@@ -132,7 +132,7 @@ const getExpenses = async (req, res) => {
             error: err.message,
         });
     }
-};
+};  
 
 // GET specific expense data by expenseId
 const getExpenseById = async (req, res) => {
@@ -230,6 +230,32 @@ const updateExpense = async (req, res) => {
             image,
         });
         res.status(200).json({ data: updatedExpense });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            message: "Internal Server Error",
+            error: err.message,
+        });
+    }
+};
+
+// PATCH request to transfer expense data
+const transferExpense = async (req, res) => {
+    const expenseId = req.params.expenseId;
+    const { fromTripId, toTripId } = req.body;
+    if (!expenseId || !fromTripId || !toTripId) {
+        return res
+            .status(400)
+            .json({ error: "Missing required fields: fromTripId, toTripId" });
+    }
+    try {
+        // find expense by id
+        const expense = await Expense.findByPk(expenseId);
+        if (expense && expense.trip_id === fromTripId) {
+            expense.trip_id = toTripId;
+            await expense.save();
+            res.status(500).json({ message: 'Expense transferred successfully' });
+        }
     } catch (err) {
         console.error(err);
         res.status(500).json({
@@ -370,6 +396,7 @@ module.exports = {
     getReceiptImageByExpenseId,
     getExtractedReceiptData,
     updateExpense,
+    transferExpense,
     deleteExpense,
     createLinkToken,
     exchangePublicToken,

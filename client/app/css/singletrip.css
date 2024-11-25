@@ -999,3 +999,14 @@
     background-color: rgba(123, 117, 117, 0.123);
     border-color: rgba(0, 0, 0, 0.8); 
 }
+
+.expense-suggestions-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin: 20px auto;
+    overflow-y: auto;
+    height: 300px;
+    width: fit-content;
+}

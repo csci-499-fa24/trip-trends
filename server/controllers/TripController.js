@@ -11,6 +11,18 @@ const createTrip = async (req, res) => {
     const userId = req.params['userId'];
     const { name, start_date, end_date, budget } = req.body;
     try {
+        // const defaultTrip = await Trip.findOne({ where: { trip_id: -1 } });
+        // if (!defaultTrip) {
+        //     await Trip.create({
+        //         trip_id: -1,  
+        //         name: "Default Trip",
+        //         start_date: "2024-01-01", 
+        //         end_date: "2024-12-31",   
+        //         budget: 0                  
+        //     });
+        //     await SharedTrip.create({ user_id: userId, trip_id: -1 });
+        //     console.log("Default trip created with trip_id: -1");
+        // }
         // create new model isntance
         const newTrip = await Trip.create({ name, start_date, end_date, budget });
         // create relationship b/w user and trip
@@ -51,7 +63,9 @@ const getTripsByUserId = async (req, res) => {
         if (!sharedTrips || sharedTrips.length === 0) {
             return res.status(404).json({ message: "Trip not found" });
         }
-        const tripIds = sharedTrips.map(trip => trip.trip_id);
+        const tripIds = sharedTrips
+            .map(trip => trip.trip_id)
+            .filter(tripId => tripId !== -1);
         const trips = await Trip.findAll({ where: { trip_id: tripIds } });
         res.status(200).json({ data: trips });
     } catch (err) {

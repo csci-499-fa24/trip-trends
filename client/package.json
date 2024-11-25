@@ -25,6 +25,7 @@
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "delayed-stream": "^1.0.0",
+    "fuse.js": "^7.0.0",
     "heic2any": "^0.0.4",
     "jwt-decode": "^4.0.0",
     "leaflet": "^1.9.4",
