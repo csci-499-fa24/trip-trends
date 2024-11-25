@@ -116,11 +116,17 @@ const EditTripComponent = ({ tripId, tripData, tripLocations, userRole, homeCurr
                 .filter(({ location }) => !tripLocationsState.includes(location))
                 .map(({ index }) => index);
     
-            //Delete the images based on the specified position
-            console.log(deletedPositions);
-            for (const position of deletedPositions) {
-                await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/images/trips/${tripId}/${position}`);
-            }
+                deletedPositions.sort((a, b) => b - a);
+
+                console.log("Deleted positions in reverse order:", deletedPositions);
+                
+                for (const position of deletedPositions) {
+                    try {
+                        await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/images/trips/${tripId}/${position}`);
+                    } catch (error) {
+                        console.error(`Failed to delete image at position ${position}:`, error.message);
+                    }
+                }
     
             await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`, requestBody); //Update the trip data
             await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/update-locations`, requestLocations); //Update the location data
