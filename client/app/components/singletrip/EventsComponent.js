@@ -139,19 +139,23 @@ const EventComponent = ({ tripId }) => {
 
     const handleAddEvent = (event) => {
         console.log('Event added:', event);
-        if (!event.name) {
+
+        // Check if event name is present, else show an error toast
+        if (!event.name && !event.properties?.name_international?.en && !event.properties?.formatted) {
             toast.error("Event name is missing. Please provide a valid event.");
             setTimeout(() => {
             }, 500);
         } else {
+            // Determine if the name is for an event or sightseeing
             const newEvent = {
-                name: event.name,
+                name: event.name || event.properties?.name_international?.en || event.properties?.formatted || 'Unknown Name',
                 list_type: "sightseeing",
                 is_completed: false
             };
 
             console.log("ADDING EVENT: ", newEvent);
 
+            // Event body to send for adding the event
             const eventBody = {
                 name: newEvent.name,
                 list_type: "sightseeing",
@@ -173,6 +177,7 @@ const EventComponent = ({ tripId }) => {
                 });
         }
     };
+
 
     return (
         <div className="event-widget-container">
@@ -227,7 +232,7 @@ const EventComponent = ({ tripId }) => {
             </div>
 
             {/* Sightseeing Section */}
-            <div className="event-widget">
+            <div className="event-widget" style={{ marginTop: '5%' }}>
                 <h2 className="EvenHeader">Sightseeing</h2>
                 {sightseeingData.length === 0 ? (
                     <p>No sightseeing places found.</p>
@@ -235,16 +240,33 @@ const EventComponent = ({ tripId }) => {
                     <div className="event-container">
                         {sightseeingData.map((place, index) => (
                             <div key={`sightseeing-${index}`} className="event-card">
-                                 <button
+                                <button
                                     className="add-button"
                                     onClick={() => handleAddEvent(place)}
                                 >
                                     +
                                 </button>
                                 <div className="event-content">
-                                <h3 className="event-title">{place.properties.name_international?.en || place.properties.name || 'Unknown Place'}</h3>
-                                <p>{place.properties.formatted || 'No address available'}</p>
-                                    <p><strong>Category:</strong> {place.properties.category || 'Tourism'}</p>
+                                    <h3 className="event-title">{place.properties.name_international?.en || place.properties.name || 'Unknown Place'}</h3>
+                                    <p><strong>Address:</strong> {place.properties.formatted || 'No address available'}</p>
+                                    <br />
+                                    <p><strong>Description:</strong> {place.properties.description || 'Tourist Attraction'}</p>
+
+                                    {/* Conditionally render website link or "No URL" */}
+                                    <p>
+                                        {place.properties.website ? (
+                                            <a
+                                                href={place.properties.website}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="website-link"
+                                            >
+                                                Visit Official Website
+                                            </a>
+                                        ) : (
+                                            <span>No URL</span> // Display "No URL" if no website exists
+                                        )}
+                                    </p>
                                 </div>
                             </div>
                         ))}
