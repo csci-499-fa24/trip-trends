@@ -10,7 +10,6 @@
 }
 
 .dropdown-suggestions {
-
     background-color: white; /* Background for visibility */
     border: 1px solid #ccc; /* Border for separation */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Adds depth */
@@ -19,6 +18,7 @@
     z-index: 1000; /* Ensure it appears above other elements */
     width: 100%; /* Match the width of the input */
     display: block;
+    border-radius: 8px;
 }
 
 .dropdown-suggestion {
