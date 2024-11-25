@@ -1,10 +1,12 @@
-.event-widget-container {
-    display: flex;
+.event-widget-container,
+.sightseeing-container {
     justify-content: center;
     align-items: center;
     width: 100%;
     height: 100vh;
     background-color: #ffffff;
+    margin-top: 5%;
+    margin-left: 5%;
 }
 
 .event-widget {

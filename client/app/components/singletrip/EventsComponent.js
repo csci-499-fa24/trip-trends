@@ -11,6 +11,9 @@ const EventComponent = ({ tripId }) => {
     const [locationsData, setLocationsData] = useState([]);
     const [tripData, setTripData] = useState([]);
     const [eventsData, setEventsData] = useState([]);
+    const [sightseeingData, setSightseeingData] = useState([]);
+    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(false);
 
 
     useEffect(() => {
@@ -33,6 +36,7 @@ const EventComponent = ({ tripId }) => {
                 const { start_date, end_date } = tripData.data;
 
                 getEvents(latitude, longitude, start_date, end_date);
+                getSightseeing(latitude, longitude);
             });
         } else {
             console.log("Problem with locationsData:", locationsData);
@@ -102,6 +106,36 @@ const EventComponent = ({ tripId }) => {
                 console.log(error);
             });
     };
+
+    async function getSightseeing(latitude, longitude) {
+        const API_KEY = `${process.env.NEXT_PUBLIC_SIGHTSEEING_API_KEY}`;
+        const baseURL = 'https://api.geoapify.com/v2/places';
+
+        const params = {
+            categories: 'tourism.sights,building.tourism',
+            filter: `circle:${longitude},${latitude},10000`,
+            bias: `proximity:${longitude},${latitude}`,
+            limit: 100,
+            apiKey: API_KEY,
+        };
+
+        try {
+            setLoading(true); // Set loading state
+            const response = await axios.get(baseURL, { params });
+            console.log('API Response:', response.data.features);
+            setSightseeingData((prevData) => [
+                ...prevData,
+                ...response.data.features || []
+            ]);
+            setError(null); // Clear any previous error
+        } catch (error) {
+            console.error('Error fetching tourist places:', error.message);
+            setError(error.message); // Save error message in state
+        } finally {
+            setLoading(false); // End loading state
+        }
+    }
+
 
     const handleAddEvent = (event) => {
         console.log('Event added:', event);
@@ -190,6 +224,32 @@ const EventComponent = ({ tripId }) => {
                         <p className="no-events">No Events Found</p>
                     )}
                 </div>
+            </div>
+
+            {/* Sightseeing Section */}
+            <div className="event-widget">
+                <h2 className="EvenHeader">Sightseeing</h2>
+                {sightseeingData.length === 0 ? (
+                    <p>No sightseeing places found.</p>
+                ) : (
+                    <div className="event-container">
+                        {sightseeingData.map((place, index) => (
+                            <div key={`sightseeing-${index}`} className="event-card">
+                                 <button
+                                    className="add-button"
+                                    onClick={() => handleAddEvent(place)}
+                                >
+                                    +
+                                </button>
+                                <div className="event-content">
+                                <h3 className="event-title">{place.properties.name_international?.en || place.properties.name || 'Unknown Place'}</h3>
+                                <p>{place.properties.formatted || 'No address available'}</p>
+                                    <p><strong>Category:</strong> {place.properties.category || 'Tourism'}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
 
