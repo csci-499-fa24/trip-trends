@@ -4,6 +4,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    align-content: center;
     text-align: center;
     min-height: 200px;
     overflow: 'hidden';

@@ -545,6 +545,7 @@ function Singletrip() {
                                 toggleChange={handleCurrencyToggleChange} />
                             {/* General Trip Info*/}
                             <GeneralTripInfoComponent 
+                                userId={userId}
                                 tripData={tripData} // handles budget currency
                                 convertedBudget={convertedBudget}
                                 tripId={tripId} 

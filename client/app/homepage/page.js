@@ -13,6 +13,7 @@ import MapComponent from '../components/homepage/MapComponent';
 import RecentTripsComponent from '../components/homepage/RecentTripsComponent';
 import TripsDisplayComponent from '../components/homepage/TripsDisplayComponent';
 import LoadingPageComponent from '../components/LoadingPageComponent';
+import PlaidButtonComponent from '../components/homepage/PlaidButtonComponent';
 
 const googleID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
@@ -205,7 +206,8 @@ function homepage() {
                             ) :
                             (
                                 <h1 style={{ textAlign: "center" }}>Welcome!</h1>
-                            )}
+                        )}
+                        <PlaidButtonComponent />
                         <p style={{marginLeft: '-15px'}}>See where you've been:</p>
                     </div>
 
