@@ -1046,14 +1046,6 @@
         width: 100% !important;
     }
 
-    /* .new-expense-title {
-        font-size: 24px;
-        color: black;
-        text-align: center;
-        font-weight: bold;
-        margin-bottom: 0px;
-    } */
-
     /* Trip page: Edit expense fom sizing */
     .edit-expense-modal-content{
         max-width: 100% !important;
@@ -1150,4 +1142,11 @@
         margin-top: 10px; 
         width: 100%;
     }  
+}
+
+@media(max-width: 600px){
+    /* Trip page: Edit expense fomm edit btn */
+    .submit-edit-expense-button {
+        width: 70%;
+    }
 }

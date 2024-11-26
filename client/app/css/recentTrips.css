@@ -73,3 +73,31 @@
         width: 350px; 
     } 
 }
+
+@media(min-width: 601px) and (max-width: 768px){
+    /* Home pg: Recent trips title postion */
+    .recent-trips-container {
+        float: left;
+        margin-top: 20%;
+        margin-left: -50%;
+    }
+
+    /* Home pg: Recent trips cards size */
+    .trip-card {
+        width: 400px; 
+    }
+}
+
+@media(min-width: 769px) and (max-width: 992px){
+    /* Home pg: Recent trips title postion */
+    .recent-trips-container {
+        float: left;
+        margin-top: 20%;
+        margin-left: -40%;
+    }
+
+    /* Home pg: Recent trips cards size */
+    .trip-card {
+        width: 400px; 
+    }
+}

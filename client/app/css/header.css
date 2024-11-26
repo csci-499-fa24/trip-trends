@@ -9,7 +9,6 @@
     justify-content: center;
     align-items: center;
     z-index: 1000; /* Ensure modal is on top */
-    transition: all 0.3s ease;
 }
 
 .modal-content {
@@ -25,6 +24,7 @@
     margin: 10px;
     width: 100%;
     text-align: center;
+    /* transition: all 0.3s ease; */
 }
 
 .currency-title{
@@ -59,6 +59,34 @@
 @media(max-width: 600px){
     /* Trip form: all form size. */
     .modal-content {
-        max-width: 90% !important;
+        max-width: 80% !important;
+    }
+}
+
+@media(min-width: 601px){
+    /* Trip form: all form size. */
+    .modal-content {
+        max-width: 70% !important;
+    }
+}
+
+@media(min-width: 768px){
+    /* Trip form: all form size. */
+    .modal-content {
+        max-width: 60% !important;
+    }
+}
+
+@media(min-width: 992px){
+    /* Trip form: all form size. */
+    .modal-content {
+        max-width: 50% !important;
+    }
+}
+
+@media(min-width: 1200px){
+    /* Trip form: all form size. */
+    .modal-content {
+        max-width: 40% !important;
     }
 }

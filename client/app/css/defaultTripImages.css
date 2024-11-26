@@ -54,3 +54,11 @@
         padding: 0 22%;
     }
 }
+
+
+@media (max-width: 430px) {
+    /* Trip pg: image size */
+    .image-wrapper {
+        padding: 0 25%;
+    }
+}

@@ -281,7 +281,6 @@
 
 
 @media (max-width: 600px) {
-    
     /* seperates map and recent trips to different rows*/
     .responsive-container {
       flex-direction: column;
@@ -309,12 +308,11 @@
     }
 }
 
-
-@media (max-width: 600px) {
+@media (min-width: 601px) and (max-width:768px) {
     /* seperates map and recent trips to different rows*/
     .responsive-container {
       flex-direction: column;
-      align-items: flex-start;
+      align-items: center;
     }
   
     .responsive-container > div {
@@ -329,11 +327,30 @@
 
     /* New Trip form size */
     .homepage-modal-content {
-        max-width: 90% !important;
-    }
-
-    /* Trip pg: top icon bar size */
-    .icon-div  {
-        width: -10%;
+        max-width: 80% !important;
     }
 }
+
+@media (min-width: 769px) and (max-width:992px) {
+    /* seperates map and recent trips to different rows*/
+    .responsive-container {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .responsive-container > div {
+        width: 100%;
+        margin: 0;
+    }
+    
+    /* adding space between welcome and see trips message */
+    .welcome-section h1 {
+        margin-bottom: 20px;
+    }
+
+    /* New Trip form size */
+    .homepage-modal-content {
+        max-width: 60% !important;
+    }
+}
+
