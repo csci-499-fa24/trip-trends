@@ -310,7 +310,7 @@ describe('Expense Controller', () => {
 
         mockRequest.body = updatedData;
 
-        Expense.findByPk.mockResolvedValue({ update: jest.fn().mockResolvedValue(updatedExpense) });
+        Expense.findByPk.mockResolvedValue({ expense_id: mockExpenseId, update: jest.fn().mockResolvedValue(updatedExpense) });
 
         await updateExpense(mockRequest, mockResponse);
 
