@@ -6,9 +6,10 @@ import DefaultTripImagesComponent from '../singletrip/DefaultTripImagesComponent
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import currencySymbolMap from 'currency-symbol-map';
+import axios from 'axios';
 import '../../css/singletrip.css';
 
-const GeneralTripInfoComponent = ({ tripData, convertedBudget, tripId, tripLocations, expenses, totalExpenses, currency }) => {
+const GeneralTripInfoComponent = ({ userId, tripData, convertedBudget, tripId, tripLocations, expenses, totalExpenses, currency }) => {
     const [totalExpensesByDate, setTotalExpensesByDate] = useState({});
     const [selectedDate, setSelectedDate] = useState(null);
     const [showExpenseBox, setShowExpenseBox] = useState(false);
@@ -18,6 +19,32 @@ const GeneralTripInfoComponent = ({ tripData, convertedBudget, tripId, tripLocat
     const currencySymbol = currencySymbolMap(currency);
     const exceedsBudget = totalExpenses > convertedBudget;
     // console.log(convertedBudget);
+    // console.log(tripId);
+
+    useEffect(() => {
+        const fetchFavoriteStatus = async () => {
+            try {
+                const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/trips/${tripId}`);
+                // console.log(response.data); 
+                if (response.data && Array.isArray(response.data)) {
+                    const user = response.data.find((user) => user.user_id === userId);
+                    
+                    if (user) {
+                        setIsFavorited(user.favorite);  
+                    } else {
+                        console.log(`Trip with ID ${tripId} not found`);
+                    }
+                } else {
+                    console.log("No trips found for the user");
+                }
+            } catch (error) {
+                console.error("Error fetching favorite status:", error);
+            }
+        };
+
+        fetchFavoriteStatus();
+    }, [userId, tripId]);
+    // console.log(isFavorited);
 
     const DateComponent = ({ dateStr, showYear }) => {
         const [year, month, day] = dateStr.split('-');
@@ -126,7 +153,7 @@ const GeneralTripInfoComponent = ({ tripData, convertedBudget, tripId, tripLocat
         <div>
             <br />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
-                <h2 style={{ marginRight: '10px', marginTop: '40px' }}>Trip Info</h2>
+                <h2 className='trip-info-title' style={{ marginRight: '10px', marginTop: '40px' }}>Trip Info</h2>
                 {/* Favorite Star Icon */}
                 <div
                     className="favorite-icon"
@@ -154,7 +181,7 @@ const GeneralTripInfoComponent = ({ tripData, convertedBudget, tripId, tripLocat
                 </div>
 
                 <div className="trip-overview-div">
-                    <div className="trip-overview-circle" style={{ marginLeft: '-30px' }}>💰</div>
+                    <div className="trip-overview-bag" style={{ marginLeft: '-30px' }}>💰</div>
                     <div className="trip-overview-content">
                         <p style={{ marginLeft: '-30px' }}>{currencySymbol}{convertedBudget}</p>
                     </div>

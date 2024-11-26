@@ -4,7 +4,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: height;
+    align-content: center;
     text-align: center;
     /* background-color: #f0f0f0; */
     background-color: transparent;
@@ -33,7 +33,7 @@
     100% { transform: rotate(360deg); }
   }
   
-  p {
+  .loading-text {
     font-size: 18px;
     color: var(--lightgreen);
   }

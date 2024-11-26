@@ -5,16 +5,25 @@ import dayjs from 'dayjs';
 import currencySymbolMap from 'currency-symbol-map';
 import LoadingPageComponent from '../LoadingPageComponent';
 import { load } from 'ol/Image';
-
+import "../../css/barChart.css";
 
 const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData, currency }) => {
     const [loading, setLoading] = React.useState(true);
-    const [empty, setEmpty] = React.useState(false);
+    const [loadingTimedOut, setLoadingTimedOut] = useState(false);
+
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            if (loading) {
+                setLoadingTimedOut(true); 
+            }
+        }, 5000); // 5 seconds
+
+        return () => clearTimeout(timeoutId);
+    }, [loading]);
 
     useEffect(() => {
         if (categoryData.datasets.length == 0) {
             setLoading(false);
-            setEmpty(true);
         }
         if (expensesToDisplay && categoryData && categoryData.datasets.length > 0) {
             setLoading(false); 
@@ -102,23 +111,44 @@ const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData, currency
         };
     });
     
-    if (loading) {
+    const chartColors = categoryData?.datasets?.[0]?.backgroundColor || ['#000'];
+
+    if (loading && !loadingTimedOut) {
         return <LoadingPageComponent />;
     }
 
-    if (empty) {
-        return <p>No expense data available to display.</p>
+    if (loadingTimedOut && (expensesToDisplay?.length === 0 || !categoryData?.datasets?.length)) {
+        return (
+            <div>
+                <p id="budgetTitle">Daily Expenses by Category</p>
+                <p>No expense data available to display.</p>
+            </div>
+        );
     }
 
     return (
-        <div>
+        <div className="bar-chart-container">
             <h3 style={{ textAlign: "center" }}>Daily Expenses by Category</h3>
             <BarChart
                 xAxis={[{ scaleType: 'band', data: Array.from(allExpenseDates).sort() }]}
                 series={series}
-                width={1050}
+                // minWidth={1000}
                 height={300}
-                colors={categoryData.datasets[0].backgroundColor}
+                colors={chartColors}
+                slotProps={{
+                    legend: {
+                        label: {
+                            style: {
+                                fontSize: '10px',
+                                fontWeight: 'normal',
+                            }
+                        }
+                    }
+                }}
+                style={{
+                    maxWidth: '100%', 
+                    display: 'block',
+                }}
             />
         </div>
     );

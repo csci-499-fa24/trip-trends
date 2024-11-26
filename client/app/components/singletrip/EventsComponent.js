@@ -182,7 +182,7 @@ const EventComponent = ({ tripId }) => {
     return (
         <div className="event-widget-container">
             <div className="event-widget">
-                <h2 className="EvenHeader">Events</h2>
+                <h2 className="section-title">Events</h2>
                 <div className="event-container">
                     {eventsData.length > 0 ? (
                         eventsData.map((event, index) => (

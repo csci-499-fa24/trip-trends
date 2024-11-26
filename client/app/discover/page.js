@@ -7,6 +7,7 @@ import '../css/discover.css';
 import axios from 'axios';
 
 import EventsComponent from '../components/singletrip/EventsComponent';
+import FlightsComponent from '../components/singletrip/FlightsComponent';
 import NavBarComponent from '../components/singletrip/NavBarComponent';
 
 function DiscoverPage() {
@@ -96,6 +97,7 @@ function DiscoverPage() {
         userId={userId}
       />
       <NavBarComponent tripId={tripId} userRole={userRole} tripName={tripName} pointerDisabled={true}/>
+      <FlightsComponent tripId={tripId}/>
       <EventsComponent tripId={tripId}/>
     </div>
   );

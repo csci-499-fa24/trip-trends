@@ -305,16 +305,33 @@ describe('Expense Controller', () => {
     it('should update expense and return 200 status', async () => {
         const mockExpenseId = '4567';
         mockRequest.params = { expenseId: mockExpenseId };
-        const updatedData = { name: 'Another Flight', amount: 350 };
+        const updatedData = { 
+            name: 'Another Flight', 
+            amount: 350, 
+            category: 'Travel', 
+            currency: 'USD', 
+            posted: '2023-01-01',
+            notes: 'Test flight',
+            tripId: 'trip123' 
+        };
         const updatedExpense = { expense_id: mockExpenseId, ...updatedData };
 
         mockRequest.body = updatedData;
 
-        Expense.findByPk.mockResolvedValue({ update: jest.fn().mockResolvedValue(updatedExpense) });
+        const mockExpenseInstance = {
+            update: jest.fn().mockResolvedValue(updatedExpense)
+        };
+    
+        Expense.findByPk = jest.fn().mockResolvedValue(mockExpenseInstance);
 
         await updateExpense(mockRequest, mockResponse);
 
         expect(Expense.findByPk).toHaveBeenCalledWith(mockExpenseId);
+        expect(mockExpenseInstance.update).toHaveBeenCalledWith(expect.objectContaining({
+            name: 'Another Flight',
+            amount: 350,
+            category: 'Travel'
+        }));
         expect(mockResponse.status).toHaveBeenCalledWith(200);
         expect(mockResponse.json).toHaveBeenCalledWith({ data: updatedExpense });
     });
