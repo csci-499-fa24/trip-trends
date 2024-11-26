@@ -15,7 +15,7 @@ const FlightsComponent = ({ tripId }) => {
     const [returnDate, setReturnDate] = useState('');
     const [flights, setFlights] = useState([]);
     const [isLoading, setLoading] = useState(false);
-    const [budgetOption, setBudgetOption] = useState('$'); // Budget option
+    const [budgetOption, setBudgetOption] = useState('$');
     const [sortOption, setSortOption] = useState('PRICE');
     const [classOfServiceOption, setClassOfServiceOption] = useState('ECONOMY'); 
 
