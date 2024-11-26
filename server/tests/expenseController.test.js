@@ -189,8 +189,10 @@ describe('Expense Controller', () => {
         // Call the getExpensesByTripId function
         await getExpensesByTripId(mockRequest, mockResponse);
     
-        // Check that Expense.findAll was called with the correct trip_id
-        expect(Expense.findAll).toHaveBeenCalledWith({ where: { trip_id: mockTripId } });
+        expect(Expense.findAll).toHaveBeenCalledWith({
+            where: { trip_id: mockTripId },
+            attributes: { exclude: ['image'] } // Include the exclusion of the 'image' attribute
+        });
     
         // Check that the status 200 was returned
         expect(mockResponse.status).toHaveBeenCalledWith(200);

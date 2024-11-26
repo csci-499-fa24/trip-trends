@@ -5,9 +5,10 @@ import '../../css/ExpenseTableComponent.css';
 import currencySymbolMap from 'currency-symbol-map';
 import LoadingPageComponent from '../LoadingPageComponent';
 
-const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisplay, currencyCodes, expenseCategories, categoryData }) => {
+const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisplay, currencyCodes, expenseCategories, categoryData, selectedCurrency, setSelectedCurrency, otherCurrencies}) => {
     const [isEditPopupVisible, setEditPopupVisible] = useState(false);
     const [selectedExpense, setSelectedExpense] = useState(null);
+    const [localFormCurrency, setLocalFormCurrency] = useState(selectedCurrency);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -27,8 +28,25 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
         }));
     };
 
+    const handleCurrencyChange = (e) => {
+        setLocalFormCurrency(e.target.value);
+    };
+
+    const handleEditClick = (expense) => {
+        setEditPopupVisible(true);
+        setSelectedExpense(expense);
+        setLocalFormCurrency(expense.currency);
+    };
+
     const submitEditExpense = async (expenseID) => {
-        axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/${expenseID}`, selectedExpense)
+        const updatedExpense = { ...selectedExpense, currency: localFormCurrency };
+
+        // update global currency if it is different
+        if (selectedExpense.currency !== localFormCurrency) {
+            // update global currency
+            setSelectedCurrency(localFormCurrency);
+        }
+        axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/${expenseID}`, updatedExpense)
             .then(response => {
                 console.log(response)
                 window.location.reload();
@@ -104,11 +122,13 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                                 {expensesToDisplay.map((expense) => {
                                     const categoryIndex = categoryData.labels.indexOf(expense.category);
                                     const tagColor = categoryData.datasets[0].backgroundColor[categoryIndex];
-                                    const currencySymbol = currencySymbolMap(expense.currency);
                                     return (
                                         <tr key={expense.expense_id}>
                                             <td>{expense.name}</td>
-                                            <td>{currencySymbol}{expense.amount}</td>
+                                            <td>
+                                                {currencySymbolMap(expense.currency)}
+                                                {expense.amount}
+                                            </td>
                                             <td>{expense.currency}</td>
                                             <td>
                                                 {/* Category with color tag */}
@@ -133,10 +153,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                                                 <div className="icon-div" tooltip="Edit Trip" tabIndex="0">
                                                     <div className="icon-SVG">
                                                         <svg
-                                                            onClick={() => {
-                                                                setEditPopupVisible(true);
-                                                                setSelectedExpense(expense);
-                                                            }}
+                                                            onClick={() => handleEditClick(expense)}
                                                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.3" stroke="currentColor" className="size-6">
                                                             <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                                                         </svg>
@@ -145,8 +162,8 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                                                 </div>
                                                 <div className="expense-form">
                                                     {isEditPopupVisible && selectedExpense && (
-                                                        <div className="modal">
-                                                            <div className="modal-content">
+                                                        <div className="edit-expense-modal">
+                                                            <div className="edit-expense-modal-content">
                                                                 <span className="close" onClick={() => setEditPopupVisible(false)}>&times;</span>
                                                                 <h2 className="edit-expense-title">Edit or Delete Expense</h2>
                                                                 <form onSubmit={(e) => {
@@ -184,28 +201,57 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                                                                                 style={{
                                                                                     position: 'absolute',
                                                                                     left: '43px',
-                                                                                    top: '41%',
+                                                                                    top: '40%',
                                                                                     transform: 'translateY(-50%)',
                                                                                     pointerEvents: 'none',
                                                                                 }}
                                                                             >
-                                                                                {currencySymbol}
+                                                                                {currencySymbolMap(localFormCurrency)}
                                                                             </span>
                                                                         </label>
                                                                         <label className="edit-expense-field-label">
                                                                             Currency:
                                                                             <select
                                                                                 name="currency"
-                                                                                value={selectedExpense.currency}
-                                                                                onChange={handleEditChange}
+                                                                                value={localFormCurrency}
+                                                                                onChange={handleCurrencyChange}
                                                                                 required
                                                                             >
-                                                                                <option value="">Select Currency</option>
-                                                                                {currencyCodes.map((code) => (
-                                                                                    <option key={code} value={code}>{code}</option>
-                                                                                ))}
+                                                                                <option value="" disabled>Select Currency</option>
+
+                                                                                {/* Display the selected currency at the top if it exists */}
+                                                                                {localFormCurrency && (
+                                                                                    <option value={localFormCurrency}>{localFormCurrency}</option>
+                                                                                )}
+
+                                                                                {/* Recommended currencies */}
+                                                                                {otherCurrencies
+                                                                                    .filter((code) => code !== localFormCurrency)
+                                                                                    .map((code, index) => (
+                                                                                        <option key={`other-${index}`} value={code}>
+                                                                                            {code}
+                                                                                        </option>
+                                                                                    ))}
+
+                                                                                {/* USD as a fallback option */}
+                                                                                <optgroup label="Other">
+                                                                                    <option value="USD">USD</option>
+                                                                                    {currencyCodes
+                                                                                        .filter(
+                                                                                            (code) =>
+                                                                                                code !== localFormCurrency &&
+                                                                                                code !== "USD" &&
+                                                                                                !otherCurrencies.includes(code)
+                                                                                        )
+                                                                                        .map((code) => (
+                                                                                            <option key={code} value={code}>
+                                                                                                {code}
+                                                                                            </option>
+                                                                                        ))}
+                                                                                </optgroup>
                                                                             </select>
                                                                         </label>
+
                                                                     </div>
                                                                     <div className="field-pair">
                                                                         <label className="edit-expense-field-label">

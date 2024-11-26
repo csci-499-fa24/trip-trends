@@ -146,15 +146,46 @@
 }
 
 .submit-new-expense-button {
-    padding: 8px;
+    /* padding: 8px;
+    width: 40%; */
+    padding: 15px 30px; 
     background-color:var(--lightgreen);
     color: white;
     border: none;
-    width: 40%;
+    width: fit-content;
     border-radius: 10px;
-    font-size: 15px;
+    font-size: 15px; 
     cursor: pointer;
     align-self: center;
+}
+
+.edit-expense-modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(0.4px);
+}
+
+.edit-expense-modal-content{
+    position: relative; 
+    max-width: 40% !important;
+    max-height: 80vh;
+    width: 90%;
+    background-color: white;
+    color: black;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(159, 154, 154, 0.1);
+    overflow-x: auto;
+    overflow-y: auto;
+    margin: 10px;
+    text-align: center;
 }
 
 .edit-expense-title {
@@ -199,30 +230,30 @@
     flex: 1;
 }
 
-.field-pair label {
-    flex: 1;
-}
-
 .submit-edit-expense-button {
-    padding: 8px;
-    background-color: var(--lightgreen);
+    /* padding: 8px;
+    width: 90%; */
+    padding: 15px 30px; 
+    background-color:var(--lightgreen);
     color: white;
     border: none;
-    width: 90%;
+    width: 50%;
     border-radius: 10px;
-    font-size: 15px;
+    font-size: 15px; 
     cursor: pointer;
     align-self: center;
 }
 
 .delete-expense-button {
-    padding: 8px;
+    /* padding: 8px;
+    width: 90%; */
+    padding: 15px 30px; 
     background-color: #8B0000;
     color: white;
     border: none;
-    width: 90%;
+    width: 50%;
     border-radius: 10px;
-    font-size: 15px;
+    font-size: 15px; 
     cursor: pointer;
     align-self: center;
 }
@@ -614,10 +645,10 @@
     justify-content: space-between;
     align-items: center;
     display: flex;
-    align-items: center;
     padding: 20px; /* Adjust spacing as needed */
     background-color: white; /* Optional background color */
     margin: 0 auto; /* Center the icon bar */
+    position: relative;
 }
 
 
@@ -742,6 +773,20 @@
     margin-bottom: 10px;
 }
 
+.trip-overview-bag{
+    width: 50px;
+    height: 50px;
+    background-color: rgb(214, 213, 213);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 10px; 
+    margin-top: 0px; 
+}
+
 #trip-locations-circle {
     width: 50px;
     height: 50px;
@@ -777,6 +822,14 @@
 
 .gallery-icon .icon-text {
     background-color: green;
+}
+
+.todo-icon:hover {
+    color: rgb(60, 60, 247);
+}
+
+.todo-icon .icon-text {
+    background-color: rgb(60, 60, 247);
 }
 
 .exchange-table-dropdown input,
@@ -984,4 +1037,116 @@
 .favorite-icon:hover {
     background-color: rgba(123, 117, 117, 0.123);
     border-color: rgba(0, 0, 0, 0.8); 
+}
+
+
+@media(max-width: 600px){
+    /* Homepage: map size */
+    [style*="height: 537px"][style*="width: 85%"] {
+        width: 100% !important;
+    }
+
+    /* Trip page: Edit expense fom sizing */
+    .edit-expense-modal-content{
+        max-width: 100% !important;
+        max-height: 100%;
+    }
+
+    /* Trip page: Edit expense fomm edit btn */
+    .submit-edit-expense-button {
+        width: 60%;
+    }
+
+    /* Trip page: Edit expense fomm delete btn */
+    .delete-expense-button {
+        width: 60%;
+        padding: 10%;
+    }
+
+    /* Trip page: expense table filter pop up size*/
+    .applied-filter {
+        white-space: wrap;
+    }
+
+    /* Trip page: expense table filter pop up x position */
+    .clear-filter-btn {
+        margin: -20px;
+    }
+    
+    /* Trip pg: Exchange rate sizing and spacing */
+    .exchange-rates-container {
+        width: 90%;
+        margin-bottom: 5%;
+        margin-top: 0%;
+    }
+
+    /* Trip pg: Top Icon bar position*/
+    .top-icon-bar-header {
+       margin-left: -7%;
+       margin-top: 5%;
+    }
+
+    /* Trip pg: Trip info title positon */
+    .trip-info-title{
+        padding-top: 5%;
+    }
+
+    /* Trip pg: overwiew size */
+    .trip-overview {
+        width: 102%;
+    }
+
+    /* Trip pg: overwiew item sizing */
+    .trip-overview-div {
+        min-width: 120px;
+    }
+
+    /* Trip pg: overwiew item buget positoning */
+    .trip-overview-bag{
+        margin-top: -45%;
+    }
+    
+    /* Trip pg: overwiew items location and discover positoning */
+    #trip-locations-circle {
+        margin-top: -45%;
+        margin-left: -10%;
+    }
+
+    /* Trip pg: favorite icon positon */
+    .favorite-icon {
+        margin-top: 12%;
+    }
+
+    /* Trip pg: Spending circles position */
+    .spending-circles-container {
+        flex-direction: column; 
+        gap: 50px;
+    }
+
+    /* Trip page: expense table icon bar size*/
+    .icon-bar-header {
+        width: 100%; 
+        padding: 0px; 
+    }
+
+    /* Trip page: expense table icon bar gap*/
+    .icon-bar-left,
+    .icon-bar-right {
+        gap: 0px;
+    }
+
+     /* Trip page: expense table icon bar title*/
+    .icon-bar-center {
+        position: static; 
+        transform: none; 
+        margin-top: 10px; 
+        width: 100%;
+    }  
+}
+
+@media(max-width: 600px){
+    /* Trip page: Edit expense fomm edit btn */
+    .submit-edit-expense-button {
+        width: 70%;
+    }
 }

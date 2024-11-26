@@ -4,7 +4,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5); /* Dimmed background */
+    backdrop-filter: blur(2px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -24,6 +24,7 @@
     margin: 10px;
     width: 100%;
     text-align: center;
+    /* transition: all 0.3s ease; */
 }
 
 .currency-title{
@@ -53,4 +54,39 @@
 
 .field-label select:focus {
     border-color: var(--lightgreen);
+}
+
+@media(max-width: 600px){
+    /* Trip form: all form size. */
+    .modal-content {
+        max-width: 80% !important;
+    }
+}
+
+@media(min-width: 601px){
+    /* Trip form: all form size. */
+    .modal-content {
+        max-width: 70% !important;
+    }
+}
+
+@media(min-width: 768px){
+    /* Trip form: all form size. */
+    .modal-content {
+        max-width: 60% !important;
+    }
+}
+
+@media(min-width: 992px){
+    /* Trip form: all form size. */
+    .modal-content {
+        max-width: 50% !important;
+    }
+}
+
+@media(min-width: 1200px){
+    /* Trip form: all form size. */
+    .modal-content {
+        max-width: 40% !important;
+    }
 }

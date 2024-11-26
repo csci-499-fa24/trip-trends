@@ -10,14 +10,14 @@
 }
 
 .dropdown-button:hover {
-    background-color: #7cb37b;
+    background-color: var(--lightergreen);
     color: white;
     box-shadow: none;
 }
 
 .dropdown-button:active,
 .dropdown-button:focus {
-    background-color: #7cb37b;
+    background-color: var(--lightergreen);
     color: white;
     box-shadow: none;
 }
@@ -32,7 +32,7 @@
 }
 
 .dropdown-item:hover {
-    background-color: #7cb37b !important;
+    background-color: var(--lightergreen) !important;
     color: black !important;
 }
 

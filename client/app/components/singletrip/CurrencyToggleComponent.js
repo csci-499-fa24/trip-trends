@@ -1,6 +1,7 @@
 // CurrencyToggle
 import React, { useState, useEffect } from "react";
 import Switch from "react-switch";
+import "../../css/navbar.css";
 
 const CurrencyToggleComponent = ({ homeCurrency, otherCurrencies, toggleChange }) => {
   const [selectedToggleCurrency, setSelectedToggleCurrency] = useState("");

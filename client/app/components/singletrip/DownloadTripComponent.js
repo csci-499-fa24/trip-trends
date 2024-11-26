@@ -21,6 +21,7 @@ const DownloadTripComponent = ({ tripData, tripId }) => {
             if (contentDisposition && contentDisposition.includes('filename=')) {
                 const filenamePart = contentDisposition.split('filename=')[1];
                 filename = filenamePart.replace(/"/g, ''); // Clean up the filename
+                filename = filename.replace(/[^a-zA-Z0-9.]/g, '');
             }
 
             // Create a blob from the file data

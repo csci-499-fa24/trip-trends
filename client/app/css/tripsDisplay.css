@@ -25,23 +25,6 @@
     text-align: left;
 }
 
-.trips-display-image-wrapper {
-    width: 100%;
-    height: 120px;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 10px; 
-}
-
-.trips-display-image-wrapper img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
 .favorite-icon {
     cursor: pointer;
     position: absolute;
@@ -91,4 +74,25 @@
 .search-input:focus {
     background-color: rgba(255, 255, 255, 0.4);
     border-color: rgba(0, 0, 0, 0.3);
+}
+
+@media(max-width: 600px){
+    /* Homepg: trip cards position */
+    .trips-display-card {
+       margin-left: 10%;
+    }
+}
+
+@media(max-width: 430px){
+    /* Homepg: trip cards position */
+    .trips-display {
+        font-size: small;
+        margin: 0px;
+    }
+
+    /* Homepg: search bar position */
+    .search-bar {
+        margin-top: 0px;
+        margin-bottom: 30px;
+    }    
 }
