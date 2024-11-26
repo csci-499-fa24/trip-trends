@@ -1,0 +1,12 @@
+@media (max-width: 600px) {
+    /* Trip pg: bar chat size */
+    .bar-chart-container {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .bar-chart-container canvas {
+        width: 100% !important;
+        height: auto !important;
+    }
+}
