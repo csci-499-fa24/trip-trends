@@ -71,3 +71,24 @@
     font-size: 14px; 
     font-weight: bold;
 }
+
+@media (max-width: 600px) {
+    /* Trip pg: shared user icon position */
+    .whole_container{
+        top: 137px;
+        right: 4%;
+    }
+
+    /* Trip pg: shared user icon and text spacing */
+    .shared-with-message {
+        margin-bottom: 0px;
+    }
+
+    /* Trip pg: shared user icon size */
+    .shared-user {       
+        width: 35px;                  
+        height: 35px;                         
+    }
+}
+
+

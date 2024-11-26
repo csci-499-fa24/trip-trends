@@ -334,6 +334,6 @@
 
     /* Trip pg: top icon bar size */
     .icon-div  {
-        width: 0%;
+        width: -10%;
     }
 }

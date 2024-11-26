@@ -57,9 +57,8 @@
 }
 
 @media(max-width: 600px){
-    /* Home Currency form size & position*/
-    .modal-overlay {
-        margin-left: -10%;
-        width: 120%;
+    /* Trip form: all form size. */
+    .modal-content {
+        max-width: 90% !important;
     }
 }

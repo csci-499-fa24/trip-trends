@@ -47,3 +47,10 @@
     background-color: white;
     border-radius: 8px;
 }
+
+@media (max-width: 600px) {
+    /* Trip pg: image size */
+    .image-wrapper {
+        padding: 0 22%;
+    }
+}

@@ -34,3 +34,30 @@
 .expense-table td:nth-child(7) {
     text-align: center;
 }
+
+@media (max-width: 600px) {
+    /* Trip pg: expense table size */
+    .expense-table-container {
+        width: 100%;
+    }
+
+    /* Trip pg: expense table col title size */
+    .expense-table th {
+        font-size: 14px;
+    }
+
+    /* Trip pg: expense table content siZe */
+    .expense-table {
+        font-size: 12px; 
+        table-layout: fixed; 
+        width: 100%;
+    }
+
+    /* Trip pg: expense table content position */
+    .expense-table th, 
+    .expense-table td {
+        padding: 5px;
+        white-space: normal;
+        word-wrap: break-word;
+    }
+}
