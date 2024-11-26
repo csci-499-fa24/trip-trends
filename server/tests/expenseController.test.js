@@ -315,6 +315,8 @@ describe('Expense Controller', () => {
         await updateExpense(mockRequest, mockResponse);
 
         expect(Expense.findByPk).toHaveBeenCalledWith(mockExpenseId);
+        const findResult = await Expense.findByPk(mockExpenseId);
+        expect(findResult.update).toHaveBeenCalledWith(updatedData);
         expect(mockResponse.status).toHaveBeenCalledWith(200);
         expect(mockResponse.json).toHaveBeenCalledWith({ data: updatedExpense });
     });
