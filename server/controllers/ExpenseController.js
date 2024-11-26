@@ -273,7 +273,7 @@ const deleteExpense = async (req, res) => {
     const expenseId = req.params.expenseId;
     try {
         // delete expense by expenseId
-        const deletedCount = await Expense.destroy({ where: { expenseId } });
+        const deletedCount = await Expense.destroy({ where: { expense_id: expenseId } });
         if (deletedCount === 0) {
             return res.status(404).json({ message: "Expense not found" });
         }

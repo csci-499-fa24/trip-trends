@@ -19,13 +19,13 @@ const GeneralTripInfoComponent = ({ userId, tripData, convertedBudget, tripId, t
     const currencySymbol = currencySymbolMap(currency);
     const exceedsBudget = totalExpenses > convertedBudget;
     // console.log(convertedBudget);
-    console.log(tripId);
+    // console.log(tripId);
 
     useEffect(() => {
         const fetchFavoriteStatus = async () => {
             try {
                 const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/trips/${tripId}`);
-                console.log(response.data); 
+                // console.log(response.data); 
                 if (response.data && Array.isArray(response.data)) {
                     const user = response.data.find((user) => user.user_id === userId);
                     
@@ -44,7 +44,7 @@ const GeneralTripInfoComponent = ({ userId, tripData, convertedBudget, tripId, t
 
         fetchFavoriteStatus();
     }, [userId, tripId]);
-    console.log(isFavorited);
+    // console.log(isFavorited);
 
     const DateComponent = ({ dateStr, showYear }) => {
         const [year, month, day] = dateStr.split('-');

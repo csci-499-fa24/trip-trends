@@ -150,7 +150,6 @@ const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData, currency
                     display: 'block',
                 }}
             />
-            </div>
         </div>
     );
 };

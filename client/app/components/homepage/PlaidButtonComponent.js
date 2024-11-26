@@ -94,6 +94,40 @@ const PlaidLinkComponent = ({ onSuccess }) => {
         "Other" 
     ];
 
+    const categoryMap = {
+        "grocery": "Food/Drink", 
+        "taxi": "Transport", 
+        "fuel": "Transport", 
+        "hardware": "Shopping", 
+        "online shopping": "Shopping", 
+        "restaurant": "Food/Drink", 
+        "utilities": "Phone/Internet", 
+        "hotel": "Accommodations", 
+        "fast food": "Food/Drink", 
+        "department store": "Shopping", 
+        "convenience": "Food/Drink", 
+        "general contractor": "Other", 
+        "food": "Food/Drink", 
+        "car repair": "Transport", 
+        "coffee": "Food/Drink", 
+        "parking": "Transport", 
+        "drugstore / pharmacy": "Health/Safety", 
+        "airlines": "Flights", 
+        "nurseries & gardening": "Shopping", 
+        "auto parts": "Transport", 
+        "bakery": "Food/Drink", 
+        "transportation": "Transport", 
+        "health": "Health/Safety", 
+        "building supplies": "Shopping", 
+        "office equipment": "Shopping",
+        "airline": "Flights",
+        "uber": "Transport",
+        "hiking": "Activities",
+        "museum": "Activities",
+        "park": "Activities",
+        "gym": "Activities"
+    };
+
     const saveTransactionsAsExpenses = async (transactions) => {
         try {
             for (let transaction of transactions) {
@@ -108,6 +142,7 @@ const PlaidLinkComponent = ({ onSuccess }) => {
                     posted: transaction.date || dayjs().format("YYYY-MM-DD"),
                     notes: transaction.merchant_name || 
                            transaction.payment_channel || 
+                            transaction.location?.city ||
                            "No additional notes",
                     
                 };
@@ -121,7 +156,7 @@ const PlaidLinkComponent = ({ onSuccess }) => {
                         console.log("Expense saved:", {
                             name: expenseData.name,
                             amount: expenseData.amount,
-                            category: expenseData.category
+                            category: expenseData.category,
                         });
                     } catch (postError) {
                         console.error("Failed to save individual expense:", {
@@ -142,21 +177,28 @@ const PlaidLinkComponent = ({ onSuccess }) => {
     const getMatchedCategory = (transactionCategories, expenseCategories) => {
         const options = {
             includeScore: true,   
-            threshold: 0.3,       
+            threshold: 0.4,       
             keys: ["category"],  
         };
-     
+    
         const fuse = new Fuse(expenseCategories, options);
+        let bestCategory = "Other";
     
         for (let category of transactionCategories) {
-            let matchedCategory = fuse.search(category);
+            const normalizedCategory = category.toLowerCase().trim();  
+            const mappedCategory = categoryMap[normalizedCategory];
+            if (mappedCategory) {
+                return mappedCategory; 
+            }
     
+            const matchedCategory = fuse.search(normalizedCategory);
             if (matchedCategory.length > 0) {
-                return matchedCategory[0].item; 
+                bestCategory = matchedCategory[0].item; 
+                break; 
             }
         }
     
-        return "Other";
+        return bestCategory; 
     };
 
     const handleOnExit = (error, metadata) => {
@@ -181,7 +223,7 @@ const PlaidLinkComponent = ({ onSuccess }) => {
                         console.log("Plaid Link Exit:", error, metadata)
                     }
                 >
-                    Link Your Bank Account
+                    Link Bank Account
                 </PlaidLink>
             ) : (
                 <p>
