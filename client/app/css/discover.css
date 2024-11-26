@@ -187,7 +187,6 @@ label {
     width: 100%;
 }
 
-
 select, input {
     padding: 6px 10px;
     font-size: 14px;
@@ -210,7 +209,6 @@ select, input {
     height: 18px;
     color: black;
 }
-
 
 /* Flights display */
 .flights-widget-container {
