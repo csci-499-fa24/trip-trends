@@ -24,3 +24,16 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+.icon-div {
+    box-sizing: border-box;
+    height: 56px;
+    width: 56px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 300ms ease, transform 300ms ease;
+    left: 1.5%;
+}

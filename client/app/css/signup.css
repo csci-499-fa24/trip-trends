@@ -1,30 +1,76 @@
 .container {
     display: flex;
-    justify-content: center;
-    align-items: center; 
-}
-
-.row {
-    display: flex; 
-    flex: 1;
-}
-
-.logo {
-    background-color: #344E41;
     height: 100vh;
+    width: 100%;}
+
+.passport-wrapper {
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
+    background: linear-gradient(to bottom, #344e41e7, var(--green));
+}
+
+.passport {
+    width: 475px;
+    height: 650px;
+    position: relative;
+    border-radius: 25px;
+    overflow: hidden;
+    margin-left: 4%;
+    margin-right: 4%;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.6);
+}
+
+.passport-cover {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    backface-visibility: hidden;
+    background: var(--darkgreen); 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    z-index: 2;
+}
+
+.passport-logo {
+    width: 270px;
+    height: auto;
+}
+
+.passport-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
+}
+
+.passport-spine {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 30px;
+    height: 100%;
+    background: linear-gradient(to right, #2d4030, var(--darkgreen));
+    border-radius: 25px 0 0 25px;
+    box-shadow: inset 1px 0px 5px rgba(0, 0, 0, 0.3);
 }
 
 .signIn {
     display: flex;
-    flex-direction: column; 
+    flex-direction: column;
     justify-content: center;
-    align-items: center; 
-    margin-left: 10vw;
-    margin-right: 10vw;
+    align-items: center;
+    margin-left: 0vw;
+    margin-right: 0vw;
     height: 100vh;
+    width: 62vw;
+    background: white;
 }
 
 .signInGoogle {
@@ -39,4 +85,18 @@
 .description {
     margin-bottom: 2vw;
     margin-top: 1vw;
+}
+
+@media (max-width: 800px) {
+    .passport-wrapper {
+        display: none; /* hide passport on smaller screens */
+    }
+
+    .signIn {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0 5%;
+    }
 }

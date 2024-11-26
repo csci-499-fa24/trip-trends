@@ -146,15 +146,46 @@
 }
 
 .submit-new-expense-button {
-    padding: 8px;
+    /* padding: 8px;
+    width: 40%; */
+    padding: 15px 30px; 
     background-color:var(--lightgreen);
     color: white;
     border: none;
-    width: 40%;
+    width: fit-content;
     border-radius: 10px;
-    font-size: 15px;
+    font-size: 15px; 
     cursor: pointer;
     align-self: center;
+}
+
+.edit-expense-modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(0.4px);
+}
+
+.edit-expense-modal-content{
+    position: relative; 
+    max-width: 40% !important;
+    max-height: 80vh;
+    width: 90%;
+    background-color: white;
+    color: black;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(159, 154, 154, 0.1);
+    overflow-x: auto;
+    overflow-y: auto;
+    margin: 10px;
+    text-align: center;
 }
 
 .edit-expense-title {
@@ -199,30 +230,30 @@
     flex: 1;
 }
 
-.field-pair label {
-    flex: 1;
-}
-
 .submit-edit-expense-button {
-    padding: 8px;
-    background-color: var(--lightgreen);
+    /* padding: 8px;
+    width: 90%; */
+    padding: 15px 30px; 
+    background-color:var(--lightgreen);
     color: white;
     border: none;
-    width: 90%;
+    width: 50%;
     border-radius: 10px;
-    font-size: 15px;
+    font-size: 15px; 
     cursor: pointer;
     align-self: center;
 }
 
 .delete-expense-button {
-    padding: 8px;
+    /* padding: 8px;
+    width: 90%; */
+    padding: 15px 30px; 
     background-color: #8B0000;
     color: white;
     border: none;
-    width: 90%;
+    width: 50%;
     border-radius: 10px;
-    font-size: 15px;
+    font-size: 15px; 
     cursor: pointer;
     align-self: center;
 }
@@ -791,6 +822,14 @@
 
 .gallery-icon .icon-text {
     background-color: green;
+}
+
+.todo-icon:hover {
+    color: rgb(60, 60, 247);
+}
+
+.todo-icon .icon-text {
+    background-color: rgb(60, 60, 247);
 }
 
 .exchange-table-dropdown input,

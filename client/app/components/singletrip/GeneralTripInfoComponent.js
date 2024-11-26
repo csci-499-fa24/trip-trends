@@ -51,11 +51,11 @@ const GeneralTripInfoComponent = ({ userId, tripData, convertedBudget, tripId, t
         const options = showYear
             ? { month: 'long', day: 'numeric', year: 'numeric' }
             : { month: 'long', day: 'numeric' };
-    
+
         const formattedDate = new Intl.DateTimeFormat('en-US', options).format(
             new Date(year, month - 1, day)
         );
-    
+
         return <span>{formattedDate}</span>;
     };
 
@@ -70,7 +70,7 @@ const GeneralTripInfoComponent = ({ userId, tripData, convertedBudget, tripId, t
         if (!tripData) {
             return { startDate: null, endDate: null };
         }
-        
+
         const startDate = startOfDay(parseISO(tripData.data.start_date));
         const endDate = endOfDay(parseISO(tripData.data.end_date));
         const startYear = tripData.data.start_date.split('-')[0];
@@ -84,26 +84,26 @@ const GeneralTripInfoComponent = ({ userId, tripData, convertedBudget, tripId, t
 
     useEffect(() => {
         if (!expenses || !Array.isArray(expenses)) return; // to handle expenses undefined during runtime
-    
+
         const totals = {};
         expenses.forEach(expense => {
             if (!expense.posted || !expense.amount) return; // Skip invalid data.
-            
+
             const [year, month, day] = expense.posted.split('-').map(Number);
             const date = new Date(year, month - 1, day);
             date.setHours(0, 0, 0, 0);
             const dateKey = date.toDateString();
-    
+
             const amount = parseFloat(expense.amount);
             if (!totals[dateKey]) {
                 totals[dateKey] = 0;
             }
             totals[dateKey] += amount;
         });
-    
+
         setTotalExpensesByDate(totals);
     }, [expenses]);
-    
+
 
 
     const handleDateClick = (date, event) => {
@@ -133,7 +133,7 @@ const GeneralTripInfoComponent = ({ userId, tripData, convertedBudget, tripId, t
     };
 
     const handleFavoriteClick = async () => {
-        setIsFavorited(prevState => !prevState); 
+        setIsFavorited(prevState => !prevState);
         try {
             await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/users/${userId}/trips/${tripId}`, {
                 favorite: !isFavorited
@@ -151,12 +151,12 @@ const GeneralTripInfoComponent = ({ userId, tripData, convertedBudget, tripId, t
 
     return (
         <div>
-            <br/>
+            <br />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
-                <h2 style={{ marginRight: '10px', marginTop: '40px'}}>Trip Info</h2>
+                <h2 style={{ marginRight: '10px', marginTop: '40px' }}>Trip Info</h2>
                 {/* Favorite Star Icon */}
-                <div 
-                    className="favorite-icon" 
+                <div
+                    className="favorite-icon"
                     onClick={(event) => {
                         handleFavoriteClick();
                     }}
@@ -165,7 +165,7 @@ const GeneralTripInfoComponent = ({ userId, tripData, convertedBudget, tripId, t
                     {isFavorited ? (
                         <StarIcon sx={{ color: 'yellow', zIndex: 2, fontSize: 35 }} />
                     ) : (
-                        <StarBorderIcon sx={{ color: 'gray', zIndex: 2, fontSize: 35  }} />
+                        <StarBorderIcon sx={{ color: 'gray', zIndex: 2, fontSize: 35 }} />
                     )}
                 </div>
             </div>
@@ -181,9 +181,9 @@ const GeneralTripInfoComponent = ({ userId, tripData, convertedBudget, tripId, t
                 </div>
 
                 <div className="trip-overview-div">
-                    <div className="trip-overview-circle" style={{marginLeft: '-30px'}}>💰</div>
+                    <div className="trip-overview-circle" style={{ marginLeft: '-30px' }}>💰</div>
                     <div className="trip-overview-content">
-                        <p style={{marginLeft: '-30px'}}>{currencySymbol}{convertedBudget}</p>
+                        <p style={{ marginLeft: '-30px' }}>{currencySymbol}{convertedBudget}</p>
                     </div>
                 </div>
 
@@ -196,14 +196,14 @@ const GeneralTripInfoComponent = ({ userId, tripData, convertedBudget, tripId, t
                     </div>
                 </div>
             </div>
-            
+
 
             <br />
             <div className='row'>
                 <div className='col' style={{ marginBottom: "20px" }}>
                     <DefaultTripImagesComponent tripId={tripId} tripLocations={tripLocations} />
                 </div>
-                <div className='col' style={{ flexDirection: "column" , marginBottom: "20px"}}>
+                <div className='col' style={{ flexDirection: "column", marginBottom: "20px" }}>
                     <Calendar
                         tileClassName={({ date }) => {
                             if (isDateInRange(date)) {
@@ -236,7 +236,7 @@ const GeneralTripInfoComponent = ({ userId, tripData, convertedBudget, tripId, t
                                 position: 'absolute',
                                 top: `${boxPosition.top}px`,
                                 left: `${boxPosition.left}px`,
-                                background: 'rgba(0, 0, 0, 0.7)', 
+                                background: 'rgba(0, 0, 0, 0.7)',
                                 color: 'white',
                                 borderRadius: '5px',
                                 padding: '10px',

@@ -138,13 +138,13 @@ a {
 }
 
 button {
-  padding: 8px;
+  padding: 15px 30px; 
   background-color:var(--lightgreen);
   color: white;
   border: none;
-  width: 40%;
+  width: fit-content;
   border-radius: 10px;
-  font-size: 15px;
+  font-size: 15px; 
   cursor: pointer;
   align-self: center;
 }

@@ -6,8 +6,10 @@
     align-items: center;
     align-content: center;
     text-align: center;
-    min-height: 200px;
-    overflow: 'hidden';
+    /* background-color: #f0f0f0; */
+    background-color: transparent;
+    min-height: 100vh;
+    max-height: 300vh;
   }
   
   .loading-logo {

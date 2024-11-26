@@ -25,6 +25,7 @@ import UploadTripImage from "../components/singletrip/UploadTripImage";
 import CurrencyToggleComponent from "../components/singletrip/CurrencyToggleComponent";
 import LoadingPageComponent from "../components/LoadingPageComponent";
 import ExpenseSuggestionsComponent from "../components/singletrip/ExpenseSuggestionsComponent";
+import NavBarComponent from '../components/singletrip/NavBarComponent';
 
 Chart.register(ArcElement, Tooltip, Legend);
 
@@ -55,7 +56,10 @@ function Singletrip() {
     const [originalData, setOriginalData] = useState([]);
     const [selectedFilter, setSelectedFilter] = useState("");
     const [tripLocations, setTripLocations] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState("");
+    const [expenseUSD, setExpenseUSD] = useState([]);
+    const [tripName, setTripName] = useState('');
+
+    const [selectedCategory, setSelectedCategory] = useState('');
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
     const [newExpenseData, setNewExpenseData] = useState({
         trip_id: "",
@@ -149,12 +153,13 @@ function Singletrip() {
       };
 
     useEffect(() => {
-        const savedFilter = localStorage.getItem("selectedFilter");
-        if (savedFilter && expensesToDisplay.length > 0) {
-            // console.log(expensesToDisplay);
-            applyFilter(savedFilter, expensesToDisplay);
+        const savedFilter = localStorage.getItem('selectedFilter');
+
+        if (savedFilter && expenseUSD.length > 0) {
+            //console.log(expenseData)
+            applyFilter(savedFilter);
         }
-    }, [expensesToDisplay]);
+    }, [expenseUSD, selectedFilter]);
 
     const fetchExpenseData = () => {
         setLoading(true);
@@ -172,7 +177,7 @@ function Singletrip() {
                 const savedFilter = localStorage.getItem("selectedFilter");
                 if (savedFilter) {
                     // console.log(expensesToDisplay);
-                    applyFilter(savedFilter, expensesToDisplay);
+                    applyFilter(savedFilter);
                 }
             })
             .catch((error) => {
@@ -279,7 +284,6 @@ function Singletrip() {
                 }
             });
         }
-
         setExpenseData({ data: filteredData });
     };
 
@@ -287,11 +291,13 @@ function Singletrip() {
         setIsDropdownVisible(!isDropdownVisible);
     };
 
-    const applyFilter = (filterOption, data = expensesToDisplay) => {
+    const applyFilter = (filterOption, data = expenseUSD) => {
+        console.log('hi');
         if (!Array.isArray(data)) {
             console.error("Data is not an array:", data);
             return;
         }
+    
         let sortedExpenses;
         if (filterOption === "highest") {
             sortedExpenses = [...data].sort(
@@ -310,9 +316,22 @@ function Singletrip() {
                 (a, b) => new Date(a.posted) - new Date(b.posted)
             );
         }
-        setExpenseData({ data: sortedExpenses });
-        setSelectedFilter(filterOption);
-        localStorage.setItem("selectedFilter", filterOption);
+    
+        // Find corresponding expenses in expensesToDisplay
+        const sortedWithDisplay = sortedExpenses.map(sortedExpense => {
+            return expensesToDisplay.find(exp => exp.expense_id === sortedExpense.expense_id);
+        });
+    
+        // Only update if the sorted data has actually changed
+        if (JSON.stringify(sortedWithDisplay) !== JSON.stringify(expenseData.data)) {
+            setExpenseData({ data: sortedWithDisplay });
+        }
+    
+        // Update filter and store in localStorage only if changed
+        if (filterOption !== selectedFilter) {
+            setSelectedFilter(filterOption);
+            localStorage.setItem('selectedFilter', filterOption);
+        }
     };
 
     const clearFilter = () => {
@@ -493,6 +512,7 @@ function Singletrip() {
             return;
         }
 
+
         try {
             const uniqueCurrencies = [
                 ...new Set(expenses.map((exp) => exp.currency)),
@@ -504,6 +524,7 @@ function Singletrip() {
                     `https://hexarate.paikama.co/api/rates/latest/${currency}?target=${targetCurrency}`
                 )
             );
+
 
             const currencyResponses = await Promise.all(currencyPromises);
 
@@ -518,6 +539,7 @@ function Singletrip() {
             let totalExpensesInTargetCurrency = 0;
             const categoryTotals = {};
 
+
             // convert expenses and calculate totals
             const convertedData = expenses.map((expense) => {
                 const rate = currencyRates[expense.currency] || 1; // fallback to 1 if no rate is available
@@ -530,6 +552,7 @@ function Singletrip() {
                     parseFloat(convertedAmount);
                 totalExpensesInTargetCurrency += parseFloat(convertedAmount);
 
+
                 return {
                     ...expense,
                     amount: convertedAmount,
@@ -537,8 +560,10 @@ function Singletrip() {
                 };
             });
 
+
             setConvertedExpenses(convertedData);
             setTotalExpenses(totalExpensesInTargetCurrency);
+            setExpenseUSD(convertedData);
 
             let currency =
                 selectedToggleCurrency !== ""
@@ -582,6 +607,7 @@ function Singletrip() {
         }
     };
 
+
     // for home currency
     const fetchCurrencyRates = async () => {
         convertExpenses(
@@ -592,6 +618,7 @@ function Singletrip() {
             setCategoryData
         );
     };
+
 
     // for toggle currency (including home currency)
     const convertExpensesToToggleCurrency = async () => {
@@ -612,6 +639,7 @@ function Singletrip() {
     useEffect(() => {
         if (tripData) {
             convertBudget(tripData.data.budget);
+            setTripName(tripData.data.name);
         }
     }, [selectedToggleCurrency, tripData]);
 
@@ -622,6 +650,7 @@ function Singletrip() {
     }, [selectedToggleCurrency, expenseData]);
 
     if (loading) {
+        return <LoadingPageComponent />;
         return <LoadingPageComponent />;
     }
 
@@ -636,7 +665,8 @@ function Singletrip() {
             <div className="main-container">
                 {tripData ? (
                     <div>
-                        <div className="container">
+                        <NavBarComponent tripId={tripId} userRole={userRole} tripName={tripName}/>
+                        <div className='container'>
                             {/* Icon Bar Above Trip Info */}
                             <TripIconBarComponent
                                 tripId={tripId}
@@ -651,8 +681,7 @@ function Singletrip() {
                             <CurrencyToggleComponent
                                 homeCurrency={homeCurrency}
                                 otherCurrencies={otherCurrencies}
-                                toggleChange={handleCurrencyToggleChange}
-                            />
+                                toggleChange={handleCurrencyToggleChange} />
                             {/* General Trip Info*/}
                             <GeneralTripInfoComponent
                                 userId={userId}
@@ -660,18 +689,9 @@ function Singletrip() {
                                 convertedBudget={convertedBudget}
                                 tripId={tripId}
                                 tripLocations={tripLocations}
-                                expenses={expensesToDisplay}
-                                totalExpenses={
-                                    selectedToggleCurrency !== ""
-                                        ? totalExpensesInToggleCurrency
-                                        : totalExpenses
-                                }
-                                currency={
-                                    selectedToggleCurrency !== ""
-                                        ? selectedToggleCurrency
-                                        : homeCurrency
-                                }
-                            />
+                                expenses={expenseUSD}
+                                totalExpenses={selectedToggleCurrency !== "" ? totalExpensesInToggleCurrency : totalExpenses}
+                                currency={selectedToggleCurrency !== "" ? selectedToggleCurrency : homeCurrency} />
                         </div>
                         <br></br>
                         <div className="container">
@@ -895,7 +915,7 @@ function Singletrip() {
                                         tripId={tripId}
                                     />
                                 </div>
-                                <div class="icon-bar-center">
+                                <div className="icon-bar-center">
                                     <h2>Expense History</h2>
                                 </div>
                                 <div class="icon-bar-right">
@@ -957,16 +977,9 @@ function Singletrip() {
                                 }}
                             >
                                 {/* Expense Table */}
-                                <ExpenseTableComponent
-                                    tripData={tripData}
-                                    tripId={tripId}
-                                    tripLocations={tripLocations}
-                                    expensesToDisplay={expensesToDisplay}
-                                    currencyCodes={currencyCodes}
-                                    expenseCategories={expenseCategories}
-                                    userRole={userRole}
-                                    categoryData={categoryData}
-                                />
+                                <ExpenseTableComponent tripData={tripData} tripId={tripId} tripLocations={tripLocations} expensesToDisplay={expensesToDisplay}
+                                    currencyCodes={currencyCodes} expenseCategories={expenseCategories} userRole={userRole} categoryData={categoryData} 
+                                    selectedCurrency={selectedCurrency} setSelectedCurrency={setSelectedCurrency} otherCurrencies={otherCurrencies} />
                             </div>
                             <br></br>
                             <br></br>
