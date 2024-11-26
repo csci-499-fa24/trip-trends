@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import Table from 'react-bootstrap/Table';
 import '../../css/ExpenseTableComponent.css';
@@ -10,12 +10,20 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
     const [selectedExpense, setSelectedExpense] = useState(null);
     const [localFormCurrency, setLocalFormCurrency] = useState(selectedCurrency);
     const [loading, setLoading] = useState(true);
+    const [loadingTimedOut, setLoadingTimedOut] = useState(false);
 
     useEffect(() => {
-        if (!expensesToDisplay) {
-            setLoading(false);
-        }
-        if (expensesToDisplay && categoryData && categoryData.datasets.length > 0) {
+        const timeoutId = setTimeout(() => {
+            if (loading) {
+                setLoadingTimedOut(true); 
+            }
+        }, 5000); // 5 seconds
+
+        return () => clearTimeout(timeoutId);
+    }, [loading]);
+
+    useEffect(() => {
+        if (expensesToDisplay && categoryData && categoryData.datasets && categoryData.datasets.length > 0) {
             setLoading(false); 
         }
     }, [expensesToDisplay, categoryData]);
@@ -97,8 +105,28 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
     // console.log(categoryData)
     // console.log(categoryData.labels)
 
-    if (loading) {
+    const memoizedExpenses = useMemo(() => {
+        if (!expensesToDisplay || expensesToDisplay.length === 0) return [];
+        return expensesToDisplay.map((expense) => {
+            const categoryIndex = categoryData?.labels?.indexOf(expense.category) || -1;
+
+            const tagColor = categoryData?.datasets?.[0]?.backgroundColor?.[categoryIndex] || '#000'; // Fallback to black if not found
+            const currencySymbol = currencySymbolMap(expense.currency);
+
+            return {
+                ...expense,
+                tagColor,
+                currencySymbol
+            };
+        });
+    }, [expensesToDisplay, categoryData]);
+
+    if (loading && !loadingTimedOut) {
         return <LoadingPageComponent />;
+    }
+
+    if (loadingTimedOut && (expensesToDisplay && expensesToDisplay.length === 0)) {
+        return <p>No expenses yet...</p>;
     }
 
     return (
@@ -312,7 +340,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                     </div>
                 </div>
             ) : (
-                <p>No expenses yet...</p>
+                <p>No expense data available to display.</p>
             )}
         </div>
     );

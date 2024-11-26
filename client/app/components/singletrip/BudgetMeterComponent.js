@@ -5,7 +5,18 @@ import LoadingPageComponent from '../LoadingPageComponent';
 
 const BudgetMeterComponent = ({ tripData, convertedBudget, expensesToDisplay, totalExpenses, currency }) => {
     const currencySymbol = currencySymbolMap(currency);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = React.useState(true);
+    const [loadingTimedOut, setLoadingTimedOut] = useState(false);
+
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            if (loading) {
+                setLoadingTimedOut(true); 
+            }
+        }, 5000); // 5 seconds
+
+        return () => clearTimeout(timeoutId);
+    }, [loading]);
 
     useEffect(() => {
         if (!expensesToDisplay) {
@@ -16,8 +27,15 @@ const BudgetMeterComponent = ({ tripData, convertedBudget, expensesToDisplay, to
         }
     }, [expensesToDisplay, convertedBudget, totalExpenses]);
 
-    if (loading) {
+    if (loading && !loadingTimedOut) { 
         return <LoadingPageComponent />;
+    }
+
+    if (loadingTimedOut && (expensesToDisplay && totalExpenses === 0)) {
+        return <div>
+            <p id="budgetTitle">Budget Meter</p>
+            <p>No expense data available to display.</p>
+        </div>;
     }
 
     return (

@@ -1,0 +1,31 @@
+.plaid-link-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 600px;
+    margin: 0 auto; 
+    padding: 20px;
+}
+
+.error-message {
+    color: red;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+.plaid-link-button {
+    background-color: var(--lightgreen)!important; 
+    color: white;
+    padding: 12px 24px !important; 
+    border: none;
+    border-radius: 10px !important; 
+    font-size: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+    text-align: center; 
+}
+
+.plaid-link-button:hover {
+    background-color: var(--lightergreen) !important; 
+}
