@@ -53,6 +53,7 @@ const FlightsComponent = ({ tripId }) => {
     });
 
     const fetchArrivalAirportCodes = async (locationsWithLatLong) => {
+        // console.log(locationsWithLatLong);
         try {
             const airportPromises = locationsWithLatLong.map(async (location) => {
                 const { latitude, longitude } = location;
@@ -62,7 +63,7 @@ const FlightsComponent = ({ tripId }) => {
                     const response = await amadeus.referenceData.locations.airports.get({
                         latitude,
                         longitude,
-                        radius: 80, // in km
+                        radius: 200, // in km
                         sort: 'distance'
                     });
                     // console.log(response);
@@ -117,8 +118,8 @@ const FlightsComponent = ({ tripId }) => {
 
         const formattedTravelDate = formatDate(travelDate)
         const formattedReturnDate = formatDate(returnDate)
-        console.log(formattedTravelDate);
-        console.log(formattedReturnDate);
+        // console.log(formattedTravelDate);
+        // console.log(formattedReturnDate);
 
         setLoading(true);
         const options = {
@@ -145,7 +146,7 @@ const FlightsComponent = ({ tripId }) => {
             const response = await axios.request(options);
             console.log('Flights Found:', response.data);
             setFlights(response.data.data.flights || []);
-            console.log(response.data.data.flights);
+            // console.log(response.data.data.flights);
             toast.success('Flight search successful!');
 
         } catch (error) {
