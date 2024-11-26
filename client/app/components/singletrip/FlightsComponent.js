@@ -253,7 +253,7 @@ const FlightsComponent = ({ tripId }) => {
             </form>
         </div>
 
-                {/* flights found container */}
+        {/* flights found container */}
         <div className="flights-widget-container">
             <div className="flights-widget">
                 {isLoading ? (
