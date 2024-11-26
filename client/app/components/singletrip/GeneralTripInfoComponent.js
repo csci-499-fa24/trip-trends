@@ -153,7 +153,7 @@ const GeneralTripInfoComponent = ({ userId, tripData, convertedBudget, tripId, t
         <div>
             <br />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
-                <h2 style={{ marginRight: '10px', marginTop: '40px' }}>Trip Info</h2>
+                <h2 className='trip-info-title' style={{ marginRight: '10px', marginTop: '40px' }}>Trip Info</h2>
                 {/* Favorite Star Icon */}
                 <div
                     className="favorite-icon"
@@ -181,7 +181,7 @@ const GeneralTripInfoComponent = ({ userId, tripData, convertedBudget, tripId, t
                 </div>
 
                 <div className="trip-overview-div">
-                    <div className="trip-overview-circle" style={{ marginLeft: '-30px' }}>💰</div>
+                    <div className="trip-overview-bag" style={{ marginLeft: '-30px' }}>💰</div>
                     <div className="trip-overview-content">
                         <p style={{ marginLeft: '-30px' }}>{currencySymbol}{convertedBudget}</p>
                     </div>

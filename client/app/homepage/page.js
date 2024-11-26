@@ -211,16 +211,13 @@ function homepage() {
                         <p style={{marginLeft: '-15px'}}>See where you've been:</p>
                     </div>
 
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-
+                    <div className="responsive-container" style={{ display: 'flex', justifyContent: 'space-between' }}>
                         {/* Map section */}
                         <MapComponent allTripLocations={allTripLocations} toggleTripDetails={toggleTripDetails} />
-
                         {/* Recent Trips section */}
                         <div style={{ width: '35%', marginLeft: '10px' }}>
                             <RecentTripsComponent trips={trips} />
                         </div>
-
                     </div>
 
                 {/* All Trips Section */}

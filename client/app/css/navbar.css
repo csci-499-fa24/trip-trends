@@ -23,3 +23,15 @@
     background-color: var(--lightergreen);
     color: white;
 }
+
+
+@media (max-width: 600px) {
+    /* Trip pg: nar bar position */
+    .navbar {
+        left: -5%;
+    }
+
+    [style*="right: 45px"] {
+        right: 20px !important;
+    }
+}
