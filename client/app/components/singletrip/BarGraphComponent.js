@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import currencySymbolMap from 'currency-symbol-map';
 import LoadingPageComponent from '../LoadingPageComponent';
 import { load } from 'ol/Image';
-
+import "../../css/barChart.css";
 
 const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData, currency }) => {
     const [loading, setLoading] = React.useState(true);
@@ -111,7 +111,7 @@ const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData, currency
     }
 
     return (
-        <div>
+        <div className="bar-chart-container">
             <h3 style={{ textAlign: "center" }}>Daily Expenses by Category</h3>
             <BarChart
                 xAxis={[{ scaleType: 'band', data: Array.from(allExpenseDates).sort() }]}
