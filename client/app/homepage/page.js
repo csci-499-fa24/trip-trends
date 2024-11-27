@@ -179,7 +179,7 @@ function homepage() {
 
 
     useEffect(() => {
-        if (userId && trips.length > 0 && allTripLocations.length > 0) {
+        if (userId && trips.length >= 0 && allTripLocations.length >= 0) {
             setLoading(false); 
         }
     }, [userId, trips, allTripLocations]);
