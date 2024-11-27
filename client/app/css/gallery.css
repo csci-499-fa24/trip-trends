@@ -73,3 +73,11 @@
     transform: scale(1);
     transition: transform 0.3s ease;
 }
+
+.error-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: black;
+}

@@ -14,6 +14,18 @@ function Gallery() {
     const [userId, setUserId] = useState(null);
     const [userName, setUserName] = useState("");
     const [tripName, setTripName] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [loadingTimedOut, setLoadingTimedOut] = useState(false);
+
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            if (loading) {
+                setLoadingTimedOut(true); 
+            }
+        }, 5000); // 5 seconds
+
+        return () => clearTimeout(timeoutId);
+    }, [loading]);
 
     const getUserId = () => {
         const user_id = localStorage.getItem("user_id");
@@ -59,9 +71,10 @@ function Gallery() {
         getUserId();
         fetchUserName();
         fetchTripName();
+        setLoading(false);
     }, []);
 
-    if (!tripId || !userRole) {
+    if (loading && !loadingTimedOut) {
         return (
             <div>
                 <HeaderComponent
@@ -69,7 +82,36 @@ function Gallery() {
                     setUserName={setUserName}
                     userId={userId}
                 />
+                <NavBarComponent tripId={tripId} userRole={userRole} tripName={tripName} pointerDisabled={true}/>
+                <header className="top-icon-bar-header" style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                    <div className="icon-div" tooltip="Gallery" tabIndex="0" style={{ display: 'flex', cursor: 'pointer' }}>
+                        {userRole === 'owner' || userRole === 'editor' ? (
+                            <UploadTripImage tripId={tripId} />
+                        ) : null}
+                    </div>
+                </header> 
                 <LoadingPageComponent />
+            </div>
+        );
+    }
+
+    if (loadingTimedOut) {
+        return (
+            <div>
+                <HeaderComponent
+                    headerTitle="Trip Gallery"
+                    setUserName={setUserName}
+                    userId={userId}
+                />
+                <NavBarComponent tripId={tripId} userRole={userRole} tripName={tripName} pointerDisabled={true}/>
+                <header className="top-icon-bar-header" style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                    <div className="icon-div" tooltip="Gallery" tabIndex="0" style={{ display: 'flex', cursor: 'pointer' }}>
+                        {userRole === 'owner' || userRole === 'editor' ? (
+                            <UploadTripImage tripId={tripId} />
+                        ) : null}
+                    </div>
+                </header> 
+                <TripImageComponent tripId={tripId} />
             </div>
         );
     }
