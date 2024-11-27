@@ -929,7 +929,7 @@ function Singletrip() {
                                     {/* Filter Expenses Button */}
                                     {selectedFilter && (
                                         <div className="applied-filter">
-                                            <span>{`Filter: ${selectedFilter}`}</span>
+                                            <span style={{paddingLeft:"29px"}}>{`Filter: ${selectedFilter}`}</span>
                                             <button
                                                 className="clear-filter-btn"
                                                 onClick={clearFilter}

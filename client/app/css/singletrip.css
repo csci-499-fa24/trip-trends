@@ -495,12 +495,13 @@
 .applied-filter {
     display: flex;
     align-items: center;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    padding: 5px 10px;
+    justify-content: center;
+    background-color: var(--lightgreen);
+    color: white;
+    padding: 0px 10px;
     border-radius: 5px;
     white-space: nowrap;
-    margin-left: 10px;
+    width: 170px;
 }
 
 
@@ -510,7 +511,6 @@
     color: #ff0000;
     cursor: pointer;
     font-size: 16px;
-    margin-left: 10px;
 }
 
 .filter-section {
