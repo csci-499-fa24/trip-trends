@@ -177,6 +177,33 @@ const getExpensesByTripId = async (req, res) => {
     }
 };
 
+const checkReceiptExistenceByExpenseId = async (req, res) => {
+    const expenseId = req.params.expenseId;
+
+    if (!expenseId) {
+        return res.status(400).json({ message: "Expense ID is required" });
+    }
+
+    try {
+        const expense = await Expense.findByPk(expenseId);  // Find expense by ID
+        if (!expense) {
+            return res.status(404).json({ message: "Expense not found" });
+        }
+
+        if (!expense.image) {
+            return res.status(200).json({ receiptExists: false });  // No receipt image
+        }
+
+        return res.status(200).json({ receiptExists: true });  // Receipt exists
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            message: "Internal Server Error",
+            error: err.message,
+        });
+    }
+};
+
 // GET expense image using ExpenseID
 const getReceiptImageByExpenseId = async (req, res) => {
     const expenseId = req.params.expenseId;
@@ -396,6 +423,7 @@ module.exports = {
     getExpenses,
     getExpenseById,
     getExpensesByTripId,
+    checkReceiptExistenceByExpenseId,
     getReceiptImageByExpenseId,
     getExtractedReceiptData,
     updateExpense,
