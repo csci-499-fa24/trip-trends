@@ -1,12 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const ExpenseController = require('../controllers/ExpenseController');
+const Expense = require('../models/Expense');
 
 router.post("/trips/:tripId/", ExpenseController.createExpense);
 router.post("/process-receipt", ExpenseController.getExtractedReceiptData);
 router.get("/", ExpenseController.getExpenses);
 router.get("/:expenseId", ExpenseController.getExpenseById);
 router.get("/trips/:tripId/", ExpenseController.getExpensesByTripId);
+router.get("/:expenseId/check-receipt", ExpenseController.checkReceiptExistenceByExpenseId);
 router.get("/:expenseId/image", ExpenseController.getReceiptImageByExpenseId);
 router.put("/:expenseId", ExpenseController.updateExpense);
 // router.patch("/:expenseId", ExpenseController.updateExpense);
