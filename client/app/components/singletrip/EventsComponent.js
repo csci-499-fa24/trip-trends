@@ -14,6 +14,7 @@ const EventComponent = ({ tripId }) => {
     const [sightseeingData, setSightseeingData] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [activeTab, setActiveTab] = useState('events'); // 'events' or 'sightseeing'
 
 
     useEffect(() => {
@@ -181,98 +182,116 @@ const EventComponent = ({ tripId }) => {
 
     return (
         <div className="event-widget-container">
-            <div className="event-widget">
-                <h2 className="section-title">Events</h2>
-                <div className="event-container">
-                    {eventsData.length > 0 ? (
-                        eventsData.map((event, index) => (
-                            <div key={index} className="event-card">
-                                <button
-                                    className="add-button"
-                                    onClick={() => handleAddEvent(event)}
-                                >
-                                    +
-                                </button>
-                                {event.images && event.images.length > 0 ? (
-                                    <img
-                                        src={event.images[0].url}
-                                        alt={event.name}
-                                        className="event-image"
-                                    />
-                                ) : (
-                                    <div className="event-placeholder">No Image Available</div>
-                                )}
-                                <div className="event-content">
-                                    <p className="event-date">
-                                        {new Date(event.dates?.start?.localDate).toDateString()} at{' '}
-                                        {event.dates?.start?.localTime || 'TBA'}
-                                    </p>
-                                    <h3 className="event-title">{event.name}</h3>
-                                    <div className="event-location">
-                                        <p className="event-loc-name">{event._embedded?.venues[0]?.name}</p>
-                                        <p className="event-loc">{event._embedded?.venues[0]?.city?.name}</p>
-                                    </div>
-                                    <p>
-                                        <a
-                                            href={event.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="event-detail"
-                                        >
-                                            View Event Details
-                                        </a>
-                                    </p>
-                                </div>
-                            </div>
-                        ))
-                    ) : (
-                        <p className="no-events">No Events Found</p>
-                    )}
-                </div>
+            {/* Toggle Buttons */}
+            <div className="toggle-container">
+                <button
+                    className={`toggle-button ${activeTab === 'events' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('events')}
+                >
+                    Events
+                </button>
+                <button
+                    className={`toggle-button ${activeTab === 'sightseeing' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('sightseeing')}
+                >
+                    Sightseeing
+                </button>
             </div>
 
-            {/* Sightseeing Section */}
-            <div className="event-widget" style={{ marginTop: '5%' }}>
-                <h2 className="EvenHeader">Sightseeing</h2>
-                {sightseeingData.length === 0 ? (
-                    <p>No sightseeing places found.</p>
-                ) : (
+            {/* Conditional Rendering Based on Active Tab */}
+            {activeTab === 'events' && (
+                <div className="event-widget">
+                    <h2 className="section-title">Events</h2>
                     <div className="event-container">
-                        {sightseeingData.map((place, index) => (
-                            <div key={`sightseeing-${index}`} className="event-card">
-                                <button
-                                    className="add-button"
-                                    onClick={() => handleAddEvent(place)}
-                                >
-                                    +
-                                </button>
-                                <div className="event-content">
-                                    <h3 className="event-title">{place.properties.name_international?.en || place.properties.name || 'Unknown Place'}</h3>
-                                    <p><strong>Address:</strong> {place.properties.formatted || 'No address available'}</p>
-                                    <br />
-                                    <p><strong>Description:</strong> {place.properties.description || 'Tourist Attraction'}</p>
-
-                                    {/* Conditionally render website link or "No URL" */}
-                                    <p>
-                                        {place.properties.website ? (
+                        {eventsData.length > 0 ? (
+                            eventsData.map((event, index) => (
+                                <div key={index} className="event-card">
+                                    <button
+                                        className="add-button"
+                                        onClick={() => handleAddEvent(event)}
+                                    >
+                                        +
+                                    </button>
+                                    {event.images && event.images.length > 0 ? (
+                                        <img
+                                            src={event.images[0].url}
+                                            alt={event.name}
+                                            className="event-image"
+                                        />
+                                    ) : (
+                                        <div className="event-placeholder">No Image Available</div>
+                                    )}
+                                    <div className="event-content">
+                                        <p className="event-date">
+                                            {new Date(event.dates?.start?.localDate).toDateString()} at{' '}
+                                            {event.dates?.start?.localTime || 'TBA'}
+                                        </p>
+                                        <h3 className="event-title">{event.name}</h3>
+                                        <div className="event-location">
+                                            <p className="event-loc-name">{event._embedded?.venues[0]?.name}</p>
+                                            <p className="event-loc">{event._embedded?.venues[0]?.city?.name}</p>
+                                        </div>
+                                        <p>
                                             <a
-                                                href={place.properties.website}
+                                                href={event.url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="website-link"
+                                                className="event-detail"
                                             >
-                                                Visit Official Website
+                                                View Event Details
                                             </a>
-                                        ) : (
-                                            <span>No URL</span> // Display "No URL" if no website exists
-                                        )}
-                                    </p>
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))
+                        ) : (
+                            <p className="no-events">No Events Found</p>
+                        )}
                     </div>
-                )}
-            </div>
+                </div>
+            )}
+
+            {activeTab === 'sightseeing' && (
+                <div className="event-widget">
+                    <h2 className="section-title">Sightseeing</h2>
+                    {sightseeingData.length === 0 ? (
+                        <p>No sightseeing places found.</p>
+                    ) : (
+                        <div className="event-container">
+                            {sightseeingData.map((place, index) => (
+                                <div key={`sightseeing-${index}`} className="event-card">
+                                    <button
+                                        className="add-button"
+                                        onClick={() => handleAddEvent(place)}
+                                    >
+                                        +
+                                    </button>
+                                    <div className="event-content">
+                                        <h3 className="event-title">{place.properties.name_international?.en || place.properties.name || 'Unknown Place'}</h3>
+                                        <p><strong>Address:</strong> {place.properties.formatted || 'No address available'}</p>
+                                        <br />
+                                        <p><strong>Description:</strong> {place.properties.description || 'Tourist Attraction'}</p>
+                                        <p>
+                                            {place.properties.website ? (
+                                                <a
+                                                    href={place.properties.website}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="website-link"
+                                                >
+                                                    Visit Official Website
+                                                </a>
+                                            ) : (
+                                                <span>No URL</span>
+                                            )}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
 
     );
