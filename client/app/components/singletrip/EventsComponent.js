@@ -3,6 +3,7 @@ import '../../css/discover.css';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import LoadingPageComponent from '../LoadingPageComponent';
 
 
 const EventComponent = ({ tripId }) => {
@@ -14,8 +15,18 @@ const EventComponent = ({ tripId }) => {
     const [sightseeingData, setSightseeingData] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [loadingTimedOut, setLoadingTimedOut] = useState(false);
     const [activeTab, setActiveTab] = useState('events'); // 'events' or 'sightseeing'
 
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            if (loading) {
+                setLoadingTimedOut(true); 
+            }
+        }, 5000); // 5 seconds
+
+        return () => clearTimeout(timeoutId);
+    }, [loading]);
 
     useEffect(() => {
         setStoredTripId(tripId);
@@ -179,6 +190,13 @@ const EventComponent = ({ tripId }) => {
         }
     };
 
+    if (loading && !loadingTimedOut) {
+        return <LoadingPageComponent />;
+    }
+
+    if (loadingTimedOut) {
+        return <p>Nothing to display...</p>;
+    }
 
     return (
         <div className="event-widget-container">
