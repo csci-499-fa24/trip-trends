@@ -261,11 +261,13 @@ function Singletrip() {
         setSelectedCategory("");
         setExpenseData({ data: expensesToDisplay });
         setIsDropdownVisible(false);
+        clearFilter();
     };
 
     const handleCategorySelect = (category) => {
         setSelectedCategory(category);
         setIsDropdownVisible(false);
+        setSelectedFilter(category);
     };
 
     useEffect(() => {
@@ -276,9 +278,9 @@ function Singletrip() {
 
     const applyCategoryFilter = () => {
         let filteredData = [];
-
+        
         if (selectedCategory) {
-            expensesToDisplay.forEach((expense) => {
+            originalData.data.forEach((expense) => {
                 if (expense.category === selectedCategory) {
                     filteredData.push(expense);
                 }
@@ -929,7 +931,7 @@ function Singletrip() {
                                     {/* Filter Expenses Button */}
                                     {selectedFilter && (
                                         <div className="applied-filter">
-                                            <span style={{paddingLeft:"29px"}}>{`Filter: ${selectedFilter}`}</span>
+                                            <span style={{ paddingLeft: "29px" }}>{`Filter: ${selectedFilter}`}</span>
                                             <button
                                                 className="clear-filter-btn"
                                                 onClick={clearFilter}
