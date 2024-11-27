@@ -11,6 +11,10 @@ const EventComponent = ({ tripId }) => {
     const [locationsData, setLocationsData] = useState([]);
     const [tripData, setTripData] = useState([]);
     const [eventsData, setEventsData] = useState([]);
+    const [sightseeingData, setSightseeingData] = useState([]);
+    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [activeTab, setActiveTab] = useState('events'); // 'events' or 'sightseeing'
 
 
     useEffect(() => {
@@ -33,6 +37,7 @@ const EventComponent = ({ tripId }) => {
                 const { start_date, end_date } = tripData.data;
 
                 getEvents(latitude, longitude, start_date, end_date);
+                getSightseeing(latitude, longitude);
             });
         } else {
             console.log("Problem with locationsData:", locationsData);
@@ -103,21 +108,55 @@ const EventComponent = ({ tripId }) => {
             });
     };
 
+    async function getSightseeing(latitude, longitude) {
+        const API_KEY = `${process.env.NEXT_PUBLIC_SIGHTSEEING_API_KEY}`;
+        const baseURL = 'https://api.geoapify.com/v2/places';
+
+        const params = {
+            categories: 'tourism.sights,building.tourism',
+            filter: `circle:${longitude},${latitude},10000`,
+            bias: `proximity:${longitude},${latitude}`,
+            limit: 100,
+            apiKey: API_KEY,
+        };
+
+        try {
+            setLoading(true); // Set loading state
+            const response = await axios.get(baseURL, { params });
+            console.log('API Response:', response.data.features);
+            setSightseeingData((prevData) => [
+                ...prevData,
+                ...response.data.features || []
+            ]);
+            setError(null); // Clear any previous error
+        } catch (error) {
+            console.error('Error fetching tourist places:', error.message);
+            setError(error.message); // Save error message in state
+        } finally {
+            setLoading(false); // End loading state
+        }
+    }
+
+
     const handleAddEvent = (event) => {
         console.log('Event added:', event);
-        if (!event.name) {
+
+        // Check if event name is present, else show an error toast
+        if (!event.name && !event.properties?.name_international?.en && !event.properties?.formatted) {
             toast.error("Event name is missing. Please provide a valid event.");
             setTimeout(() => {
             }, 500);
         } else {
+            // Determine if the name is for an event or sightseeing
             const newEvent = {
-                name: event.name,
+                name: event.name || event.properties?.name_international?.en || event.properties?.formatted || 'Unknown Name',
                 list_type: "sightseeing",
                 is_completed: false
             };
 
             console.log("ADDING EVENT: ", newEvent);
 
+            // Event body to send for adding the event
             const eventBody = {
                 name: newEvent.name,
                 list_type: "sightseeing",
@@ -140,57 +179,119 @@ const EventComponent = ({ tripId }) => {
         }
     };
 
+
     return (
         <div className="event-widget-container">
-            <div className="event-widget">
-                <h2 className="section-title">Events</h2>
-                <div className="event-container">
-                    {eventsData.length > 0 ? (
-                        eventsData.map((event, index) => (
-                            <div key={index} className="event-card">
-                                <button
-                                    className="add-button"
-                                    onClick={() => handleAddEvent(event)}
-                                >
-                                    +
-                                </button>
-                                {event.images && event.images.length > 0 ? (
-                                    <img
-                                        src={event.images[0].url}
-                                        alt={event.name}
-                                        className="event-image"
-                                    />
-                                ) : (
-                                    <div className="event-placeholder">No Image Available</div>
-                                )}
-                                <div className="event-content">
-                                    <p className="event-date">
-                                        {new Date(event.dates?.start?.localDate).toDateString()} at{' '}
-                                        {event.dates?.start?.localTime || 'TBA'}
-                                    </p>
-                                    <h3 className="event-title">{event.name}</h3>
-                                    <div className="event-location">
-                                        <p className="event-loc-name">{event._embedded?.venues[0]?.name}</p>
-                                        <p className="event-loc">{event._embedded?.venues[0]?.city?.name}</p>
+            {/* Toggle Buttons */}
+            <div className="toggle-container">
+                <button
+                    className={`toggle-button ${activeTab === 'events' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('events')}
+                >
+                    Events
+                </button>
+                <button
+                    className={`toggle-button ${activeTab === 'sightseeing' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('sightseeing')}
+                >
+                    Sightseeing
+                </button>
+            </div>
+
+            {/* Conditional Rendering Based on Active Tab */}
+            {activeTab === 'events' && (
+                <div className="event-widget">
+                    <h2 className="section-title">Events</h2>
+                    <div className="event-container">
+                        {eventsData.length > 0 ? (
+                            eventsData.map((event, index) => (
+                                <div key={index} className="event-card">
+                                    <button
+                                        className="add-button"
+                                        onClick={() => handleAddEvent(event)}
+                                    >
+                                        +
+                                    </button>
+                                    {event.images && event.images.length > 0 ? (
+                                        <img
+                                            src={event.images[0].url}
+                                            alt={event.name}
+                                            className="event-image"
+                                        />
+                                    ) : (
+                                        <div className="event-placeholder">No Image Available</div>
+                                    )}
+                                    <div className="event-content">
+                                        <p className="event-date">
+                                            {new Date(event.dates?.start?.localDate).toDateString()} at{' '}
+                                            {event.dates?.start?.localTime || 'TBA'}
+                                        </p>
+                                        <h3 className="event-title">{event.name}</h3>
+                                        <div className="event-location">
+                                            <p className="event-loc-name">{event._embedded?.venues[0]?.name}</p>
+                                            <p className="event-loc">{event._embedded?.venues[0]?.city?.name}</p>
+                                        </div>
+                                        <p>
+                                            <a
+                                                href={event.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="event-detail"
+                                            >
+                                                View Event Details
+                                            </a>
+                                        </p>
                                     </div>
-                                    <p>
-                                        <a
-                                            href={event.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="event-detail"
-                                        >
-                                            View Event Details
-                                        </a>
-                                    </p>
                                 </div>
-                            </div>
-                        ))
+                            ))
+                        ) : (
+                            <p className="no-events">No Events Found</p>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {activeTab === 'sightseeing' && (
+                <div className="event-widget">
+                    <h2 className="section-title">Sightseeing</h2>
+                    {sightseeingData.length === 0 ? (
+                        <p>No sightseeing places found.</p>
                     ) : (
-                        <p className="no-events">No Events Found</p>
+                        <div className="event-container">
+                            {sightseeingData.map((place, index) => (
+                                <div key={`sightseeing-${index}`} className="event-card">
+                                    <button
+                                        className="add-button"
+                                        onClick={() => handleAddEvent(place)}
+                                    >
+                                        +
+                                    </button>
+                                    <div className="event-content">
+                                        <h3 className="event-title">{place.properties.name_international?.en || place.properties.name || 'Unknown Place'}</h3>
+                                        <p><strong>Address:</strong> {place.properties.formatted || 'No address available'}</p>
+                                        <br />
+                                        <p><strong>Description:</strong> {place.properties.description || 'Tourist Attraction'}</p>
+                                        <p>
+                                            {place.properties.website ? (
+                                                <a
+                                                    href={place.properties.website}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="website-link"
+                                                >
+                                                    Visit Official Website
+                                                </a>
+                                            ) : (
+                                                <span>No URL</span>
+                                            )}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     )}
                 </div>
-            </div>
+            )}
         </div>
 
     );

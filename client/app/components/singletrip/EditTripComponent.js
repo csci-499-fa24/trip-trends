@@ -148,23 +148,49 @@ const EditTripComponent = ({
                     ({ location }) => !tripLocationsState.includes(location)
                 )
                 .map(({ index }) => index);
+    
+                deletedPositions.sort((a, b) => b - a);
 
-            //Delete the images based on the specified position
-            for (const position of deletedPositions) {
-                await axios.delete(
-                    `${process.env.NEXT_PUBLIC_SERVER_URL}/api/images/trips/${tripId}/${position}`
-                );
+                console.log("Deleted positions in reverse order:", deletedPositions);
+                
+                for (const position of deletedPositions) {
+                    try {
+                        await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/images/trips/${tripId}/${position}`);
+                    } catch (error) {
+                        console.error(`Failed to delete image at position ${position}:`, error.message);
+                    }
+                }
+    
+            await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`, requestBody); //Update the trip data
+            await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/update-locations`, requestLocations); //Update the location data
+            for (let i = 0; i < tripLocationsState.length; i++) {
+                let a_trip_location = {trip_id: tripId, location: tripLocationsState[i]};
+                let geocode_response = null;
+                try {
+                    geocode_response = await axios.get(`https://api.opencagedata.com/geocode/v1/json`, {
+                        params: {
+                            q: a_trip_location.location,
+                            key: process.env.NEXT_PUBLIC_OPENCAGE_API_KEY
+                        }
+                    });
+                    //console.log(geocode_response);
+                    const lat = geocode_response.data.results[0].geometry.lat;
+                    const long = geocode_response.data.results[0].geometry.lng;
+                    const currency = geocode_response.data.results[0].annotations.currency.iso_code;
+                    const coordinates = {"latitude": lat, "longitude": long, "currency_code": currency};
+                    try {
+                        await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${tripId}/${tripLocationsState[i]}`, coordinates);
+                    } catch (error) {
+                        console.error("Error updating trip location with coordinates");
+                    }
+                }
+                catch (error) {
+                    console.error("Error fetching geocode response using trip location.")
+                }
+
             }
 
-            await axios.put(
-                `${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`,
-                requestBody
-            ); //Update the trip data
-            await axios.put(
-                `${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/update-locations`,
-                requestLocations
-            ); //Update the location data
-
+    
             toast.success("Trip updated successfully!");
             setIsOpen(false);
             setTimeout(() => {
