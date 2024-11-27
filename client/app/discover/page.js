@@ -97,7 +97,7 @@ function DiscoverPage() {
         userId={userId}
       />
       <NavBarComponent tripId={tripId} userRole={userRole} tripName={tripName} pointerDisabled={true}/>
-      <FlightsComponent tripId={tripId}/>
+      {/* <FlightsComponent tripId={tripId}/> */}
       <EventsComponent tripId={tripId}/>
     </div>
   );
