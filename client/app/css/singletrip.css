@@ -85,33 +85,33 @@
 
 @media (max-width: 805px) {
     .modal-content {
-      max-width: 70% !important;
+        max-width: 70% !important;
     }
-  }
-  
-  @media (max-width: 1150px) {
+}
+
+@media (max-width: 1150px) {
     .modal-content {
-      max-width: 50% !important;
+        max-width: 50% !important;
     }
-  }
-  
-  @media (max-width: 700px) {
+}
+
+@media (max-width: 700px) {
     .modal-content {
-      max-width: 73% !important;
+        max-width: 73% !important;
     }
-  }
-  
-  @media (max-width: 420px) {
+}
+
+@media (max-width: 420px) {
     .modal-content {
-      max-width: 80% !important;
+        max-width: 80% !important;
     }
-  }
-  
-  @media (max-width: 390px) {
+}
+
+@media (max-width: 390px) {
     .modal-content {
-      max-width: 87% !important;
+        max-width: 87% !important;
     }
-  }
+}
 
 .new-expense-title {
     font-size: 24px;
@@ -148,13 +148,13 @@
 .submit-new-expense-button {
     /* padding: 8px;
     width: 40%; */
-    padding: 15px 30px; 
-    background-color:var(--lightgreen);
+    padding: 15px 30px;
+    background-color: var(--lightgreen);
     color: white;
     border: none;
     width: fit-content;
     border-radius: 10px;
-    font-size: 15px; 
+    font-size: 15px;
     cursor: pointer;
     align-self: center;
 }
@@ -172,8 +172,8 @@
     backdrop-filter: blur(0.4px);
 }
 
-.edit-expense-modal-content{
-    position: relative; 
+.edit-expense-modal-content {
+    position: relative;
     max-width: 40% !important;
     max-height: 80vh;
     width: 90%;
@@ -223,7 +223,7 @@
 }
 
 .edit-expense-field-label input[type="date"] {
-    box-sizing: border-box; 
+    box-sizing: border-box;
 }
 
 .field-pair label {
@@ -233,13 +233,13 @@
 .submit-edit-expense-button {
     /* padding: 8px;
     width: 90%; */
-    padding: 15px 30px; 
-    background-color:var(--lightgreen);
+    padding: 15px 30px;
+    background-color: var(--lightgreen);
     color: white;
     border: none;
     width: 50%;
     border-radius: 10px;
-    font-size: 15px; 
+    font-size: 15px;
     cursor: pointer;
     align-self: center;
 }
@@ -247,19 +247,19 @@
 .delete-expense-button {
     /* padding: 8px;
     width: 90%; */
-    padding: 15px 30px; 
+    padding: 15px 30px;
     background-color: #8B0000;
     color: white;
     border: none;
     width: 50%;
     border-radius: 10px;
-    font-size: 15px; 
+    font-size: 15px;
     cursor: pointer;
     align-self: center;
 }
 
 .highlighted-date {
-    background-color: rgba(0, 128, 0, 0.5); 
+    background-color: rgba(0, 128, 0, 0.5);
     border-radius: 5px;
 }
 
@@ -270,15 +270,15 @@
 
 .calendar-container {
     width: 100%;
-    margin: auto; 
-    padding: 0 10px; 
+    margin: auto;
+    padding: 0 10px;
 }
 
 @media (max-width: 768px) {
     .calendar-container {
         margin-top: 60px;
         margin-bottom: 20px;
-        padding: 0 15px; 
+        padding: 0 15px;
     }
 }
 
@@ -286,7 +286,7 @@
     .calendar-container {
         margin-top: 40px;
         margin-bottom: 20px;
-        padding: 0 20px; 
+        padding: 0 20px;
     }
 }
 
@@ -301,8 +301,8 @@
 }
 
 .react-calendar {
-    width: 100% !important; 
-    height: 100% !important; 
+    width: 100% !important;
+    height: 100% !important;
     border: none;
     border-radius: 10px;
     overflow: hidden;
@@ -312,8 +312,8 @@
     box-shadow: none;
     transition: none;
     border-radius: 6px;
-    padding: 10px !important; 
-    font-size: 1em !important; 
+    padding: 10px !important;
+    font-size: 1em !important;
     font-weight: bold !important;
 }
 
@@ -339,7 +339,7 @@
     background-color: white;
     color: black;
     border-radius: 8px;
-    font-size: 1.2em; 
+    font-size: 1.2em;
 }
 
 .react-calendar__tile {
@@ -351,17 +351,17 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center; 
+    justify-content: center;
     height: 100%;
 }
 
 .date-number {
     font-weight: bold;
-    font-size: 1.2em; 
+    font-size: 1.2em;
 }
 
 .expense-amount {
-    font-size: 0.9em; 
+    font-size: 0.9em;
     /* color: rgb(243, 133, 133);  */
 }
 
@@ -402,7 +402,7 @@
 }
 
 .MuiChartsLegend-root {
-    font-size: 8px; 
+    font-size: 8px;
     margin-bottom: 5px;
 }
 
@@ -411,7 +411,7 @@
 }
 
 .MuiChartsLegend-root .MuiChartsLegend-row {
-    font-size: 8px; 
+    font-size: 8px;
 }
 
 #budgetTitle {
@@ -475,10 +475,9 @@
 }
 
 .filter-option-button {
-    background-color: transparent;
-    color: black;
+    background-color: var(--lightgreen);
+    color: white;
     padding: 10px 20px;
-    border: 2px solid black;
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
@@ -489,7 +488,7 @@
 }
 
 .filter-option-button:hover {
-    background-color: var(--lightgreen);
+    background-color: var(--lightergreen);
     color: white;
 }
 
@@ -501,7 +500,7 @@
     padding: 5px 10px;
     border-radius: 5px;
     white-space: nowrap;
-    margin-left: 10px; 
+    margin-left: 10px;
 }
 
 
@@ -579,7 +578,7 @@
     border-radius: 10px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
     margin-right: 40px;
-    float:right;
+    float: right;
 }
 
 
@@ -648,7 +647,7 @@
     display: flex;
     /* justify-content: center; */
     align-items: center;
-    background-color: white; 
+    background-color: white;
     /* margin: 30px auto; Center the icon bar */
     max-width: 500px;
     margin: 50px 10px 0px 0px;
@@ -659,9 +658,12 @@
     justify-content: space-between;
     align-items: center;
     display: flex;
-    padding: 20px; /* Adjust spacing as needed */
-    background-color: white; /* Optional background color */
-    margin: 0 auto; /* Center the icon bar */
+    padding: 20px;
+    /* Adjust spacing as needed */
+    background-color: white;
+    /* Optional background color */
+    margin: 0 auto;
+    /* Center the icon bar */
     position: relative;
 }
 
@@ -706,7 +708,7 @@
 }
 
 .icon-SVG svg {
-    color: black; 
+    color: black;
     z-index: 999;
 }
 
@@ -767,7 +769,7 @@
     border-radius: 10px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
     max-width: 1000px;
-    
+
 }
 
 .trip-overview-div {
@@ -789,7 +791,7 @@
     margin-bottom: 10px;
 }
 
-.trip-overview-bag{
+.trip-overview-bag {
     width: 50px;
     height: 50px;
     background-color: rgb(214, 213, 213);
@@ -799,8 +801,8 @@
     align-items: center;
     justify-content: center;
     font-size: 24px;
-    margin-bottom: 10px; 
-    margin-top: 0px; 
+    margin-bottom: 10px;
+    margin-top: 0px;
 }
 
 #trip-locations-circle {
@@ -813,8 +815,8 @@
     align-items: center;
     justify-content: center;
     font-size: 24px;
-    margin-bottom: 10px; 
-    margin-top: 13px; 
+    margin-bottom: 10px;
+    margin-top: 13px;
 }
 
 .trip-overview-content p {
@@ -864,19 +866,19 @@
 
 
 .expense-box ul {
-    list-style-type: none; 
-    padding-left: 0; 
+    list-style-type: none;
+    padding-left: 0;
 }
 
 .expense-box li {
-    margin-bottom: 4px; 
+    margin-bottom: 4px;
 }
 
 .expense-row-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    
+
     padding: 5px;
     padding-right: 0px;
 }
@@ -898,7 +900,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 50px; 
+    gap: 50px;
     padding: 20px;
 }
 
@@ -907,19 +909,19 @@
     background-color: #f5f5f5;
     text-align: center;
     border-radius: 50%;
-    width: 100%; 
+    width: 100%;
     width: 200px;
-    max-width: 200px; 
-    aspect-ratio: 1; 
+    max-width: 200px;
+    aspect-ratio: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    box-sizing: border-box; 
+    box-sizing: border-box;
 }
 
 .circle-card:nth-child(2) {
-    max-width: 250px; 
+    max-width: 250px;
 }
 
 .circle-card-spending {
@@ -935,11 +937,11 @@
 
 @media (max-width: 768px) {
     .circle-card-spending {
-        font-size: 24px; 
+        font-size: 24px;
     }
 
     .circle-card-spending:nth-child(2) {
-        font-size: 80px; 
+        font-size: 80px;
     }
 }
 
@@ -962,53 +964,54 @@
 }
 
 .card:hover {
-    transform: scale(1.05); 
+    transform: scale(1.05);
 }
 
 @media (max-width: 768px) {
     .circle-card {
-        max-width: 150px; 
+        max-width: 150px;
     }
 }
+
 .expense-container {
     align-items: center;
     justify-content: space-between;
     padding: 20px;
     gap: 20px;
-    
+
 }
 
 
 @media (max-width: 768px) {
     .expense-table-container {
-        width: 100%; 
+        width: 100%;
         float: none;
         margin-left: 0;
-        margin-right: 0; 
+        margin-right: 0;
     }
 
     .exchange-rates-container {
-        width: 65%; 
-        float: none; 
-        margin-right: 0; 
-        margin-top: 20px; 
+        width: 65%;
+        float: none;
+        margin-right: 0;
+        margin-top: 20px;
     }
 }
 
 .exchange-rate-table {
-    width: 100%; 
-    max-width: 600px; 
-    margin: 20px auto; 
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
     padding: 10px;
-    border: 1px solid #ddd; 
+    border: 1px solid #ddd;
     border-radius: 5px;
 }
 
 
 @media (max-width: 768px) {
     .exchange-rate-table {
-        max-width: 90%; 
-        font-size: 0.8em; 
+        max-width: 90%;
+        font-size: 0.8em;
     }
 }
 
@@ -1018,15 +1021,20 @@
 
 @keyframes highlight {
     0% {
-        background-color: rgba(0, 255, 0, 0.3); /* Initial green highlight */
+        background-color: rgba(0, 255, 0, 0.3);
+        /* Initial green highlight */
     }
+
     50% {
-        background-color: rgba(0, 255, 0, 0.6); /* Midpoint green color */
+        background-color: rgba(0, 255, 0, 0.6);
+        /* Midpoint green color */
     }
+
     100% {
-        background-color: rgba(0, 255, 0, 0); /* Fade out */
+        background-color: rgba(0, 255, 0, 0);
+        /* Fade out */
     }
-}   
+}
 
 .modal.wide-form {
     width: 145%;
@@ -1040,30 +1048,31 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 50px;  
-    height: 50px;  
+    width: 50px;
+    height: 50px;
     padding: 5px;
     border-radius: 10px;
-    background-color: rgba(123, 117, 117, 0.223);  
-    z-index: 3; 
+    background-color: rgba(123, 117, 117, 0.223);
+    z-index: 3;
     transition: background-color 0.3s ease, border-color 0.3s ease;
     margin-top: 28px;
 }
 
 .favorite-icon:hover {
     background-color: rgba(123, 117, 117, 0.123);
-    border-color: rgba(0, 0, 0, 0.8); 
+    border-color: rgba(0, 0, 0, 0.8);
 }
 
 
-@media(max-width: 600px){
+@media(max-width: 600px) {
+
     /* Homepage: map size */
     [style*="height: 537px"][style*="width: 85%"] {
         width: 100% !important;
     }
 
     /* Trip page: Edit expense fom sizing */
-    .edit-expense-modal-content{
+    .edit-expense-modal-content {
         max-width: 100% !important;
         max-height: 100%;
     }
@@ -1088,7 +1097,7 @@
     .clear-filter-btn {
         margin: -20px;
     }
-    
+
     /* Trip pg: Exchange rate sizing and spacing */
     .exchange-rates-container {
         width: 90%;
@@ -1098,12 +1107,12 @@
 
     /* Trip pg: Top Icon bar position*/
     .top-icon-bar-header {
-       margin-left: -7%;
-       margin-top: 5%;
+        margin-left: -7%;
+        margin-top: 5%;
     }
 
     /* Trip pg: Trip info title positon */
-    .trip-info-title{
+    .trip-info-title {
         padding-top: 5%;
     }
 
@@ -1118,10 +1127,10 @@
     }
 
     /* Trip pg: overwiew item buget positoning */
-    .trip-overview-bag{
+    .trip-overview-bag {
         margin-top: -45%;
     }
-    
+
     /* Trip pg: overwiew items location and discover positoning */
     #trip-locations-circle {
         margin-top: -45%;
@@ -1135,14 +1144,14 @@
 
     /* Trip pg: Spending circles position */
     .spending-circles-container {
-        flex-direction: column; 
+        flex-direction: column;
         gap: 50px;
     }
 
     /* Trip page: expense table icon bar size*/
     .icon-bar-header {
-        width: 100%; 
-        padding: 0px; 
+        width: 100%;
+        padding: 0px;
     }
 
     /* Trip page: expense table icon bar gap*/
@@ -1151,16 +1160,17 @@
         gap: 0px;
     }
 
-     /* Trip page: expense table icon bar title*/
+    /* Trip page: expense table icon bar title*/
     .icon-bar-center {
-        position: static; 
-        transform: none; 
-        margin-top: 10px; 
+        position: static;
+        transform: none;
+        margin-top: 10px;
         width: 100%;
-    }  
+    }
 }
 
-@media(max-width: 600px){
+@media(max-width: 600px) {
+
     /* Trip page: Edit expense fomm edit btn */
     .submit-edit-expense-button {
         width: 70%;
@@ -1179,7 +1189,7 @@
 }
 
 .expenses-suggestions-carousel {
-    position: relative; 
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1205,13 +1215,13 @@
 }
 
 .suggestion-card:hover {
-    transform: scale(1.05); 
+    transform: scale(1.05);
 }
 
 .add-suggestion-div {
     justify-content: flex-end;
     position: absolute;
-    bottom: 5px;      
+    bottom: 5px;
     right: 5px;
     display: flex;
     cursor: pointer;
@@ -1252,6 +1262,6 @@
 }
 
 .expense-detail {
-    margin: 0; 
-    padding: 0; 
+    margin: 0;
+    padding: 0;
 }
