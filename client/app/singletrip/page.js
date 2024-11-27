@@ -832,13 +832,13 @@ function Singletrip() {
                                                     }
                                                     totalExpenses={
                                                         selectedToggleCurrency !==
-                                                        ""
+                                                            ""
                                                             ? totalExpensesInToggleCurrency
                                                             : totalExpenses
                                                     }
                                                     currency={
                                                         selectedToggleCurrency !==
-                                                        ""
+                                                            ""
                                                             ? selectedToggleCurrency
                                                             : homeCurrency
                                                     }
@@ -852,7 +852,7 @@ function Singletrip() {
                                                     categoryData={categoryData}
                                                     currency={
                                                         selectedToggleCurrency !==
-                                                        ""
+                                                            ""
                                                             ? selectedToggleCurrency
                                                             : homeCurrency
                                                     }
@@ -885,7 +885,7 @@ function Singletrip() {
                             <header className="icon-bar-header">
                                 <div class="icon-bar-left">
                                     {userRole == "owner" ||
-                                    userRole == "editor" ? (
+                                        userRole == "editor" ? (
                                         // {/* Add Expense Button */}
                                         <div
                                             className="icon-div"
@@ -927,6 +927,17 @@ function Singletrip() {
                                 </div>
                                 <div class="icon-bar-right">
                                     {/* Filter Expenses Button */}
+                                    {selectedFilter && (
+                                        <div className="applied-filter">
+                                            <span>{`Filter: ${selectedFilter}`}</span>
+                                            <button
+                                                className="clear-filter-btn"
+                                                onClick={clearFilter}
+                                            >
+                                                &times;
+                                            </button>
+                                        </div>
+                                    )}
                                     <div
                                         className="icon-div"
                                         tooltip="Filter"
@@ -956,21 +967,6 @@ function Singletrip() {
                                         </div>
                                     </div>
                                 </div>
-                                {/* <div className="spacer"></div>
-                                <div className="divider"></div> */}
-
-                                {/* Applied filter popup */}
-                                {selectedFilter && (
-                                    <div className="applied-filter">
-                                        <span>{`Filter: ${selectedFilter}`}</span>
-                                        <button
-                                            className="clear-filter-btn"
-                                            onClick={clearFilter}
-                                        >
-                                            &times;
-                                        </button>
-                                    </div>
-                                )}
                             </header>
                         </div>
                         <div className="container">
