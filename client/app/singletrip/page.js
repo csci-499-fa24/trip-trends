@@ -261,11 +261,13 @@ function Singletrip() {
         setSelectedCategory("");
         setExpenseData({ data: expensesToDisplay });
         setIsDropdownVisible(false);
+        clearFilter();
     };
 
     const handleCategorySelect = (category) => {
         setSelectedCategory(category);
         setIsDropdownVisible(false);
+        setSelectedFilter(category);
     };
 
     useEffect(() => {
@@ -276,9 +278,9 @@ function Singletrip() {
 
     const applyCategoryFilter = () => {
         let filteredData = [];
-
+        
         if (selectedCategory) {
-            expensesToDisplay.forEach((expense) => {
+            originalData.data.forEach((expense) => {
                 if (expense.category === selectedCategory) {
                     filteredData.push(expense);
                 }
@@ -832,13 +834,13 @@ function Singletrip() {
                                                     }
                                                     totalExpenses={
                                                         selectedToggleCurrency !==
-                                                        ""
+                                                            ""
                                                             ? totalExpensesInToggleCurrency
                                                             : totalExpenses
                                                     }
                                                     currency={
                                                         selectedToggleCurrency !==
-                                                        ""
+                                                            ""
                                                             ? selectedToggleCurrency
                                                             : homeCurrency
                                                     }
@@ -852,7 +854,7 @@ function Singletrip() {
                                                     categoryData={categoryData}
                                                     currency={
                                                         selectedToggleCurrency !==
-                                                        ""
+                                                            ""
                                                             ? selectedToggleCurrency
                                                             : homeCurrency
                                                     }
@@ -885,7 +887,7 @@ function Singletrip() {
                             <header className="icon-bar-header">
                                 <div class="icon-bar-left">
                                     {userRole == "owner" ||
-                                    userRole == "editor" ? (
+                                        userRole == "editor" ? (
                                         // {/* Add Expense Button */}
                                         <div
                                             className="icon-div"
@@ -927,6 +929,17 @@ function Singletrip() {
                                 </div>
                                 <div class="icon-bar-right">
                                     {/* Filter Expenses Button */}
+                                    {selectedFilter && (
+                                        <div className="applied-filter">
+                                            <span style={{ paddingLeft: "29px" }}>{`Filter: ${selectedFilter}`}</span>
+                                            <button
+                                                className="clear-filter-btn"
+                                                onClick={clearFilter}
+                                            >
+                                                &times;
+                                            </button>
+                                        </div>
+                                    )}
                                     <div
                                         className="icon-div"
                                         tooltip="Filter"
@@ -956,21 +969,6 @@ function Singletrip() {
                                         </div>
                                     </div>
                                 </div>
-                                {/* <div className="spacer"></div>
-                                <div className="divider"></div> */}
-
-                                {/* Applied filter popup */}
-                                {selectedFilter && (
-                                    <div className="applied-filter">
-                                        <span>{`Filter: ${selectedFilter}`}</span>
-                                        <button
-                                            className="clear-filter-btn"
-                                            onClick={clearFilter}
-                                        >
-                                            &times;
-                                        </button>
-                                    </div>
-                                )}
                             </header>
                         </div>
                         <div className="container">
