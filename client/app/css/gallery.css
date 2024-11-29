@@ -29,7 +29,7 @@
     height: 100%;
     object-fit: cover;
     object-position: center;
-    border-radius: 12px; 
+    border-radius: 12px;
 }
 
 /* Updated Popup styling */
@@ -55,15 +55,15 @@
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    min-width: 200px; /* Smaller minimum to accommodate scaling */
-    min-height: 150px; /* Smaller minimum to accommodate scaling */
+    min-width: 200px;
+    min-height: 150px;
 }
 
 .imgBox img {
     max-width: 95vw;
     max-height: 90vh;
-    min-width: 600px; /* Significantly increased for small images */
-    min-height: 450px; /* Significantly increased for small images */
+    min-width: 600px;
+    min-height: 450px;
     width: auto;
     height: auto;
     object-fit: contain;
@@ -80,4 +80,13 @@
     align-items: center;
     text-align: center;
     color: black;
+}
+
+.delete-image-icon {
+    background-color: white;
+    padding: 8px;
+    border-radius: 50%;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    z-index: 1001;
 }
