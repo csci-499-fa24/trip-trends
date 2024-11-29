@@ -56,18 +56,14 @@
     align-items: center;
     overflow: hidden;
     min-width: 200px;
-    /* Smaller minimum to accommodate scaling */
     min-height: 150px;
-    /* Smaller minimum to accommodate scaling */
 }
 
 .imgBox img {
     max-width: 95vw;
     max-height: 90vh;
     min-width: 600px;
-    /* Significantly increased for small images */
     min-height: 450px;
-    /* Significantly increased for small images */
     width: auto;
     height: auto;
     object-fit: contain;
