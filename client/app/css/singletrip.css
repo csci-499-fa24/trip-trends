@@ -823,7 +823,6 @@
     margin: 5px 0 0;
     font-size: 17px;
     color: black;
-
 }
 
 .delete-icon:hover {
@@ -1064,119 +1063,6 @@
 }
 
 
-@media(max-width: 600px) {
-
-    /* Homepage: map size */
-    [style*="height: 537px"][style*="width: 85%"] {
-        width: 100% !important;
-    }
-
-    /* Trip page: Edit expense fom sizing */
-    .edit-expense-modal-content {
-        max-width: 100% !important;
-        max-height: 100%;
-    }
-
-    /* Trip page: Edit expense fomm edit btn */
-    .submit-edit-expense-button {
-        width: 60%;
-    }
-
-    /* Trip page: Edit expense fomm delete btn */
-    .delete-expense-button {
-        width: 60%;
-        padding: 10%;
-    }
-
-    /* Trip page: expense table filter pop up size*/
-    .applied-filter {
-        white-space: wrap;
-    }
-
-    /* Trip page: expense table filter pop up x position */
-    .clear-filter-btn {
-        margin: -20px;
-    }
-
-    /* Trip pg: Exchange rate sizing and spacing */
-    .exchange-rates-container {
-        width: 90%;
-        margin-bottom: 5%;
-        margin-top: 0%;
-    }
-
-    /* Trip pg: Top Icon bar position*/
-    .top-icon-bar-header {
-        margin-left: -7%;
-        margin-top: 5%;
-    }
-
-    /* Trip pg: Trip info title positon */
-    .trip-info-title {
-        padding-top: 5%;
-    }
-
-    /* Trip pg: overwiew size */
-    .trip-overview {
-        width: 102%;
-    }
-
-    /* Trip pg: overwiew item sizing */
-    .trip-overview-div {
-        min-width: 120px;
-    }
-
-    /* Trip pg: overwiew item buget positoning */
-    .trip-overview-bag {
-        margin-top: -45%;
-    }
-
-    /* Trip pg: overwiew items location and discover positoning */
-    #trip-locations-circle {
-        margin-top: -45%;
-        margin-left: -10%;
-    }
-
-    /* Trip pg: favorite icon positon */
-    .favorite-icon {
-        margin-top: 12%;
-    }
-
-    /* Trip pg: Spending circles position */
-    .spending-circles-container {
-        flex-direction: column;
-        gap: 50px;
-    }
-
-    /* Trip page: expense table icon bar size*/
-    .icon-bar-header {
-        width: 100%;
-        padding: 0px;
-    }
-
-    /* Trip page: expense table icon bar gap*/
-    .icon-bar-left,
-    .icon-bar-right {
-        gap: 0px;
-    }
-
-    /* Trip page: expense table icon bar title*/
-    .icon-bar-center {
-        position: static;
-        transform: none;
-        margin-top: 10px;
-        width: 100%;
-    }
-}
-
-@media(max-width: 600px) {
-
-    /* Trip page: Edit expense fomm edit btn */
-    .submit-edit-expense-button {
-        width: 70%;
-    }
-}
-
 /* Expense suggestions styling */
 .expense-suggestions-container {
     display: flex;
@@ -1265,3 +1151,132 @@
     margin: 0;
     padding: 0;
 }
+
+
+@media(max-width: 600px) {
+    /* Homepage: map size */
+    [style*="height: 537px"][style*="width: 85%"] {
+        width: 100% !important;
+    }
+
+    /* Trip page: Edit expense fom sizing */
+    .edit-expense-modal-content {
+        max-width: 100% !important;
+        max-height: 100%;
+    }
+
+    /* Trip page: Edit expense fomm edit btn */
+    .submit-edit-expense-button {
+        width: 60%;
+    }
+
+    /* Trip page: Edit expense fomm delete btn */
+    .delete-expense-button {
+        width: 60%;
+        padding: 10%;
+    }
+
+    /* Trip page: expense table filter pop up size*/
+    .applied-filter {
+        white-space: wrap;
+    }
+
+    /* Trip page: expense table filter pop up x position */
+    .clear-filter-btn {
+        margin: -20px;
+    }
+
+    /* Trip pg: Exchange rate sizing and spacing */
+    .exchange-rates-container {
+        width: 90%;
+        margin-bottom: 5%;
+        margin-top: 0%;
+    }
+
+    /* Trip pg: Top Icon bar position*/
+    .top-icon-bar-header {
+        margin-left: -5%;
+        margin-top: 5%;
+        max-width: 0%;
+    }
+
+    /* Trip pg: Trip info title positon */
+    .trip-info-title {
+        padding-top: 5%;
+    }
+
+    /* Trip pg: overwiew size */
+    .trip-overview {
+        width: 102%;
+    }
+
+    /* Trip pg: overwiew item sizing */
+    .trip-overview-div {
+        min-width: 120px;
+    }
+
+    /* Trip pg: overwiew item buget positoning */
+    .trip-overview-bag {
+        margin-top: -45%;
+    }
+
+    /* Trip pg: overwiew item pin location positoning */
+    #trip-locations-circle {
+        margin-top: -40%;
+        margin-left: -45%;
+    }
+
+    /* Trip pg: overwiew items pin location text positoning */
+    .dropdown-container-pin{
+        margin-right: 30%;
+    }
+
+    /* Trip pg: favorite icon positon */
+    .favorite-icon {
+        margin-top: 12%;
+    }
+
+    /* Trip pg: Spending circles position */
+    .spending-circles-container {
+        flex-direction: column;
+        gap: 50px;
+    }
+
+    /* Trip page: expense table icon bar size*/
+    .icon-bar-header {
+        width: 100%;
+        padding: 0px;
+    }
+
+    /* Trip page: expense table icon bar gap*/
+    .icon-bar-left,
+    .icon-bar-right {
+        gap: 0px;
+    }
+
+    /* Trip page: expense table icon bar title*/
+    .icon-bar-center {
+        position: static;
+        transform: none;
+        margin-top: 10px;
+        width: 100%;
+    }
+    
+
+    /* Trip pg: Expense suggestions position */
+    .expense-suggestions-container {
+        width: 100%;
+    }
+
+     /* Trip pg: Expense suggestions cards position */
+    .cards-container {
+        max-width: 50%;
+    }
+}
+
+/* Trip page: Edit expense fomm edit btn
+@media(max-width: 600px) {
+    .submit-edit-expense-button {
+        width: 70%;
+    }
+} */

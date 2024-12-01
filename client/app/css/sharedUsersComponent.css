@@ -2,7 +2,7 @@
 .whole_container{
     position: absolute;
     top: 150px;
-    right: 50px;
+    right: 5.5%;
 }
 
 .shared-users {
@@ -89,5 +89,13 @@
     .shared-user {       
         width: 35px;                  
         height: 35px;                         
+    }
+}
+
+@media (min-width: 1600px){
+    /* Trip pg: shared user icon position */
+    .whole_container{
+        top: 137px;
+        right: 14%;
     }
 }

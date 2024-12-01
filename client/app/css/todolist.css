@@ -3,6 +3,7 @@
     display: flex;
     justify-content: center;
     width: 100%;
+    flex-wrap: wrap;
 }
 
 .list-display {
@@ -26,4 +27,18 @@ h3 {
 
 .MuiListItemText-primary {
     font-size: 18px;
+}
+
+@media (max-width: 600px) {
+    /* list pg: both list size and position */
+    .list-display {
+        width: 90%; 
+        margin: 10px auto; 
+    }
+
+    /* list pg: both list stacking */
+    .row {
+        flex-direction: column;
+        align-items: center;
+    }
 }

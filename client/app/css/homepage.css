@@ -302,9 +302,9 @@
         max-width: 90% !important;
     }
 
-    /* Trip pg: top icon bar size */
+    /* Gallery pg: upload btn position */
     .icon-div  {
-        width: 0%;
+        margin-left: 2%;
     }
 }
 
