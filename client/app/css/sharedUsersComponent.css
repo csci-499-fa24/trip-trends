@@ -72,6 +72,7 @@
     font-weight: bold;
 }
 
+
 @media (max-width: 600px) {
     /* Trip pg: shared user icon position */
     .whole_container{
@@ -90,5 +91,3 @@
         height: 35px;                         
     }
 }
-
-
