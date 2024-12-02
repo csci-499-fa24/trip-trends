@@ -313,6 +313,7 @@ select, input {
     font-size: 1.1em;
     color: #666;
     font-weight: lighter;
+    margin-top: 5px;
 }
 
 .leg-dates {

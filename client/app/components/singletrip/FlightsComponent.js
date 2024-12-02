@@ -29,6 +29,12 @@ const FlightsComponent = ({ tripId }) => {
         }
     }, [tripId]);
 
+    useEffect(() => {
+        if (locationsData.length === 1) {
+            getTripDates()
+        }
+    }, [locationsData]);
+
     const handleTabChange = (event, newIndex) => {
         setTabIndex(newIndex);
     };
@@ -39,6 +45,7 @@ const FlightsComponent = ({ tripId }) => {
                 // console.log(response.data);
                 const data = response.data.data;
 
+                // including date
                 const locationsWithLatLong = data.map(item => ({
                     location: item.location,
                     latitude: item.latitude,
@@ -46,12 +53,43 @@ const FlightsComponent = ({ tripId }) => {
                 }));
 
                 setLocationsData(locationsWithLatLong);
+                console.log(locationsWithLatLong);
                 fetchArrivalAirportCodes(locationsWithLatLong);
 
             })
             .catch(error => {
-                console.error('Error fetching trip data:', error);
+                console.error('Error fetching trip locations data:', error);
             });
+    };
+
+    // only called when there is one trip location associated with the trips
+    const getTripDates = () => {
+        setLoading(true);
+        if (tripId) {
+            axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}`)
+                .then((response) => {
+                    const { start_date, end_date } = response.data.data;
+                    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+
+                    if (start_date >= today) {
+                        setTravelDate(start_date);
+                    }
+
+                    if (end_date >= today) {
+                        setReturnDate(end_date);
+                    }
+
+                    // console.log(start_date);
+                    // console.log(end_date);
+                })
+
+                .catch((error) => {
+                    console.error("Error fetching trip data:", error);
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        }
     };
 
     // SDK for destination currencies
@@ -251,18 +289,21 @@ const FlightsComponent = ({ tripId }) => {
             <div className="form-group">
                 <label>Going To:</label>
                 <div className="select-container">
-                    <select
+                    <input
+                        type="text"
+                        list="destination-options"
                         value={travelAirportCode}
                         onChange={(e) => setTravelAirportCode(e.target.value)}
                         required
-                    >
-                        <option value="" disabled>Select destination airport</option>
+                    />
+                    <datalist id="destination-options">
+                        <option value="">Select or Type Destination Airport</option>
                         {destinationAirportCodes.map((code, index) => (
                             <option key={index} value={code}>
                                 {code}
                             </option>
                         ))}
-                    </select>
+                    </datalist>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="icon">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                         <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
@@ -279,6 +320,7 @@ const FlightsComponent = ({ tripId }) => {
                     value={travelDate}
                     onChange={(e) => setTravelDate(e.target.value)}
                     required
+                    min={new Date().toISOString().split('T')[0]} // cannot set dates before today
                 />
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="icon">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 2.994v2.25m10.5-2.25v2.25m-14.252 13.5V7.491a2.25 2.25 0 0 1 2.25-2.25h13.5a2.25 2.25 0 0 1 2.25 2.25v11.251m-18 0a2.25 2.25 0 0 0 2.25 2.25h13.5a2.25 2.25 0 0 0 2.25-2.25m-18 0v-7.5a2.25 2.25 0 0 1 2.25-2.25h13.5a2.25 2.25 0 0 1 2.25 2.25v7.5m-6.75-6h2.25m-9 2.25h4.5m.002-2.25h.005v.006H12v-.006Zm-.001 4.5h.006v.006h-.006v-.005Zm-2.25.001h.005v.006H9.75v-.006Zm-2.25 0h.005v.005h-.006v-.005Zm6.75-2.247h.005v.005h-.005v-.005Zm0 2.247h.006v.006h-.006v-.006Zm2.25-2.248h.006V15H16.5v-.005Z" />
@@ -296,6 +338,7 @@ const FlightsComponent = ({ tripId }) => {
                         value={returnDate}
                         onChange={(e) => setReturnDate(e.target.value)}
                         required
+                        min={new Date().toISOString().split('T')[0]} // cannot set dates before today
                     />
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="icon">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 2.994v2.25m10.5-2.25v2.25m-14.252 13.5V7.491a2.25 2.25 0 0 1 2.25-2.25h13.5a2.25 2.25 0 0 1 2.25 2.25v11.251m-18 0a2.25 2.25 0 0 0 2.25 2.25h13.5a2.25 2.25 0 0 0 2.25-2.25m-18 0v-7.5a2.25 2.25 0 0 1 2.25-2.25h13.5a2.25 2.25 0 0 1 2.25 2.25v7.5m-6.75-6h2.25m-9 2.25h4.5m.002-2.25h.005v.006H12v-.006Zm-.001 4.5h.006v.006h-.006v-.005Zm-2.25.001h.005v.006H9.75v-.006Zm-2.25 0h.005v.005h-.006v-.005Zm6.75-2.247h.005v.005h-.005v-.005Zm0 2.247h.006v.006h-.006v-.006Zm2.25-2.248h.006V15H16.5v-.005Z" />
