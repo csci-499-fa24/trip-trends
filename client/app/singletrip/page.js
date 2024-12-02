@@ -662,6 +662,7 @@ function Singletrip() {
                 setUserName={setUserName}
                 userId={userId}
             />
+            <div className="trip-pg-contanier">
             <div className="main-container">
                 {tripData ? (
                     <div>
@@ -1113,6 +1114,7 @@ function Singletrip() {
                         </div>
                     )}
                 </div>
+            </div>
             </div>
             <div></div>
         </div>

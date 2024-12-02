@@ -31,3 +31,24 @@
         right: 20px !important;
     }
 }
+
+@media (min-width: 1600px){
+    /* Trip pg: currency tooggle position */
+    .currency-toggle {
+        right: 10% !important;
+    }
+}
+
+@media (min-width: 2000px){
+    /* Trip pg: currency tooggle position */
+    .currency-toggle {
+        right: 16% !important;
+    }
+}
+
+@media (min-width: 2600px){
+    /* Trip pg: currency tooggle position */
+    .currency-toggle {
+        right: 25% !important;
+    }
+}
