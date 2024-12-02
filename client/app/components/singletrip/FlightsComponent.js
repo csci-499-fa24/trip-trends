@@ -21,7 +21,7 @@ const FlightsComponent = ({ tripId }) => {
     const [budgetOption, setBudgetOption] = useState('$');
     const [sortOption, setSortOption] = useState('PRICE');
     const [classOfServiceOption, setClassOfServiceOption] = useState('ECONOMY'); 
-    const [tabIndex, setTabIndex] = useState(0); // default is one way
+    const [tabIndex, setTabIndex] = useState(0); // default is one way (0 index)
 
     useEffect(() => {
         if (tripId) {
@@ -158,13 +158,23 @@ const FlightsComponent = ({ tripId }) => {
         try {
             const response = await axios.request(options);
             console.log('Full Response:', response);
-        
-            const flights = response.data?.data?.flights || [];
-            if (flights.length === 0) {
-                toast.warn('No flights found');
-            } else {
-                setFlights(flights);
-                toast.success('Flight search successful!');
+            
+            // check if status is 200 and message is Success meaning API is working
+            if (response.status === 200 && response.data?.message === "Success") {
+                const flights = response.data?.data?.flights || [];
+                if (flights.length === 0) {
+                    toast.warn('No flights found');
+                } else {
+                    setFlights(flights);
+                    toast.success('Flight search successful!');
+                }
+            } 
+            // check If status is 200 but message is not "Success" meaning API is down
+            else if (response.status === 200) {
+                toast.warn('TripAdvisor is experiencing issues. Please try again later.');
+            } 
+            else {
+                toast.error('Something went wrong with the flight search');
             }
         } catch (error) {
             const message = error.response?.data?.message || 'Unknown error occurred';
@@ -175,7 +185,6 @@ const FlightsComponent = ({ tripId }) => {
         }
     };
     
-    
     // useEffect(() => {
     //     console.log(budgetOption);
     //     console.log(sortOption);
@@ -184,7 +193,7 @@ const FlightsComponent = ({ tripId }) => {
     
     return (
     <div>
-        {/* flight search fields */}
+        {/* Flight search fields */}
         <h2 className='section-title' style={{marginTop: '3%'}}>Search for Flights</h2>
         <div style={{ padding: "20px", textAlign: "center" }}>
             <Paper square sx={{ backgroundColor: "#f9f9f9", padding: "10px", marginLeft: '4%', marginRight: '4%', borderRadius: '8px'}}>
@@ -296,7 +305,7 @@ const FlightsComponent = ({ tripId }) => {
             )}
             {/* </div> */}
 
-            {/* budget sign options */}
+            {/* Budget sign options */}
             <div className="budget-options-row">
                     <div className="budget-options-container">
                         {budgetOptions.map((option) => (
@@ -315,7 +324,7 @@ const FlightsComponent = ({ tripId }) => {
             </form>
         </div>
 
-        {/* Flights found container */}
+        {/* Flights found display */}
         <div className="flights-widget-container">
             <div className="flights-widget">
                 {isLoading ? (
@@ -331,7 +340,11 @@ const FlightsComponent = ({ tripId }) => {
 
                                             <div className="flight-logo-container">
                                                 <img
-                                                    src={flight.segments[0].legs[0].operatingCarrier.logoUrl}
+                                                    src={
+                                                        flight.segments[0].legs[0].operatingCarrier.displayName === "Delta"
+                                                            ? "https://static.tacdn.com/img2/flights/airlines/logos/100x100/DeltaAirlines.png"
+                                                            : flight.segments[0].legs[0].operatingCarrier.logoUrl
+                                                    }
                                                     alt={flight.segments[0].legs[0].operatingCarrier.displayName}
                                                     className="flight-logo"
                                                 />
@@ -340,56 +353,86 @@ const FlightsComponent = ({ tripId }) => {
                                                 </h3>
                                             </div>
 
+                                            {flight.itineraryTag?.tag && (
+                                                <p className="itinerary-tag">
+                                                    {flight.itineraryTag.tag}
+                                                </p>
+                                            )}
+
                                             {flight.purchaseLinks[0].totalPricePerPassenger > 0 && (
                                                 <p className="flight-price">
                                                     <strong>Price:</strong> ${flight.purchaseLinks[0].totalPricePerPassenger}
                                                 </p>
                                             )}
 
-                                            {flight.segments.map((segment, segmentIndex) => (
-                                                <div key={segmentIndex} className="flight-segment">
-                                                    {segment.legs.map((leg, legIndex) => {
-                                                        if (!leg) return null;
+                                            {/* Layover information */}
+                                            {flight.segments.map((segment, segmentIndex) => {
+                                                const layovers = segment.legs.slice(1).map(leg => leg.originStationCode);
+                                                const layoverCount
+                                                 = layovers.length;
+                                                const layoverAirports = layovers.join(', ');
 
-                                                        const firstLegOrigin = segment.legs[0].originStationCode;
-                                                        const lastLegDestination = segment.legs[segment.legs.length - 1].destinationStationCode;
+                                                return (
+                                                    <div key={segmentIndex} className="flight-segment">
+                                                        {segment.legs.map((leg, legIndex) => {
+                                                            if (!leg) return null;
 
-                                                        return (
-                                                            <div key={legIndex} className="flight-leg">
+                                                            const firstLegOrigin = segment.legs[0].originStationCode;
+                                                            const lastLegDestination = segment.legs[segment.legs.length - 1].destinationStationCode;
 
-                                                                {/* display the first and last leg's origin and destination */}
-                                                                {legIndex === 0 && (
-                                                                    <div className="leg-info">
-                                                                        <p className="leg-origin-destination">
-                                                                            <strong>{firstLegOrigin}</strong> to{" "}
-                                                                            <strong>{lastLegDestination}</strong>
-                                                                        </p>
-                                                                        <p className="leg-times">
-                                                                            <strong>
-                                                                                {new Date(segment.legs[0].departureDateTime).toLocaleTimeString()}
-                                                                            </strong>{" "}
-                                                                            -{" "}
-                                                                            <strong>
-                                                                                {new Date(segment.legs[segment.legs.length - 1].arrivalDateTime).toLocaleTimeString()}
-                                                                            </strong>
-                                                                        </p>
-                                                                        <p className="leg-dates">
-                                                                            <strong>
-                                                                                {new Date(segment.legs[0].departureDateTime).toLocaleDateString()}
-                                                                            </strong>{" "}
-                                                                            -{" "}
-                                                                            <strong>
-                                                                                {new Date(segment.legs[segment.legs.length - 1].arrivalDateTime).toLocaleDateString()}
-                                                                            </strong>
-                                                                        </p>
-                                                                        
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
-                                            ))}
+                                                            const departureDate = new Date(segment.legs[0].departureDateTime);
+                                                            const arrivalDate = new Date(segment.legs[segment.legs.length - 1].arrivalDateTime);
+
+                                                            // Check if arrival is the next day
+                                                            const arriveNextDay = arrivalDate.getDate() !== departureDate.getDate();
+
+                                                            return (
+                                                                <div key={legIndex} className="flight-leg">
+
+                                                                    {/* Display the first and last leg's origin and destination */}
+                                                                    {legIndex === 0 && (
+                                                                        <div className="leg-info">
+                                                                            <p className="leg-origin-destination">
+                                                                                <strong>{firstLegOrigin}</strong> to{" "}
+                                                                                <strong>{lastLegDestination}</strong>
+                                                                                {arriveNextDay && (
+                                                                                    <span className="arrive-next-day">
+                                                                                        Arrive +1 Day
+                                                                                    </span>
+                                                                                )}
+                                                                            </p>
+                                                                            <p className="leg-times">
+                                                                                <strong>
+                                                                                    {departureDate.toLocaleTimeString()}
+                                                                                </strong>{" "}
+                                                                                -{" "}
+                                                                                <strong>
+                                                                                    {arrivalDate.toLocaleTimeString()}
+                                                                                </strong>
+                                                                            </p>
+                                                                            {/* <p className="leg-dates">
+                                                                                <strong>
+                                                                                    {departureDate.toLocaleDateString()}
+                                                                                </strong>{" "}
+                                                                                -{" "}
+                                                                                <strong>
+                                                                                    {arrivalDate.toLocaleDateString()}
+                                                                                </strong>
+                                                                            </p> */}
+
+                                                                            {layoverCount > 0 && (
+                                                                                <p className="layover-info">
+                                                                                    {layoverCount} layover{layoverCount > 1 ? 's' : ''} in {layoverAirports}
+                                                                                </p>
+                                                                            )}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                );
+                                            })}
 
                                             <a
                                                 href={`${flight.purchaseLinks[0].url}`}
@@ -403,9 +446,12 @@ const FlightsComponent = ({ tripId }) => {
                                     </div>
                                 ))
                             ) : (
-                                <p className="no-flights">No Flights Found</p>
+                                <p className="no-flights">No flights found</p>
                             )}
                         </div>
+
+
+
                     </>
                 )}
             </div>
