@@ -42,3 +42,18 @@ h3 {
         align-items: center;
     }
 }
+
+
+@media (min-width: 2000px) {
+    .whole-todo-list-container {
+        transform-origin: top center ; 
+        transform: scale(1.1);
+    }
+}
+
+@media (min-width: 2600px) {
+    .whole-todo-list-container {
+        transform-origin: top center ; 
+        transform: scale(1.1);
+    }
+}

@@ -26,9 +26,10 @@ const CurrencyToggleComponent = ({ homeCurrency, otherCurrencies, toggleChange }
 
   return (
     <div
+    className="currency-toggle"
     style={{
         position: "absolute",
-        right: "45px",
+        right: "5%",
         display: "flex",
         gap: "5px",
         padding: "0px", 
