@@ -283,9 +283,21 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                                                                                     paddingLeft: '35px',
                                                                                     paddingRight: '10px',
                                                                                     width: '100%',
-                                                                                    textAlign: 'right'
+                                                                                    textAlign: 'left'
                                                                                 }}
                                                                             />
+                                                                            {/* currency symbol */}
+                                                                            <span
+                                                                                style={{
+                                                                                    position: 'absolute',
+                                                                                    left: '43px',
+                                                                                    top: '40%',
+                                                                                    transform: 'translateY(-50%)',
+                                                                                    pointerEvents: 'none',
+                                                                                }}
+                                                                            >
+                                                                                {currencySymbolMap(localFormCurrency)}
+                                                                            </span>
                                                                         </label>
                                                                         <label className="edit-expense-field-label">
                                                                             Currency:
@@ -304,6 +316,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                                                                             </select>
                                                                         </label>
                                                                     </div>
+                                                                    <div className="field-pair">
                                                                     <label className="edit-expense-field-label">
                                                                         Category:
                                                                         <select
@@ -329,17 +342,27 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                                                                             required
                                                                         />
                                                                     </label>
-                                                                    <label className="edit-expense-field-label">
+                                                                    </div>
+                                                                    <label className="new-expense-field-label">
                                                                         Notes:
-                                                                        <textarea
+                                                                        <input
+                                                                            type="text"
                                                                             name="notes"
                                                                             value={selectedExpense.notes}
                                                                             onChange={handleEditChange}
                                                                         />
                                                                     </label>
-                                                                    <button type="submit">Save Changes</button>
+                                                                   <div className='container'>
+                                                                        <div className='row'>
+                                                                            <div className='col'>
+                                                                                <button type="submit" className="submit-edit-expense-button">Edit</button>
+                                                                            </div>
+                                                                            <div className='col'>
+                                                                                <button type="button" onClick={() => deleteExpense(selectedExpense.expense_id)} className="delete-expense-button">Delete</button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
                                                                 </form>
-                                                                <button onClick={() => deleteExpense(selectedExpense.expense_id)}>Delete Expense</button>
                                                             </div>
                                                         </div>
                                                     )}
