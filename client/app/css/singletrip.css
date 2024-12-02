@@ -1284,12 +1284,18 @@
 @media(min-width: 1600px) {
     /* Trip pg: pi chat, bar graph and meter's containers size */
     .toggle-container {
-        width: 90%;
+        width: 89%;
     }
 
     /* Trip pg: bottom icon bar size*/
     .icon-bar-header {
         width: 80%;
+    }
+
+    /* Trip pg: the whole trip page size */
+    .trip-pg-contanier{
+        transform-origin: top center ; 
+        transform: scale(1.1);
     }
 }
 

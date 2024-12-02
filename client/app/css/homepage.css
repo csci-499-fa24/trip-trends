@@ -354,3 +354,26 @@
     }
 }
 
+@media (min-width: 1600px) {
+    /* New Trip form size */
+    .homepage-modal-content {
+        max-width: 35% !important;
+    }
+}
+
+@media (min-width: 2000px) {
+    /* New Trip form size */
+    .homepage-modal-content {
+        max-width: 30% !important;
+    }
+}
+
+@media (min-width: 2600px) {
+    /* New Trip form size */
+    .homepage-modal-content {
+        max-width: 22% !important;
+    }
+}
+
+
+

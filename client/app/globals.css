@@ -183,6 +183,7 @@ form {
   gap: 15px; 
 }
 
+
 /* the container holding the dates */
 .date-fields {
   display: flex;
@@ -276,5 +277,12 @@ form {
   /* dropdown position */
   .dropdown {
     right: 30%;
+  }
+}
+
+@media(min-width: 1600px){
+  /* Trip pg : position of the top forms */
+  .modal {
+    top: -30% !important;
   }
 }
