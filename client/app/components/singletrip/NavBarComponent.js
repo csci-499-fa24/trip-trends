@@ -18,6 +18,9 @@ const NavBarComponent = ({ tripId, userRole, tripName, pointerDisabled = false }
             else if (path === '/discover') {
                 setActiveLink('discover');
             } 
+            else if (path === '/flights') {
+                setActiveLink('flights');
+            }
             else {
                 setActiveLink(`/singletrip?tripId=${tripId}`);
             }
@@ -60,6 +63,12 @@ const NavBarComponent = ({ tripId, userRole, tripName, pointerDisabled = false }
                             onClick={() => { setActiveLink('discover'), window.location.href = `/discover?tripId=${tripId}`;
                             }}>
                             Discover
+                        </Nav.Link>
+                        <Nav.Link
+                            className={activeLink === 'flights' ? 'active' : ''}
+                            onClick={() => { setActiveLink('flights'), window.location.href = `/flights?tripId=${tripId}`;
+                            }}>
+                            Flights
                         </Nav.Link>
                     </Nav>
                     </Navbar.Collapse>
