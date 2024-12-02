@@ -8,7 +8,11 @@ const {
     checkReceiptExistenceByExpenseId,
     getReceiptImageByExpenseId,
     updateExpense,
-    deleteExpense
+    transferExpense,
+    deleteExpense,
+    createLinkToken,
+    exchangePublicToken,
+    getTransactions
 } = require('../controllers/ExpenseController');
 
 // mock Expense and Trip model
@@ -391,6 +395,76 @@ describe('Expense Controller', () => {
         expect(mockResponse.json).toHaveBeenCalledWith({ data: updatedExpense });
     });
 
+    it('should transfer the expense successfully when valid data is provided', async () => {
+        const mockExpense = { 
+            trip_id: 1, 
+            save: jest.fn() 
+        };
+        
+        Expense.findByPk.mockResolvedValue(mockExpense);
+
+        mockRequest.params = { expenseId: '123' };
+        mockRequest.body = { fromTripId: 1, toTripId: 2 };
+
+        await transferExpense(mockRequest, mockResponse);
+
+        expect(Expense.findByPk).toHaveBeenCalledWith('123');
+        
+        expect(mockExpense.trip_id).toBe(2);
+        expect(mockExpense.save).toHaveBeenCalled();
+        
+        expect(mockResponse.status).toHaveBeenCalledWith(500);
+        expect(mockResponse.json).toHaveBeenCalledWith({ message: 'Expense transferred successfully' });
+    });
+
+    it('should return 400 when missing required fields (expenseId, fromTripId, toTripId)', async () => {
+        mockRequest.body = { fromTripId: 1, toTripId: 2 };
+        
+        await transferExpense(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(400);
+        expect(mockResponse.json).toHaveBeenCalledWith({ error: "Missing required fields: fromTripId, toTripId" });
+    });
+
+    it('should return 500 if the expense does not belong to the fromTripId', async () => {
+        const mockExpense = { 
+            trip_id: 3, 
+            save: jest.fn() 
+        };
+
+        Expense.findByPk.mockResolvedValue(mockExpense);
+
+        mockRequest.params = { expenseId: '123' };
+        mockRequest.body = { fromTripId: 1, toTripId: 2 };
+
+        await transferExpense(mockRequest, mockResponse);
+
+        expect(mockExpense.save).not.toHaveBeenCalled();
+        
+        expect(mockResponse.status).toHaveBeenCalledWith(500);
+        expect(mockResponse.json).toHaveBeenCalledWith({
+            message: "Internal Server Error",
+            error: expect.any(String)
+        });
+    });
+
+    it('should return 500 if an error occurs during the expense transfer', async () => {
+        const mockError = new Error('Database error');
+
+        Expense.findByPk.mockRejectedValue(mockError);
+
+        mockRequest.params = { expenseId: '123' };
+        mockRequest.body = { fromTripId: 1, toTripId: 2 };
+
+        await transferExpense(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(500);
+        expect(mockResponse.json).toHaveBeenCalledWith({
+            message: "Internal Server Error",
+            error: mockError.message
+        });
+    });
+
     it('should delete expense and return 204 status', async () => {
         const mockExpenseId = '4567';
         mockRequest.params = { expenseId: mockExpenseId };
@@ -430,5 +504,149 @@ describe('Expense Controller', () => {
             error: error.message
         });
         expect(console.error).toHaveBeenCalledWith(error);
+    });
+
+    it('should create a link token and return 200 status', async () => {
+        const mockCreateLinkTokenResponse = {
+            data: { link_token: 'mock-link-token' }
+        };
+
+        const plaidClient = new PlaidApi(new Configuration({
+            basePath: PlaidEnvironments.sandbox,
+            baseOptions: {
+                headers: {
+                    "PLAID-CLIENT-ID": process.env.PLAID_CLIENT_ID,
+                    "PLAID-SECRET": process.env.PLAID_SECRET,
+                },
+            },
+        }));
+
+        plaidClient.linkTokenCreate.mockResolvedValue(mockCreateLinkTokenResponse);
+        
+        mockRequest.body = { client_user_id: 'user123' };
+
+        await createLinkToken(mockRequest, mockResponse);
+
+        expect(plaidClient.linkTokenCreate).toHaveBeenCalledWith({
+            user: { client_user_id: 'user123' },
+            client_name: 'Trip Trends',
+            products: ['transactions'],
+            country_codes: ['US'],
+            language: 'en',
+        });
+        expect(mockResponse.status).toHaveBeenCalledWith(200);
+        expect(mockResponse.json).toHaveBeenCalledWith({ link_token: 'mock-link-token' });
+    });
+
+    it('should exchange public token and return 200 status', async () => {
+        const mockExchangeResponse = {
+            data: { access_token: 'mock-access-token' }
+        };
+
+        const plaidClient = new PlaidApi(new Configuration({
+            basePath: PlaidEnvironments.sandbox,
+            baseOptions: {
+                headers: {
+                    "PLAID-CLIENT-ID": process.env.PLAID_CLIENT_ID,
+                    "PLAID-SECRET": process.env.PLAID_SECRET,
+                },
+            },
+        }));
+
+        plaidClient.itemPublicTokenExchange.mockResolvedValue(mockExchangeResponse);
+
+        mockRequest.body = { public_token: 'mock-public-token' };
+
+        await exchangePublicToken(mockRequest, mockResponse);
+
+        expect(plaidClient.itemPublicTokenExchange).toHaveBeenCalledWith({
+            public_token: 'mock-public-token'
+        });
+        expect(mockResponse.status).toHaveBeenCalledWith(200);
+        expect(mockResponse.json).toHaveBeenCalledWith({ access_token: 'mock-access-token' });
+    });
+
+    it('should return 400 if public token is missing', async () => {
+        mockRequest.body = {}; 
+
+        await exchangePublicToken(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(400);
+        expect(mockResponse.json).toHaveBeenCalledWith({ error: "Public token is required" });
+    });
+
+    it('should return transactions and 200 status', async () => {
+        const mockTransactionsResponse = {
+            data: {
+                transactions: [
+                    { transaction_id: 'tx1', amount: 50, date: '2024-11-11', name: 'Transaction 1' },
+                    { transaction_id: 'tx2', amount: 100, date: '2024-11-10', name: 'Transaction 2' }
+                ],
+                total_transactions: 2
+            }
+        };
+
+        const plaidClient = new PlaidApi(new Configuration({
+            basePath: PlaidEnvironments.sandbox,
+            baseOptions: {
+                headers: {
+                    "PLAID-CLIENT-ID": process.env.PLAID_CLIENT_ID,
+                    "PLAID-SECRET": process.env.PLAID_SECRET,
+                },
+            },
+        }));
+
+        plaidClient.transactionsGet.mockResolvedValue(mockTransactionsResponse);
+
+        mockRequest.body = { access_token: 'mock-access-token' };
+
+        await getTransactions(mockRequest, mockResponse);
+
+        expect(plaidClient.transactionsGet).toHaveBeenCalledWith({
+            access_token: 'mock-access-token',
+            start_date: expect.any(String),
+            end_date: expect.any(String),
+            options: { count: 100, offset: 0 }
+        });
+
+        expect(mockResponse.status).toHaveBeenCalledWith(200);
+        expect(mockResponse.json).toHaveBeenCalledWith({
+            transactions: mockTransactionsResponse.data.transactions,
+            total_transactions: mockTransactionsResponse.data.total_transactions
+        });
+    });
+
+    it('should return 400 if access token is missing for transactions', async () => {
+        mockRequest.body = {}; 
+
+        await getTransactions(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(400);
+        expect(mockResponse.json).toHaveBeenCalledWith({ error: "Access token is required" });
+    });
+
+    it('should return 500 on error fetching transactions', async () => {
+        const error = new Error('Plaid API error');
+        const plaidClient = new PlaidApi(new Configuration({
+            basePath: PlaidEnvironments.sandbox,
+            baseOptions: {
+                headers: {
+                    "PLAID-CLIENT-ID": process.env.PLAID_CLIENT_ID,
+                    "PLAID-SECRET": process.env.PLAID_SECRET,
+                },
+            },
+        }));
+
+        plaidClient.transactionsGet.mockRejectedValue(error);
+
+        mockRequest.body = { access_token: 'mock-access-token' };
+
+        await getTransactions(mockRequest, mockResponse);
+
+        expect(mockResponse.status).toHaveBeenCalledWith(500);
+        expect(mockResponse.json).toHaveBeenCalledWith({
+            error: "Failed to fetch transactions",
+            details: error.message
+        });
     });
 });
