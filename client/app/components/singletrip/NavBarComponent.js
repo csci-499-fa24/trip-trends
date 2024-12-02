@@ -62,7 +62,7 @@ const NavBarComponent = ({ tripId, userRole, tripName, pointerDisabled = false }
                             className={activeLink === 'discover' ? 'active' : ''}
                             onClick={() => { setActiveLink('discover'), window.location.href = `/discover?tripId=${tripId}`;
                             }}>
-                            Discover
+                            Activities
                         </Nav.Link>
                         <Nav.Link
                             className={activeLink === 'flights' ? 'active' : ''}
