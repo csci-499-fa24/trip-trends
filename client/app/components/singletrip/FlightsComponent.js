@@ -5,6 +5,9 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import LoadingPageComponent from '../LoadingPageComponent';
+import Paper from "@mui/material/Paper";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
 
 const FlightsComponent = ({ tripId }) => {
     const [locationsData, setLocationsData] = useState([]);
@@ -18,12 +21,17 @@ const FlightsComponent = ({ tripId }) => {
     const [budgetOption, setBudgetOption] = useState('$');
     const [sortOption, setSortOption] = useState('PRICE');
     const [classOfServiceOption, setClassOfServiceOption] = useState('ECONOMY'); 
+    const [tabIndex, setTabIndex] = useState(0); // default is one way
 
     useEffect(() => {
         if (tripId) {
             getTripLocation();
         }
     }, [tripId]);
+
+    const handleTabChange = (event, newIndex) => {
+        setTabIndex(newIndex);
+    };
 
     const getTripLocation = () => {
         axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${tripId}`)
@@ -111,31 +119,36 @@ const FlightsComponent = ({ tripId }) => {
     const searchFlights = async (e) => {
         e.preventDefault();
     
-        if (!originAirportCode || !travelAirportCode || !travelDate || !returnDate) {
+        if (!originAirportCode || !travelAirportCode || !travelDate || (tabIndex !== 0 && !returnDate)) {
             toast.error('All fields are required!');
             return;
         }
-
-        const formattedTravelDate = formatDate(travelDate)
-        const formattedReturnDate = formatDate(returnDate)
-        // console.log(formattedTravelDate);
-        // console.log(formattedReturnDate);
-
+    
+        const formattedTravelDate = formatDate(travelDate);
+        const formattedReturnDate = tabIndex !== 0 ? formatDate(returnDate) : null;
+    
         setLoading(true);
+    
+        const params = {
+            sourceAirportCode: originAirportCode,
+            destinationAirportCode: travelAirportCode,
+            itineraryType: tabIndex === 0 ? 'ONE_WAY' : 'ROUND_TRIP',  // ONE_WAY for tabIndex 0, ROUND_TRIP 1
+            sortOrder: sortOption, // 'ML_BEST_VALUE', 'PRICE'
+            numAdults: 1,
+            numSeniors: 0,
+            classOfService: classOfServiceOption, // 'ECONOMY'
+            date: formattedTravelDate,
+        };
+    
+        // add returnDate only for round trips 
+        if (tabIndex !== 0) {
+            params.returnDate = formattedReturnDate;
+        }
+    
         const options = {
             method: 'GET',
             url: 'https://tripadvisor16.p.rapidapi.com/api/v1/flights/searchFlights',
-            params: {
-                sourceAirportCode: originAirportCode,
-                destinationAirportCode: travelAirportCode,
-                itineraryType: 'ROUND_TRIP', // assumes round trip, 'ONE_WAY'
-                sortOrder: sortOption, //'ML_BEST_VALUE','PRICE'
-                numAdults: 1,
-                numSeniors: 0,
-                classOfService: classOfServiceOption, // 'ECONOMY'
-                date: formattedTravelDate,
-                returnDate: formattedReturnDate
-            },
+            params: params,
             headers: {
                 'x-rapidapi-key': process.env.NEXT_PUBLIC_RAPIDAPI_TRIPADVISOR_KEY,
                 'x-rapidapi-host': 'tripadvisor16.p.rapidapi.com',
@@ -144,19 +157,25 @@ const FlightsComponent = ({ tripId }) => {
     
         try {
             const response = await axios.request(options);
-            console.log('Flights Found:', response.data);
-            setFlights(response.data.data.flights || []);
-            // console.log(response.data.data.flights);
-            toast.success('Flight search successful!');
-
+            console.log('Full Response:', response);
+        
+            const flights = response.data?.data?.flights || [];
+            if (flights.length === 0) {
+                toast.warn('No flights found');
+            } else {
+                setFlights(flights);
+                toast.success('Flight search successful!');
+            }
         } catch (error) {
-            console.error('Error finding flights:', error);
-            toast.error('Error finding flights');
+            const message = error.response?.data?.message || 'Unknown error occurred';
+            console.error('Error finding flights from TripAdvisor:', message);
+            toast.error(`Error: ${message}`);
         } finally {
             setLoading(false);
         }
     };
-
+    
+    
     // useEffect(() => {
     //     console.log(budgetOption);
     //     console.log(sortOption);
@@ -167,8 +186,42 @@ const FlightsComponent = ({ tripId }) => {
     <div>
         {/* flight search fields */}
         <h2 className='section-title' style={{marginTop: '3%'}}>Search for Flights</h2>
+        <div style={{ padding: "20px", textAlign: "center" }}>
+            <Paper square sx={{ backgroundColor: "#f9f9f9", padding: "10px", marginLeft: '4%', marginRight: '4%', borderRadius: '8px'}}>
+                <Tabs
+                    value={tabIndex}
+                    onChange={handleTabChange}
+                    textColor="inherit"
+                    centered
+                    TabIndicatorProps={{
+                        style: {
+                            backgroundColor: 'var(--lightgreen)',
+                        },
+                    }}
+                >
+                    <Tab
+                        label="One-Way"
+                        sx={{
+                            color: tabIndex === 0 ? 'var(--lightgreen)' : "inherit",
+                            fontWeight: tabIndex === 0 ? "bold" : "normal",
+                            borderRadius: '12px'
+                        }}
+                    />
+                    <Tab
+                        label="RoundTrip"
+                        sx={{
+                            color: tabIndex === 1 ? 'var(--lightgreen)' : "inherit",
+                            fontWeight: tabIndex === 1 ? "bold" : "normal",
+                            borderRadius: '12px'
+                        }}
+                    />
+                </Tabs>
+            </Paper>
+        </div>
         <div>
             <form onSubmit={searchFlights} className="flights-form">
+            {/* <div className="form-fields-container"> */}
+            {/* Leaving from */}
             <div className="form-group">
                 <label>Leaving From:</label>
                 <div className="input-container">
@@ -185,42 +238,47 @@ const FlightsComponent = ({ tripId }) => {
                 </div>
             </div>
 
-                <div className="form-group">
-                    <label>Going To:</label>
-                    <div className="select-container">
-                        <select
-                            value={travelAirportCode}
-                            onChange={(e) => setTravelAirportCode(e.target.value)}
-                            required
-                        >
-                            <option value="" disabled>Select destination airport</option>
-                            {destinationAirportCodes.map((code, index) => (
-                                <option key={index} value={code}>
-                                    {code}
-                                </option>
-                            ))}
-                        </select>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="icon">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
-                        </svg>
-                    </div>
-                </div>
-
-                <div className="form-group">
-                    <label>Travel Date:</label>
-                    <div className="input-container">
-                    <input
-                        type="date"
-                        value={travelDate}
-                        onChange={(e) => setTravelDate(e.target.value)}
+            {/* Going to */}
+            <div className="form-group">
+                <label>Going To:</label>
+                <div className="select-container">
+                    <select
+                        value={travelAirportCode}
+                        onChange={(e) => setTravelAirportCode(e.target.value)}
                         required
-                    />
+                    >
+                        <option value="" disabled>Select destination airport</option>
+                        {destinationAirportCodes.map((code, index) => (
+                            <option key={index} value={code}>
+                                {code}
+                            </option>
+                        ))}
+                    </select>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="icon">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 2.994v2.25m10.5-2.25v2.25m-14.252 13.5V7.491a2.25 2.25 0 0 1 2.25-2.25h13.5a2.25 2.25 0 0 1 2.25 2.25v11.251m-18 0a2.25 2.25 0 0 0 2.25 2.25h13.5a2.25 2.25 0 0 0 2.25-2.25m-18 0v-7.5a2.25 2.25 0 0 1 2.25-2.25h13.5a2.25 2.25 0 0 1 2.25 2.25v7.5m-6.75-6h2.25m-9 2.25h4.5m.002-2.25h.005v.006H12v-.006Zm-.001 4.5h.006v.006h-.006v-.005Zm-2.25.001h.005v.006H9.75v-.006Zm-2.25 0h.005v.005h-.006v-.005Zm6.75-2.247h.005v.005h-.005v-.005Zm0 2.247h.006v.006h-.006v-.006Zm2.25-2.248h.006V15H16.5v-.005Z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
                     </svg>
-                    </div>
                 </div>
+            </div>
+
+            {/* Travel date */}
+            <div className="form-group">
+                <label>Travel Date:</label>
+                <div className="input-container">
+                <input
+                    type="date"
+                    value={travelDate}
+                    onChange={(e) => setTravelDate(e.target.value)}
+                    required
+                />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="icon">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 2.994v2.25m10.5-2.25v2.25m-14.252 13.5V7.491a2.25 2.25 0 0 1 2.25-2.25h13.5a2.25 2.25 0 0 1 2.25 2.25v11.251m-18 0a2.25 2.25 0 0 0 2.25 2.25h13.5a2.25 2.25 0 0 0 2.25-2.25m-18 0v-7.5a2.25 2.25 0 0 1 2.25-2.25h13.5a2.25 2.25 0 0 1 2.25 2.25v7.5m-6.75-6h2.25m-9 2.25h4.5m.002-2.25h.005v.006H12v-.006Zm-.001 4.5h.006v.006h-.006v-.005Zm-2.25.001h.005v.006H9.75v-.006Zm-2.25 0h.005v.005h-.006v-.005Zm6.75-2.247h.005v.005h-.005v-.005Zm0 2.247h.006v.006h-.006v-.006Zm2.25-2.248h.006V15H16.5v-.005Z" />
+                </svg>
+                </div>
+            </div>
+
+            {/* Return date for roundtrip option */}
+            {tabIndex === 1 && (
                 <div className="form-group">
                     <label>Return Date:</label>
                     <div className="input-container">
@@ -235,9 +293,11 @@ const FlightsComponent = ({ tripId }) => {
                     </svg>
                     </div>
                 </div>
+            )}
+            {/* </div> */}
 
-                {/* budget sign options */}
-                <div className="budget-options-row">
+            {/* budget sign options */}
+            <div className="budget-options-row">
                     <div className="budget-options-container">
                         {budgetOptions.map((option) => (
                             <button
@@ -255,7 +315,7 @@ const FlightsComponent = ({ tripId }) => {
             </form>
         </div>
 
-        {/* flights found container */}
+        {/* Flights found container */}
         <div className="flights-widget-container">
             <div className="flights-widget">
                 {isLoading ? (

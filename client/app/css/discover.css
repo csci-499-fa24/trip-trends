@@ -167,15 +167,6 @@
     align-items: center;
 }
 
-.website-link {
-    text-decoration: underline;
-    color: #0056b3; 
-  }
-  
-  .website-link:hover {
-    text-decoration: underline;
-  }
-  
 .form-group {
     display: flex;
     flex-direction: row;
@@ -388,39 +379,4 @@ select, input {
     color: white;
     box-shadow: 4px 4px 8px rgba(185, 185, 185, 0.4), 
                 -4px -4px 8px rgba(255, 255, 255, 0.8);
-}
-
-
-.toggle-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 20px;
-    /* background-color: red; */
-    margin-left: 38%;
-    width: 15%;
-}
-
-.toggle-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    background-color: #f0f0f0;
-    color: #555;
-    margin: 0 5px;
-    border-radius: 20px;
-    transition: all 0.3s ease;
-}
-
-.toggle-button.active {
-    background-color: #A3B18A;
-    color: white;
-    font-weight: bold;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-}
-
-.toggle-button:not(.active):hover {
-    background-color: #ddd;
 }
