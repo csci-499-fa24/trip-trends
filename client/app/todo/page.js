@@ -287,8 +287,9 @@ function TodoList() {
                 setUserName={setUserName}
                 userId={userId}
             />
+          
             <NavBarComponent tripId={tripId} userRole={userRole} tripName={tripName} pointerDisabled={true} />
-
+            <div className='whole-todo-list-container'>
             <div className='list-container' style={{ marginTop: '25px' }}>
                 <div className="row" style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <div className="col list-display" style={{ flex: 1 }}>
@@ -461,6 +462,7 @@ function TodoList() {
                         </div>
                     </div>
                 </div>
+            </div>
             </div>
             <br></br>
             <br></br>

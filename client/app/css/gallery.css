@@ -11,7 +11,7 @@
     border-radius: 12px;
     width: 100%;
     aspect-ratio: 4 / 3;
-    cursor: pointer;
+    cursor: pointer; 
 }
 
 .gallery-item:nth-child(1) {
@@ -29,7 +29,7 @@
     height: 100%;
     object-fit: cover;
     object-position: center;
-    border-radius: 12px;
+    border-radius: 12px; 
 }
 
 /* Updated Popup styling */
@@ -55,15 +55,15 @@
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    min-width: 200px;
-    min-height: 150px;
+    min-width: 200px; /* Smaller minimum to accommodate scaling */
+    min-height: 150px; /* Smaller minimum to accommodate scaling */
 }
 
 .imgBox img {
     max-width: 95vw;
     max-height: 90vh;
-    min-width: 600px;
-    min-height: 450px;
+    min-width: 600px; /* Significantly increased for small images */
+    min-height: 450px; /* Significantly increased for small images */
     width: auto;
     height: auto;
     object-fit: contain;

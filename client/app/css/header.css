@@ -9,6 +9,7 @@
     justify-content: center;
     align-items: center;
     z-index: 1000; /* Ensure modal is on top */
+    transition: all 0.3s ease;
 }
 
 .modal-content {
@@ -24,7 +25,6 @@
     margin: 10px;
     width: 100%;
     text-align: center;
-    /* transition: all 0.3s ease; */
 }
 
 .currency-title{
@@ -57,6 +57,12 @@
 }
 
 @media(max-width: 600px){
+    /* Home Currency form size & position*/
+    .modal-overlay {
+        margin-left: -10%;
+        width: 120%;
+    }
+
     /* Trip form: all form size. */
     .modal-content {
         max-width: 80% !important;
