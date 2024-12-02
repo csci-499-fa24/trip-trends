@@ -280,14 +280,12 @@ form {
   }
 }
 
-@media(min-width: 1600px){
+@media(min-width: 2000px){
   /* Trip pg : position of the top forms */
   .modal {
     top: -30% !important;
   }
-}
 
-@media(min-width: 2000px){
   /* Green banner size */
   .header {
     height: 150px; 

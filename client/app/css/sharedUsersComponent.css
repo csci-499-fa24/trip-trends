@@ -95,7 +95,6 @@
 @media (min-width: 1600px){
     /* Trip pg: shared user icon position */
     .whole_container{
-        top: 1%;
         right: 10%;
     }
 }

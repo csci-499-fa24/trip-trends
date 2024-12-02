@@ -1305,23 +1305,6 @@
     .icon-bar-header {
         width: 80%;
     }
-
-    /* Trip pg: the whole trip page size */
-    .trip-pg-contanier{
-        transform-origin: top center ; 
-        transform: scale(1.1);
-    }
-
-    /* Trip pg: edit expense form postion */
-    .edit-expense-modal {
-        top: 10%;
-    }
-
-    /* Trip pg: edit expense form postion */
-    .new-expense-modal{
-        top: 10%;
-    }
-
 }
 
 @media(min-width: 2000px) {
@@ -1341,11 +1324,20 @@
         transform: scale(1.4);
     }
 
+    /* Trip pg: edit expense form postion */
+    .edit-expense-modal {
+        top: 15%;
+    }
+
+    /* Trip pg: edit expense form postion */
+    .new-expense-modal{
+        top: 15%;
+    }
+
      /* Trip pg:  edit expense form size */
     .edit-expense-modal-content {
         max-width: 30% !important;
     }
-
 }
 
 @media(min-width: 2600px) {
