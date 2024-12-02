@@ -366,12 +366,22 @@
     .homepage-modal-content {
         max-width: 30% !important;
     }
+
+    /* Trip pg: form size */
+    .modal-content {
+        width: 30% !important; 
+    }
 }
 
 @media (min-width: 2600px) {
     /* New Trip form size */
     .homepage-modal-content {
         max-width: 22% !important;
+    }
+
+    /* Trip pg: form size */
+    .modal-content {
+        width: 25% !important; 
     }
 }
 
