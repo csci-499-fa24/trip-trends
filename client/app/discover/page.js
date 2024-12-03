@@ -92,7 +92,7 @@ function DiscoverPage() {
 
       <ToastContainer hideProgressBar={true} />
       <HeaderComponent
-        headerTitle="Discover Page"
+        headerTitle="Activities Page"
         setUserName={setUserName}
         userId={userId}
       />

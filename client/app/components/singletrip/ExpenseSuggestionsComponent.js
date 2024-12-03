@@ -128,7 +128,7 @@ const ExpenseSuggestionsComponent = ({
 
     return (
         <div className="expense-suggestions-container">
-            <h3>Suggested Expenses</h3>
+            <h2>Suggested Expenses</h2>
             <div className="expenses-suggestions-carousel">
                 <div className="arrow">
                     <svg

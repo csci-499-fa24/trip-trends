@@ -4,6 +4,9 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import LoadingPageComponent from '../LoadingPageComponent';
+import Paper from "@mui/material/Paper";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
 
 
 const EventComponent = ({ tripId }) => {
@@ -16,7 +19,7 @@ const EventComponent = ({ tripId }) => {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     const [loadingTimedOut, setLoadingTimedOut] = useState(false);
-    const [activeTab, setActiveTab] = useState('events'); // 'events' or 'sightseeing'
+    const [tabIndex, setTabIndex] = useState(0); // default is one way
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {
@@ -54,6 +57,10 @@ const EventComponent = ({ tripId }) => {
             console.log("Problem with locationsData:", locationsData);
         }
     }, [tripData, locationsData]);
+
+    const handleTabChange = (event, newIndex) => {
+        setTabIndex(newIndex);
+    };
 
     const getTripLocation = () => {
         axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trip-locations/trips/${tripId}`)
@@ -201,23 +208,41 @@ const EventComponent = ({ tripId }) => {
     return (
         <div className="event-widget-container">
             {/* Toggle Buttons */}
-            <div className="toggle-container">
-                <button
-                    className={`toggle-button ${activeTab === 'events' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('events')}
+            <div style={{ padding: "20px", textAlign: "center" }}>
+            <Paper square sx={{ backgroundColor: "#f9f9f9", padding: "10px", marginLeft: '0%', marginRight: '10%', borderRadius: '8px'}}>
+                <Tabs
+                    value={tabIndex}
+                    onChange={handleTabChange}
+                    textColor="inherit"
+                    centered
+                    TabIndicatorProps={{
+                        style: {
+                            backgroundColor: 'var(--lightgreen)',
+                        },
+                    }}
                 >
-                    Events
-                </button>
-                <button
-                    className={`toggle-button ${activeTab === 'sightseeing' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('sightseeing')}
-                >
-                    Sightseeing
-                </button>
-            </div>
+                    <Tab
+                        label="Events"
+                        sx={{
+                            color: tabIndex === 0 ? 'var(--lightgreen)' : "inherit",
+                            fontWeight: tabIndex === 0 ? "bold" : "normal",
+                            borderRadius: '12px'
+                        }}
+                    />
+                    <Tab
+                        label="Sightseeing"
+                        sx={{
+                            color: tabIndex === 1 ? 'var(--lightgreen)' : "inherit",
+                            fontWeight: tabIndex === 1 ? "bold" : "normal",
+                            borderRadius: '12px'
+                        }}
+                    />
+                </Tabs>
+            </Paper>
+        </div>
 
-            {/* Conditional Rendering Based on Active Tab */}
-            {activeTab === 'events' && (
+            {/* Conditional Rendering Based on Active Tab Index */}
+            {tabIndex === 0 && (
                 <div className="event-widget">
                     <h2 className="section-title">Events</h2>
                     <div className="event-container">
@@ -263,17 +288,17 @@ const EventComponent = ({ tripId }) => {
                                 </div>
                             ))
                         ) : (
-                            <p className="no-events">No Events Found</p>
+                            <p className="no-events">No events found</p>
                         )}
                     </div>
                 </div>
             )}
 
-            {activeTab === 'sightseeing' && (
+            {tabIndex === 1 && (
                 <div className="event-widget">
                     <h2 className="section-title">Sightseeing</h2>
                     {sightseeingData.length === 0 ? (
-                        <p>No sightseeing places found.</p>
+                        <p className='no-events'>No sightseeing places found</p>
                     ) : (
                         <div className="event-container">
                             {sightseeingData.map((place, index) => (
