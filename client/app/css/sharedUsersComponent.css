@@ -2,7 +2,7 @@
 .whole_container{
     position: absolute;
     top: 150px;
-    right: 50px;
+    right: 5.5%;
 }
 
 .shared-users {
@@ -72,6 +72,7 @@
     font-weight: bold;
 }
 
+
 @media (max-width: 600px) {
     /* Trip pg: shared user icon position */
     .whole_container{
@@ -91,4 +92,25 @@
     }
 }
 
+@media (min-width: 1600px){
+    /* Trip pg: shared user icon position */
+    .whole_container{
+        right: 10%;
+    }
+}
 
+@media (min-width: 2000px){
+    /* Trip pg: shared user icon position */
+    .whole_container{
+        top: 1.5%;
+        right: 16%;
+    }
+}
+
+@media (min-width: 2600px){
+    /* Trip pg: shared user icon position */
+    .whole_container{
+        top: 1.5%;
+        right: 25%;
+    }
+}

@@ -190,7 +190,7 @@ const GeneralTripInfoComponent = ({ userId, tripData, convertedBudget, tripId, t
                 <div className="trip-overview-div">
                     <div id="trip-locations-circle">📍</div>
                     <div className="trip-overview-content">
-                        <div className='dropdown-container'>
+                        <div className='dropdown-container-pin'>
                             <LocationsDropdownComponent tripLocations={tripLocations} />
                         </div>
                     </div>

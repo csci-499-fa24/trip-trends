@@ -132,6 +132,7 @@ const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData, currency
             <BarChart
                 xAxis={[{ scaleType: 'band', data: Array.from(allExpenseDates).sort() }]}
                 series={series}
+                width={1050}
                 // minWidth={1000}
                 height={300}
                 colors={chartColors}

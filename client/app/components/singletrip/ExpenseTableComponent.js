@@ -11,6 +11,9 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
     const [localFormCurrency, setLocalFormCurrency] = useState(selectedCurrency);
     const [loading, setLoading] = useState(true);
     const [loadingTimedOut, setLoadingTimedOut] = useState(false);
+    const [expensesWithReceipt, setExpensesWithReceipt] = useState({});
+    const [modalImage, setModalImage] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {
@@ -27,6 +30,24 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
             setLoading(false); 
         }
     }, [expensesToDisplay, categoryData]);
+
+    useEffect(() => {
+        if (Array.isArray(expensesToDisplay)) {
+            expensesToDisplay.forEach(async (expense) => {
+                try {
+                    const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/${expense.expense_id}/check-receipt`);
+                    if (response.status === 200) {
+                        setExpensesWithReceipt((prev) => ({
+                            ...prev,
+                            [expense.expense_id]: response.data.receiptExists,
+                        }));
+                    }
+                } catch (error) {
+                    console.error('Error checking receipt:', error);
+                }
+            });
+        }
+    }, [expensesToDisplay]);
 
     const handleEditChange = (e) => {
         const { name, value } = e.target;
@@ -102,9 +123,6 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
         }
     };
 
-    // console.log(categoryData)
-    // console.log(categoryData.labels)
-
     const memoizedExpenses = useMemo(() => {
         if (!expensesToDisplay || expensesToDisplay.length === 0) return [];
         return expensesToDisplay.map((expense) => {
@@ -120,6 +138,24 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
             };
         });
     }, [expensesToDisplay, categoryData]);
+
+    const handleReceiptClick = async (expenseId) => {
+        try {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/${expenseId}/image`, {
+                responseType: 'blob', // Ensure you get the image data
+            });
+            const imageUrl = URL.createObjectURL(response.data);
+            setModalImage(imageUrl); // Set the image for the modal
+            setIsModalOpen(true); // Open the modal
+        } catch (error) {
+            console.error('Error fetching receipt image:', error);
+        }
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false); // Close the modal
+        setModalImage(null); // Clear the image
+    };
 
     if (loading && !loadingTimedOut) {
         return <LoadingPageComponent />;
@@ -143,6 +179,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                                     <th>Category</th>
                                     <th>Date</th>
                                     <th>Notes</th>
+                                    <th>Receipt</th> {/* New Receipt Column */}
                                     <th>Edit</th>
                                 </tr>
                             </thead>
@@ -159,7 +196,6 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                                             </td>
                                             <td>{expense.currency}</td>
                                             <td>
-                                                {/* Category with color tag */}
                                                 <span
                                                     className="category-tag"
                                                     style={{
@@ -174,9 +210,35 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                                                     {getCategoryIcon(expense.category)} {expense.category}
                                                 </span>
                                             </td>
-                                            {/* <td>{getCategoryIcon(expense.category)} {expense.category}</td> */}
-                                            <td>{expense.posted.split('-')[1]}/{expense.posted.split('-')[2]}/{expense.posted.split('-')[0]} </td>
+                                            <td>{expense.posted.split('-')[1]}/{expense.posted.split('-')[2]}/{expense.posted.split('-')[0]}</td>
                                             <td>{expense.notes}</td>
+                                            <td>
+                                            {/* Display Receipt SVG */}
+                                            {expensesWithReceipt[expense.expense_id] ? (
+                                                <button 
+                                                onClick={() => handleReceiptClick(expense.expense_id)} 
+                                                aria-label="View Receipt"
+                                                style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }} // Makes the background transparent
+                                                >
+                                                <svg 
+                                                    xmlns="http://www.w3.org/2000/svg" 
+                                                    fill="none" 
+                                                    viewBox="0 0 24 24" 
+                                                    strokeWidth="1.5" 
+                                                    stroke="currentColor" 
+                                                    className="size-6"
+                                                >
+                                                    <path 
+                                                    strokeLinecap="round" 
+                                                    strokeLinejoin="round" 
+                                                    d="m9 14.25 6-6m4.5-3.493V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0c1.1.128 1.907 1.077 1.907 2.185ZM9.75 9h.008v.008H9.75V9Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm4.125 4.5h.008v.008h-.008V13.5Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" 
+                                                    />
+                                                </svg>
+                                                </button>
+                                            ) : (
+                                                <span>No Receipt</span>
+                                            )}
+                                            </td>
                                             <td>
                                                 <div className="icon-div" tooltip="Edit Trip" tabIndex="0">
                                                     <div className="icon-SVG">
@@ -221,7 +283,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                                                                                     paddingLeft: '35px',
                                                                                     paddingRight: '10px',
                                                                                     width: '100%',
-                                                                                    textAlign: 'left',
+                                                                                    textAlign: 'left'
                                                                                 }}
                                                                             />
                                                                             {/* currency symbol */}
@@ -245,69 +307,43 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                                                                                 onChange={handleCurrencyChange}
                                                                                 required
                                                                             >
-                                                                                <option value="" disabled>Select Currency</option>
-
-                                                                                {/* Display the selected currency at the top if it exists */}
-                                                                                {localFormCurrency && (
-                                                                                    <option value={localFormCurrency}>{localFormCurrency}</option>
-                                                                                )}
-
-                                                                                {/* Recommended currencies */}
-                                                                                {otherCurrencies
-                                                                                    .filter((code) => code !== localFormCurrency)
-                                                                                    .map((code, index) => (
-                                                                                        <option key={`other-${index}`} value={code}>
-                                                                                            {code}
-                                                                                        </option>
-                                                                                    ))}
-
-                                                                                {/* USD as a fallback option */}
-                                                                                <optgroup label="Other">
-                                                                                    <option value="USD">USD</option>
-                                                                                    {currencyCodes
-                                                                                        .filter(
-                                                                                            (code) =>
-                                                                                                code !== localFormCurrency &&
-                                                                                                code !== "USD" &&
-                                                                                                !otherCurrencies.includes(code)
-                                                                                        )
-                                                                                        .map((code) => (
-                                                                                            <option key={code} value={code}>
-                                                                                                {code}
-                                                                                            </option>
-                                                                                        ))}
-                                                                                </optgroup>
-                                                                            </select>
-                                                                        </label>
-
-                                                                    </div>
-                                                                    <div className="field-pair">
-                                                                        <label className="edit-expense-field-label">
-                                                                            Category:
-                                                                            <select
-                                                                                name="category"
-                                                                                value={selectedExpense.category}
-                                                                                onChange={handleEditChange}
-                                                                                required
-                                                                            >
-                                                                                <option value="">Select Category</option>
-                                                                                {expenseCategories.map((category) => (
-                                                                                    <option key={category} value={category}>{category}</option>
+                                                                                <option value="USD">USD</option>
+                                                                                {otherCurrencies.map((currency) => (
+                                                                                    <option key={currency} value={currency}>
+                                                                                        {currency}
+                                                                                    </option>
                                                                                 ))}
                                                                             </select>
                                                                         </label>
-                                                                        <label className="edit-expense-field-label">
-                                                                            Date:
-                                                                            <input
-                                                                                type="date"
-                                                                                name="posted"
-                                                                                value={selectedExpense.posted}
-                                                                                onChange={handleEditChange}
-                                                                                required
-                                                                            />
-                                                                        </label>
                                                                     </div>
+                                                                    <div className="field-pair">
                                                                     <label className="edit-expense-field-label">
+                                                                        Category:
+                                                                        <select
+                                                                            name="category"
+                                                                            value={selectedExpense.category}
+                                                                            onChange={handleEditChange}
+                                                                            required
+                                                                        >
+                                                                            {expenseCategories.map((category, idx) => (
+                                                                                <option key={idx} value={category}>
+                                                                                    {category}
+                                                                                </option>
+                                                                            ))}
+                                                                        </select>
+                                                                    </label>
+                                                                    <label className="edit-expense-field-label">
+                                                                        Date:
+                                                                        <input
+                                                                            type="date"
+                                                                            name="posted"
+                                                                            value={selectedExpense.posted}
+                                                                            onChange={handleEditChange}
+                                                                            required
+                                                                        />
+                                                                    </label>
+                                                                    </div>
+                                                                    <label className="new-expense-field-label">
                                                                         Notes:
                                                                         <input
                                                                             type="text"
@@ -316,7 +352,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                                                                             onChange={handleEditChange}
                                                                         />
                                                                     </label>
-                                                                    <div className='container'>
+                                                                   <div className='container'>
                                                                         <div className='row'>
                                                                             <div className='col'>
                                                                                 <button type="submit" className="submit-edit-expense-button">Edit</button>
@@ -338,9 +374,20 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                             </tbody>
                         </Table>
                     </div>
+                    
+                    {/* Modal for displaying the receipt */}
+                    {isModalOpen && (
+                        <div className="receipt-modal-overlay">
+                            <div className="receipt-modal">
+                                <button className="close-modal-button" onClick={handleCloseModal}>X</button>
+                                <img src={modalImage} alt="Receipt" className="receipt-image" />
+                            </div>
+                        </div>
+                    )}
+
                 </div>
             ) : (
-                <p>No expense data available to display.</p>
+                <p>No expense data available...</p>
             )}
         </div>
     );

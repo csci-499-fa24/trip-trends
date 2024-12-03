@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ReceiptImageComponent from './ReceiptImageComponent';
 import currencySymbolMap from 'currency-symbol-map';
+import '../../css/singletrip.css';
 
 const ExpenseFormComponent = ({ 
     tripId, 
@@ -48,7 +49,7 @@ const ExpenseFormComponent = ({
     return (
         <div className="expense-form">
             {isPopUpVisible && (
-                <div className={`modal ${isUploadHidden ? 'wide-form' : ''}`}>
+                <div className={`new-expense-modal ${isUploadHidden ? 'wide-form' : ''}`}>
                     <div className="modal-content">
                         <span className="close" onClick={() => setPopUpVisible(false)}>&times;</span>
                         <h2 className="new-expense-title">New Expense</h2>

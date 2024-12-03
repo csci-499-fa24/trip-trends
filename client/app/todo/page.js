@@ -249,7 +249,7 @@ function TodoList() {
                         console.error('Error fetching trip data:', error);
                     })
             }
-          };
+        };
 
         getUserId();
         fetchUserName();
@@ -277,11 +277,8 @@ function TodoList() {
             }
         };
         fetchUserRole();
-    
-    }, [tripId]);
 
-    // console.log("PLIST: ", purchaseList);
-    // console.log("SLIST: ", sightseeingList);
+    }, [tripId]);
 
     return (
         <div className='container'>
@@ -290,9 +287,10 @@ function TodoList() {
                 setUserName={setUserName}
                 userId={userId}
             />
-            <NavBarComponent tripId={tripId} userRole={userRole} tripName={tripName} pointerDisabled={true}/>
-
-            <div className='list-container' style ={{marginTop: '25px'}}>
+          
+            <NavBarComponent tripId={tripId} userRole={userRole} tripName={tripName} pointerDisabled={true} />
+            <div className='whole-todo-list-container'>
+            <div className='list-container' style={{ marginTop: '25px' }}>
                 <div className="row" style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <div className="col list-display" style={{ flex: 1 }}>
                         {/* Add Purchase Item */}
@@ -433,7 +431,7 @@ function TodoList() {
                                                             </div>
                                                         </div>
                                                     }
-                                                    disablePadding sx={{ width: "28vw", alignItems: 'center', justifyContent: 'center' }}>
+                                                    disablePadding sx={{ width: "115%", alignItems: 'center', justifyContent: 'center' }}>
                                                     <div className="icon-div" tooltip="Delete Item" tabIndex="0">
                                                         <div className="icon-SVG">
                                                             <div onClick={() => deleteItem(item)}>
@@ -464,6 +462,7 @@ function TodoList() {
                         </div>
                     </div>
                 </div>
+            </div>
             </div>
             <br></br>
             <br></br>

@@ -92,12 +92,12 @@ function DiscoverPage() {
 
       <ToastContainer hideProgressBar={true} />
       <HeaderComponent
-        headerTitle="Discover Page"
+        headerTitle="Activities Page"
         setUserName={setUserName}
         userId={userId}
       />
       <NavBarComponent tripId={tripId} userRole={userRole} tripName={tripName} pointerDisabled={true}/>
-      <FlightsComponent tripId={tripId}/>
+      {/* <FlightsComponent tripId={tripId}/> */}
       <EventsComponent tripId={tripId}/>
     </div>
   );
