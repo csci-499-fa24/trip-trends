@@ -14,10 +14,25 @@ const {
     exchangePublicToken,
     getTransactions
 } = require('../controllers/ExpenseController');
+const { PlaidApi, Configuration, PlaidEnvironments } = require('plaid');
 
 // mock Expense and Trip model
 jest.mock('../models/Expense');
 jest.mock('../models/Trip');
+jest.mock('plaid', () => {
+    return {
+        PlaidApi: jest.fn().mockImplementation(() => {
+        return {
+            linkTokenCreate: jest.fn(),
+            itemPublicTokenExchange: jest.fn(),
+            transactionsGet: jest.fn(),
+        };
+        }),
+        Configuration: jest.fn(),
+        PlaidEnvironments: { sandbox: 'sandbox' }, 
+    };
+});
+  
 
 describe('Expense Controller', () => {
     let mockRequest, mockResponse;
