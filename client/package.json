@@ -10,10 +10,10 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@emotion/react": "^11.13.3",
-    "@emotion/styled": "^11.13.0",
+    "@emotion/react": "^11.13.5",
+    "@emotion/styled": "^11.13.5",
     "@mui/icons-material": "^6.1.6",
-    "@mui/material": "^6.1.5",
+    "@mui/material": "^6.1.9",
     "@mui/x-charts": "^7.21.0",
     "@react-oauth/google": "^0.12.1",
     "@types/jwt-decode": "^2.2.1",
