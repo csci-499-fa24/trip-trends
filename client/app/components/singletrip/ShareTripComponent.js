@@ -63,7 +63,7 @@ const ShareTripComponent = ({ tripId, isOwner }) => {
                     user.user_id === userId ? { ...user, role: newRole } : user
                 )
             );
-            toast.success("Role updated successfully: ");
+            toast.success("Role updated successfully.");
         } catch (error) {
             toast.error("Failed to update role.");
         }
