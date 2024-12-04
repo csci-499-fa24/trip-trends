@@ -14,6 +14,7 @@ import RecentTripsComponent from '../components/homepage/RecentTripsComponent';
 import TripsDisplayComponent from '../components/homepage/TripsDisplayComponent';
 import LoadingPageComponent from '../components/LoadingPageComponent';
 import PlaidButtonComponent from '../components/homepage/PlaidButtonComponent';
+import HomeCurrencyPopupComponent from '../components/homepage/HomeCurrencyPopupComponent';
 
 const googleID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
@@ -25,6 +26,7 @@ function homepage() {
     const [userId, setUserId] = useState(null);
     const [loading, setLoading] = useState(true);
     const [homeCurrency, setHomeCurrency] = useState(null);
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
 
     // Used to display user's name
     const fetchUserName = async () => {
@@ -77,7 +79,9 @@ function homepage() {
             if (userId) {
                 const currency = await fetchHomeCurrency(userId);
                 if (currency) {
-                    setHomeCurrency(currency);  // Only set if currency is valid
+                    setHomeCurrency(currency); // Only set if currency is valid
+                } else {
+                    setIsPopupOpen(true); // Open popup if no currency is set
                 }
             }
         };
@@ -177,12 +181,15 @@ function homepage() {
         }
     }, [userId]);
 
-
     useEffect(() => {
         if (userId && trips.length >= 0 && allTripLocations.length >= 0) {
             setLoading(false); 
         }
     }, [userId, trips, allTripLocations]);
+
+    const handleClosePopup = () => {
+        setIsPopupOpen(false);
+    };
 
     return (
         <GoogleOAuthProvider clientId={googleID}>
@@ -191,6 +198,12 @@ function homepage() {
                 <LoadingPageComponent /> 
             ) : (
             <div>
+                {/* Home Currency Popup */}
+                <HomeCurrencyPopupComponent
+                    isOpen={isPopupOpen}
+                    onClose={handleClosePopup}
+                    userId={userId}
+                />
                 {/* Header section */}
                 <HeaderComponent
                     headerTitle="Trip Trends"
