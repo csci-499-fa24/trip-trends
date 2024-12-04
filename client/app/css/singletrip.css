@@ -512,10 +512,13 @@
     justify-content: center;
     background-color: var(--lightgreen);
     color: white;
-    padding: 0px 10px;
-    border-radius: 5px;
+    padding: 0px 0px;
+    /* border: solid; */
+    border-radius: 20px;
+    border-color: var(--lightgreen);
     white-space: nowrap;
-    width: 170px;
+    width: 155px;
+    height: 40px;
 }
 
 
