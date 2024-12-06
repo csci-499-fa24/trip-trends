@@ -278,7 +278,7 @@ function Singletrip() {
 
     const applyCategoryFilter = () => {
         let filteredData = [];
-        
+
         if (selectedCategory) {
             originalData.data.forEach((expense) => {
                 if (expense.category === selectedCategory) {
@@ -663,216 +663,98 @@ function Singletrip() {
                 userId={userId}
             />
             <div className="trip-pg-contanier">
-            <div className="main-container">
-                {tripData ? (
-                    <div>
-                        <NavBarComponent
-                            tripId={tripId}
-                            userRole={userRole}
-                            tripName={tripName}
-                        />
-                        <div className="container">
-                            {/* Icon Bar Above Trip Info */}
-                            <TripIconBarComponent
+                <div className="main-container">
+                    {tripData ? (
+                        <div>
+                            <NavBarComponent
                                 tripId={tripId}
-                                userId={userId}
-                                isOwner={isOwner}
-                                tripData={tripData}
-                                tripLocations={tripLocations}
                                 userRole={userRole}
-                                fetchTripData={fetchTripData}
-                                homeCurrency={homeCurrency} // budget is always set as home
+                                tripName={tripName}
                             />
-                            <CurrencyToggleComponent
-                                homeCurrency={homeCurrency}
-                                otherCurrencies={otherCurrencies}
-                                toggleChange={handleCurrencyToggleChange}
-                            />
-                            {/* General Trip Info*/}
-                            <GeneralTripInfoComponent
-                                userId={userId}
-                                tripData={tripData} // handles budget currency
-                                convertedBudget={convertedBudget}
-                                tripId={tripId}
-                                tripLocations={tripLocations}
-                                expenses={expenseUSD}
-                                totalExpenses={
-                                    selectedToggleCurrency !== ""
-                                        ? totalExpensesInToggleCurrency
-                                        : totalExpenses
-                                }
-                                currency={
-                                    selectedToggleCurrency !== ""
-                                        ? selectedToggleCurrency
-                                        : homeCurrency
-                                }
-                            />
-                        </div>
-                        <br></br>
-                        <div className="container">
-                            <div className="row">
-                                <div
-                                    className="col"
-                                    style={{ flexDirection: "column" }}
-                                >
-                                    <h2
-                                        style={{
-                                            textAlign: "center",
-                                            marginBottom: "20px",
-                                            marginTop: "15px",
-                                        }}
-                                    >
-                                        Exchange Rates
-                                    </h2>
-                                    {/* Exchange Rate Table */}
-                                    <ExchangeRateTableComponent
-                                        exchangeRates={exchangeRates}
-                                        currencyCodes={currencyCodes}
-                                        homeCurrency={homeCurrency}
-                                    />
-                                </div>
-                                <div
-                                    className="col"
-                                    style={{ flexDirection: "column" }}
-                                >
-                                    <h2
-                                        style={{
-                                            textAlign: "center",
-                                            marginTop: "30px",
-                                            marginBottom: "20px",
-                                        }}
-                                    >
-                                        Expenses in{" "}
-                                        {selectedToggleCurrency !== ""
+                            <div className="container">
+                                {/* Icon Bar Above Trip Info */}
+                                <TripIconBarComponent
+                                    tripId={tripId}
+                                    userId={userId}
+                                    isOwner={isOwner}
+                                    tripData={tripData}
+                                    tripLocations={tripLocations}
+                                    userRole={userRole}
+                                    fetchTripData={fetchTripData}
+                                    homeCurrency={homeCurrency} // budget is always set as home
+                                />
+                                <CurrencyToggleComponent
+                                    homeCurrency={homeCurrency}
+                                    otherCurrencies={otherCurrencies}
+                                    toggleChange={handleCurrencyToggleChange}
+                                />
+                                {/* General Trip Info*/}
+                                <GeneralTripInfoComponent
+                                    userId={userId}
+                                    tripData={tripData} // handles budget currency
+                                    convertedBudget={convertedBudget}
+                                    tripId={tripId}
+                                    tripLocations={tripLocations}
+                                    expenses={expenseUSD}
+                                    totalExpenses={
+                                        selectedToggleCurrency !== ""
+                                            ? totalExpensesInToggleCurrency
+                                            : totalExpenses
+                                    }
+                                    currency={
+                                        selectedToggleCurrency !== ""
                                             ? selectedToggleCurrency
-                                            : homeCurrency}
-                                    </h2>
-                                    <SpendingCirclesComponent
-                                        totalExpenses={
-                                            selectedToggleCurrency !== ""
-                                                ? totalExpensesInToggleCurrency
-                                                : totalExpenses
-                                        }
-                                        tripData={tripData}
-                                        convertedBudget={convertedBudget}
-                                        currency={
-                                            selectedToggleCurrency !== ""
-                                                ? selectedToggleCurrency
-                                                : homeCurrency
-                                        }
-                                    />
-                                </div>
+                                            : homeCurrency
+                                    }
+                                />
                             </div>
-                        </div>
-                        {/* Data Visualisations Toggle */}
-                        <div className="toggle-container">
-                            <div className="row justify-content-center">
-                                <div className="col-auto">
+                            <br></br>
+                            <div className="container">
+                                <div className="row">
                                     <div
-                                        className="icon-div toggle-icon"
-                                        tabIndex="0"
-                                        onClick={toggleVisibility}
+                                        className="col"
+                                        style={{ flexDirection: "column" }}
                                     >
-                                        <div className="icon-SVG">
-                                            {isVisible ? (
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    strokeWidth="1.3"
-                                                    stroke="currentColor"
-                                                    className="size-6"
-                                                >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        d="m4.5 18.75 7.5-7.5 7.5 7.5"
-                                                    />
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        d="m4.5 12.75 7.5-7.5 7.5 7.5"
-                                                    />
-                                                </svg>
-                                            ) : (
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    strokeWidth="1.3"
-                                                    stroke="currentColor"
-                                                    className="size-6"
-                                                >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        d="m4.5 5.25 7.5 7.5 7.5-7.5m-15 6 7.5 7.5 7.5-7.5"
-                                                    />
-                                                </svg>
-                                            )}
-                                            <span className="icon-text">
-                                                {isVisible
-                                                    ? "Hide Visualizations"
-                                                    : "Show Visualizations"}
-                                            </span>
-                                        </div>
+                                        <h2
+                                            style={{
+                                                textAlign: "center",
+                                                marginBottom: "20px",
+                                                marginTop: "15px",
+                                            }}
+                                        >
+                                            Exchange Rates
+                                        </h2>
+                                        {/* Exchange Rate Table */}
+                                        <ExchangeRateTableComponent
+                                            exchangeRates={exchangeRates}
+                                            currencyCodes={currencyCodes}
+                                            homeCurrency={homeCurrency}
+                                        />
                                     </div>
-                                </div>
-                            </div>
-                            {isVisible && (
-                                <>
-                                    <div className="row">
-                                        {/* Budget Meter */}
-                                        <div className="col">
-                                            <div className="meter-container">
-                                                <BudgetMeterComponent
-                                                    tripData={tripData}
-                                                    convertedBudget={
-                                                        convertedBudget
-                                                    }
-                                                    expensesToDisplay={
-                                                        expensesToDisplay
-                                                    }
-                                                    totalExpenses={
-                                                        selectedToggleCurrency !==
-                                                            ""
-                                                            ? totalExpensesInToggleCurrency
-                                                            : totalExpenses
-                                                    }
-                                                    currency={
-                                                        selectedToggleCurrency !==
-                                                            ""
-                                                            ? selectedToggleCurrency
-                                                            : homeCurrency
-                                                    }
-                                                />
-                                            </div>
-                                        </div>
-                                        {/* Pie Chart */}
-                                        <div className="col">
-                                            <div className="meter-container">
-                                                <CategoryDataComponent
-                                                    categoryData={categoryData}
-                                                    currency={
-                                                        selectedToggleCurrency !==
-                                                            ""
-                                                            ? selectedToggleCurrency
-                                                            : homeCurrency
-                                                    }
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {/* Bar Graph */}
-                                    <div className="meter-container">
-                                        <BarGraphComponent
-                                            tripData={tripData}
-                                            expensesToDisplay={
+                                    <div
+                                        className="col"
+                                        style={{ flexDirection: "column" }}
+                                    >
+                                        <h2
+                                            style={{
+                                                textAlign: "center",
+                                                marginTop: "30px",
+                                                marginBottom: "20px",
+                                            }}
+                                        >
+                                            Expenses in{" "}
+                                            {selectedToggleCurrency !== ""
+                                                ? selectedToggleCurrency
+                                                : homeCurrency}
+                                        </h2>
+                                        <SpendingCirclesComponent
+                                            totalExpenses={
                                                 selectedToggleCurrency !== ""
-                                                    ? expensesToDisplay
-                                                    : convertedHomeCurrencyExpenseData
+                                                    ? totalExpensesInToggleCurrency
+                                                    : totalExpenses
                                             }
-                                            categoryData={categoryData}
+                                            tripData={tripData}
+                                            convertedBudget={convertedBudget}
                                             currency={
                                                 selectedToggleCurrency !== ""
                                                     ? selectedToggleCurrency
@@ -880,25 +762,181 @@ function Singletrip() {
                                             }
                                         />
                                     </div>
-                                </>
-                            )}
-                        </div>
-                        {/* Icon Bar Above Expenses */}
-                        <div>
-                            <header className="icon-bar-header">
-                                <div class="icon-bar-left">
-                                    {userRole == "owner" ||
-                                        userRole == "editor" ? (
-                                        // {/* Add Expense Button */}
+                                </div>
+                            </div>
+                            {/* Data Visualisations Toggle */}
+                            <div className="toggle-container">
+                                <div className="row justify-content-center">
+                                    <div className="col-auto">
+                                        <div
+                                            className="icon-div toggle-icon"
+                                            tabIndex="0"
+                                            onClick={toggleVisibility}
+                                        >
+                                            <div className="icon-SVG">
+                                                {isVisible ? (
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        strokeWidth="1.3"
+                                                        stroke="currentColor"
+                                                        className="size-6"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            d="m4.5 18.75 7.5-7.5 7.5 7.5"
+                                                        />
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            d="m4.5 12.75 7.5-7.5 7.5 7.5"
+                                                        />
+                                                    </svg>
+                                                ) : (
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        strokeWidth="1.3"
+                                                        stroke="currentColor"
+                                                        className="size-6"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            d="m4.5 5.25 7.5 7.5 7.5-7.5m-15 6 7.5 7.5 7.5-7.5"
+                                                        />
+                                                    </svg>
+                                                )}
+                                                <span className="icon-text">
+                                                    {isVisible
+                                                        ? "Hide Visualizations"
+                                                        : "Show Visualizations"}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {isVisible && (
+                                    <>
+                                        <div className="row">
+                                            {/* Budget Meter */}
+                                            <div className="col">
+                                                <div className="meter-container">
+                                                    <BudgetMeterComponent
+                                                        tripData={tripData}
+                                                        convertedBudget={
+                                                            convertedBudget
+                                                        }
+                                                        expensesToDisplay={
+                                                            expensesToDisplay
+                                                        }
+                                                        totalExpenses={
+                                                            selectedToggleCurrency !==
+                                                                ""
+                                                                ? totalExpensesInToggleCurrency
+                                                                : totalExpenses
+                                                        }
+                                                        currency={
+                                                            selectedToggleCurrency !==
+                                                                ""
+                                                                ? selectedToggleCurrency
+                                                                : homeCurrency
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                            {/* Pie Chart */}
+                                            <div className="col">
+                                                <div className="meter-container">
+                                                    <CategoryDataComponent
+                                                        categoryData={categoryData}
+                                                        currency={
+                                                            selectedToggleCurrency !==
+                                                                ""
+                                                                ? selectedToggleCurrency
+                                                                : homeCurrency
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {/* Bar Graph */}
+                                        <div className="meter-container">
+                                            <BarGraphComponent tripData={tripData} expensesToDisplay={convertedHomeCurrencyExpenseData} categoryData={categoryData} />
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                            {/* Icon Bar Above Expenses */}
+                            <div>
+                                <header className="icon-bar-header">
+                                    <div class="icon-bar-left">
+                                        {userRole == "owner" ||
+                                            userRole == "editor" ? (
+                                            // {/* Add Expense Button */}
+                                            <div
+                                                className="icon-div"
+                                                tooltip="Add Expense"
+                                                tabIndex="0"
+                                            >
+                                                <div className="icon-SVG">
+                                                    <svg
+                                                        onClick={() =>
+                                                            setPopUpVisible(true)
+                                                        }
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        strokeWidth="1.3"
+                                                        stroke="currentColor"
+                                                        className="size-6"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                                        />
+                                                    </svg>
+                                                    <span className="icon-text">
+                                                        Add Expense
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ) : null}
+                                        {/* Download Trip Button */}
+                                        <DownloadTripComponent
+                                            tripData={tripData}
+                                            tripId={tripId}
+                                        />
+                                    </div>
+                                    <div className="icon-bar-center">
+                                        <h2>Expense History</h2>
+                                    </div>
+                                    <div class="icon-bar-right">
+                                        {/* Filter Expenses Button */}
+                                        {selectedFilter && (
+                                            <div className="applied-filter">
+                                                <span style={{ paddingLeft: "29px" }}>{`Filter: ${selectedFilter}`}</span>
+                                                <button
+                                                    className="clear-filter-btn"
+                                                    onClick={clearFilter}
+                                                >
+                                                    &times;
+                                                </button>
+                                            </div>
+                                        )}
                                         <div
                                             className="icon-div"
-                                            tooltip="Add Expense"
+                                            tooltip="Filter"
                                             tabIndex="0"
                                         >
                                             <div className="icon-SVG">
                                                 <svg
                                                     onClick={() =>
-                                                        setPopUpVisible(true)
+                                                        setFilterPopupVisible(true)
                                                     }
                                                     xmlns="http://www.w3.org/2000/svg"
                                                     fill="none"
@@ -910,211 +948,160 @@ function Singletrip() {
                                                     <path
                                                         strokeLinecap="round"
                                                         strokeLinejoin="round"
-                                                        d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                                        d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
                                                     />
                                                 </svg>
                                                 <span className="icon-text">
-                                                    Add Expense
+                                                    Filter
                                                 </span>
                                             </div>
                                         </div>
-                                    ) : null}
-                                    {/* Download Trip Button */}
-                                    <DownloadTripComponent
+                                    </div>
+                                </header>
+                            </div>
+                            <div className="container">
+                                <div
+                                    className="row"
+                                    style={{
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        display: "flex",
+                                        textAlign: "center",
+                                    }}
+                                >
+                                    {/* Expense Table */}
+                                    <ExpenseTableComponent
                                         tripData={tripData}
                                         tripId={tripId}
+                                        tripLocations={tripLocations}
+                                        expensesToDisplay={expensesToDisplay}
+                                        currencyCodes={currencyCodes}
+                                        expenseCategories={expenseCategories}
+                                        userRole={userRole}
+                                        categoryData={categoryData}
+                                        selectedCurrency={selectedCurrency}
+                                        setSelectedCurrency={setSelectedCurrency}
+                                        otherCurrencies={otherCurrencies}
                                     />
                                 </div>
-                                <div className="icon-bar-center">
-                                    <h2>Expense History</h2>
-                                </div>
-                                <div class="icon-bar-right">
-                                    {/* Filter Expenses Button */}
-                                    {selectedFilter && (
-                                        <div className="applied-filter">
-                                            <span style={{ paddingLeft: "29px" }}>{`Filter: ${selectedFilter}`}</span>
-                                            <button
-                                                className="clear-filter-btn"
-                                                onClick={clearFilter}
-                                            >
-                                                &times;
-                                            </button>
-                                        </div>
-                                    )}
-                                    <div
-                                        className="icon-div"
-                                        tooltip="Filter"
-                                        tabIndex="0"
-                                    >
-                                        <div className="icon-SVG">
-                                            <svg
-                                                onClick={() =>
-                                                    setFilterPopupVisible(true)
-                                                }
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                strokeWidth="1.3"
-                                                stroke="currentColor"
-                                                className="size-6"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
-                                                />
-                                            </svg>
-                                            <span className="icon-text">
-                                                Filter
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </header>
-                        </div>
-                        <div className="container">
-                            <div
-                                className="row"
-                                style={{
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    display: "flex",
-                                    textAlign: "center",
-                                }}
-                            >
-                                {/* Expense Table */}
-                                <ExpenseTableComponent
-                                    tripData={tripData}
-                                    tripId={tripId}
-                                    tripLocations={tripLocations}
-                                    expensesToDisplay={expensesToDisplay}
-                                    currencyCodes={currencyCodes}
-                                    expenseCategories={expenseCategories}
-                                    userRole={userRole}
-                                    categoryData={categoryData}
-                                    selectedCurrency={selectedCurrency}
-                                    setSelectedCurrency={setSelectedCurrency}
-                                    otherCurrencies={otherCurrencies}
-                                />
-                            </div>
-                            <br></br>
-                            <br></br>
-                            <br></br>
-                        </div>
-                    </div>
-                ) : (
-                    <LoadingPageComponent />
-                )}
-                {/* Suggested Expenses */}
-                <ExpenseSuggestionsComponent
-                    userId={userId}
-                    currentTripId={tripId}
-                    onTransferSuccess={handleExpenseTransferSuccess}
-                />
-
-                {/* Create a expense popup form */}
-                <ExpenseFormComponent
-                    tripId={tripId}
-                    newExpenseData={newExpenseData}
-                    setNewExpenseData={setNewExpenseData}
-                    selectedCurrency={selectedCurrency}
-                    setSelectedCurrency={setSelectedCurrency}
-                    submitNewExpense={submitNewExpense}
-                    isPopUpVisible={isPopUpVisible}
-                    setPopUpVisible={setPopUpVisible}
-                    otherCurrencies={otherCurrencies}
-                    currencyCodes={currencyCodes}
-                    expenseCategories={expenseCategories}
-                />
-                {/* Create a filter popup form */}
-                <div className="filter-container">
-                    {isFilterPopupVisible && (
-                        <div className="filter-popup">
-                            <div className="filter-popup-content">
-                                <span
-                                    className="filter-popup-close"
-                                    onClick={() => setFilterPopupVisible(false)}
-                                >
-                                    &times;
-                                </span>
-                                <h2 className="filter-popup-title">
-                                    Filter Expenses
-                                </h2>
-                                <div className="filter-options">
-                                    <button
-                                        className="filter-option-button"
-                                        onClick={() =>
-                                            handleFilterChange("highest")
-                                        }
-                                    >
-                                        Highest to Lowest
-                                    </button>
-                                    <button
-                                        className="filter-option-button"
-                                        onClick={() =>
-                                            handleFilterChange("lowest")
-                                        }
-                                    >
-                                        Lowest to Highest
-                                    </button>
-                                    <button
-                                        className="filter-option-button"
-                                        onClick={() =>
-                                            handleFilterChange("recent")
-                                        }
-                                    >
-                                        Most Recent
-                                    </button>
-                                    <button
-                                        className="filter-option-button"
-                                        onClick={() =>
-                                            handleFilterChange("oldest")
-                                        }
-                                    >
-                                        Oldest
-                                    </button>
-                                    <div className="filter-option-button">
-                                        <label
-                                            htmlFor="category"
-                                            onClick={toggleDropdown}
-                                            style={{ cursor: "pointer" }}
-                                        >
-                                            Select Category
-                                        </label>
-                                        {isDropdownVisible && (
-                                            <div className="custom-dropdown">
-                                                <div
-                                                    className="dropdown-item"
-                                                    onClick={
-                                                        handleAllCategoriesSelect
-                                                    }
-                                                >
-                                                    All Categories
-                                                </div>
-                                                {expenseCategories.map(
-                                                    (category) => (
-                                                        <div
-                                                            key={category}
-                                                            className="dropdown-item"
-                                                            onClick={() =>
-                                                                handleCategorySelect(
-                                                                    category
-                                                                )
-                                                            }
-                                                        >
-                                                            {category}
-                                                        </div>
-                                                    )
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
+                                <br></br>
+                                <br></br>
+                                <br></br>
                             </div>
                         </div>
+                    ) : (
+                        <LoadingPageComponent />
                     )}
+                    {/* Suggested Expenses */}
+                    <ExpenseSuggestionsComponent
+                        userId={userId}
+                        currentTripId={tripId}
+                        onTransferSuccess={handleExpenseTransferSuccess}
+                    />
+
+                    {/* Create a expense popup form */}
+                    <ExpenseFormComponent
+                        tripId={tripId}
+                        newExpenseData={newExpenseData}
+                        setNewExpenseData={setNewExpenseData}
+                        selectedCurrency={selectedCurrency}
+                        setSelectedCurrency={setSelectedCurrency}
+                        submitNewExpense={submitNewExpense}
+                        isPopUpVisible={isPopUpVisible}
+                        setPopUpVisible={setPopUpVisible}
+                        otherCurrencies={otherCurrencies}
+                        currencyCodes={currencyCodes}
+                        expenseCategories={expenseCategories}
+                    />
+                    {/* Create a filter popup form */}
+                    <div className="filter-container">
+                        {isFilterPopupVisible && (
+                            <div className="filter-popup">
+                                <div className="filter-popup-content">
+                                    <span
+                                        className="filter-popup-close"
+                                        onClick={() => setFilterPopupVisible(false)}
+                                    >
+                                        &times;
+                                    </span>
+                                    <h2 className="filter-popup-title">
+                                        Filter Expenses
+                                    </h2>
+                                    <div className="filter-options">
+                                        <button
+                                            className="filter-option-button"
+                                            onClick={() =>
+                                                handleFilterChange("highest")
+                                            }
+                                        >
+                                            Highest to Lowest
+                                        </button>
+                                        <button
+                                            className="filter-option-button"
+                                            onClick={() =>
+                                                handleFilterChange("lowest")
+                                            }
+                                        >
+                                            Lowest to Highest
+                                        </button>
+                                        <button
+                                            className="filter-option-button"
+                                            onClick={() =>
+                                                handleFilterChange("recent")
+                                            }
+                                        >
+                                            Most Recent
+                                        </button>
+                                        <button
+                                            className="filter-option-button"
+                                            onClick={() =>
+                                                handleFilterChange("oldest")
+                                            }
+                                        >
+                                            Oldest
+                                        </button>
+                                        <div className="filter-option-button">
+                                            <label
+                                                htmlFor="category"
+                                                onClick={toggleDropdown}
+                                                style={{ cursor: "pointer" }}
+                                            >
+                                                Select Category
+                                            </label>
+                                            {isDropdownVisible && (
+                                                <div className="custom-dropdown">
+                                                    <div
+                                                        className="dropdown-item"
+                                                        onClick={
+                                                            handleAllCategoriesSelect
+                                                        }
+                                                    >
+                                                        All Categories
+                                                    </div>
+                                                    {expenseCategories.map(
+                                                        (category) => (
+                                                            <div
+                                                                key={category}
+                                                                className="dropdown-item"
+                                                                onClick={() =>
+                                                                    handleCategorySelect(
+                                                                        category
+                                                                    )
+                                                                }
+                                                            >
+                                                                {category}
+                                                            </div>
+                                                        )
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
-            </div>
             </div>
             <div></div>
         </div>
