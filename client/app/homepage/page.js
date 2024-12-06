@@ -183,7 +183,7 @@ function homepage() {
 
     useEffect(() => {
         if (userId && trips.length >= 0 && allTripLocations.length >= 0) {
-            setLoading(false); 
+            setLoading(false);
         }
     }, [userId, trips, allTripLocations]);
 
@@ -195,53 +195,53 @@ function homepage() {
         <GoogleOAuthProvider clientId={googleID}>
             <ToastContainer />
             {loading ? (
-                <LoadingPageComponent /> 
+                <LoadingPageComponent />
             ) : (
-            <div>
-                {/* Home Currency Popup */}
-                <HomeCurrencyPopupComponent
-                    isOpen={isPopupOpen}
-                    onClose={handleClosePopup}
-                    userId={userId}
-                />
-                {/* Header section */}
-                <HeaderComponent
-                    headerTitle="Trip Trends"
-                    setUserName={setUserName}
-                    userId={userId}
-                />
-                <div className='main-container'>
-                    {/* Welcome section */}
-                    <div className="welcome-section">
-                        {userName ?
-                            (
-                                <h1 style={{ textAlign: "center" }}>Welcome, {userName}!</h1>
-                            ) :
-                            (
-                                <h1 style={{ textAlign: "center" }}>Welcome!</h1>
-                        )}
-                        <PlaidButtonComponent />
-                        <p style={{marginLeft: '-15px'}}>See where you've been:</p>
-                    </div>
-
-                    <div className="responsive-container" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        {/* Map section */}
-                        <MapComponent allTripLocations={allTripLocations} toggleTripDetails={toggleTripDetails} />
-                        {/* Recent Trips section */}
-                        <div style={{ width: '35%', marginLeft: '10px' }}>
-                            <RecentTripsComponent trips={trips} />
+                <div>
+                    {/* Home Currency Popup */}
+                    <HomeCurrencyPopupComponent
+                        isOpen={isPopupOpen}
+                        onClose={handleClosePopup}
+                        userId={userId}
+                    />
+                    {/* Header section */}
+                    <HeaderComponent
+                        headerTitle="Trip Trends"
+                        setUserName={setUserName}
+                        userId={userId}
+                    />
+                    <div className='main-container'>
+                        {/* Welcome section */}
+                        <div className="welcome-section">
+                            <div className="welcome-content">
+                                {userName ? (
+                                    <h1>Welcome, {userName}!</h1>
+                                ) : (
+                                    <h1>Welcome!</h1>
+                                )}
+                                <PlaidButtonComponent />
+                            </div>
+                            <p>See where you've been:</p>
                         </div>
-                    </div>
 
-                {/* All Trips Section */}
-                <TripsDisplayComponent trips={trips} userId={userId} homeCurrency={homeCurrency}/>
+                        <div className="responsive-container" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            {/* Map section */}
+                            <MapComponent allTripLocations={allTripLocations} toggleTripDetails={toggleTripDetails} />
+                            {/* Recent Trips section */}
+                            <div style={{ width: '35%', marginLeft: '10px' }}>
+                                <RecentTripsComponent trips={trips} />
+                            </div>
+                        </div>
+
+                        {/* All Trips Section */}
+                        <TripsDisplayComponent trips={trips} userId={userId} homeCurrency={homeCurrency} />
                         {/* All Trips Section */}
                         {/* <TripsDisplayComponent trips={trips} userId={userId} /> */}
 
+                    </div>
                 </div>
-            </div>
-        )}
-        
+            )}
+
         </GoogleOAuthProvider>
     );
 }

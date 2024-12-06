@@ -13,6 +13,13 @@
     font-weight: bold;
 }
 
+.welcome-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 165%;
+}
+
 .logout {
     background-color: var(--lightgreen);
     color: white;
