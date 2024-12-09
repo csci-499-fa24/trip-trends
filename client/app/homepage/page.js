@@ -123,10 +123,20 @@ function homepage() {
         }
     };
 
+    // useEffect(() => {
+    //     if (userId) {
+    //         fetchUserTrips(); // Call the function to fetch trips on component mount
+    //     }
+    // }, [userId]);
+
     useEffect(() => {
-        if (userId) {
-            fetchUserTrips(); // Call the function to fetch trips on component mount
-        }
+        const interval = setInterval(() => {
+            if (userId) {
+                fetchUserTrips();
+            }
+        }, 5000);
+    
+        return () => clearInterval(interval);
     }, [userId]);
 
 
