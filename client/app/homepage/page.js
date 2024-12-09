@@ -123,23 +123,17 @@ function homepage() {
         }
     };
 
-    // useEffect(() => {
-    //     if (userId) {
-    //         fetchUserTrips(); // Call the function to fetch trips on component mount
-    //     }
-    // }, [userId]);
-
     useEffect(() => {
-        const interval = setInterval(() => {
+        const fetchTrips = async () => {
             if (userId) {
-                fetchUserTrips();
+                await fetchUserTrips(); 
             }
-        }, 5000);
-    
+        };
+        fetchTrips();
+        const interval = setInterval(fetchTrips, 5000);
         return () => clearInterval(interval);
     }, [userId]);
-
-
+    
     // Toggle the expanded state of a trip
     const toggleTripDetails = async (tripId) => {
         setExpandedTripId(prevId => (prevId === tripId ? null : tripId));
