@@ -2,19 +2,17 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart } from '@mui/x-charts/BarChart';
 import dayjs from 'dayjs';
-import currencySymbolMap from 'currency-symbol-map';
 import LoadingPageComponent from '../LoadingPageComponent';
-import { load } from 'ol/Image';
 import "../../css/barChart.css";
 
-const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData, currency }) => {
+const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData }) => {
     const [loading, setLoading] = React.useState(true);
     const [loadingTimedOut, setLoadingTimedOut] = useState(false);
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             if (loading) {
-                setLoadingTimedOut(true); 
+                setLoadingTimedOut(true);
             }
         }, 5000); // 5 seconds
 
@@ -26,20 +24,9 @@ const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData, currency
             setLoading(false);
         }
         if (expensesToDisplay && categoryData && categoryData.datasets.length > 0) {
-            setLoading(false); 
+            setLoading(false);
         }
     }, [expensesToDisplay, categoryData]);
-
-    const currencySymbol = currencySymbolMap(currency);
-
-    const formatDate = (dateStr) => {
-        const [year, month, day] = dateStr.split('-');
-        const formattedDate = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' }).format(
-            new Date(year, month - 1, day)
-        );
-        
-        return formattedDate;
-    }
 
     const generateDateArray = (startDate, endDate) => {
         const start = dayjs(startDate);
@@ -48,7 +35,7 @@ const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData, currency
 
         // loop through the dates from the start to the end date and add each date in between (inclusive)
         for (let date = start; date.isBefore(end.add(1, 'day')); date = date.add(1, 'day')) {
-            datesArray.push(formatDate(date.format('YYYY-MM-DD')));
+            datesArray.push(date.format('YYYY-MM-DD'));
         }
 
         return datesArray;
@@ -72,7 +59,7 @@ const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData, currency
         'Other': 'leisure',
     };
     expensesToDisplay.forEach(expense => {
-        const date = formatDate(dayjs(expense.posted).format('YYYY-MM-DD'));
+        const date = dayjs(expense.posted).format('YYYY-MM-DD');
         const category = expense.category;
         const amount = parseFloat(expense.amount);
 
@@ -110,7 +97,7 @@ const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData, currency
             stack: categoryStackMap[category],
         };
     });
-    
+
     const chartColors = categoryData?.datasets?.[0]?.backgroundColor || ['#000'];
 
     if (loading && !loadingTimedOut) {
@@ -147,7 +134,7 @@ const BarGraphComponent = ({ tripData, expensesToDisplay, categoryData, currency
                     }
                 }}
                 style={{
-                    maxWidth: '100%', 
+                    maxWidth: '100%',
                     display: 'block',
                 }}
             />
