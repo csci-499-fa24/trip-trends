@@ -180,6 +180,7 @@ const TripsDisplayComponent = ({ trips, userId, homeCurrency }) => {
                                             <StarBorderIcon sx={{ color: 'gray', zIndex: 2 }} />
                                         )}
                                     </div>
+                                    <SharedUsersComponent tripId={trip.trip_id} userId={userId} isHomepage={true} />
                                 </CardContent>
                             </CardActionArea>
                         </Card>

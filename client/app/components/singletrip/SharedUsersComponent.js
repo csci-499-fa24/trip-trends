@@ -4,7 +4,7 @@ import noImage from "../../img/no-user.png";
 import Image from "next/image";
 import axios from "axios";
 
-const SharedUsersComponent = ({ tripId, userId }) => {
+const SharedUsersComponent = ({ tripId, userId, isHomepage = false }) => {
     const [sharedUsers, setSharedUsers] = useState([]);
     const [hoveredUser, setHoveredUser] = useState(null);
     const [showAllUsers, setShowAllUsers] = useState(false);
@@ -37,21 +37,24 @@ const SharedUsersComponent = ({ tripId, userId }) => {
     const additionalUsersCount = sharedUsers.length - displayedUsers.length;
 
     return (
-        <div className="whole_container">
-            <div className="shared-with-message">
-                {getSharedWithMessage()}
-            </div>
+        <div className={`whole_container ${isHomepage ? "homepage-size" : ""}`}>
+             {!isHomepage && (
+                <div className="shared-with-message">
+                    {getSharedWithMessage()}
+                </div>
+            )}
             <div className="shared-users">
                 {displayedUsers.map(user => (
-                    <div key={user.id} className="shared-user" 
+                    <div key={user.id}
+                        className={`shared-user ${isHomepage ? "homepage-user" : ""}`}
                         onMouseEnter={() => setHoveredUser(user)} 
                         onMouseLeave={() => setHoveredUser(null)}
                     >
                         <Image
                             src={user.image || noImage}
                             alt={`${user.fname}'s profile`}
-                            width={40}
-                            height={40}
+                            width={isHomepage ? 30 : 40}
+                            height={isHomepage ? 30 : 40}
                             className="shared-user-image"
                         />
                         {hoveredUser === user && (
@@ -62,8 +65,8 @@ const SharedUsersComponent = ({ tripId, userId }) => {
                     </div>
                 ))}
                 {additionalUsersCount > 0 && !showAllUsers && (
-                    <div className="show-more" onClick={handleShowAllUsers}>
-                        <span className="show-more-icon">+{additionalUsersCount}</span>
+                   <div className={`show-more ${isHomepage ? "homepage-show-more" : ""}`} onClick={handleShowAllUsers}>
+                        <span className={`show-more-icon ${isHomepage ? "homepage-icon" : ""}`}>+{additionalUsersCount}</span>
                     </div>
                 )}
             </div>

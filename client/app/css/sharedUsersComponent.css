@@ -72,6 +72,34 @@
     font-weight: bold;
 }
 
+/* homepage-specific adjustments */
+.whole_container.homepage-size {
+    position:absolute;
+    top: 87%;
+    left: 20%;
+}
+
+.shared-user.homepage-user {
+    width: 25px;
+    height: 25px;
+}
+
+.homepage-show-more {
+    margin-top: 3px;
+}
+
+.homepage-icon {
+    background-color: gray;
+    color: white;
+    border-radius: 50%;
+    width: 20px; 
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px; 
+    font-weight: bold;
+}
 
 @media (max-width: 600px) {
     /* Trip pg: shared user icon position */
