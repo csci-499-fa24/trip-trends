@@ -114,7 +114,7 @@ const createGoogleUser = async (req, res) => {
                 lname: lastName,
                 email,
                 image: picture,
-                home_currency: 'USD'
+                home_currency: null
             });
 
             return res.status(201).json({ message: 'User created successfully', user: newUser });

@@ -27,21 +27,8 @@ const RecentTripsComponent = ({ trips }) => {
         // Function to find the three most recent trips
         const findRecentTrips = () => {
             if (trips.length === 0) return [];
-
-            // Initialize an array to hold the three most recent trips
-            const recent = [];
-            for (let trip of trips) {
-                // Check if the trip is among the three most recent
-                if (recent.length < 3) {
-                    recent.push(trip);
-                } else {
-                    const oldestIndex = recent.findIndex(t => new Date(t.start_date) < new Date(trip.start_date));
-                    if (oldestIndex > -1) {
-                        recent[oldestIndex] = trip; // Replace the oldest trip
-                    }
-                }
-            }
-            return recent;
+            const sortedTrips = [...trips].sort((a, b) => new Date(b.start_date) - new Date(a.start_date));
+            return sortedTrips.slice(0, 3);
         };
 
         const updatedRecentTrips = findRecentTrips();

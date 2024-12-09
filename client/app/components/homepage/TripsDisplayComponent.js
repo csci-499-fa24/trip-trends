@@ -109,7 +109,7 @@ const TripsDisplayComponent = ({ trips, userId, homeCurrency }) => {
 
     return (
         <div className="trips-display">
-            <div className="row" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginTop:"-30px" }}>
+            <div className="row" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginTop:"-40px" }}>
                 <div className="col">
                     <h1>View Your Trips:</h1>
                 </div>
