@@ -177,11 +177,11 @@ const ReceiptImageComponent = ({ tripId, handleFormData, updateIsUploadHidden })
             const imageFile = fileInput.current.files[0];
 
             // file type validation
-            const allowedTypes = ['image/jpeg', 'image/png'];
-            if (!allowedTypes.includes(imageFile.type)) {
-                // toast.error("Invalid file type. Please upload a JPEG or PNG image.");
-                return;
-            }
+            // const allowedTypes = ['image/jpeg', 'image/png'];
+            // if (!allowedTypes.includes(imageFile.type)) {
+            //     // toast.error("Invalid file type. Please upload a JPEG or PNG image.");
+            //     return;
+            // }
 
             const formData = new FormData();
             formData.append('file', imageFile); // 'file' key
@@ -252,16 +252,29 @@ const ReceiptImageComponent = ({ tripId, handleFormData, updateIsUploadHidden })
     };
 
     return (
-        <div className="receipt-upload-container">
+        <div className={`receipt-upload-container ${isHidden ? 'hidden' : ''}`}>
             {/* Icon to open up receipt upload container */}
+            <div className="top-left-button-container">
             <button 
                 onClick={toggleHideBar} 
                 className="receipt-upload-button">
                 <svg 
-                    fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"/>
+                    xmlns="http://www.w3.org/2000/svg" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    strokeWidth="1.3" 
+                    stroke="currentColor" 
+                    className="size-6"
+                >
+                    <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        d="m9 14.25 6-6m4.5-3.493V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0c1.1.128 1.907 1.077 1.907 2.185ZM9.75 9h.008v.008H9.75V9Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm4.125 4.5h.008v.008h-.008V13.5Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" 
+                    />
                 </svg>
+                <span className="button-text">Receipt</span>
             </button>
+        </div>
             <div className={`receipt-upload-form ${isHidden ? 'hidden' : ''}`}>
                 <h6 className="receipt-upload-title">Upload a Receipt</h6>
                 <form encType="multipart/form-data" className="receipt-upload-form-content">
