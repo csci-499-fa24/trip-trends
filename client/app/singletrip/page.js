@@ -713,18 +713,13 @@ function Singletrip() {
                                 <div className="row">
                                     <div
                                         className="col"
-                                        style={{ flexDirection: "column" }}
+                                        style={{
+                                            display: "flex",
+                                            flexDirection: "column", 
+                                            alignItems: "center",
+                                        }}
                                     >
-                                        <h2
-                                            style={{
-                                                textAlign: "center",
-                                                marginBottom: "20px",
-                                                marginTop: "15px",
-                                            }}
-                                        >
-                                            Exchange Rates
-                                        </h2>
-                                        {/* Exchange Rate Table */}
+                                        <h2 className="exchange-rates-title">Exchange Rates</h2>
                                         <ExchangeRateTableComponent
                                             exchangeRates={exchangeRates}
                                             currencyCodes={currencyCodes}
