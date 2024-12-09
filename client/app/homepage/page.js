@@ -124,16 +124,12 @@ function homepage() {
     };
 
     useEffect(() => {
-        const fetchTrips = async () => {
-            if (userId) {
-                await fetchUserTrips(); 
-            }
-        };
-        fetchTrips();
-        const interval = setInterval(fetchTrips, 5000);
-        return () => clearInterval(interval);
+        if (userId) {
+            fetchUserTrips(); // Call the function to fetch trips on component mount
+        }
     }, [userId]);
-    
+
+
     // Toggle the expanded state of a trip
     const toggleTripDetails = async (tripId) => {
         setExpandedTripId(prevId => (prevId === tripId ? null : tripId));
@@ -238,7 +234,7 @@ function homepage() {
                         </div>
 
                         {/* All Trips Section */}
-                        <TripsDisplayComponent trips={trips} userId={userId} homeCurrency={homeCurrency} />
+                        <TripsDisplayComponent userId={userId} homeCurrency={homeCurrency} />
                         {/* All Trips Section */}
                         {/* <TripsDisplayComponent trips={trips} userId={userId} /> */}
 
