@@ -1,19 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../../css/gallery.css';
 
-const TripImageComponent = ({ tripId }) => {
+const TripImageComponent = forwardRef(({ tripId }, ref) => {
     const [images, setImages] = useState([]);
     const [error, setError] = useState(null);
     const [selectedImage, setSelectedImage] = useState(null);
 
-    useEffect(() => {
-        const fetchImages = async () => {
-            try {
-                if (tripId) {
-                    const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}/images`);
+    const fetchImages = async () => {
+        try {
+            if (tripId) {
+                const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}/images`);
                     if (response.data.length === 0) {
                         setError("No images to display.");
                     } else {
@@ -26,10 +25,15 @@ const TripImageComponent = ({ tripId }) => {
                 console.error("Error fetching trip images:", error);
                 setError("No images to display.");
             }
-        };
+    };
 
+    useEffect(() => {
         fetchImages();
     }, [tripId]);
+
+    useImperativeHandle(ref, () => ({
+        refetchImages: fetchImages,
+    }));
 
     const openPopUp = (imageId) => {
         const image = images.find((img) => img.image_id === imageId);
@@ -101,6 +105,6 @@ const TripImageComponent = ({ tripId }) => {
             )}
         </div>
     );
-};
+});
 
 export default TripImageComponent;
