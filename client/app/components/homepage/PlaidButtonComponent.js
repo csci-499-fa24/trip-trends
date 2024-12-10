@@ -215,23 +215,24 @@ const PlaidLinkComponent = ({ onSuccess }) => {
             ) : error ? (
                 <div className="error-message">{error}</div>
             ) : linkToken ? (
-                <PlaidLink
-                    className="plaid-link-button"
-                    token={linkToken}
-                    onSuccess={handleOnSuccess}
-                    onExit={(error, metadata) =>
-                        console.log("Plaid Link Exit:", error, metadata)
-                    }
-                >
-                    Link Bank Account
-                </PlaidLink>
+                <div className="plaid-link-button-wrapper">
+                    <PlaidLink
+                        className="plaid-link-button"
+                        token={linkToken}
+                        onSuccess={handleOnSuccess}
+                        onExit={(error, metadata) =>
+                            console.log("Plaid Link Exit:", error, metadata)
+                        }
+                    >
+                        Link Bank Account
+                    </PlaidLink>
+                </div>
             ) : (
-                <p>
-                    Something went wrong... Please try again.
-                </p>
+                <p>Something went wrong... Please try again.</p>
             )}
         </div>
     );
+    
 };
 
 export default PlaidLinkComponent;
