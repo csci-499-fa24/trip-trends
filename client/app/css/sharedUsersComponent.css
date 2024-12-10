@@ -74,9 +74,10 @@
 
 /* homepage-specific adjustments */
 .whole_container.homepage-size {
-    position:absolute;
+    position: absolute;
     top: 87%;
     left: 20%;
+    right: 0%;
 }
 
 .shared-user.homepage-user {
