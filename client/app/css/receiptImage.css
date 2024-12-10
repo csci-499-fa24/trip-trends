@@ -1,3 +1,12 @@
+.receipt-upload-container.hidden {
+    box-shadow: none;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    position: relative;
+    margin: 0;
+}
+
 .receipt-upload-container {
     display: flex;
     flex-direction: column;
@@ -8,6 +17,82 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     max-width: 800px;
     margin: 20px auto;
+    position: relative;
+    margin-right: 50px;
+}
+
+@media (max-width: 929px) {
+    .receipt-upload-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        border: 0.7px solid #ddd;
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        max-width: 800px;
+        margin: 20px auto;
+        position: relative;
+        margin-right: 0px;
+        margin-top: -70px;
+    }
+
+    .receipt-upload-container.hidden {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        border: none;
+        border-radius: 12px;
+        box-shadow: none;
+        max-width: 800px;
+        margin: 20px auto;
+        position: relative;
+        margin-right: 0px;
+        margin-top: -70px;
+        margin-bottom: -200px !important;
+    }
+
+    .receipt-button-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 30px;
+        width: 100%;
+    }
+
+    .receipt-button-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        margin-bottom: 100px !important;
+        margin-top: -30px;
+        margin-left: 30px;
+    }
+
+    .receipt-button-container.hidden {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        margin-left: 30px;
+    }
+
+    .receipt-button-container.hidden {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        margin-bottom: -30px !important;
+        margin-top: -90px;
+        margin-left: 0px;
+    }
+
+    .receipt-upload-form.hidden {
+        width: 100%;
+        margin-top: -20px;
+    }
 }
 
 .receipt-upload-button,
@@ -22,16 +107,35 @@
     box-shadow: none;
 }
 
-.receipt-upload-button {
+
+.receipt-upload-button.hidden {
     background-color: transparent;
-    color: #fff;
     border: none;
     cursor: pointer;
     padding: 10px 15px;
     border-radius: 8px;
     font-size: 16px;
     font-weight: bold;
+    display: flex;
+    align-items: center;
     transition: background-color 0.3s ease;
+    margin-right: 0px;
+    margin-bottom: -20px;
+}
+
+.receipt-upload-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s ease;
+    margin-right: 65px;
+    margin-bottom: -20px;
 }
 
 .receipt-upload-button svg,
@@ -43,9 +147,8 @@
 }
 
 .receipt-upload-button svg {
-    width: 25px !important;
-    height: 25px !important;
-    margin-left: 0px !important;
+    width: 25px;
+    height: 25px;
     margin-right: 5px;
 }
 
@@ -70,18 +173,20 @@
     display: none;
 }
 
-.receipt-upload-container.hidden {
-    box-shadow: none;
-    background-color: transparent;
+.receipt-button-container.hidden {
     position: absolute;
-    top: 5%;
-    left: 40px;
-    width: fit-content;
-    padding: 15px 30px;
-    border: none;
-    border-radius: 10px;
-    font-size: 15px;
-    cursor: pointer;
+    top: 10px;
+    left: -4px;
+    z-index: 10;
+    margin-top: 60px;  
+}
+
+.receipt-button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+    width: 100%;
 }
 
 .receipt-upload-title {
@@ -135,6 +240,7 @@
     top: 10%;
     left: 35px;
     z-index: 10;
+    margin-right: 20px;
 }
 
 .input-button-container {

@@ -263,7 +263,7 @@
     /* padding: 8px;
     width: 90%; */
     padding: 15px 30px;
-    background-color: #8B0000;
+    background-color: rgb(235, 5, 5);
     color: white;
     border: none;
     width: 50%;
@@ -517,7 +517,6 @@
     width: 155px;
     height: 40px;
 }
-
 
 .clear-filter-btn {
     background: none;
@@ -894,18 +893,20 @@
 }
 
 .expense-row-container {
-    display: flex;
     justify-content: space-between;
-    align-items: center;
     padding: 5px;
     padding-right: 0px;
     margin-top: 40px;
+    display: flex; /* Use flex to align items inside */
+    justify-content: center;
+    align-items: center;
 }
 
 @media (max-width: 929px) {
     .expense-row-container {
         flex-direction: column; /* vertical layout */
         gap: 20px; 
+        margin-top: -24px;
     }
      /* disable wide form */
     .new-expense-modal.wide-form {
@@ -916,12 +917,11 @@
 }
 
 .upload-section {
-    margin-left: 10px;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: center; 
+    align-items: center; 
+    height: 100%;
 }
-
 
 .toggle-container {
     margin: 30px auto;
