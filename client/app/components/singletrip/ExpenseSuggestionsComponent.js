@@ -67,7 +67,7 @@ const ExpenseSuggestionsComponent = ({
 
             const token = localStorage.getItem("access_token");
             if (!token) {
-                toast.error("Plaid token not found.");
+                toast.warn("Connect Plaid to get suggested expenses.");
                 return;
             }
 
@@ -95,7 +95,7 @@ const ExpenseSuggestionsComponent = ({
     };
 
     useEffect(() => {
-        if (userId && tripData) {
+        if (userId && tripData && isPlaidConnected) {
             fetchSuggestedExpenses();
         }
     }, [userId, tripData]);
