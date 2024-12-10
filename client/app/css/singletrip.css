@@ -81,6 +81,7 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     margin: 10px;
     width: 100%;
+
 }
 
 .new-expense-modal{
@@ -478,10 +479,6 @@
     cursor: pointer;
 }
 
-.filter-popup-close:hover {
-    color: black;
-}
-
 .filter-popup-title {
     font-size: 20px;
     margin-bottom: 15px;
@@ -776,6 +773,12 @@
     display: inline-block; 
 } */
 
+.exchange-rates-title {
+    margin-top: 15px;
+    margin-bottom: 20px;
+    margin-left: -35px;
+}
+
 .trip-overview {
     display: flex;
     justify-content: space-around;
@@ -894,9 +897,22 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-
     padding: 5px;
     padding-right: 0px;
+    margin-top: 40px;
+}
+
+@media (max-width: 929px) {
+    .expense-row-container {
+        flex-direction: column; /* vertical layout */
+        gap: 20px; 
+    }
+     /* disable wide form */
+    .new-expense-modal.wide-form {
+        width: 110% !important;
+        height: 100% !important;
+        transform: translate(-5%, 0%) !important;
+    }
 }
 
 .upload-section {
@@ -1029,6 +1045,12 @@
         max-width: 90%;
         font-size: 0.8em;
     }
+
+    .exchange-rates-title {
+        margin-top: 15px;
+        margin-bottom: 20px;
+        margin-left: 0px;
+    }
 }
 
 .trip-card-highlight {
@@ -1052,11 +1074,10 @@
     }
 }
 
-.modal.wide-form {
+.new-expense-modal.wide-form {
     width: 145%;
-    height: 105%;
+    height: 100%;
     transform: translate(-15%, 0%);
-
 }
 
 .favorite-icon {
@@ -1078,7 +1099,6 @@
     background-color: rgba(123, 117, 117, 0.123);
     border-color: rgba(0, 0, 0, 0.8);
 }
-
 
 /* Expense suggestions styling */
 .expense-suggestions-container {
@@ -1288,6 +1308,12 @@
      /* Trip pg: Expense suggestions cards position */
     .cards-container {
         max-width: 50%;
+    }
+
+    .exchange-rates-title {
+        margin-top: 15px;
+        margin-bottom: 20px;
+        margin-left: 0px;
     }
 }
 

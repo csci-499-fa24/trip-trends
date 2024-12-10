@@ -14,6 +14,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
     const [expensesWithReceipt, setExpensesWithReceipt] = useState({});
     const [modalImage, setModalImage] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isPopUpVisible, setPopUpVisible] = useState(false);
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {
@@ -220,20 +221,26 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                                                 aria-label="View Receipt"
                                                 style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }} // Makes the background transparent
                                                 >
-                                                <svg 
-                                                    xmlns="http://www.w3.org/2000/svg" 
-                                                    fill="none" 
-                                                    viewBox="0 0 24 24" 
-                                                    strokeWidth="1.5" 
-                                                    stroke="currentColor" 
-                                                    className="size-6"
-                                                >
-                                                    <path 
-                                                    strokeLinecap="round" 
-                                                    strokeLinejoin="round" 
-                                                    d="m9 14.25 6-6m4.5-3.493V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0c1.1.128 1.907 1.077 1.907 2.185ZM9.75 9h.008v.008H9.75V9Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm4.125 4.5h.008v.008h-.008V13.5Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" 
-                                                    />
-                                                </svg>
+                                                <div className="icon-div" tooltip="View Receipt" tabIndex="0">
+                                                    <div className="icon-SVG">
+                                                        <svg 
+                                                        xmlns="http://www.w3.org/2000/svg" 
+                                                        fill="none" 
+                                                        viewBox="0 0 24 24" 
+                                                        strokeWidth="1.3" 
+                                                        stroke="currentColor" 
+                                                        className="size-6"
+                                                        >
+                                                        <path 
+                                                        strokeLinecap="round" 
+                                                        strokeLinejoin="round" 
+                                                        d="m9 14.25 6-6m4.5-3.493V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0c1.1.128 1.907 1.077 1.907 2.185ZM9.75 9h.008v.008H9.75V9Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm4.125 4.5h.008v.008h-.008V13.5Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" 
+                                                        />
+                                                        </svg>
+                                                        <span className="icon-text">View Receipt</span>
+                                                    </div>
+                                                </div>
+                        
                                                 </button>
                                             ) : (
                                                 <span>No Receipt</span>
@@ -405,7 +412,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                     {isModalOpen && (
                         <div className="receipt-modal-overlay">
                             <div className="receipt-modal">
-                                <button className="close-modal-button" onClick={handleCloseModal}>X</button>
+                                <span className="close-modal-button" onClick={() => setPopUpVisible(false), handleCloseModal}>&times;</span>
                                 <img src={modalImage} alt="Receipt" className="receipt-image" />
                             </div>
                         </div>
