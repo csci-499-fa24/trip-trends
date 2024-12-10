@@ -7,7 +7,7 @@ import '../../css/tripForm.css';
 import { toast } from 'react-toastify';
 import currencySymbolMap from 'currency-symbol-map';
 
-const TripFormComponent = ({ isPopUpVisible, setPopUpVisible, userId, homeCurrency }) => {
+const TripFormComponent = ({ isPopUpVisible, setPopUpVisible, userId, homeCurrency, fetchUserTrips }) => {
     // const router = useRouter();
     const today = new Date().toISOString().split('T')[0];
     const [newTripData, setNewTripData] = useState({

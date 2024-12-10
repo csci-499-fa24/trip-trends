@@ -1,23 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../../css/gallery.css';
 
-const TripImageComponent = ({ tripId }) => {
+const TripImageComponent = forwardRef(({ tripId }, ref) => {
     const [images, setImages] = useState([]);
     const [error, setError] = useState(null);
     const [selectedImage, setSelectedImage] = useState(null);
 
-    useEffect(() => {
-        const fetchImages = async () => {
-            try {
-                if (tripId) {
-                    const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}/images`);
+    const fetchImages = async () => {
+        try {
+            if (tripId) {
+                const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}/images`);
                     if (response.data.length === 0) {
+                        setImages([]); 
                         setError("No images to display.");
                     } else {
                         setImages(response.data);
+                        setError(null);
                     }
                 } else {
                     console.error("Trip ID is not defined");
@@ -26,10 +27,15 @@ const TripImageComponent = ({ tripId }) => {
                 console.error("Error fetching trip images:", error);
                 setError("No images to display.");
             }
-        };
+    };
 
+    useEffect(() => {
         fetchImages();
     }, [tripId]);
+
+    useImperativeHandle(ref, () => ({
+        refetchImages: fetchImages,
+    }));
 
     const openPopUp = (imageId) => {
         const image = images.find((img) => img.image_id === imageId);
@@ -48,6 +54,7 @@ const TripImageComponent = ({ tripId }) => {
                 console.log(response.data);
                 toast.success("Successfully deleted your image.");
                 setImages(prevImages => prevImages.filter(image => image.image_id !== imageID));
+                if (images.length === 1) setError("No images to display.");
             })
             .catch(error => {
                 toast.error("Couldn't deleted your image.");
@@ -64,7 +71,7 @@ const TripImageComponent = ({ tripId }) => {
             )}
             {/* Conditional rendering for empty images */}
             {images.length === 0 && !error ? (
-                <p style={{ textAlign: 'center', marginTop: '20px' }}>No images to display...</p>
+                <p style={{ textAlign: 'center', marginTop: '20px' }}>No images to display.</p>
             ) : (
                 <div className="gallery-grid">
                     {images.map(image => (
@@ -101,6 +108,6 @@ const TripImageComponent = ({ tripId }) => {
             )}
         </div>
     );
-};
+});
 
 export default TripImageComponent;

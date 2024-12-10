@@ -176,13 +176,6 @@ const ReceiptImageComponent = ({ tripId, handleFormData, updateIsUploadHidden })
         if (fileInput.current && fileInput.current.files.length > 0) {
             const imageFile = fileInput.current.files[0];
 
-            // file type validation
-            const allowedTypes = ['image/jpeg', 'image/png'];
-            if (!allowedTypes.includes(imageFile.type)) {
-                // toast.error("Invalid file type. Please upload a JPEG or PNG image.");
-                return;
-            }
-
             const formData = new FormData();
             formData.append('file', imageFile); // 'file' key
     
@@ -191,22 +184,27 @@ const ReceiptImageComponent = ({ tripId, handleFormData, updateIsUploadHidden })
                 setIsHidden(false);
                 handleHidingImgUploadUpdate();
 
-                progressBarRef.current.animate(0.5); // start progress at 50%
+                progressBarRef.current.set(0);
+
+                // start manual progress bar simulation
+                const progressPromise = simulateProgressBar(progressBarRef);
 
                 // process receipt image to extract expense data
                 const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/process-receipt`, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
-    
-                console.log("Extracted receipt data:", response.data);
-                saveExpenseDetails(response.data, formData);
 
-                progressBarRef.current.animate(1.0, () => {
-                    setTimeout(() => {
-                        setIsHidden(true); 
-                        handleHidingImgUploadUpdate();
-                    }, 500);
-                });
+                await progressPromise;
+
+                progressBarRef.current.set(1);
+    
+                setTimeout(() => {
+                    setIsHidden(true);
+                    handleHidingImgUploadUpdate();
+                }, 500);
+
+                console.log('Extracted receipt data:', response.data);
+                saveExpenseDetails(response.data, formData);
                 // toast.success("Receipt processed successfully!");
 
             } catch (error) {
@@ -221,80 +219,121 @@ const ReceiptImageComponent = ({ tripId, handleFormData, updateIsUploadHidden })
         }
     };
 
+    const simulateProgressBar = (progressBarRef) => {
+        return new Promise((resolve) => {
+            let currentProgress = 0;
+
+            const interval = setInterval(() => {
+                // increment by either 1% or 2% randomly
+                const randomIncrement = Math.random() < 0.5 ? 0.01 : 0.02;
+                currentProgress += randomIncrement;
+
+                if (currentProgress >= 0.95) { // stops at 95% to wait for completion
+                    clearInterval(interval);
+                    resolve();
+                } else {
+                    progressBarRef.current.set(currentProgress);
+                }
+            }, 140); 
+        });
+    };
+
     const toggleHideBar = () => {
         setIsHidden(!isHidden);
         handleHidingImgUploadUpdate()
     }
 
-    const handleReceiptUpload = async (event) => {
-        event.preventDefault();
+    // const handleReceiptUpload = async (event) => {
+    //     event.preventDefault();
+    //     if (fileInput.current && fileInput.current.files.length > 0) {
+    //         const imageFile = fileInput.current.files[0]; // get the first file chosen
+
+    //         if (imageFile) { 
+    //             // const formData = new FormData();
+    //             // formData.append('image', imageFile); // 'image' key
+    //             // handleFormData(formData); // passed to expense form component
+
+    //             const reader = new FileReader();
+    //             reader.onloadend = () => {
+    //                 setImageSrc(reader.result); // base64 data URL
+    //             };
+    //             reader.readAsDataURL(imageFile);
+
+    //             // toast.success("Receipt uploaded successfully!");
+    //         }
+    //     }
+    //     else {
+    //         console.error('No file chosen');
+    //         toast.error("Please choose a file to upload.");
+    //     }
+    // };
+
+    const handleAutoPreview = (event) => {
         if (fileInput.current && fileInput.current.files.length > 0) {
             const imageFile = fileInput.current.files[0]; // get the first file chosen
-
-            if (imageFile) { 
-                // const formData = new FormData();
-                // formData.append('image', imageFile); // 'image' key
-                // handleFormData(formData); // passed to expense form component
-
+    
+            if (imageFile) {
                 const reader = new FileReader();
                 reader.onloadend = () => {
-                    setImageSrc(reader.result); // base64 data URL
+                    setImageSrc(reader.result); // base64 data URL and set as preview
                 };
                 reader.readAsDataURL(imageFile);
-
-                // toast.success("Receipt uploaded successfully!");
+            } else {
+                console.error('No file chosen');
+                toast.error("Please choose a file to upload.");
             }
         }
-        else {
-            console.error('No file chosen');
-            toast.error("Please choose a file to upload.");
-        }
     };
-
+    
     return (
-        <div className="receipt-upload-container">
+        <div className={`receipt-upload-container ${isHidden ? 'hidden' : ''}`}>
             {/* Icon to open up receipt upload container */}
+            <div className="top-left-button-container">
             <button 
                 onClick={toggleHideBar} 
                 className="receipt-upload-button">
                 <svg 
-                    fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"/>
+                    xmlns="http://www.w3.org/2000/svg" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    strokeWidth="1.3" 
+                    stroke="currentColor" 
+                    className="size-6"
+                >
+                    <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        d="m9 14.25 6-6m4.5-3.493V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0c1.1.128 1.907 1.077 1.907 2.185ZM9.75 9h.008v.008H9.75V9Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm4.125 4.5h.008v.008h-.008V13.5Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" 
+                    />
                 </svg>
+                <span className="button-text">Receipt</span>
             </button>
+        </div>
             <div className={`receipt-upload-form ${isHidden ? 'hidden' : ''}`}>
                 <h6 className="receipt-upload-title">Upload a Receipt</h6>
                 <form encType="multipart/form-data" className="receipt-upload-form-content">
-                    <input
-                        type="file"
-                        name="image"
-                        ref={fileInput}
-                        required
-                        className="file-input"
-                    />
-                    {/* Preview receipt */}
-                    <div className="icon-buttons-container">
-                        <button
-                            type="button"
-                            onClick={handleReceiptUpload}
-                            className="icon-button"
-                            aria-label="Preview receipt">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                            </svg>
-                        </button>
-
+                    <div className="input-button-container">
+                        <input
+                            type="file"
+                            name="image"
+                            ref={fileInput}
+                            required
+                            className="file-input"
+                            onChange={handleAutoPreview}
+                        />
                         <button 
                             type="button" 
                             onClick={sendReceiptForExtraction}
                             className="icon-button" 
-                            aria-label="Process receipt">
+                            aria-label="Process receipt"
+                        >
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
                             </svg>
                         </button>
                     </div>
                 </form>
+
 
                 <div className="receipt-preview-container">
                     {imageSrc ? (

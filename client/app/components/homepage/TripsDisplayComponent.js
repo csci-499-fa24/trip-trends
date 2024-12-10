@@ -15,11 +15,40 @@ import SharedUsersComponent from "../singletrip/SharedUsersComponent";
 import DisplayOneImageComponent from './DisplayOneImageComponent';
 
 
-const TripsDisplayComponent = ({ trips, userId, homeCurrency }) => {
+const TripsDisplayComponent = ({ userId, homeCurrency }) => {
+    const [trips, setTrips] = useState([]);
     const [tripLocations, setTripLocations] = useState({});
     const [isPopUpVisible, setPopUpVisible] = useState(false);
     const [favoritedTrips, setFavoritedTrips] = useState({});
     const [searchTerm, setSearchTerm] = useState("");
+
+    const fetchUserTrips = async () => {
+        if (!userId) {
+            console.error("User ID is not set.");
+            return;
+        }
+        try {
+            const [tripsResponse, favoritesResponse] = await Promise.all([
+                axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/users/${userId}`),
+                axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/shared-trips/users/${userId}`)
+            ]);
+            const tripsData = tripsResponse.data.data;
+            const favoritesData = favoritesResponse.data.data;
+            const tripsWithFavorites = tripsData.map(trip => {
+                const favorite = favoritesData.find(fav => fav.trip_id === trip.trip_id);
+                return {
+                    ...trip,
+                    favorite: favorite ? favorite.favorite : false
+                };
+            });
+            const sortedTrips = tripsWithFavorites.sort((a, b) => b.favorite - a.favorite);
+            setTrips(sortedTrips);
+
+        } catch (err) {
+            console.error(err);
+            setTrips([]);
+        }
+    };
 
     const fetchAllTripLocations = async () => {
         const locations = await Promise.all(
@@ -97,6 +126,12 @@ const TripsDisplayComponent = ({ trips, userId, homeCurrency }) => {
     );
 
     useEffect(() => {
+        if (userId) {
+            fetchUserTrips(); // Fetch trips when userId changes
+        }
+    }, [userId]);
+
+    useEffect(() => {
         if (trips.length > 0) {
             fetchAllTripLocations();
             const initialFavorites = {};
@@ -109,7 +144,7 @@ const TripsDisplayComponent = ({ trips, userId, homeCurrency }) => {
 
     return (
         <div className="trips-display">
-            <div className="row" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginTop:"-30px" }}>
+            <div className="row" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginTop:"-40px" }}>
                 <div className="col">
                     <h1>View Your Trips:</h1>
                 </div>
@@ -137,6 +172,7 @@ const TripsDisplayComponent = ({ trips, userId, homeCurrency }) => {
                     setPopUpVisible={setPopUpVisible}
                     userId={userId}
                     homeCurrency={homeCurrency}
+                    fetchUserTrips={fetchUserTrips}
                 />
             )}
             {filteredTrips.length === 0 ? (
@@ -180,6 +216,7 @@ const TripsDisplayComponent = ({ trips, userId, homeCurrency }) => {
                                             <StarBorderIcon sx={{ color: 'gray', zIndex: 2 }} />
                                         )}
                                     </div>
+                                     <SharedUsersComponent tripId={trip.trip_id} userId={userId} isHomepage={true} />
                                 </CardContent>
                             </CardActionArea>
                         </Card>
