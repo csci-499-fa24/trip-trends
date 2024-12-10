@@ -17,37 +17,35 @@ const ExpenseSuggestionsComponent = ({
     const [currentIndex, setCurrentIndex] = useState(0);
     const cardsPerPage = 2;
 
-    const fetchTransactions = useCallback(
-        async (token, startDate, endDate) => {
-            try {
-                const response = await axios.post(
-                    `${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/transactions`,
-                    {
-                        access_token: token,
-                        start_date: startDate,
-                        end_date: endDate,
-                        count: 100,
-                        offset: 0,
-                    }
-                );
-
-                const transactions = response.data.transactions || [];
-                console.log("Fetched Transactions:", transactions);
-                
-                if (transactions.length === 0) {
-                    console.log("No transactions found in Plaid for the specified range.");
+    const fetchTransactions = useCallback(async (token, startDate, endDate) => {
+        try {
+            const response = await axios.post(
+                `${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/transactions`,
+                {
+                    access_token: token,
+                    start_date: startDate,
+                    end_date: endDate,
+                    count: 100,
+                    offset: 0,
                 }
+            );
 
-                return transactions; 
-            } catch (err) {
-                console.error("Transactions Fetch Error:", err);
-                toast.error("Failed to fetch transactions from Plaid");
-                return [];
+            const transactions = response.data.transactions || [];
+            console.log("Fetched Transactions:", transactions);
+
+            if (transactions.length === 0) {
+                console.log(
+                    "No transactions found in Plaid for the specified range."
+                );
             }
-        },
-        []
-    );
 
+            return transactions;
+        } catch (err) {
+            console.error("Transactions Fetch Error:", err);
+            toast.error("Failed to fetch transactions from Plaid");
+            return [];
+        }
+    }, []);
 
     const fetchSuggestedExpenses = async () => {
         if (!userId) return;
@@ -60,23 +58,34 @@ const ExpenseSuggestionsComponent = ({
             const fetchedExpenses = response.data.data || [];
             console.log("Fetched Expenses from Server:", fetchedExpenses);
 
-            const startDate = dayjs(tripData?.data?.start_date).format("YYYY-MM-DD");
-            const endDate = dayjs(tripData?.data?.end_date).format("YYYY-MM-DD");
+            const startDate = dayjs(tripData?.data?.start_date).format(
+                "YYYY-MM-DD"
+            );
+            const endDate = dayjs(tripData?.data?.end_date).format(
+                "YYYY-MM-DD"
+            );
 
-            const token = localStorage.getItem("access_token"); 
+            const token = localStorage.getItem("access_token");
             if (!token) {
                 toast.error("Plaid token not found.");
                 return;
             }
 
-            const plaidTransactions = await fetchTransactions(token, startDate, endDate);
+            const plaidTransactions = await fetchTransactions(
+                token,
+                startDate,
+                endDate
+            );
 
             console.log("Plaid Transactions:", plaidTransactions);
 
             const combinedExpenses = [...plaidTransactions, ...fetchedExpenses];
-            console.log("Combined Expenses (Plaid + Server):", combinedExpenses);
+            console.log(
+                "Combined Expenses (Plaid + Server):",
+                combinedExpenses
+            );
 
-            setSuggestedExpenses(combinedExpenses.slice(0, 10)); 
+            setSuggestedExpenses(combinedExpenses.slice(0, 10));
         } catch (err) {
             console.error("Error fetching suggested expenses:", err);
             setError("Failed to load suggested expenses");
@@ -95,7 +104,7 @@ const ExpenseSuggestionsComponent = ({
         const plaidStatus = localStorage.getItem("plaid_connected");
         if (plaidStatus === "true") {
             setIsPlaidConnected(true);
-            fetchSuggestedExpenses(); 
+            fetchSuggestedExpenses();
         } else {
             setIsPlaidConnected(false);
         }
@@ -170,10 +179,13 @@ const ExpenseSuggestionsComponent = ({
     };
 
     if (isPlaidConnected === false) {
-        return <div className="expense-suggestions-container">
-            <br></br>
-            <h2>Suggested Expenses</h2>
-            {error || "Please connect your bank account using Plaid."}</div>;
+        return (
+            <div className="expense-suggestions-container">
+                <br></br>
+                <h2>Suggested Expenses</h2>
+                {error || "Please connect your bank account using Plaid."}
+            </div>
+        );
     }
 
     if (suggestedExpenses.length === 0) {
@@ -181,7 +193,7 @@ const ExpenseSuggestionsComponent = ({
             <div style={{ textAlign: "center", fontSize: "0.875rem" }}>
                 <p>No recent transactions found.</p>
             </div>
-        ); 
+        );
     }
 
     if (loading) return <div>Loading suggested expenses...</div>;
