@@ -4,7 +4,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../../css/uploadImage.css';
 
-const TripImageComponent = ({ tripId }) => {
+const TripImageComponent = ({ tripId, onUpload }) => {
     const [error, setError] = useState(null);
     const fileInputRef = useRef();
     const [isLoading, setIsLoading] = useState(false);
@@ -86,9 +86,7 @@ const TripImageComponent = ({ tripId }) => {
 
             toast.success('Images uploaded successfully!', { autoClose: 3000 });
             console.log('Images uploaded successfully:', response.data);
-            setTimeout(() => {
-                window.location.reload();
-            }, 1500);
+            onUpload();
         } catch (error) {
             console.error('Error uploading images:', error);
             toast.error('Failed to upload images. Please try again.', { autoClose: 3000 });

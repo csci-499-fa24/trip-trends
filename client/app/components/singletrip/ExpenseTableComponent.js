@@ -240,7 +240,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                                             )}
                                             </td>
                                             <td>
-                                                <div className="icon-div" tooltip="Edit Trip" tabIndex="0">
+                                            <div className="icon-div" tooltip="Edit Trip" tabIndex="0">
                                                     <div className="icon-SVG">
                                                         <svg
                                                             onClick={() => handleEditClick(expense)}
@@ -283,7 +283,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                                                                                     paddingLeft: '35px',
                                                                                     paddingRight: '10px',
                                                                                     width: '100%',
-                                                                                    textAlign: 'left'
+                                                                                    textAlign: 'left',
                                                                                 }}
                                                                             />
                                                                             {/* currency symbol */}
@@ -307,43 +307,69 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                                                                                 onChange={handleCurrencyChange}
                                                                                 required
                                                                             >
-                                                                                <option value="USD">USD</option>
-                                                                                {otherCurrencies.map((currency) => (
-                                                                                    <option key={currency} value={currency}>
-                                                                                        {currency}
-                                                                                    </option>
+                                                                                <option value="" disabled>Select Currency</option>
+
+                                                                                {/* Display the selected currency at the top if it exists */}
+                                                                                {localFormCurrency && (
+                                                                                    <option value={localFormCurrency}>{localFormCurrency}</option>
+                                                                                )}
+
+                                                                                {/* Recommended currencies */}
+                                                                                {otherCurrencies
+                                                                                    .filter((code) => code !== localFormCurrency)
+                                                                                    .map((code, index) => (
+                                                                                        <option key={`other-${index}`} value={code}>
+                                                                                            {code}
+                                                                                        </option>
+                                                                                    ))}
+
+                                                                                {/* USD as a fallback option */}
+                                                                                <optgroup label="Other">
+                                                                                    <option value="USD">USD</option>
+                                                                                    {currencyCodes
+                                                                                        .filter(
+                                                                                            (code) =>
+                                                                                                code !== localFormCurrency &&
+                                                                                                code !== "USD" &&
+                                                                                                !otherCurrencies.includes(code)
+                                                                                        )
+                                                                                        .map((code) => (
+                                                                                            <option key={code} value={code}>
+                                                                                                {code}
+                                                                                            </option>
+                                                                                        ))}
+                                                                                </optgroup>
+                                                                            </select>
+                                                                        </label>
+
+                                                                    </div>
+                                                                    <div className="field-pair">
+                                                                        <label className="edit-expense-field-label">
+                                                                            Category:
+                                                                            <select
+                                                                                name="category"
+                                                                                value={selectedExpense.category}
+                                                                                onChange={handleEditChange}
+                                                                                required
+                                                                            >
+                                                                                <option value="">Select Category</option>
+                                                                                {expenseCategories.map((category) => (
+                                                                                    <option key={category} value={category}>{category}</option>
                                                                                 ))}
                                                                             </select>
                                                                         </label>
+                                                                        <label className="edit-expense-field-label">
+                                                                            Date:
+                                                                            <input
+                                                                                type="date"
+                                                                                name="posted"
+                                                                                value={selectedExpense.posted}
+                                                                                onChange={handleEditChange}
+                                                                                required
+                                                                            />
+                                                                        </label>
                                                                     </div>
-                                                                    <div className="field-pair">
                                                                     <label className="edit-expense-field-label">
-                                                                        Category:
-                                                                        <select
-                                                                            name="category"
-                                                                            value={selectedExpense.category}
-                                                                            onChange={handleEditChange}
-                                                                            required
-                                                                        >
-                                                                            {expenseCategories.map((category, idx) => (
-                                                                                <option key={idx} value={category}>
-                                                                                    {category}
-                                                                                </option>
-                                                                            ))}
-                                                                        </select>
-                                                                    </label>
-                                                                    <label className="edit-expense-field-label">
-                                                                        Date:
-                                                                        <input
-                                                                            type="date"
-                                                                            name="posted"
-                                                                            value={selectedExpense.posted}
-                                                                            onChange={handleEditChange}
-                                                                            required
-                                                                        />
-                                                                    </label>
-                                                                    </div>
-                                                                    <label className="new-expense-field-label">
                                                                         Notes:
                                                                         <input
                                                                             type="text"
@@ -352,7 +378,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                                                                             onChange={handleEditChange}
                                                                         />
                                                                     </label>
-                                                                   <div className='container'>
+                                                                    <div className='container'>
                                                                         <div className='row'>
                                                                             <div className='col'>
                                                                                 <button type="submit" className="submit-edit-expense-button">Edit</button>
