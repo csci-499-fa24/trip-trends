@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import TripImageComponent from '../components/singletrip/TripImageComponent';
 import UploadTripImage from '../components/singletrip/UploadTripImage';
 import HeaderComponent from '../components/HeaderComponent';
@@ -16,6 +16,7 @@ function Gallery() {
     const [tripName, setTripName] = useState('');
     const [loading, setLoading] = useState(true);
     const [loadingTimedOut, setLoadingTimedOut] = useState(false);
+    const tripImageRef = useRef();
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {
@@ -74,6 +75,10 @@ function Gallery() {
         setLoading(false);
     }, []);
 
+    const handleImageUpload = () => {
+        tripImageRef.current.refetchImages();
+    };
+
     if (loading && !loadingTimedOut) {
         return (
             <div>
@@ -86,7 +91,7 @@ function Gallery() {
                 <header className="top-icon-bar-header" style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                     <div className="icon-div" tooltip="Gallery" tabIndex="0" style={{ display: 'flex', cursor: 'pointer' }}>
                         {userRole === 'owner' || userRole === 'editor' ? (
-                            <UploadTripImage tripId={tripId} />
+                            <UploadTripImage tripId={tripId} onUpload={handleImageUpload}/>
                         ) : null}
                     </div>
                 </header> 
@@ -107,11 +112,11 @@ function Gallery() {
                 <header className="top-icon-bar-header" style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                     <div className="icon-div" tooltip="Gallery" tabIndex="0" style={{ display: 'flex', cursor: 'pointer' }}>
                         {userRole === 'owner' || userRole === 'editor' ? (
-                            <UploadTripImage tripId={tripId} />
+                            <UploadTripImage tripId={tripId} onUpload={handleImageUpload} />
                         ) : null}
                     </div>
                 </header> 
-                <TripImageComponent tripId={tripId} />
+                <TripImageComponent tripId={tripId} ref={tripImageRef}/>
             </div>
         );
     }
@@ -128,11 +133,11 @@ function Gallery() {
                 
                 <div className="icon-div" tooltip="Gallery" tabIndex="0" style={{ display: 'flex', cursor: 'pointer' }}>
                     {userRole === 'owner' || userRole === 'editor' ? (
-                        <UploadTripImage tripId={tripId} />
+                        <UploadTripImage tripId={tripId} onUpload={handleImageUpload} />
                     ) : null}
                 </div>
             </header>
-            <TripImageComponent tripId={tripId} />
+            <TripImageComponent tripId={tripId} ref={tripImageRef}/>
         </div>
     )
 }

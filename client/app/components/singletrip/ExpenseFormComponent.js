@@ -56,6 +56,8 @@ const ExpenseFormComponent = ({
                         <br></br>
                         <div className="expense-row-container">
                             <br></br>
+
+                            {/* Expense Form */}
                             <form onSubmit={submitNewExpense}>
                                 <label className="new-expense-field-label">
                                     Expense Name:
