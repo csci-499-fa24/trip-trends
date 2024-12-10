@@ -46,6 +46,7 @@
     width: 25px !important;
     height: 25px !important;
     margin-left: 0px !important;
+    margin-right: 5px;
 }
 
 .size-6 {
@@ -57,7 +58,7 @@
 .button-text {
     display: inline-block;
     color: black;
-    font-weight: none;
+    font-weight: bold;
 }
 
 .receipt-upload-form {
@@ -72,10 +73,10 @@
 .receipt-upload-container.hidden {
     box-shadow: none;
     background-color: transparent;
-    position: absolute; /* Keep independent positioning */
-    top: 5%; /* Distance from the top */
-    left: 40px; /* Distance from the left */
-    width: fit-content; /* Adjust width to fit content */
+    position: absolute;
+    top: 5%;
+    left: 40px;
+    width: fit-content;
     padding: 15px 30px;
     border: none;
     border-radius: 10px;
@@ -102,10 +103,9 @@
     border: 1px solid #ccc;
     border-radius: 8px;
     padding: 10px;
-    width: 100%;
-    max-width: 320px;
     font-size: 14px;
-    transition: border-color 0.3s ease;
+    flex-grow: 1;
+    max-width: 300px;
 }
 
 .receipt-preview-container {
@@ -135,4 +135,10 @@
     top: 10%;
     left: 35px;
     z-index: 10;
+}
+
+.input-button-container {
+    display: flex; 
+    align-items: center;
+    gap: 10px;
 }
