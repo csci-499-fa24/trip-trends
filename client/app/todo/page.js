@@ -106,7 +106,7 @@ function TodoList() {
             axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/lists/create-item/${tripId}`, itemBody)
                 .then(response => {
                     console.log(response.data)
-                    toast.success("Successful added a new item to your list!");
+                    toast.success("Successfully added a new item to your list!");
                     setPurchaseList(prevList => [...prevList, response.data.data]);
                     setNewPurchaseItem("");
                 })
@@ -130,7 +130,7 @@ function TodoList() {
             axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/lists/create-item/${tripId}`, itemBody)
                 .then(response => {
                     console.log(response.data)
-                    toast.success("Successful added a new item to your list!");
+                    toast.success("Successfully added a new item to your list!");
                     setSightseeingList(prevList => [...prevList, response.data.data]);
                     setNewSightItem("");
                 })
@@ -322,7 +322,7 @@ function TodoList() {
                         </div>
                         <br></br>
                         {/* Purchase List */}
-                        <h3>Your Purchase List</h3>
+                        <h3>Purchase List</h3>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
                                 {purchaseList.length === 0 ? (
@@ -406,7 +406,7 @@ function TodoList() {
                         </div>
                         <br></br>
                         {/* Sightseeing List */}
-                        <h3>Your Sightseeing List</h3>
+                        <h3>Sightseeing List</h3>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
                                 {

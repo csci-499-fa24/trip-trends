@@ -81,6 +81,7 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     margin: 10px;
     width: 100%;
+
 }
 
 .new-expense-modal{
@@ -476,10 +477,6 @@
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
-}
-
-.filter-popup-close:hover {
-    color: black;
 }
 
 .filter-popup-title {
@@ -902,6 +899,7 @@
     align-items: center;
     padding: 5px;
     padding-right: 0px;
+    margin-top: 40px;
 }
 
 @media (max-width: 929px) {
@@ -1101,7 +1099,6 @@
     background-color: rgba(123, 117, 117, 0.123);
     border-color: rgba(0, 0, 0, 0.8);
 }
-
 
 /* Expense suggestions styling */
 .expense-suggestions-container {

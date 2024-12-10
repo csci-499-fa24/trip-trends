@@ -64,7 +64,7 @@ const TripImageComponent = ({ tripId }) => {
             )}
             {/* Conditional rendering for empty images */}
             {images.length === 0 && !error ? (
-                <p style={{ textAlign: 'center', marginTop: '20px' }}>No images to display...</p>
+                <p style={{ textAlign: 'center', marginTop: '20px' }}>No images to display.</p>
             ) : (
                 <div className="gallery-grid">
                     {images.map(image => (

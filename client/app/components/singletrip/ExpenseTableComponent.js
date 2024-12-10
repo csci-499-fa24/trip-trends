@@ -14,6 +14,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
     const [expensesWithReceipt, setExpensesWithReceipt] = useState({});
     const [modalImage, setModalImage] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isPopUpVisible, setPopUpVisible] = useState(false);
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {
@@ -385,7 +386,7 @@ const ExpenseTableComponent = ({ tripData, tripId, tripLocations, expensesToDisp
                     {isModalOpen && (
                         <div className="receipt-modal-overlay">
                             <div className="receipt-modal">
-                                <button className="close-modal-button" onClick={handleCloseModal}>X</button>
+                                <span className="close-modal-button" onClick={() => setPopUpVisible(false), handleCloseModal}>&times;</span>
                                 <img src={modalImage} alt="Receipt" className="receipt-image" />
                             </div>
                         </div>

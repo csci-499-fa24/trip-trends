@@ -977,6 +977,7 @@ function Singletrip() {
                                         selectedCurrency={selectedCurrency}
                                         setSelectedCurrency={setSelectedCurrency}
                                         otherCurrencies={otherCurrencies}
+                                        setPopUpVisible={setPopUpVisible}
                                     />
                                 </div>
                                 <br></br>
