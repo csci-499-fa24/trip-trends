@@ -126,23 +126,23 @@ const deleteTrip = async (req, res) => {
 // DOWNLOAD trip data in various formats (CSV, PDF, XML)
 const downloadTripData = async (req, res) => {
     const tripId = req.params.tripId;
-    const format = req.query.format;
+    const format = req.query.format || 'csv'; // Default to CSV if no format is provided
 
     try {
-        // Fetch trip and expense data
         const trip = await Trip.findByPk(tripId);
         if (!trip) {
             return res.status(404).json({ message: "Trip not found" });
         }
 
         const expenses = await Expense.findAll({ where: { trip_id: tripId } });
+
+        // Prepare trip data
         const tripData = {
             name: trip.name,
             start_date: trip.start_date,
             end_date: trip.end_date,
             budget: trip.budget,
         };
-
         const expenseData = expenses.map(expense => ({
             name: expense.name,
             amount: expense.amount,
@@ -152,31 +152,27 @@ const downloadTripData = async (req, res) => {
             notes: expense.notes
         }));
 
-        const filename = tripData.name.replace(/[^a-zA-Z0-9.]/g, '');
-
-        // Handle CSV format
         if (format === 'csv') {
+            // Generate CSV
             const tripFields = ['name', 'start_date', 'end_date', 'budget'];
-            const expenseFields = ['name', 'amount', 'category', 'currency', 'posted', 'notes'];
-
             const csvTrip = parse(tripData, { fields: tripFields });
+
+            const expenseFields = ['name', 'amount', 'category', 'currency', 'posted', 'notes'];
             const csvExpenses = parse(expenseData, { fields: expenseFields });
+
             const combinedCSV = `${csvTrip}\n\nExpense Data:\n${csvExpenses}`;
-
-            res.setHeader('Content-Disposition', `attachment; filename=${filename}.csv`);
+            res.setHeader('Content-Disposition', `attachment; filename=trip_${tripId}.csv`);
             res.setHeader('Content-Type', 'text/csv');
-            return res.status(200).send(combinedCSV);
-        }
+            res.status(200).send(combinedCSV);
 
-        // Handle PDF format
-        if (format === 'pdf') {
+        } else if (format === 'pdf') {
+            // Generate PDF
             const doc = new PDFDocument();
-            res.setHeader('Content-Disposition', `attachment; filename=${filename}.pdf`);
+            res.setHeader('Content-Disposition', `attachment; filename=${tripData.name}.pdf`);
             res.setHeader('Content-Type', 'application/pdf');
-
             doc.pipe(res);
-            doc.fontSize(18).font('Helvetica-Bold').text(`${filename}`, { align: 'center', underline: true });
-            doc.fontSize(16).font('Helvetica').text(`Trip Duration: ${tripData.start_date} to ${tripData.end_date}`, { align: 'center' });
+            doc.fontSize(18).font('Helvetica-Bold').text(`${tripData.name}`, { align: 'center', underline: true });
+            doc.fontSize(16).font('Helvetica').text(`Trip Duration: ${(tripData.start_date)} to ${(tripData.end_date)}`, { align: 'center' });
             doc.text(`Budget: ${tripData.budget}`, { align: 'center' });
             doc.moveDown().text('Your Expenses:', { align: 'center', underline: true });
 
@@ -189,12 +185,9 @@ const downloadTripData = async (req, res) => {
             });
 
             doc.end();
-            res.status(200).send();
-            return;
-        }
 
-        // Handle XML format
-        if (format === 'xml') {
+        } else if (format === 'xml') {
+            // Generate XML
             const xmlData = {
                 trip: tripData,
                 expenses: { expense: expenseData }
@@ -203,9 +196,12 @@ const downloadTripData = async (req, res) => {
             const builder = new xml2js.Builder();
             const xml = builder.buildObject(xmlData);
 
-            res.setHeader('Content-Disposition', `attachment; filename=${filename}.xml`);
+            res.setHeader('Content-Disposition', `attachment; filename=trip_${tripId}.xml`);
             res.setHeader('Content-Type', 'application/xml');
-            return res.status(200).send(xml);
+            res.status(200).send(xml);
+
+        } else {
+            res.status(400).json({ message: "Invalid format requested" });
         }
     } catch (err) {
         console.error('Error generating download:', err);
