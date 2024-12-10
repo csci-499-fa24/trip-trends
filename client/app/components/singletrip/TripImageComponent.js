@@ -14,9 +14,11 @@ const TripImageComponent = forwardRef(({ tripId }, ref) => {
             if (tripId) {
                 const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/trips/${tripId}/images`);
                     if (response.data.length === 0) {
+                        setImages([]); 
                         setError("No images to display.");
                     } else {
                         setImages(response.data);
+                        setError(null);
                     }
                 } else {
                     console.error("Trip ID is not defined");
@@ -52,6 +54,7 @@ const TripImageComponent = forwardRef(({ tripId }, ref) => {
                 console.log(response.data);
                 toast.success("Successfully deleted your image.");
                 setImages(prevImages => prevImages.filter(image => image.image_id !== imageID));
+                if (images.length === 1) setError("No images to display.");
             })
             .catch(error => {
                 toast.error("Couldn't deleted your image.");
