@@ -993,6 +993,7 @@ function Singletrip() {
                         userId={userId}
                         currentTripId={tripId}
                         onTransferSuccess={handleExpenseTransferSuccess}
+                        tripData={tripData}
                     />
 
                     {/* Create a expense popup form */}

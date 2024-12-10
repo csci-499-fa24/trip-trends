@@ -57,6 +57,9 @@ const ExpenseFormComponent = ({
                         <div className="expense-row-container">
                             <br></br>
 
+                            <div className="upload-section">
+                                <ReceiptImageComponent tripId={tripId} handleFormData={handleFormData} updateIsUploadHidden={updateIsUploadHidden} />
+                            </div>
                             {/* Expense Form */}
                             <form onSubmit={submitNewExpense}>
                                 <label className="new-expense-field-label">
@@ -187,10 +190,6 @@ const ExpenseFormComponent = ({
                                 </label>
                                 <button type="submit" className="submit-new-expense-button">Create</button>
                             </form>
-                            <div className="upload-section">
-                                <ReceiptImageComponent tripId={tripId} handleFormData={handleFormData} updateIsUploadHidden={updateIsUploadHidden} />
-                            </div>
-
                         </div>
                     </div>
                 </div>

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
+import dayjs from "dayjs";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -7,32 +8,106 @@ const ExpenseSuggestionsComponent = ({
     userId,
     currentTripId,
     onTransferSuccess,
+    tripData,
 }) => {
     const [suggestedExpenses, setSuggestedExpenses] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [isPlaidConnected, setIsPlaidConnected] = useState(false);
     const [error, setError] = useState(null);
     const [currentIndex, setCurrentIndex] = useState(0);
     const cardsPerPage = 2;
 
-    useEffect(() => {
-        const fetchSuggestedExpenses = async () => {
-            if (!userId) return;
+    const fetchTransactions = useCallback(async (token, startDate, endDate) => {
+        try {
+            const response = await axios.post(
+                `${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/transactions`,
+                {
+                    access_token: token,
+                    start_date: startDate,
+                    end_date: endDate,
+                    count: 100,
+                    offset: 0,
+                }
+            );
 
-            setLoading(true);
-            try {
-                const response = await axios.get(
-                    `${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/trips/-1?userId=${userId}&limit=10`
+            const transactions = response.data.transactions || [];
+            console.log("Fetched Transactions:", transactions);
+
+            if (transactions.length === 0) {
+                console.log(
+                    "No transactions found in Plaid for the specified range."
                 );
-                setSuggestedExpenses(response.data.data || []);
-            } catch (err) {
-                console.error("Error fetching suggested expenses:", err);
-                setError("Failed to load suggested expenses");
-            } finally {
-                setLoading(false);
             }
-        };
 
-        fetchSuggestedExpenses();
+            return transactions;
+        } catch (err) {
+            console.error("Transactions Fetch Error:", err);
+            toast.error("Failed to fetch transactions from Plaid");
+            return [];
+        }
+    }, []);
+
+    const fetchSuggestedExpenses = async () => {
+        if (!userId) return;
+
+        setLoading(true);
+        try {
+            const response = await axios.get(
+                `${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/trips/-1?userId=${userId}&limit=10`
+            );
+            const fetchedExpenses = response.data.data || [];
+            console.log("Fetched Expenses from Server:", fetchedExpenses);
+
+            const startDate = dayjs(tripData?.data?.start_date).format(
+                "YYYY-MM-DD"
+            );
+            const endDate = dayjs(tripData?.data?.end_date).format(
+                "YYYY-MM-DD"
+            );
+
+            const token = localStorage.getItem("access_token");
+            if (!token) {
+                toast.error("Plaid token not found.");
+                return;
+            }
+
+            const plaidTransactions = await fetchTransactions(
+                token,
+                startDate,
+                endDate
+            );
+
+            console.log("Plaid Transactions:", plaidTransactions);
+
+            const combinedExpenses = [...plaidTransactions, ...fetchedExpenses];
+            console.log(
+                "Combined Expenses (Plaid + Server):",
+                combinedExpenses
+            );
+
+            setSuggestedExpenses(combinedExpenses.slice(0, 10));
+        } catch (err) {
+            console.error("Error fetching suggested expenses:", err);
+            setError("Failed to load suggested expenses");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (userId && tripData) {
+            fetchSuggestedExpenses();
+        }
+    }, [userId, tripData]);
+
+    useEffect(() => {
+        const plaidStatus = localStorage.getItem("plaid_connected");
+        if (plaidStatus === "true") {
+            setIsPlaidConnected(true);
+            fetchSuggestedExpenses();
+        } else {
+            setIsPlaidConnected(false);
+        }
     }, [userId]);
 
     const transferExpense = async (expenseId) => {
@@ -68,7 +143,9 @@ const ExpenseSuggestionsComponent = ({
             await axios.delete(
                 `${process.env.NEXT_PUBLIC_SERVER_URL}/api/expenses/${expense.expense_id}`
             );
+
             toast.success("Expense transferred successfully");
+
             console.log(
                 "Expense transferred:",
                 createExpenseResponse.data.data
@@ -76,8 +153,6 @@ const ExpenseSuggestionsComponent = ({
             setSuggestedExpenses((prev) =>
                 prev.filter((expense) => expense.expense_id !== expenseId)
             );
-
-            
 
             if (onTransferSuccess) {
                 onTransferSuccess();
@@ -102,6 +177,16 @@ const ExpenseSuggestionsComponent = ({
                 suggestedExpenses.length
         );
     };
+
+    if (isPlaidConnected === false) {
+        return (
+            <div className="expense-suggestions-container">
+                <br></br>
+                <h2>Suggested Expenses</h2>
+                {error || "Please connect your bank account using Plaid."}
+            </div>
+        );
+    }
 
     if (suggestedExpenses.length === 0) {
         return (

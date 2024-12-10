@@ -4,7 +4,6 @@ const FormData = require("form-data");
 const crypto = require("crypto");
 const { time } = require("console");
 const { PlaidApi, Configuration, PlaidEnvironments } = require("plaid");
-const dayjs = require("dayjs");
 // const { fromBuffer } = require('file-type');
 
 // POST new expense data with image handling
@@ -281,11 +280,21 @@ const transferExpense = async (req, res) => {
     try {
         // find expense by id
         const expense = await Expense.findByPk(expenseId);
-        if (expense && expense.trip_id === fromTripId) {
-            expense.trip_id = toTripId;
-            await expense.save();
-            res.status(500).json({ message: 'Expense transferred successfully' });
+        
+        if (!expense) {
+            return res.status(404).json({ error: "Expense not found" });
         }
+        
+        if (expense.trip_id !== fromTripId) {
+            return res.status(400).json({
+                error: "Expense does not belong to the specified fromTripId"
+            });
+        }
+        
+        expense.trip_id = toTripId;
+        await expense.save();
+        
+        res.status(200).json({ message: 'Expense transferred successfully' });
     } catch (err) {
         console.error(err);
         res.status(500).json({
@@ -373,7 +382,7 @@ const exchangePublicToken = async (req, res) => {
         console.error(error);
         res.status(500).json({
             error: "Failed to exchange public token",
-            details: err.message,
+            details: error.message,
         });
     }
 };
@@ -381,8 +390,8 @@ const exchangePublicToken = async (req, res) => {
 const getTransactions = async (req, res) => {
     const {
         access_token,
-        start_date = dayjs().subtract(90, "days").format("YYYY-MM-DD"),
-        end_date = dayjs().format("YYYY-MM-DD"),
+        start_date,
+        end_date,
         count = 100,
         offset = 0,
     } = req.body;
@@ -409,11 +418,11 @@ const getTransactions = async (req, res) => {
     } catch (error) {
         console.error(
             "Error fetching transactions:",
-            error.response || error.message
+            error.response || error
         );
         res.status(500).json({
             error: "Failed to fetch transactions",
-            details: err.message,
+            details: error.response ? error.response.data : "Unknown error",
         });
     }
 };

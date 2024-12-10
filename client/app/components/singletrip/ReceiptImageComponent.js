@@ -234,7 +234,7 @@ const ReceiptImageComponent = ({ tripId, handleFormData, updateIsUploadHidden })
                 } else {
                     progressBarRef.current.set(currentProgress);
                 }
-            }, 140); 
+            }, 150); 
         });
     };
 
@@ -242,31 +242,6 @@ const ReceiptImageComponent = ({ tripId, handleFormData, updateIsUploadHidden })
         setIsHidden(!isHidden);
         handleHidingImgUploadUpdate()
     }
-
-    // const handleReceiptUpload = async (event) => {
-    //     event.preventDefault();
-    //     if (fileInput.current && fileInput.current.files.length > 0) {
-    //         const imageFile = fileInput.current.files[0]; // get the first file chosen
-
-    //         if (imageFile) { 
-    //             // const formData = new FormData();
-    //             // formData.append('image', imageFile); // 'image' key
-    //             // handleFormData(formData); // passed to expense form component
-
-    //             const reader = new FileReader();
-    //             reader.onloadend = () => {
-    //                 setImageSrc(reader.result); // base64 data URL
-    //             };
-    //             reader.readAsDataURL(imageFile);
-
-    //             // toast.success("Receipt uploaded successfully!");
-    //         }
-    //     }
-    //     else {
-    //         console.error('No file chosen');
-    //         toast.error("Please choose a file to upload.");
-    //     }
-    // };
 
     const handleAutoPreview = (event) => {
         if (fileInput.current && fileInput.current.files.length > 0) {
@@ -286,29 +261,31 @@ const ReceiptImageComponent = ({ tripId, handleFormData, updateIsUploadHidden })
     };
     
     return (
-        <div className={`receipt-upload-container ${isHidden ? 'hidden' : ''}`}>
-            {/* Icon to open up receipt upload container */}
-            <div className="top-left-button-container">
-            <button 
-                onClick={toggleHideBar} 
-                className="receipt-upload-button">
-                <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
-                    strokeWidth="1.3" 
-                    stroke="currentColor" 
+    <div>
+        {/* Icon to open up receipt upload container */}
+        <div className={`receipt-button-container ${isHidden ? 'hidden' : ''}`}>
+            <button
+                onClick={toggleHideBar}
+                className={`receipt-upload-button ${isHidden ? 'hidden' : ''}`}>
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.3"
+                    stroke="currentColor"
                     className="size-6"
                 >
-                    <path 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" 
-                        d="m9 14.25 6-6m4.5-3.493V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0c1.1.128 1.907 1.077 1.907 2.185ZM9.75 9h.008v.008H9.75V9Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm4.125 4.5h.008v.008h-.008V13.5Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" 
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="m9 14.25 6-6m4.5-3.493V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0c1.1.128 1.907 1.077 1.907 2.185ZM9.75 9h.008v.008H9.75V9Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm4.125 4.5h.008v.008h-.008V13.5Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
                     />
                 </svg>
                 <span className="button-text">Receipt</span>
             </button>
         </div>
+    
+        <div className={`receipt-upload-container ${isHidden ? 'hidden' : ''}`}>
             <div className={`receipt-upload-form ${isHidden ? 'hidden' : ''}`}>
                 <h6 className="receipt-upload-title">Upload a Receipt</h6>
                 <form encType="multipart/form-data" className="receipt-upload-form-content">
@@ -343,12 +320,13 @@ const ReceiptImageComponent = ({ tripId, handleFormData, updateIsUploadHidden })
                             className="receipt-preview-image"
                         />
                     ) : (
-                        <p>No receipt preview available.</p>
+                        <p></p>
                     )}
                 </div>
                 {/* Progress Bar */}
                 <div id="progress-container" className="progress-bar-container"></div>
             </div>
+        </div>
         </div>
     
     );
