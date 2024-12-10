@@ -63,14 +63,19 @@ const DownloadTripComponent = ({ tripData, tripId }) => {
             {isModalOpen && (
                 <div className="modal-pdf">
                     <div className="modal-files">
-                        <h3>Select Download Format</h3>
+                        <h3 style={{marginBottom: '-30px'}}>Select Download Format</h3>
+                        <span
+                            className="download-popup-close"
+                            onClick={() => setIsModalOpen(false)}
+                        >
+                            &times;
+                        </span>
                         <button onClick={() => downloadFile('csv')}>CSV</button>
                         <br></br>
                         <button onClick={() => downloadFile('pdf')}>PDF</button>
                         <br></br>
                         <button onClick={() => downloadFile('xml')}>XML</button>
-                        <br></br>
-                        <button onClick={() => setIsModalOpen(false)} className="close-btn">Cancel</button>
+                        {/* <button onClick={() => setIsModalOpen(false)} className="close-btn">Cancel</button> */}
                     </div>
                 </div>
             )}

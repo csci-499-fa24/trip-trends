@@ -28,6 +28,16 @@
     color: #333;
 }
 
+.download-popup-close {
+    position: relative;
+    top: -2px;
+    left: -128px;
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
 .modal-files button {
     background-color: var(--lightgreen);
     color: white;
