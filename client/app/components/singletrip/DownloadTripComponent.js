@@ -34,8 +34,8 @@ const DownloadTripComponent = ({ tripData, tripId }) => {
             link.parentNode.removeChild(link);
             toast.success(`Trip data downloaded successfully as ${format.toUpperCase()}!`);
         } catch (error) {
-            console.error(`Error downloading trip data in ${format} format:`, error);
-            toast.error(`Error downloading trip data in ${format} format. Please try again.`);
+            console.error(`Error downloading trip data in ${format.toUpperCase()} format:`, error);
+            toast.error(`Error downloading trip data in ${format.toUpperCase()} format. Please try again.`);
         } finally {
             setIsModalOpen(false); // Close modal after download
         }
@@ -64,7 +64,7 @@ const DownloadTripComponent = ({ tripData, tripId }) => {
                 <div className="modal-pdf">
                     <div className="modal-files">
                         <h3>Select Download Format</h3>
-                        <button onClick={() => downloadFile('csv')}>TSV</button>
+                        <button onClick={() => downloadFile('csv')}>CSV</button>
                         <br></br>
                         <button onClick={() => downloadFile('pdf')}>PDF</button>
                         <br></br>
